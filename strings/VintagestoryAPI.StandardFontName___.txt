@@ -1,0 +1,38 @@
+Vintagestory.API.Client/GuiStyle.cs-254-		HalfPadding = 5.0;
+Vintagestory.API.Client/GuiStyle.cs-255-		DialogToScreenPadding = 10.0;
+Vintagestory.API.Client/GuiStyle.cs-256-		TitleBarHeight = 31.0;
+Vintagestory.API.Client/GuiStyle.cs-257-		DialogBGRadius = 1.0;
+Vintagestory.API.Client/GuiStyle.cs-258-		ElementBGRadius = 1.0;
+Vintagestory.API.Client/GuiStyle.cs-259-		LargeFontSize = 40.0;
+Vintagestory.API.Client/GuiStyle.cs-260-		NormalFontSize = 30.0;
+Vintagestory.API.Client/GuiStyle.cs-261-		SubNormalFontSize = 24.0;
+Vintagestory.API.Client/GuiStyle.cs-262-		SmallishFontSize = 20.0;
+Vintagestory.API.Client/GuiStyle.cs-263-		SmallFontSize = 16.0;
+Vintagestory.API.Client/GuiStyle.cs-264-		DetailFontSize = 14.0;
+Vintagestory.API.Client/GuiStyle.cs-265-		DecorativeFontName = "Lora";
+Vintagestory.API.Client/GuiStyle.cs:266:		StandardFontName = "sans-serif";
+Vintagestory.API.Client/GuiStyle.cs-267-		ColorTime1 = new double[4]
+Vintagestory.API.Client/GuiStyle.cs-268-		{
+Vintagestory.API.Client/GuiStyle.cs-269-			56.0 / 255.0,
+Vintagestory.API.Client/GuiStyle.cs-270-			232.0 / 255.0,
+Vintagestory.API.Client/GuiStyle.cs-271-			183.0 / 255.0,
+Vintagestory.API.Client/GuiStyle.cs-272-			1.0
+Vintagestory.API.Client/GuiStyle.cs-273-		};
+Vintagestory.API.Client/GuiStyle.cs-274-		ColorTime2 = new double[4]
+Vintagestory.API.Client/GuiStyle.cs-275-		{
+Vintagestory.API.Client/GuiStyle.cs-276-			79.0 / 255.0,
+Vintagestory.API.Client/GuiStyle.cs-277-			98.0 / 255.0,
+Vintagestory.API.Client/GuiStyle.cs-278-			94.0 / 255.0,
+Vintagestory.API.Client/GuiStyle.cs-279-			1.0
+Vintagestory.API.Client/GuiStyle.cs-280-		};
+Vintagestory.API.Client/GuiStyle.cs-281-		ColorRust1 = new double[4]
+Vintagestory.API.Client/GuiStyle.cs-282-		{
+Vintagestory.API.Client/GuiStyle.cs-283-			208.0 / 255.0,
+Vintagestory.API.Client/GuiStyle.cs-284-			91.0 / 255.0,
+Vintagestory.API.Client/GuiStyle.cs-285-			12.0 / 255.0,
+Vintagestory.API.Client/GuiStyle.cs-286-			1.0
+Vintagestory.API.Client/GuiStyle.cs-287-		};
+Vintagestory.API.Client/GuiStyle.cs-288-		ColorRust2 = new double[4]
+Vintagestory.API.Client/GuiStyle.cs-289-		{
+Vintagestory.API.Client/GuiStyle.cs-290-			143.0 / 255.0,
+Vintagestory.API.Client/GuiStyle.cs-291-			47.0 / 255.0,

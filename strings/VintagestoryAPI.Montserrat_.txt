@@ -1,0 +1,38 @@
+Vintagestory.API.Client/GuiStyle.cs-65-
+Vintagestory.API.Client/GuiStyle.cs-66-	/// <summary>
+Vintagestory.API.Client/GuiStyle.cs-67-	/// The font size used for specific details like Item Stack size info. 14.
+Vintagestory.API.Client/GuiStyle.cs-68-	/// </summary>
+Vintagestory.API.Client/GuiStyle.cs-69-	public static double DetailFontSize;
+Vintagestory.API.Client/GuiStyle.cs-70-
+Vintagestory.API.Client/GuiStyle.cs-71-	/// <summary>
+Vintagestory.API.Client/GuiStyle.cs-72-	/// The decorative font type. "Lora".
+Vintagestory.API.Client/GuiStyle.cs-73-	/// </summary>
+Vintagestory.API.Client/GuiStyle.cs-74-	public static string DecorativeFontName;
+Vintagestory.API.Client/GuiStyle.cs-75-
+Vintagestory.API.Client/GuiStyle.cs-76-	/// <summary>
+Vintagestory.API.Client/GuiStyle.cs:77:	/// The standard font "Montserrat".
+Vintagestory.API.Client/GuiStyle.cs-78-	/// </summary>
+Vintagestory.API.Client/GuiStyle.cs-79-	public static string StandardFontName;
+Vintagestory.API.Client/GuiStyle.cs-80-
+Vintagestory.API.Client/GuiStyle.cs-81-	/// <summary>
+Vintagestory.API.Client/GuiStyle.cs-82-	/// Set by the client, loaded from the clientsettings.json. Used by ElementBounds to add a margin for left/right aligned dialogs
+Vintagestory.API.Client/GuiStyle.cs-83-	/// </summary>
+Vintagestory.API.Client/GuiStyle.cs-84-	public static int LeftDialogMargin;
+Vintagestory.API.Client/GuiStyle.cs-85-
+Vintagestory.API.Client/GuiStyle.cs-86-	/// <summary>
+Vintagestory.API.Client/GuiStyle.cs-87-	/// Set by the client, loaded from the clientsettings.json. Used by ElementBounds to add a margin for left/right aligned dialogs
+Vintagestory.API.Client/GuiStyle.cs-88-	/// </summary>
+Vintagestory.API.Client/GuiStyle.cs-89-	public static int RightDialogMargin;
+Vintagestory.API.Client/GuiStyle.cs-90-
+Vintagestory.API.Client/GuiStyle.cs-91-	public static double[] ColorTime1;
+Vintagestory.API.Client/GuiStyle.cs-92-
+Vintagestory.API.Client/GuiStyle.cs-93-	public static double[] ColorTime2;
+Vintagestory.API.Client/GuiStyle.cs-94-
+Vintagestory.API.Client/GuiStyle.cs-95-	public static double[] ColorRust1;
+Vintagestory.API.Client/GuiStyle.cs-96-
+Vintagestory.API.Client/GuiStyle.cs-97-	public static double[] ColorRust2;
+Vintagestory.API.Client/GuiStyle.cs-98-
+Vintagestory.API.Client/GuiStyle.cs-99-	public static double[] ColorRust3;
+Vintagestory.API.Client/GuiStyle.cs-100-
+Vintagestory.API.Client/GuiStyle.cs-101-	public static double[] ColorWood;
+Vintagestory.API.Client/GuiStyle.cs-102-

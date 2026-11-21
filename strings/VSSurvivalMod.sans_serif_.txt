@@ -1,0 +1,38 @@
+Vintagestory.GameContent/TextAreaConfig.cs-12-	[DocumentAsJson("Optional", "165", false)]
+Vintagestory.GameContent/TextAreaConfig.cs-13-	public int MaxHeight = 165;
+Vintagestory.GameContent/TextAreaConfig.cs-14-
+Vintagestory.GameContent/TextAreaConfig.cs-15-	[DocumentAsJson("Optional", "20", false)]
+Vintagestory.GameContent/TextAreaConfig.cs-16-	public float FontSize = 20f;
+Vintagestory.GameContent/TextAreaConfig.cs-17-
+Vintagestory.GameContent/TextAreaConfig.cs-18-	[DocumentAsJson("Optional", "false", false)]
+Vintagestory.GameContent/TextAreaConfig.cs-19-	public bool BoldFont;
+Vintagestory.GameContent/TextAreaConfig.cs-20-
+Vintagestory.GameContent/TextAreaConfig.cs-21-	[DocumentAsJson("Optional", "Top", false)]
+Vintagestory.GameContent/TextAreaConfig.cs-22-	public EnumVerticalAlign VerticalAlign;
+Vintagestory.GameContent/TextAreaConfig.cs-23-
+Vintagestory.GameContent/TextAreaConfig.cs:24:	[DocumentAsJson("Optional", "sans-serif", false)]
+Vintagestory.GameContent/TextAreaConfig.cs-25-	public string FontName = GuiStyle.StandardFontName;
+Vintagestory.GameContent/TextAreaConfig.cs-26-
+Vintagestory.GameContent/TextAreaConfig.cs-27-	[DocumentAsJson("Optional", "0", false)]
+Vintagestory.GameContent/TextAreaConfig.cs-28-	public float textVoxelOffsetX;
+Vintagestory.GameContent/TextAreaConfig.cs-29-
+Vintagestory.GameContent/TextAreaConfig.cs-30-	[DocumentAsJson("Optional", "0", false)]
+Vintagestory.GameContent/TextAreaConfig.cs-31-	public float textVoxelOffsetY;
+Vintagestory.GameContent/TextAreaConfig.cs-32-
+Vintagestory.GameContent/TextAreaConfig.cs-33-	[DocumentAsJson("Optional", "0", false)]
+Vintagestory.GameContent/TextAreaConfig.cs-34-	public float textVoxelOffsetZ;
+Vintagestory.GameContent/TextAreaConfig.cs-35-
+Vintagestory.GameContent/TextAreaConfig.cs-36-	[DocumentAsJson("Optional", "14", false)]
+Vintagestory.GameContent/TextAreaConfig.cs-37-	public float textVoxelWidth = 14f;
+Vintagestory.GameContent/TextAreaConfig.cs-38-
+Vintagestory.GameContent/TextAreaConfig.cs-39-	[DocumentAsJson("Optional", "6.5", false)]
+Vintagestory.GameContent/TextAreaConfig.cs-40-	public float textVoxelHeight = 6.5f;
+Vintagestory.GameContent/TextAreaConfig.cs-41-
+Vintagestory.GameContent/TextAreaConfig.cs-42-	[DocumentAsJson("Optional", "false", false)]
+Vintagestory.GameContent/TextAreaConfig.cs-43-	public bool WithScrollbar;
+Vintagestory.GameContent/TextAreaConfig.cs-44-
+Vintagestory.GameContent/TextAreaConfig.cs-45-	public TextAreaConfig CopyWithFontSize(float fontSize)
+Vintagestory.GameContent/TextAreaConfig.cs-46-	{
+Vintagestory.GameContent/TextAreaConfig.cs-47-		return new TextAreaConfig
+Vintagestory.GameContent/TextAreaConfig.cs-48-		{
+Vintagestory.GameContent/TextAreaConfig.cs-49-			MaxWidth = MaxWidth,

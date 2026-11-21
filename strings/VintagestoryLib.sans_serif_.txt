@@ -1,0 +1,126 @@
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1585-			{
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1586-			case "ar":
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1587-			case "ja":
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1588-			case "ko":
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1589-			case "th":
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1590-				break;
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1591-			default:
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1592-				goto IL_02ac;
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1593-			}
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1594-		}
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1595-		if (RuntimeEnv.OS != OS.Windows)
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1596-		{
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs:1597:			if (lang != startupLanguage && ClientSettings.DefaultFontName == "sans-serif")
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1598-			{
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs:1599:				ClientSettings.DecorativeFontName = "sans-serif";
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1600-				composer.GetRichtext("restartText").SetNewText(Lang.GetL(startupLanguage, "setting-notice-restart") + " " + Lang.GetL(startupLanguage, "setting-notice-lang-communitycreated") + "\n" + Lang.GetL(startupLanguage, "setting-notice-lang-nonwindowsfonts"), CairoFont.WhiteSmallishText());
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1601-			}
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1602-		}
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1603-		else
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1604-		{
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1605-			switch (lang)
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1606-			{
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1607-			case "ko":
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1608-				SetupLocalizedFonts(lang, "Malgun Gothic", "Malgun Gothic");
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1609-				flag = true;
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1610-				break;
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1611-			case "th":
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1612-				SetupLocalizedFonts(lang, "Leelawadee UI Semilight", "Leelawadee UI");
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1613-				flag = true;
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1614-				break;
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1615-			case "ja":
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1616-				SetupLocalizedFonts(lang, "meiryo", "meiryo");
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1617-				flag = true;
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1618-				break;
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1619-			case "zh-cn":
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1620-				SetupLocalizedFonts(lang, "Microsoft YaHei Light", "Microsoft YaHei");
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1621-				flag = true;
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1622-				break;
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1623-			case "zh-tw":
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1624-				SetupLocalizedFonts(lang, "Microsoft JhengHei UI Light", "Microsoft JhengHei UI");
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1625-				flag = true;
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1626-				break;
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1627-			default:
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs:1628:				ClientSettings.DecorativeFontName = "sans-serif";
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1629-				flag = true;
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1630-				break;
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1631-			}
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1632-		}
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1633-		goto IL_032a;
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1634-		IL_032a:
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1635-		if (flag)
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1636-		{
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1637-			ClientSettings.Inst.Save(force: true);
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1638-		}
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1639-		return;
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1640-		IL_02ac:
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1641-		if (ClientSettings.DefaultFontName == "meiryo" || ClientSettings.DefaultFontName == "Malgun Gothic" || ClientSettings.DefaultFontName == "Leelawadee UI Semilight" || ClientSettings.DefaultFontName == "Microsoft YaHei Light" || ClientSettings.DefaultFontName == "Microsoft JhengHei UI Light")
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1642-		{
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs:1643:			ClientSettings.DefaultFontName = "sans-serif";
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1644-			flag = true;
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1645-		}
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs:1646:		if (ClientSettings.DefaultFontName == "sans-serif")
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1647-		{
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1648-			ClientSettings.DecorativeFontName = "Lora";
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1649-			flag = true;
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1650-		}
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1651-		goto IL_032a;
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1652-	}
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1653-
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1654-	private void SetupLocalizedFonts(string lang, string baseFont, string decorativeFont)
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1655-	{
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1656-		ClientSettings.DefaultFontName = baseFont;
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1657-		ClientSettings.DecorativeFontName = decorativeFont;
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1658-		string vtmlCode = ((lang != startupLanguage) ? (Lang.GetL(lang, "setting-notice-restart") + " " + Lang.GetL(lang, "setting-notice-lang-communitycreated")) : Lang.GetL(lang, "setting-notice-lang-communitycreated"));
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1659-		if (lang != startupLanguage)
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1660-		{
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1661-			composer.GetRichtext("restartText").SetNewText(vtmlCode, CairoFont.WhiteSmallishText(baseFont));
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1662-		}
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1663-		else
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1664-		{
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1665-			composer.GetRichtext("restartText").SetNewText(vtmlCode, CairoFont.WhiteSmallishText(baseFont));
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1666-		}
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1667-	}
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1668-
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1669-	private void OnDeveloperOptions(bool on)
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1670-	{
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-1671-		ElementBounds elementBounds = ElementBounds.Fixed(0.0, 42.0, 425.0, 42.0);
+--
+Vintagestory.Client.NoObf/ClientSettings.cs-1966-		intSettings["masterSoundLevel"] = 100;
+Vintagestory.Client.NoObf/ClientSettings.cs-1967-		intSettings["soundLevel"] = 100;
+Vintagestory.Client.NoObf/ClientSettings.cs-1968-		intSettings["entitySoundLevel"] = 100;
+Vintagestory.Client.NoObf/ClientSettings.cs-1969-		intSettings["ambientSoundLevel"] = 100;
+Vintagestory.Client.NoObf/ClientSettings.cs-1970-		intSettings["weatherSoundLevel"] = 100;
+Vintagestory.Client.NoObf/ClientSettings.cs-1971-		intSettings["musicLevel"] = 20;
+Vintagestory.Client.NoObf/ClientSettings.cs-1972-		intSettings["screenWidth"] = 1024;
+Vintagestory.Client.NoObf/ClientSettings.cs-1973-		intSettings["screenHeight"] = 768;
+Vintagestory.Client.NoObf/ClientSettings.cs-1974-		intSettings["gameWindowMode"] = 1;
+Vintagestory.Client.NoObf/ClientSettings.cs-1975-		intSettings["rightDialogMargin"] = 0;
+Vintagestory.Client.NoObf/ClientSettings.cs-1976-		intSettings["leftDialogMargin"] = 0;
+Vintagestory.Client.NoObf/ClientSettings.cs-1977-		stringSettings["language"] = "en";
+Vintagestory.Client.NoObf/ClientSettings.cs:1978:		stringSettings["defaultFontName"] = "sans-serif";
+Vintagestory.Client.NoObf/ClientSettings.cs-1979-		stringSettings["decorativeFontName"] = "Lora";
+Vintagestory.Client.NoObf/ClientSettings.cs-1980-		intSettings["maxQuadParticles"] = 8000;
+Vintagestory.Client.NoObf/ClientSettings.cs-1981-		intSettings["maxCubeParticles"] = 4000;
+Vintagestory.Client.NoObf/ClientSettings.cs-1982-		intSettings["maxAsyncQuadParticles"] = 80000;
+Vintagestory.Client.NoObf/ClientSettings.cs-1983-		intSettings["maxAsyncCubeParticles"] = 80000;
+Vintagestory.Client.NoObf/ClientSettings.cs-1984-		intSettings["itemCollectMode"] = 0;
+Vintagestory.Client.NoObf/ClientSettings.cs-1985-		boolSettings["toggleSprint"] = false;
+Vintagestory.Client.NoObf/ClientSettings.cs-1986-		boolSettings["separateCtrlKeyForMouse"] = false;
+Vintagestory.Client.NoObf/ClientSettings.cs-1987-		boolSettings["allowSettingHRTFaudio"] = true;
+Vintagestory.Client.NoObf/ClientSettings.cs-1988-		boolSettings["useHRTFaudio"] = false;
+Vintagestory.Client.NoObf/ClientSettings.cs-1989-		boolSettings["force48khzHRTFaudio"] = true;
+Vintagestory.Client.NoObf/ClientSettings.cs-1990-		intSettings["mouseSmoothing"] = 30;
+Vintagestory.Client.NoObf/ClientSettings.cs-1991-		intSettings["mouseSensivity"] = 50;
+Vintagestory.Client.NoObf/ClientSettings.cs-1992-		floatSettings["mouseWheelSensivity"] = ((RuntimeEnv.OS != OS.Mac) ? 1 : 10);
+Vintagestory.Client.NoObf/ClientSettings.cs-1993-		intSettings["modelDataPoolMaxVertexSize"] = 500000;
+Vintagestory.Client.NoObf/ClientSettings.cs-1994-		intSettings["modelDataPoolMaxIndexSize"] = 750000;
+Vintagestory.Client.NoObf/ClientSettings.cs-1995-		intSettings["modelDataPoolMaxParts"] = 1500;
+Vintagestory.Client.NoObf/ClientSettings.cs-1996-		intSettings["maxTextureAtlasWidth"] = 4096;
+Vintagestory.Client.NoObf/ClientSettings.cs-1997-		intSettings["maxTextureAtlasHeight"] = 2048;
+Vintagestory.Client.NoObf/ClientSettings.cs-1998-		floatSettings["ambientBloomLevel"] = 0.2f;
+Vintagestory.Client.NoObf/ClientSettings.cs-1999-		floatSettings["extraContrastLevel"] = 0f;
+Vintagestory.Client.NoObf/ClientSettings.cs-2000-		intSettings["godRays"] = 0;
+Vintagestory.Client.NoObf/ClientSettings.cs-2001-		intSettings["chatWindowWidth"] = 700;
+Vintagestory.Client.NoObf/ClientSettings.cs-2002-		intSettings["chatWindowHeight"] = 200;
+Vintagestory.Client.NoObf/ClientSettings.cs-2003-		intSettings["recordingBufferSize"] = 60;

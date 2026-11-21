@@ -1,0 +1,77 @@
+Vintagestory.Client/RenderAPIBase.cs-17-	internal MeshRef whiteRectangleRef;
+Vintagestory.Client/RenderAPIBase.cs-18-
+Vintagestory.Client/RenderAPIBase.cs-19-	internal bool useSSBOs = true;
+Vintagestory.Client/RenderAPIBase.cs-20-
+Vintagestory.Client/RenderAPIBase.cs-21-	private Stack<ElementBounds> scissorBoundsStacks = new Stack<ElementBounds>();
+Vintagestory.Client/RenderAPIBase.cs-22-
+Vintagestory.Client/RenderAPIBase.cs-23-	public abstract ICoreClientAPI Api { get; }
+Vintagestory.Client/RenderAPIBase.cs-24-
+Vintagestory.Client/RenderAPIBase.cs-25-	public bool UseSSBOs => useSSBOs;
+Vintagestory.Client/RenderAPIBase.cs-26-
+Vintagestory.Client/RenderAPIBase.cs-27-	public string DecorativeFontName => GuiStyle.DecorativeFontName;
+Vintagestory.Client/RenderAPIBase.cs-28-
+Vintagestory.Client/RenderAPIBase.cs:29:	public string StandardFontName => GuiStyle.StandardFontName;
+Vintagestory.Client/RenderAPIBase.cs-30-
+Vintagestory.Client/RenderAPIBase.cs-31-	public int FrameWidth => plat.WindowSize.Width;
+Vintagestory.Client/RenderAPIBase.cs-32-
+Vintagestory.Client/RenderAPIBase.cs-33-	public int FrameHeight => plat.WindowSize.Height;
+Vintagestory.Client/RenderAPIBase.cs-34-
+Vintagestory.Client/RenderAPIBase.cs-35-	public float LineWidth
+Vintagestory.Client/RenderAPIBase.cs-36-	{
+Vintagestory.Client/RenderAPIBase.cs-37-		set
+Vintagestory.Client/RenderAPIBase.cs-38-		{
+Vintagestory.Client/RenderAPIBase.cs-39-			plat.GLLineWidth(value);
+Vintagestory.Client/RenderAPIBase.cs-40-		}
+Vintagestory.Client/RenderAPIBase.cs-41-	}
+Vintagestory.Client/RenderAPIBase.cs-42-
+Vintagestory.Client/RenderAPIBase.cs-43-	public IStandardShaderProgram StandardShader => (IStandardShaderProgram)ShaderRegistry.getProgram(EnumShaderProgram.Standard);
+Vintagestory.Client/RenderAPIBase.cs-44-
+Vintagestory.Client/RenderAPIBase.cs-45-	public IShaderProgram CurrentActiveShader => ShaderProgramBase.CurrentShaderProgram;
+Vintagestory.Client/RenderAPIBase.cs-46-
+Vintagestory.Client/RenderAPIBase.cs-47-	public Stack<ElementBounds> ScissorStack => scissorBoundsStacks;
+Vintagestory.Client/RenderAPIBase.cs-48-
+Vintagestory.Client/RenderAPIBase.cs-49-	public virtual EnumRenderStage CurrentRenderStage
+Vintagestory.Client/RenderAPIBase.cs-50-	{
+Vintagestory.Client/RenderAPIBase.cs-51-		get
+Vintagestory.Client/RenderAPIBase.cs-52-		{
+Vintagestory.Client/RenderAPIBase.cs-53-			throw new NotImplementedException();
+Vintagestory.Client/RenderAPIBase.cs-54-		}
+--
+Vintagestory.Client/ClientProgram.cs-149-			Environment.CurrentDirectory = directoryName;
+Vintagestory.Client/ClientProgram.cs-150-		}
+Vintagestory.Client/ClientProgram.cs-151-		GamePaths.EnsurePathsExist();
+Vintagestory.Client/ClientProgram.cs-152-		logger = new ClientLogger();
+Vintagestory.Client/ClientProgram.cs-153-		logger.TraceLog = args.TraceLog;
+Vintagestory.Client/ClientProgram.cs-154-		ClientPlatformWindows clientPlatformWindows = new ClientPlatformWindows(logger);
+Vintagestory.Client/ClientProgram.cs-155-		clientPlatformWindows.ShaderUniforms.SepiaLevel = ClientSettings.SepiaLevel;
+Vintagestory.Client/ClientProgram.cs-156-		clientPlatformWindows.ShaderUniforms.ExtraContrastLevel = ClientSettings.ExtraContrastLevel;
+Vintagestory.Client/ClientProgram.cs-157-		CrashReporter.SetLogger((Logger)clientPlatformWindows.Logger);
+Vintagestory.Client/ClientProgram.cs-158-		clientPlatformWindows.LogAndTestHardwareInfosStage1();
+Vintagestory.Client/ClientProgram.cs-159-		screenManager = new ScreenManager(clientPlatformWindows);
+Vintagestory.Client/ClientProgram.cs-160-		GuiStyle.DecorativeFontName = ClientSettings.DecorativeFontName;
+Vintagestory.Client/ClientProgram.cs:161:		GuiStyle.StandardFontName = ClientSettings.DefaultFontName;
+Vintagestory.Client/ClientProgram.cs-162-		if (!Directory.Exists(GamePaths.AssetsPath))
+Vintagestory.Client/ClientProgram.cs-163-		{
+Vintagestory.Client/ClientProgram.cs-164-			clientPlatformWindows.XPlatInterface.ShowMessageBox("Vintagestory Warning", "Critical files are missing from your game installation. Please try re-installing.");
+Vintagestory.Client/ClientProgram.cs-165-			return;
+Vintagestory.Client/ClientProgram.cs-166-		}
+Vintagestory.Client/ClientProgram.cs-167-		Lang.PreLoad(ScreenManager.Platform.Logger, GamePaths.AssetsPath, ClientSettings.Language);
+Vintagestory.Client/ClientProgram.cs-168-		if (RuntimeEnv.OS == OS.Windows && !ClientSettings.SkipNvidiaProfileCheck && NvidiaGPUFix64.SOP_SetProfile("Vintagestory", GetExecutableName()) == 1)
+Vintagestory.Client/ClientProgram.cs-169-		{
+Vintagestory.Client/ClientProgram.cs-170-			clientPlatformWindows.XPlatInterface.ShowMessageBox("Vintagestory Nvidia Profile", Lang.Get("Your game is now configured to use your dedicated NVIDIA Graphics card. This requires a restart so please start the game again."));
+Vintagestory.Client/ClientProgram.cs-171-			return;
+Vintagestory.Client/ClientProgram.cs-172-		}
+Vintagestory.Client/ClientProgram.cs-173-		if (!CleanInstallCheck.IsCleanInstall())
+Vintagestory.Client/ClientProgram.cs-174-		{
+Vintagestory.Client/ClientProgram.cs-175-			clientPlatformWindows.XPlatInterface.ShowMessageBox("Vintagestory Warning", Lang.Get("launchfailure-notcleaninstall"));
+Vintagestory.Client/ClientProgram.cs-176-			return;
+Vintagestory.Client/ClientProgram.cs-177-		}
+Vintagestory.Client/ClientProgram.cs-178-		if (RuntimeEnv.OS == OS.Windows && !ClientSettings.MultipleInstances)
+Vintagestory.Client/ClientProgram.cs-179-		{
+Vintagestory.Client/ClientProgram.cs-180-			new Mutex(initiallyOwned: true, "Vintagestory", out var createdNew);
+Vintagestory.Client/ClientProgram.cs-181-			if (!createdNew)
+Vintagestory.Client/ClientProgram.cs-182-			{
+Vintagestory.Client/ClientProgram.cs-183-				clientPlatformWindows.XPlatInterface.ShowMessageBox(Lang.Get("Multiple Instances"), Lang.Get("game-alreadyrunning"));
+Vintagestory.Client/ClientProgram.cs-184-				return;
+Vintagestory.Client/ClientProgram.cs-185-			}
+Vintagestory.Client/ClientProgram.cs-186-		}
