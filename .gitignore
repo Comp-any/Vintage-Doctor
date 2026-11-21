@@ -1,0 +1,9 @@
+bin/
+obj/
+release/
+*.user
+.vs/
+.idea/
+.vscode/
+__pycache__/
+*.pyc

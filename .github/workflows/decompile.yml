@@ -1,0 +1,86 @@
+name: Decompile game classes
+
+# Decompiles the game's assemblies so the exact log messages, file names and settings keys the doctor reads can be
+# checked against the game's own code. Whole files whose name matches "types" are copied; for "strings", only the
+# lines around each match. Pushed to a branch for reading (the game's code is the game's: delete the branch after).
+on:
+  workflow_dispatch:
+    inputs:
+      types:
+        description: Regex of type (file) names to copy whole
+        default: "CrashReporter|ModLoader|ModContainer|ModAssemblyLoader|ClientSettings\\.cs|ServerConfig\\.cs|RemapperAssistant"
+      strings:
+        description: Text to look for, separated by ;; (the lines around each match are copied)
+        default: "Critical error occurred;;Could not resolve some dependencies;;disabledMods;;DisabledMods;;fixmapping;;Graphics Card;;Server overloaded;;An exception was thrown;;crash.log;;-crash;;viewDistance;;Missing modinfo;;modinfo.json"
+      gameVersion:
+        description: Game version
+        default: "1.22.7"
+      resultsBranch:
+        description: Branch to push the sources to
+        default: ""
+
+permissions:
+  contents: write
+
+jobs:
+  decompile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      VS_VERSION: ${{ inputs.gameVersion || '1.22.7' }}
+      TYPES: ${{ inputs.types }}
+      STRINGS: ${{ inputs.strings }}
+      RESULTS_BRANCH: ${{ inputs.resultsBranch || format('ci-decompile-{0}', github.run_number) }}
+    steps:
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Download the game server
+        run: |
+          set -e
+          for name in "vs_server_linux-x64_${VS_VERSION}.tar.gz" "vs_server_${VS_VERSION}.tar.gz"; do
+            if curl -fsSL -o server.tar.gz "https://cdn.vintagestory.at/gamefiles/stable/$name"; then echo "got $name"; break; fi
+          done
+          mkdir -p vs && tar -xzf server.tar.gz -C vs
+          vsdir=$(dirname "$(find "$PWD/vs" -name VintagestoryServer.dll | head -1)")
+          echo "VSDIR=$vsdir" >> "$GITHUB_ENV"
+          # The client has classes the server lacks (settings, the window, the crash reporter's client half).
+          if curl -fsSL -o client.tar.gz "https://cdn.vintagestory.at/gamefiles/stable/vs_client_linux-x64_${VS_VERSION}.tar.gz"; then
+            mkdir -p vsclient && tar -xzf client.tar.gz -C vsclient
+            echo "CLIENTDIR=$(dirname "$(find "$PWD/vsclient" -name VintagestoryLib.dll | head -1)")" >> "$GITHUB_ENV"
+          fi
+
+      - name: Decompile
+        run: |
+          set +e
+          dotnet tool install -g ilspycmd
+          export PATH="$PATH:$HOME/.dotnet/tools"
+          mkdir -p out/strings
+          dir="${CLIENTDIR:-$VSDIR}"
+          ls "$dir" > out/files-in-game-folder.txt
+          for dll in VintagestoryLib VintagestoryAPI VSEssentials VSSurvivalMod Vintagestory VintagestoryServer; do
+            f=$(find "$dir" -name "$dll.dll" | head -1); [ -n "$f" ] || { echo "no $dll"; continue; }
+            rm -rf proj && mkdir proj
+            ilspycmd -p -o proj -r "$dir" -r "$dir/Lib" -r "$dir/Mods" "$f" > "ilspy-$dll.log" 2>&1 || echo "ilspy exit $? for $dll"
+            find proj -name "*.cs" | sed "s|^proj/||" > "out/all-types-$dll.txt"
+            find proj -name "*.cs" | grep -E "$TYPES" | while read -r cs; do cp "$cs" "out/$dll.$(basename "$cs")"; done
+            echo "$STRINGS" | sed 's/;;/\n/g' | while IFS= read -r needle; do
+              [ -n "$needle" ] || continue
+              safe=$(echo "$needle" | tr -c 'A-Za-z0-9' '_')
+              grep -rnF -B12 -A25 --include=*.cs -- "$needle" proj | sed "s|^proj/||" | cut -c1-400 | head -1500 >> "out/strings/$dll.$safe.txt"
+              [ -s "out/strings/$dll.$safe.txt" ] || rm -f "out/strings/$dll.$safe.txt"
+            done
+            tail -3 "ilspy-$dll.log"
+          done
+          ls -la out out/strings | head -120
+
+      - name: Push to the branch
+        run: |
+          cd out
+          git init -q -b "$RESULTS_BRANCH"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -qm "Decompiled from Vintage Story $VS_VERSION for reading"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git" "$RESULTS_BRANCH"
