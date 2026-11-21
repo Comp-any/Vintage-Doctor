@@ -99,7 +99,12 @@ namespace VintageDoctor
                 Error = null;
                 Seconds = Math.Max(5, Math.Min(120, seconds));
                 wasEnabled = profiler.Enabled;
+                bool alreadyTiming = profiler.Enabled || profiler.PrintSlowTicks;
                 profiler.Enabled = true;
+                // This runs in the middle of a tick, which the game began with its profiler off: the tick has no
+                // root entry, and the game's End() at the end of the tick would fail on that and take the game
+                // down. Beginning one here gives the rest of this tick somewhere to go.
+                if (!alreadyTiming) profiler.Begin();
                 lastRoot = profiler.PrevRootEntry;
                 StartedAt = DateTime.Now;
                 endAt = Environment.TickCount64 + Seconds * 1000L;

@@ -26,7 +26,7 @@ namespace VintageDoctor
                 var drive = new DriveInfo(Path.GetFullPath(GamePaths.DataPath));
                 long free = drive.AvailableFreeSpace;
                 long save = 0;
-                try { string file = sapi.WorldManager.CurrentWorldName; if (!string.IsNullOrEmpty(file) && File.Exists(file)) save = new FileInfo(file).Length; } catch { }
+                try { string file = sapi.WorldManager.CurrentWorldFilepath; if (!string.IsNullOrEmpty(file) && File.Exists(file)) save = new FileInfo(file).Length; } catch { }
                 if (free < 1024L * 1024 * 1024) { x.Problem(x.T("world-disk-critical", Size(free))); x.Explain(x.T("world-disk-why")); x.Advice(x.T("world-disk-advice")); }
                 else if (free < 5L * 1024 * 1024 * 1024) { x.Warn(x.T("world-disk-low", Size(free))); x.Explain(x.T("world-disk-why")); }
                 else x.Ok(x.T("world-disk-ok", Size(free)));
@@ -132,8 +132,8 @@ namespace VintageDoctor
                 if (!x.Ev.Mods.Has(domain) && !ModSnapshot.IsGameMod(domain)) x.UrlButton(ModDbSearch(domain), x.T("btn-find", domain));
                 return;
             }
-            x.Info(DoctorReport.Ref(c) + " " + x.T("item-title", c.Code.ToString(), ModSnapshot.IsGameMod(domain) ? x.T("the-game") : x.ModName(domain)));
-            x.Detail(x.T("item-kind", isBlock ? x.T("item-block") : x.T("item-item"), string.IsNullOrEmpty(c.Class) ? "-" : c.Class, type));
+            x.Info(DoctorReport.Ref(c) + " " + x.T("item-title", ModSnapshot.IsGameMod(domain) ? x.T("the-game") : x.ModName(domain)));
+            x.Detail(x.T("item-kind", isBlock ? x.T("item-block") : x.T("item-item"), c.Code.ToString(), string.IsNullOrEmpty(c.Class) ? "-" : c.Class, type));
             if (typeMod != null && typeMod != domain) x.Detail(x.T("item-typemod", x.ModName(typeMod)));
             try
             {
@@ -246,7 +246,10 @@ namespace VintageDoctor
                 {
                     if (ing == null) continue;
                     CollectibleObject c = ing.ResolvedItemStack?.Collectible;
-                    string key = (c != null ? DoctorReport.Ref(c) : ing.Code?.ToString() ?? "?") + (ing.IsTool ? " (tool)" : "");
+                    string code = ing.Code?.ToString();
+                    // An ingredient matched by tags has no code of its own: its own description says what it takes.
+                    if (c == null && (code == null || code == "*:*")) code = LogScan.Shorten(ing.ToString() ?? "?", 70);
+                    string key = (c != null ? DoctorReport.Ref(c) : code ?? "?") + (ing.IsTool ? " (tool)" : "");
                     if (!counts.ContainsKey(key)) { counts[key] = 0; order.Add(key); }
                     counts[key] += Math.Max(1, ing.Quantity);
                 }

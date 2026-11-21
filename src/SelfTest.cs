@@ -110,6 +110,9 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             if (ci) t.Guard("fixes on the real server", () => RealFixes(t, doctor, sapi));
             else t.Skip("fixes on the real server", "only with SelfTestOnStart");
 
+            // What is known so far, in case the server doesn't live to see the end.
+            try { File.WriteAllText(Path.Combine(folder, "selftest-sync.txt"), string.Join("\n", t.Lines) + "\n" + t.Passed + " passed, " + t.Failed + " failed before the profiler\n"); } catch { }
+
             // The measured run takes a few seconds: its result is added when it is over, and the file written then.
             bool started = doctor.Profile.Start(sapi.World, 5);
             t.Check("the tick profiler starts", started, doctor.Profile.Error);

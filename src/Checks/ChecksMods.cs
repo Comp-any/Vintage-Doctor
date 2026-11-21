@@ -33,7 +33,8 @@ namespace VintageDoctor
                     x.Owner = null;
                     x.Warn(x.T("modcheck-failed", x.ModName(check.ModId), check.Id, e.GetType().Name + ": " + e.Message));
                     x.Detail(x.T("modcheck-failed-why"));
-                    try { x.Api.Logger.Warning("[vintagedoctor] The check '{0}' of mod '{1}' failed: {2}", check.Id, check.ModId, e); } catch { }
+                    // Under the mod's own tag, so the log's page counts it against that mod and not against the doctor.
+                    try { x.Api.Logger.Warning("[{0}] Its check '{1}' for Vintage Doctor failed: {2}", check.ModId, check.Id, e); } catch { }
                 }
                 x.Owner = null;
             }
