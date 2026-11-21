@@ -213,11 +213,13 @@ namespace VintageDoctor
             var fileFailures = log.StartFailures.Where(f => f.IsFile && x.Ev.Mods?.Get(f.Mod) == null).GroupBy(f => f.Mod).ToList();
             if (fileFailures.Count > 0)
             {
-                x.Problem(x.T("start-files-failed", fileFailures.Count, string.Join(", ", fileFailures.Take(full ? 30 : 6).Select(g => g.Key)) + (!full && fileFailures.Count > 6 ? ", …" : "")));
+                // The game names a file by its name, or by the mod id when it got as far as reading that.
+                string FileName(string key) => FailedFile(x, key)?.Name ?? key;
+                x.Problem(x.T("start-files-failed", fileFailures.Count, string.Join(", ", fileFailures.Take(full ? 30 : 6).Select(g => FileName(g.Key))) + (!full && fileFailures.Count > 6 ? ", …" : "")));
                 foreach (var g in fileFailures.Take(full ? 30 : 6))
                 {
                     StartFailure f = g.First();
-                    x.Detail(g.Key + ": " + (FileReason(x, g.Key) ?? LogScan.Shorten(f.Error ?? f.What, 200)));
+                    x.Detail(FileName(g.Key) + ": " + (FileReason(x, g.Key) ?? LogScan.Shorten(f.Error ?? f.What, 200)));
                 }
                 x.Explain(x.T("start-files-failed-why"));
                 x.LinkButton(TopicFiles, "", x.T("btn-files"));
@@ -304,10 +306,19 @@ namespace VintageDoctor
             return found;
         }
 
+        /// <summary>The file in the Mods folder that a start-up error is about: by its name, or by its mod id when the game had read that much before giving up.</summary>
+        static ModFile FailedFile(DoctorContext x, string key)
+        {
+            var files = x.Ev.Folder?.Files;
+            if (files == null || string.IsNullOrEmpty(key)) return null;
+            return files.FirstOrDefault(m => string.Equals(m.Name, key, StringComparison.OrdinalIgnoreCase))
+                ?? files.FirstOrDefault(m => !m.Loaded && string.Equals(m.ModId, key, StringComparison.OrdinalIgnoreCase));
+        }
+
         /// <summary>What a file in the Mods folder is, in a few words, from the doctor's own look at it; null when it looked fine or wasn't looked at.</summary>
         static string FileReason(DoctorContext x, string fileName)
         {
-            ModFile f = x.Ev.Folder?.Files.FirstOrDefault(m => string.Equals(m.Name, fileName, StringComparison.OrdinalIgnoreCase));
+            ModFile f = FailedFile(x, fileName);
             if (f == null) return null;
             if (f.ReadError != null) return x.T("reason-damaged");
             if (f.InnerZip != null) return x.T("reason-innerzip", f.InnerZip);

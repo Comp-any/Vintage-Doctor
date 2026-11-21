@@ -67,6 +67,7 @@ namespace VintageDoctor
 21.11.2026 10:00:03 [Error] Block with code ghosty:machine-north has defined a block entity class GhostMachineEntity, no such class registered. Will ignore.
 21.11.2026 10:00:03 [Error] Item with code ghosty:wand has defined an item class GhostWand, but no such class registered. Will ignore.
 21.11.2026 10:00:03 [Error] Item type ghosty:itemtypes/broken.json could not be loaded. Will ignore. Exception:
+21.11.2026 10:00:03 [Error] Syntax error in json file 'ghosty:recipes/grid/cutshort.json': Failed deserializing cutshort.json: Unexpected end when reading token. Path ''.
 21.11.2026 10:00:03 [Warning] [ghosty] Is a Content mod, but .cs or .dll files were found. These will be ignored.
 21.11.2026 10:00:04 [Warning] Failed resolving crafting recipe ingredient with code armory:part-hammerhead-steel in Grid recipe
 21.11.2026 10:00:04 [Error] Grid Recipe with output 'armory:part-hammerhead-steel' contains an ingredient that cannot be resolved: Item code armory:part-hammerhead-steel
@@ -207,7 +208,8 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             t.Check("log: blocks and items whose code is missing", log.MissingClasses.Count == 3 && log.MissingClasses.Contains(("block", "ghosty:machine-north", "GhostMachine"))
                 && log.MissingClasses.Contains(("entity", "ghosty:machine-north", "GhostMachineEntity")) && log.MissingClasses.Contains(("item", "ghosty:wand", "GhostWand")),
                 string.Join(";", log.MissingClasses.Select(m => m.kind + " " + m.code + " " + m.className)));
-            t.Check("log: a block or item file the game couldn't read", log.BrokenTypes.TryGetValue("ghosty", out List<string> unread) && unread.Count == 1 && unread[0] == "itemtypes/broken.json",
+            t.Check("log: files of a mod the game couldn't read, in the words of two game versions", log.BrokenTypes.TryGetValue("ghosty", out List<string> unread) && unread.Count == 2
+                && unread[0] == "itemtypes/broken.json" && unread[1] == "recipes/grid/cutshort.json",
                 string.Join(";", log.BrokenTypes.Select(kv => kv.Key + "=" + string.Join(",", kv.Value))));
             t.Check("log: code in a mod that calls itself a content mod", log.IgnoredCode.Count == 1 && log.IgnoredCode[0] == "ghosty", string.Join(";", log.IgnoredCode));
             t.Check("log: a slow tick", log.Overloads.Count == 1 && log.Overloads[0].ms == 2377);
@@ -501,12 +503,12 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             string clashes = SickPage(doctor, sapi, ev, folder, Checks.TopicClashes, "", "sick-clashes");
             string flint = SickPage(doctor, sapi, ev, folder, Checks.TopicCraft, "game:flint", "sick-craft-flint");
             SickPage(doctor, sapi, ev, folder, Pages.Deep, "", "sick-deep");
-            SickPage(doctor, sapi, ev, folder, Checks.TopicMod, "doctorsick", "sick-mod-doctorsick");
+            string sickMod = SickPage(doctor, sapi, ev, folder, Checks.TopicMod, "doctorsick", "sick-mod-doctorsick");
 
             t.Check("sick: a mod that failed to start is named, with its error", startup.Contains("Doctor Crashy threw an error while starting: Method not found"), First(startup, "threw an error"));
             t.Check("sick: the error is explained", startup.Contains("built for a different version"));
             t.Check("sick: the part of the mod the game gave up on is named", startup.Contains("Not started: ") && startup.Contains("DoctorCrashy"), First(startup, "Not started"));
-            t.Check("sick: files the game couldn't load as mods, each with what it really is", startup.Contains("5 file(s) in the Mods folder aren't mods the game can load")
+            t.Check("sick: files the game couldn't load as mods, each with what it really is", startup.Contains("5 file(s) in the Mods folder aren't mods the game can load") && !startup.Contains("doctorsickstray")
                 && startup.Contains("doctor-sick-straydll.zip: it has code in the wrong place (lib/Helper.dll)")
                 && startup.Contains("doctor-sick-notamod.zip: it has no modinfo.json") && startup.Contains("doctor-sick-nested.zip: the mod sits one folder down")
                 && startup.Contains("doctor-sick-wrapped.zip: it holds another zip") && startup.Contains("doctor-sick-corrupt.zip: the zip is damaged"), First(startup, "aren't mods"));
@@ -540,7 +542,7 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             t.Check("sick: a block and an item whose code is missing, the block's data code too", clashes.Contains("Doctor Sick: 3 block(s) or item(s) need code that isn't in the game")
                 && clashes.Contains("doctorsick:ghost (its code: DoctorGhostItem)") && clashes.Contains("doctorsick:ghostblock (its code: DoctorGhostBlock)")
                 && clashes.Contains("doctorsick:ghostblock (its data code: DoctorGhostEntity)"), First(clashes, "need code") + " / " + First(clashes, "DoctorGhostEntity"));
-            t.Check("sick: an item file the game couldn't read", clashes.Contains("Doctor Sick: 1 block, item or creature file(s) couldn't be read") && clashes.Contains("doctorsick:itemtypes/broken.json"),
+            t.Check("sick: an item file the game couldn't read", clashes.Contains("Doctor Sick: 1 of its files couldn't be read") && clashes.Contains("doctorsick:itemtypes/broken.json"),
                 First(clashes, "couldn't be read"));
             t.Check("sick: a patch for a file the game doesn't have, and one for a mod that isn't installed", clashes.Contains("Doctor Sick tries to change 1 file(s) that aren't there")
                 && clashes.Contains("game:itemtypes/doctor-no-such-file.json") && clashes.Contains("Doctor Sick has 1 patch(es) for mods that aren't installed (doctornosuchmod)"),
@@ -564,6 +566,8 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
                 First(clashes, "with code were made"));
             t.Check("sick: two recipes with the same ingredients", clashes.Contains("1 recipe(s) have exactly the same ingredients as another recipe"), First(clashes, "same ingredients"));
             t.Check("sick: the same on the item's own crafting page", flint.Contains("Another recipe has exactly the same ingredients"), First(flint, "same ingredients"));
+            t.Check("sick: a mod's own page has what is wrong with its files", sickMod.Contains("3 block(s) or item(s) need code that isn't in the game") && sickMod.Contains("1 of its files couldn't be read")
+                && sickMod.Contains("tries to change 1 file(s) that aren't there") && sickMod.Contains("It replaces 1 of the game's own files"), First(sickMod, "need code") + " / " + First(sickMod, "replaces"));
             t.Check("sick: the check-up shows the clashes that matter and leads to the rest", overview.Contains("need code that isn't in the game") && overview.Contains("/doctor clashes")
                 && !overview.Contains("brings its own copy"), First(overview, "/doctor clashes"));
 

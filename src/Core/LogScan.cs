@@ -78,7 +78,7 @@ namespace VintageDoctor
         public readonly Dictionary<string, string> UnresolvedExample = new Dictionary<string, string>(StringComparer.Ordinal);
         /// <summary>Blocks and items that name code the game doesn't have ("has defined a block class X, no such class registered").</summary>
         public readonly List<(string kind, string code, string className)> MissingClasses = new List<(string, string, string)>();
-        /// <summary>Block, item and creature files the game could not read, by the mod (asset domain) they are in.</summary>
+        /// <summary>Files of a mod (blocks, items, recipes...) the game could not read and skipped, by the mod (asset domain) they are in.</summary>
         public readonly Dictionary<string, List<string>> BrokenTypes = new Dictionary<string, List<string>>(StringComparer.Ordinal);
         /// <summary>JSON patches for files that aren't there, by the mod that has the patch: the files it wanted to change.</summary>
         public readonly Dictionary<string, List<string>> MissingTargets = new Dictionary<string, List<string>>(StringComparer.Ordinal);
@@ -104,6 +104,7 @@ namespace VintageDoctor
         static readonly Regex PatchNoFile = new Regex(@"^Patch \d+ in ([a-z0-9_.-]+):(\S+?): File (\S+?) not found", RegexOptions.Compiled);
         static readonly Regex NoClass = new Regex(@"^(Block|Item) with code (\S+) has defined an? (block entity|block|item) class (\S+?),", RegexOptions.Compiled);
         static readonly Regex TypeNotLoaded = new Regex(@"^(Item|Block|Entity) type ([a-z0-9_.-]+):(\S+?) could not be loaded", RegexOptions.Compiled);
+        static readonly Regex SyntaxError = new Regex(@"^Syntax error in json file '([a-z0-9_.-]+):([^']+)'", RegexOptions.Compiled);
         static readonly Regex Unresolvable = new Regex(@"^Failed resolving .* with code ([a-z0-9_.-]+):(\S+)", RegexOptions.Compiled);
         static readonly Regex DuplicateId = new Regex(@"^Multiple mods share the mod ID '([^']+)' \((.*)\)\. Will only load the highest version one - v(.+)\.$", RegexOptions.Compiled);
         static readonly Regex Overload = new Regex(@"^Server overloaded\. A tick took (\d+)ms", RegexOptions.Compiled);
@@ -349,10 +350,12 @@ namespace VintageDoctor
                     if (MissingClasses.Count < 2000 && !MissingClasses.Contains((kind, nc.Groups[2].Value, nc.Groups[4].Value))) MissingClasses.Add((kind, nc.Groups[2].Value, nc.Groups[4].Value));
                     // No "continue": it counts as one of the mod's errors too.
                 }
+                // 1.22 says "Syntax error in json file 'mod:itemtypes/x.json': ..."; newer versions "Item type mod:itemtypes/x.json could not be loaded".
                 Match tn = TypeNotLoaded.Match(text);
-                if (tn.Success)
+                Match se = tn.Success ? Match.Empty : SyntaxError.Match(text);
+                if (tn.Success || se.Success)
                 {
-                    string domain = tn.Groups[2].Value, file = tn.Groups[3].Value.TrimEnd('.', ',');
+                    string domain = tn.Success ? tn.Groups[2].Value : se.Groups[1].Value, file = tn.Success ? tn.Groups[3].Value.TrimEnd('.', ',') : se.Groups[2].Value;
                     if (!BrokenTypes.TryGetValue(domain, out List<string> broken)) BrokenTypes[domain] = broken = new List<string>();
                     if (!broken.Contains(file) && broken.Count < 200) broken.Add(file);
                     // No "continue": the error itself, with what was wrong in the file, belongs in the log's list too.

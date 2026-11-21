@@ -87,7 +87,7 @@ namespace VintageDoctor
         /// failed to start, or it needs a library mod that isn't installed - the game says so in the log, makes a plain
         /// block or item instead and carries on: the thing exists but does nothing.
         /// </summary>
-        public static void MissingClasses(DoctorContext x, bool full)
+        public static void MissingClasses(DoctorContext x, bool full, string onlyMod = null)
         {
             var byMod = new Dictionary<string, List<string>>(StringComparer.Ordinal);
             var names = new Dictionary<string, List<string>>(StringComparer.Ordinal);
@@ -131,32 +131,34 @@ namespace VintageDoctor
             int shown = full ? 30 : 5;
             foreach (var kv in byMod.OrderByDescending(kv => kv.Value.Count))
             {
+                if (onlyMod != null && !string.Equals(kv.Key, onlyMod, StringComparison.OrdinalIgnoreCase)) continue;
                 bool startFailed = log != null && log.StartFailures.Any(f => string.Equals(f.Mod, kv.Key, StringComparison.OrdinalIgnoreCase));
                 x.Problem(x.T("missing-title", OwnerName(x, kv.Key), kv.Value.Count, string.Join(", ", names[kv.Key].Take(8))));
                 foreach (string line in kv.Value.Take(shown)) x.Detail(line);
                 if (kv.Value.Count > shown) x.Detail(x.T("more-lines", kv.Value.Count - shown));
                 x.Explain(startFailed ? x.T("missing-why-startfailed", x.ModName(kv.Key)) : x.T("missing-why"));
                 x.Advice(x.T("missing-advice"));
-                if (x.Ev.Mods.Has(kv.Key)) ModButtons(x, kv.Key, false);
+                if (onlyMod == null && x.Ev.Mods.Has(kv.Key)) ModButtons(x, kv.Key, false);
             }
-            if (byMod.Count == 0 && full) x.Ok(x.T("missing-none"));
+            if (byMod.Count == 0 && full && onlyMod == null) x.Ok(x.T("missing-none"));
         }
 
         // ---------------------------------------------------------------- block and item files the game couldn't read
 
         /// <summary>Block, item and creature files with a mistake in them: the game skips the file, so what it describes isn't in the game.</summary>
-        public static void UnreadableTypes(DoctorContext x, bool full)
+        public static void UnreadableTypes(DoctorContext x, bool full, string onlyMod = null)
         {
             LogScan log = x.Ev.Log;
             if (log == null || log.BrokenTypes.Count == 0) return;
             int shown = full ? 20 : 4;
             foreach (var kv in log.BrokenTypes.OrderByDescending(kv => kv.Value.Count))
             {
+                if (onlyMod != null && !string.Equals(kv.Key, onlyMod, StringComparison.OrdinalIgnoreCase)) continue;
                 x.Warn(x.T("types-broken", OwnerName(x, kv.Key), kv.Value.Count));
                 foreach (string file in kv.Value.Take(shown)) x.Detail(kv.Key + ":" + file);
                 if (kv.Value.Count > shown) x.Detail(x.T("more-lines", kv.Value.Count - shown));
                 x.Explain(x.T("types-broken-why"));
-                if (x.Ev.Mods.Has(kv.Key)) ModButtons(x, kv.Key, false);
+                if (onlyMod == null && x.Ev.Mods.Has(kv.Key)) ModButtons(x, kv.Key, false);
             }
         }
 
@@ -167,13 +169,14 @@ namespace VintageDoctor
         /// other, and harmless; for the game's files or an installed mod's, the file was renamed or removed in an
         /// update and the patch has stopped doing anything.
         /// </summary>
-        public static void PatchTargets(DoctorContext x, bool full)
+        public static void PatchTargets(DoctorContext x, bool full, string onlyMod = null)
         {
             LogScan log = x.Ev.Log;
             if (log == null) return;
             int found = 0, shown = full ? 20 : 4;
             foreach (var kv in log.MissingTargets.OrderByDescending(kv => kv.Value.Count))
             {
+                if (onlyMod != null && !string.Equals(kv.Key, onlyMod, StringComparison.OrdinalIgnoreCase)) continue;
                 var real = kv.Value.Where(t => ModSnapshot.IsGameMod(DomainOf(t)) || x.Ev.Mods.Has(DomainOf(t))).ToList();
                 var optional = kv.Value.Where(t => !real.Contains(t)).ToList();
                 if (real.Count > 0)
@@ -183,7 +186,7 @@ namespace VintageDoctor
                     foreach (string t in real.Take(shown)) x.Detail(t);
                     if (real.Count > shown) x.Detail(x.T("more-lines", real.Count - shown));
                     x.Explain(x.T("targets-missing-why"));
-                    if (x.Ev.Mods.Has(kv.Key)) ModButtons(x, kv.Key, false);
+                    if (onlyMod == null && x.Ev.Mods.Has(kv.Key)) ModButtons(x, kv.Key, false);
                 }
                 if (optional.Count > 0 && full)
                 {
@@ -192,7 +195,7 @@ namespace VintageDoctor
                     x.Explain(x.T("targets-optional-why"));
                 }
             }
-            if (found == 0 && full) x.Ok(x.T("targets-none"));
+            if (found == 0 && full && onlyMod == null) x.Ok(x.T("targets-none"));
         }
 
         // ---------------------------------------------------------------- code the game leaves out
@@ -548,11 +551,28 @@ namespace VintageDoctor
             if (found == 0) x.Ok(x.T("names-none"));
         }
 
-        /// <summary>On a mod's own page: what it puts into the game's and other mods' folders, and the libraries it brings.</summary>
+        /// <summary>
+        /// On a mod's own page: its blocks and items whose code is missing, its files the game couldn't read, its
+        /// patches for files that aren't there, what it puts into the game's and other mods' folders, and the libraries it brings.
+        /// </summary>
         static void ModFiles(DoctorContext x, ModEntry m)
         {
+            if (x.Side == EnumAppSide.Server || !x.Doctor.ServerAnswers)
+            {
+                MissingClasses(x, true, m.Id);
+                UnreadableTypes(x, true, m.Id);
+                PatchTargets(x, true, m.Id);
+            }
+            // The mod's file is the same seen from either side: in single player the player's game says it.
+            if (x.Side == EnumAppSide.Server && x.SameProcess) return;
             ModFile f = x.Ev.Folder?.Find(m.Id);
             if (f == null) return;
+            if (f.Dlls.Count > 0 && !string.IsNullOrEmpty(f.Type) && !string.Equals(f.Type, "code", StringComparison.OrdinalIgnoreCase))
+            {
+                x.Warn(x.T("ignoredcode-title", m.Name, f.Type.ToLowerInvariant(), string.Join(", ", f.Dlls.Take(6))));
+                x.Explain(x.T("ignoredcode-why"));
+                x.Advice(x.T("ignoredcode-advice"));
+            }
             if (f.ForeignAssets.Count > 0)
             {
                 List<string> replaced = GameFilesReplaced(f);
