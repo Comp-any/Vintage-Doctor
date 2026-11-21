@@ -32,6 +32,10 @@ jobs:
       STRINGS: ${{ inputs.strings }}
       RESULTS_BRANCH: ${{ inputs.resultsBranch || format('ci-decompile-{0}', github.run_number) }}
     steps:
+      - uses: actions/checkout@v4
+        with:
+          path: repo
+
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "10.0.x"
@@ -74,6 +78,20 @@ jobs:
             tail -3 "ilspy-$dll.log"
           done
           ls -la out out/strings | head -120
+
+      # The game draws text with the fonts it comes with and has no second font to fall back on, so a character
+      # they lack is an empty box. This lists what each of its font files has (tools/game-font-chars.txt is made
+      # from font-chars.txt), with the files that say which font is used where.
+      - name: What the game's fonts can draw
+        run: |
+          set +e
+          mkdir -p out/fonts
+          dir="${CLIENTDIR:-$VSDIR}"
+          for f in fonts.conf install.sh run.sh; do [ -f "$dir/$f" ] && cp "$dir/$f" "out/fonts/$f.txt"; done
+          find "$dir" \( -iname '*.ttf' -o -iname '*.otf' -o -iname '*.ttc' \) | sed "s|^$dir/||" > out/fonts/font-files.txt
+          python3 repo/tools/font_chars.py "$dir" > out/fonts/font-chars.txt 2> out/fonts/font-chars-errors.txt
+          [ -s out/fonts/font-chars-errors.txt ] || rm -f out/fonts/font-chars-errors.txt
+          cat out/fonts/font-files.txt; grep '^#' out/fonts/font-chars.txt | cut -c1-300
 
       - name: Push to the branch
         run: |
