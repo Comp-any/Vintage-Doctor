@@ -131,7 +131,8 @@ namespace VintageDoctor
                         packet.Outcome = outcome ?? "";
                         packet.ServerVersion = DoctorVersion;
                         packet.ServerMods = ev.Mods.UserMods.Select(m => m.Key).ToArray();
-                        packet.ServerTopics = AllTopics().Select(t => t.Id + "|" + (t.Question ?? t.Id)).ToArray();
+                        // In the asker's language: their game may not have the mod whose lang key the question is.
+                        packet.ServerTopics = AllTopics().Select(t => t.Id + "|" + WordsIn(lang, t.Question ?? t.Id)).ToArray();
                         serverChannel.SendPacket(packet, player);
                     }, Working);
                 }

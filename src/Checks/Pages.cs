@@ -232,7 +232,7 @@ namespace VintageDoctor
             {
                 int bar = s.IndexOf('|');
                 if (bar <= 0 || x.Doctor.TopicFor(s.Substring(0, bar)) != null) continue;
-                x.Line(DoctorReport.Open(s.Substring(0, bar), "", s.Substring(bar + 1)));
+                x.Line(DoctorReport.Open(s.Substring(0, bar), "", x.Words(s.Substring(bar + 1))));
             }
             x.Line(DoctorReport.Open(Deep, "", x.T("q-deep")));
             x.Line(DoctorReport.Open(BugReportTopic, "", x.T("q-bugreport")));

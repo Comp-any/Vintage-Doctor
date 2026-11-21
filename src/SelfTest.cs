@@ -550,6 +550,8 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
                 notes.SetString("question", "My guest notes are missing");
                 notes.SetBool("ownHeadings", true);
                 list.GetOrAddTreeAttribute("crash").SetString("question", "a name the doctor uses itself");
+                // A question given as a lang key is shown in the asker's language.
+                list.GetOrAddTreeAttribute("guest-keyed").SetString("question", "vintagedoctor:q-crash");
             };
             EventBusListenerDelegate page = (string name, ref EnumHandling handling, IAttribute data) =>
             {
@@ -603,7 +605,11 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
                 string.Join(",", doctor.AllTopics().Select(tp => tp.Id)));
             var ask = new DoctorContext { Doctor = doctor, Api = sapi, Side = EnumAppSide.Server, LanguageCode = "en", Ev = ev };
             Pages.Questions(ask, null, true, false);
-            t.Check("guests: it is among the questions", ask.R.PlainText(sapi.World).Contains("My guest notes are missing (/doctor guest-notes)"));
+            string asked = ask.R.PlainText(sapi.World);
+            t.Check("guests: it is among the questions", asked.Contains("My guest notes are missing (/doctor guest-notes)"));
+            string crashWords = ask.T("q-crash");
+            t.Check("guests: a question given as a lang key is shown in words, here and for a player's game", asked.Contains(crashWords + " (/doctor guest-keyed)") && !asked.Contains("vintagedoctor:q-crash")
+                && VintageDoctorSystem.WordsIn("en", "vintagedoctor:q-crash") == crashWords && VintageDoctorSystem.WordsIn("en", "Plain words: kept") == "Plain words: kept", First(asked, "guest-keyed"));
 
             // What the player's game sends along: gathered there, packed, unpacked here, handed to the mod.
             api.RegisterClientFacts(me, (topic, arg) => Encoding.UTF8.GetBytes("table 5 for " + topic + " " + arg));
@@ -704,7 +710,7 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             api.Unregister(me);
             guestTest = false;
             doctor.ForgetBusTopics();
-            t.Check("guests: when the mod stops answering, its page is gone", doctor.TopicFor("guest-notes") == null && doctor.TopicFor("guest-typed") == null && doctor.GatherClientFacts("x", "") == null);
+            t.Check("guests: when the mod stops answering, its page is gone", doctor.TopicFor("guest-notes") == null && doctor.TopicFor("guest-keyed") == null && doctor.TopicFor("guest-typed") == null && doctor.GatherClientFacts("x", "") == null);
         }
 
         public const string SickMarker = "doctor-sick-server.marker";

@@ -58,6 +58,20 @@ namespace VintageDoctor
 
         string NextRequest() => SideName[0] + "-" + (++requestCounter).ToString(System.Globalization.CultureInfo.InvariantCulture);
 
+        /// <summary>
+        /// A text a mod gave, in a player's language: when it is a lang key ("mymod:doctor-question", no spaces) that
+        /// has a translation, the translation; otherwise the text as it is.
+        /// </summary>
+        public static string WordsIn(string lang, string textOrKey)
+        {
+            if (string.IsNullOrEmpty(textOrKey)) return "";
+            if (textOrKey.IndexOf(' ') < 0 && textOrKey.IndexOf(':') > 0)
+            {
+                try { if (Lang.HasTranslation(textOrKey, false, false)) return Lang.GetL(string.IsNullOrEmpty(lang) ? "en" : lang, textOrKey); } catch { }
+            }
+            return textOrKey;
+        }
+
         static bool ValidTopicId(string id)
         {
             return !string.IsNullOrEmpty(id) && !Pages.Topics.Contains(id) && id != "fix" && id != "selftest" && id != "hello" && Regex.IsMatch(id, "^[a-z0-9-]+$");
