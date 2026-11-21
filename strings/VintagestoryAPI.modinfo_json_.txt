@@ -1,0 +1,143 @@
+Vintagestory.API.Common/ModInfoAttribute.cs-1-using System;
+Vintagestory.API.Common/ModInfoAttribute.cs-2-
+Vintagestory.API.Common/ModInfoAttribute.cs-3-namespace Vintagestory.API.Common;
+Vintagestory.API.Common/ModInfoAttribute.cs-4-
+Vintagestory.API.Common/ModInfoAttribute.cs-5-/// <summary>
+Vintagestory.API.Common/ModInfoAttribute.cs-6-/// Applied to a mod assembly to provide additional meta data information
+Vintagestory.API.Common/ModInfoAttribute.cs:7:/// about a code mod. Superseded by "modinfo.json" file, if available.
+Vintagestory.API.Common/ModInfoAttribute.cs-8-/// </summary>
+Vintagestory.API.Common/ModInfoAttribute.cs-9-[AttributeUsage(AttributeTargets.Assembly)]
+Vintagestory.API.Common/ModInfoAttribute.cs-10-public sealed class ModInfoAttribute : Attribute
+Vintagestory.API.Common/ModInfoAttribute.cs-11-{
+Vintagestory.API.Common/ModInfoAttribute.cs-12-	/// <summary> The name of this mod. For example "My Example Mod". </summary>
+Vintagestory.API.Common/ModInfoAttribute.cs-13-	public string Name { get; }
+Vintagestory.API.Common/ModInfoAttribute.cs-14-
+Vintagestory.API.Common/ModInfoAttribute.cs-15-	public string IconPath { get; set; }
+Vintagestory.API.Common/ModInfoAttribute.cs-16-
+Vintagestory.API.Common/ModInfoAttribute.cs-17-	/// <summary> The mod ID (domain) of this mod. For example "myexamplemod". </summary>
+Vintagestory.API.Common/ModInfoAttribute.cs-18-	public string ModID { get; }
+Vintagestory.API.Common/ModInfoAttribute.cs-19-
+Vintagestory.API.Common/ModInfoAttribute.cs-20-	/// <summary> The version of this mod. For example "2.10.4". (optional) </summary>
+Vintagestory.API.Common/ModInfoAttribute.cs-21-	public string Version { get; set; }
+Vintagestory.API.Common/ModInfoAttribute.cs-22-
+Vintagestory.API.Common/ModInfoAttribute.cs-23-	/// <summary> Is this mod part of the core game, i.e. vanilla Vintage Story?  (optional)  <br />Only affects whether the player is given a warning when attempting to disable this mod.<br />Mods other than VSSurvival, VSEssentials, VSCreative should not use this, obviously... </summary>
+Vintagestory.API.Common/ModInfoAttribute.cs-24-	public bool CoreMod { get; set; }
+Vintagestory.API.Common/ModInfoAttribute.cs-25-
+Vintagestory.API.Common/ModInfoAttribute.cs-26-	/// <summary>
+Vintagestory.API.Common/ModInfoAttribute.cs-27-	/// The network version of this mod. Change this number when a user that has an older version of your mod should not be allowed to connected to server with a newer version. If not set, the version value is used.
+Vintagestory.API.Common/ModInfoAttribute.cs-28-	/// </summary>
+Vintagestory.API.Common/ModInfoAttribute.cs-29-	public string NetworkVersion { get; set; }
+Vintagestory.API.Common/ModInfoAttribute.cs-30-
+Vintagestory.API.Common/ModInfoAttribute.cs-31-	/// <summary> A short description of what this mod does. (optional) </summary>
+Vintagestory.API.Common/ModInfoAttribute.cs-32-	public string Description { get; set; }
+--
+Vintagestory.API.Common/Mod.cs-9-public abstract class Mod
+Vintagestory.API.Common/Mod.cs-10-{
+Vintagestory.API.Common/Mod.cs-11-	/// <summary> Gets the origin file type of the mod (.cs, .dll, .zip or folder). </summary>
+Vintagestory.API.Common/Mod.cs-12-	public EnumModSourceType SourceType { get; internal set; }
+Vintagestory.API.Common/Mod.cs-13-
+Vintagestory.API.Common/Mod.cs-14-	/// <summary> Gets the full path to where this mod originated from, including file name. </summary>
+Vintagestory.API.Common/Mod.cs-15-	public string SourcePath { get; internal set; }
+Vintagestory.API.Common/Mod.cs-16-
+Vintagestory.API.Common/Mod.cs-17-	/// <summary> Gets the file name of this mod. </summary>
+Vintagestory.API.Common/Mod.cs-18-	public string FileName { get; internal set; }
+Vintagestory.API.Common/Mod.cs-19-
+Vintagestory.API.Common/Mod.cs-20-	/// <summary>
+Vintagestory.API.Common/Mod.cs:21:	/// Gets the info of this mod. Found either as "modinfo.json" in the
+Vintagestory.API.Common/Mod.cs-22-	/// of the mod's folder or archive, or in the case of raw .cs and .dll
+Vintagestory.API.Common/Mod.cs-23-	/// files, using the <see cref="T:Vintagestory.API.Common.ModInfoAttribute" />
+Vintagestory.API.Common/Mod.cs-24-	/// on the assembly.
+Vintagestory.API.Common/Mod.cs-25-	/// </summary>
+Vintagestory.API.Common/Mod.cs-26-	public ModInfo Info { get; internal set; }
+Vintagestory.API.Common/Mod.cs-27-
+Vintagestory.API.Common/Mod.cs-28-	public ModWorldConfiguration WorldConfig { get; internal set; }
+Vintagestory.API.Common/Mod.cs-29-
+Vintagestory.API.Common/Mod.cs-30-	/// <summary>
+Vintagestory.API.Common/Mod.cs-31-	/// Holds the icon of this mod. Found as "modicon.png" in the root of
+Vintagestory.API.Common/Mod.cs-32-	/// the mod's folder or archive. May be null.
+Vintagestory.API.Common/Mod.cs-33-	/// </summary>
+Vintagestory.API.Common/Mod.cs-34-	public BitmapExternal Icon { get; internal set; }
+Vintagestory.API.Common/Mod.cs-35-
+Vintagestory.API.Common/Mod.cs-36-	/// <summary> Gets the logger associated with this mod. </summary>
+Vintagestory.API.Common/Mod.cs-37-	public ILogger Logger { get; internal set; }
+Vintagestory.API.Common/Mod.cs-38-
+Vintagestory.API.Common/Mod.cs-39-	/// <summary> Gets a collection of systems belonging to this mod. </summary>
+Vintagestory.API.Common/Mod.cs-40-	public IReadOnlyCollection<ModSystem> Systems { get; internal set; } = new List<ModSystem>(0).AsReadOnly();
+Vintagestory.API.Common/Mod.cs-41-
+Vintagestory.API.Common/Mod.cs-42-	public override string ToString()
+Vintagestory.API.Common/Mod.cs-43-	{
+Vintagestory.API.Common/Mod.cs-44-		if (string.IsNullOrEmpty(Info?.ModID))
+Vintagestory.API.Common/Mod.cs-45-		{
+Vintagestory.API.Common/Mod.cs-46-			return "'" + FileName + "'";
+--
+Vintagestory.API.Common/ModDependencyAttribute.cs-1-using System;
+Vintagestory.API.Common/ModDependencyAttribute.cs-2-
+Vintagestory.API.Common/ModDependencyAttribute.cs-3-namespace Vintagestory.API.Common;
+Vintagestory.API.Common/ModDependencyAttribute.cs-4-
+Vintagestory.API.Common/ModDependencyAttribute.cs-5-/// <summary>
+Vintagestory.API.Common/ModDependencyAttribute.cs-6-/// Applied to a mod assembly multiple times for each required dependency.
+Vintagestory.API.Common/ModDependencyAttribute.cs:7:/// Superseded by this mod's "modinfo.json" file, if available.
+Vintagestory.API.Common/ModDependencyAttribute.cs-8-/// </summary>
+Vintagestory.API.Common/ModDependencyAttribute.cs-9-[AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
+Vintagestory.API.Common/ModDependencyAttribute.cs-10-public sealed class ModDependencyAttribute : Attribute
+Vintagestory.API.Common/ModDependencyAttribute.cs-11-{
+Vintagestory.API.Common/ModDependencyAttribute.cs-12-	/// <summary> The required mod id (domain) of this dependency. </summary>
+Vintagestory.API.Common/ModDependencyAttribute.cs-13-	public string ModID { get; }
+Vintagestory.API.Common/ModDependencyAttribute.cs-14-
+Vintagestory.API.Common/ModDependencyAttribute.cs-15-	/// <summary>
+Vintagestory.API.Common/ModDependencyAttribute.cs-16-	/// The minimum version requirement of this dependency.
+Vintagestory.API.Common/ModDependencyAttribute.cs-17-	/// May be empty if the no specific version is required.
+Vintagestory.API.Common/ModDependencyAttribute.cs-18-	/// </summary>
+Vintagestory.API.Common/ModDependencyAttribute.cs-19-	public string Version { get; }
+Vintagestory.API.Common/ModDependencyAttribute.cs-20-
+Vintagestory.API.Common/ModDependencyAttribute.cs-21-	public ModDependencyAttribute(string modID, string version = "")
+Vintagestory.API.Common/ModDependencyAttribute.cs-22-	{
+Vintagestory.API.Common/ModDependencyAttribute.cs-23-		if (modID == null)
+Vintagestory.API.Common/ModDependencyAttribute.cs-24-		{
+Vintagestory.API.Common/ModDependencyAttribute.cs-25-			throw new ArgumentNullException("modID");
+Vintagestory.API.Common/ModDependencyAttribute.cs-26-		}
+Vintagestory.API.Common/ModDependencyAttribute.cs-27-		if (!ModInfo.IsValidModID(modID))
+Vintagestory.API.Common/ModDependencyAttribute.cs-28-		{
+Vintagestory.API.Common/ModDependencyAttribute.cs-29-			throw new ArgumentException("'" + modID + "' is not a valid mod ID. Please use only lowercase letters and numbers.", "modID");
+Vintagestory.API.Common/ModDependencyAttribute.cs-30-		}
+Vintagestory.API.Common/ModDependencyAttribute.cs-31-		ModID = modID;
+Vintagestory.API.Common/ModDependencyAttribute.cs-32-		Version = version ?? "";
+--
+Vintagestory.API.Common/ModInfo.cs-5-using System.Runtime.Serialization;
+Vintagestory.API.Common/ModInfo.cs-6-using System.Text;
+Vintagestory.API.Common/ModInfo.cs-7-using Newtonsoft.Json;
+Vintagestory.API.Common/ModInfo.cs-8-using Newtonsoft.Json.Converters;
+Vintagestory.API.Common/ModInfo.cs-9-using Newtonsoft.Json.Linq;
+Vintagestory.API.Common/ModInfo.cs-10-using Vintagestory.API.Config;
+Vintagestory.API.Common/ModInfo.cs-11-using Vintagestory.API.Util;
+Vintagestory.API.Common/ModInfo.cs-12-
+Vintagestory.API.Common/ModInfo.cs-13-namespace Vintagestory.API.Common;
+Vintagestory.API.Common/ModInfo.cs-14-
+Vintagestory.API.Common/ModInfo.cs-15-/// <summary>
+Vintagestory.API.Common/ModInfo.cs-16-/// Meta data for a specific mod folder, archive, source file or assembly.
+Vintagestory.API.Common/ModInfo.cs:17:/// Either loaded from a "modinfo.json" or from the assembly's
+Vintagestory.API.Common/ModInfo.cs-18-/// <see cref="T:Vintagestory.API.Common.ModInfoAttribute" />.
+Vintagestory.API.Common/ModInfo.cs-19-/// </summary>
+Vintagestory.API.Common/ModInfo.cs-20-public class ModInfo : IComparable<ModInfo>
+Vintagestory.API.Common/ModInfo.cs-21-{
+Vintagestory.API.Common/ModInfo.cs-22-	private class DependenciesConverter : JsonConverter
+Vintagestory.API.Common/ModInfo.cs-23-	{
+Vintagestory.API.Common/ModInfo.cs-24-		public override bool CanConvert(Type objectType)
+Vintagestory.API.Common/ModInfo.cs-25-		{
+Vintagestory.API.Common/ModInfo.cs-26-			return typeof(IEnumerable<ModDependency>).IsAssignableFrom(objectType);
+Vintagestory.API.Common/ModInfo.cs-27-		}
+Vintagestory.API.Common/ModInfo.cs-28-
+Vintagestory.API.Common/ModInfo.cs-29-		public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+Vintagestory.API.Common/ModInfo.cs-30-		{
+Vintagestory.API.Common/ModInfo.cs-31-			return (from prop in JObject.Load(reader).Properties()
+Vintagestory.API.Common/ModInfo.cs-32-				select new ModDependency(prop.Name, (string?)prop.Value)).ToList().AsReadOnly();
+Vintagestory.API.Common/ModInfo.cs-33-		}
+Vintagestory.API.Common/ModInfo.cs-34-
+Vintagestory.API.Common/ModInfo.cs-35-		public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+Vintagestory.API.Common/ModInfo.cs-36-		{
+Vintagestory.API.Common/ModInfo.cs-37-			writer.WriteStartObject();
+Vintagestory.API.Common/ModInfo.cs-38-			foreach (ModDependency item in (IEnumerable<ModDependency>)value)
+Vintagestory.API.Common/ModInfo.cs-39-			{
+Vintagestory.API.Common/ModInfo.cs-40-				writer.WritePropertyName(item.ModID);
+Vintagestory.API.Common/ModInfo.cs-41-				writer.WriteValue(item.Version);
+Vintagestory.API.Common/ModInfo.cs-42-			}

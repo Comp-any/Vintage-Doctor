@@ -1,0 +1,38 @@
+Vintagestory.ClientNative/CrashReporter.cs-119-					}
+Vintagestory.ClientNative/CrashReporter.cs-120-					MethodBase originalMethod = Harmony.GetOriginalMethod(replacement);
+Vintagestory.ClientNative/CrashReporter.cs-121-					if (originalMethod != null)
+Vintagestory.ClientNative/CrashReporter.cs-122-					{
+Vintagestory.ClientNative/CrashReporter.cs-123-						Patches patchInfo = Harmony.GetPatchInfo(originalMethod);
+Vintagestory.ClientNative/CrashReporter.cs-124-						if (patchInfo != null)
+Vintagestory.ClientNative/CrashReporter.cs-125-						{
+Vintagestory.ClientNative/CrashReporter.cs-126-							hashSet2.UnionWith(patchInfo.Owners);
+Vintagestory.ClientNative/CrashReporter.cs-127-						}
+Vintagestory.ClientNative/CrashReporter.cs-128-					}
+Vintagestory.ClientNative/CrashReporter.cs-129-				}
+Vintagestory.ClientNative/CrashReporter.cs-130-			}
+Vintagestory.ClientNative/CrashReporter.cs:131:			stringBuilder.Append(DateTime.Now.ToString() + ": Critical error occurred");
+Vintagestory.ClientNative/CrashReporter.cs-132-			if (hashSet.Count == 0)
+Vintagestory.ClientNative/CrashReporter.cs-133-			{
+Vintagestory.ClientNative/CrashReporter.cs-134-				stringBuilder.Append('\n');
+Vintagestory.ClientNative/CrashReporter.cs-135-			}
+Vintagestory.ClientNative/CrashReporter.cs-136-			else
+Vintagestory.ClientNative/CrashReporter.cs-137-			{
+Vintagestory.ClientNative/CrashReporter.cs-138-				stringBuilder.AppendFormat(" in the following mod{0}: {1}\n", (hashSet.Count > 1) ? "s" : "", string.Join(", ", hashSet.Select((ModContainer mod) => mod.Info?.ModID + "@" + mod.Info?.Version)));
+Vintagestory.ClientNative/CrashReporter.cs-139-			}
+Vintagestory.ClientNative/CrashReporter.cs-140-			stringBuilder.AppendLine("Loaded Mods: " + string.Join(", ", LoadedMods.Select((ModContainer mod) => mod.Info?.ModID + "@" + mod.Info?.Version)));
+Vintagestory.ClientNative/CrashReporter.cs-141-			if (hashSet2.Count > 0)
+Vintagestory.ClientNative/CrashReporter.cs-142-			{
+Vintagestory.ClientNative/CrashReporter.cs-143-				stringBuilder.Append("Involved Harmony IDs: ");
+Vintagestory.ClientNative/CrashReporter.cs-144-				stringBuilder.AppendLine(string.Join(", ", hashSet2));
+Vintagestory.ClientNative/CrashReporter.cs-145-			}
+Vintagestory.ClientNative/CrashReporter.cs-146-			stringBuilder.Append(stringBuilder2);
+Vintagestory.ClientNative/CrashReporter.cs-147-			if (launchCrashReporterGui)
+Vintagestory.ClientNative/CrashReporter.cs-148-			{
+Vintagestory.ClientNative/CrashReporter.cs-149-				try
+Vintagestory.ClientNative/CrashReporter.cs-150-				{
+Vintagestory.ClientNative/CrashReporter.cs-151-					File.WriteAllText(Path.Combine(Path.GetTempPath(), "VSLastCrash.log"), stringBuilder.ToString());
+Vintagestory.ClientNative/CrashReporter.cs-152-					switch (RuntimeEnv.OS)
+Vintagestory.ClientNative/CrashReporter.cs-153-					{
+Vintagestory.ClientNative/CrashReporter.cs-154-					case OS.Windows:
+Vintagestory.ClientNative/CrashReporter.cs-155-						Process.Start(Path.Combine(GamePaths.Binaries, "VSCrashReporter.exe"), new string[1] { GamePaths.Logs });
+Vintagestory.ClientNative/CrashReporter.cs-156-						break;

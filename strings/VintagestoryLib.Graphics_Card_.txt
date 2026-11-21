@@ -1,0 +1,41 @@
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-506-			LogFrameworkVersions();
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-507-		}
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-508-	}
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-509-
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-510-	private void LogFrameworkVersions()
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-511-	{
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-512-		logger.Notification("C# Framework: " + GetFrameworkInfos());
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-513-		logger.Notification("Cairo Graphics Version: " + CairoAPI.VersionString);
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-514-	}
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-515-
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-516-	public void LogAndTestHardwareInfosStage2()
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-517-	{
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs:518:		logger.Notification("Graphics Card Vendor: " + GL.GetString(StringName.Vendor));
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs:519:		logger.Notification("Graphics Card Version: " + GL.GetString(StringName.Version));
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs:520:		logger.Notification("Graphics Card Renderer: " + GL.GetString(StringName.Renderer));
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs:521:		logger.Notification("Graphics Card ShadingLanguageVersion: " + GL.GetString(StringName.ShadingLanguageVersion));
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-522-		logger.Notification("GL.MaxVertexUniformComponents: " + GL.GetInteger(GetPName.MaxVertexUniformComponents));
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-523-		logger.Notification("GL.MaxUniformBlockSize: " + GL.GetInteger(GetPName.MaxUniformBlockSize));
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-524-		if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-525-		{
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-526-			LogFrameworkVersions();
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-527-		}
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-528-		logger.Notification("OpenAL Version: " + AL.Get(ALGetString.Version));
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-529-		string text = System.IO.Path.Combine(GamePaths.Binaries, "Lib/OpenTK.dll");
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-530-		if (File.Exists(text))
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-531-		{
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-532-			FileVersionInfo versionInfo = FileVersionInfo.GetVersionInfo(text);
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-533-			logger.Notification("OpenTK Version: " + versionInfo.FileVersion + " (" + versionInfo.Comments + ")");
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-534-		}
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-535-		logger.Notification("Zstd Version: " + ZstdNative.Version);
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-536-		CheckGlError("loghwinfo");
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-537-		if (RuntimeEnv.OS != OS.Mac && ClientSettings.TestGlExtensions)
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-538-		{
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-539-			HashSet<string> hashSet = new HashSet<string>(new string[4] { "GL_ARB_framebuffer_object", "GL_ARB_vertex_array_object", "GL_ARB_draw_instanced", "GL_ARB_explicit_attrib_location" });
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-540-			int integer = GL.GetInteger(GetPName.NumExtensions);
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-541-			for (int i = 0; i < integer; i++)
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-542-			{
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-543-				string text2 = GL.GetString(StringNameIndexed.Extensions, i);
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-544-				supportsGlDebugMode |= text2 == "GL_ARB_debug_output" || text2 == "GL_KHR_debug";
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-545-				supportsPersistentMapping |= text2 == "GL_ARB_buffer_storage";
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-546-				if (hashSet.Contains(text2))

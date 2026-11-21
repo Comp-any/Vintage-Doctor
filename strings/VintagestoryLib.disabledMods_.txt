@@ -1,0 +1,397 @@
+Vintagestory.ModDb/ModDbUtil.cs-371-		foreach (ModContainer mod in mods)
+Vintagestory.ModDb/ModDbUtil.cs-372-		{
+Vintagestory.ModDb/ModDbUtil.cs-373-			if (mod.Info.ModID != modIdentifier)
+Vintagestory.ModDb/ModDbUtil.cs-374-			{
+Vintagestory.ModDb/ModDbUtil.cs-375-				continue;
+Vintagestory.ModDb/ModDbUtil.cs-376-			}
+Vintagestory.ModDb/ModDbUtil.cs-377-			if (mod.Info.Version == desiredVersion || desiredVersion == null)
+Vintagestory.ModDb/ModDbUtil.cs-378-			{
+Vintagestory.ModDb/ModDbUtil.cs-379-				if (mod.Enabled)
+Vintagestory.ModDb/ModDbUtil.cs-380-				{
+Vintagestory.ModDb/ModDbUtil.cs-381-					return (ModEnableOutcome.AlreadyEnabled, installedVersion: mod.Info.Version);
+Vintagestory.ModDb/ModDbUtil.cs-382-				}
+Vintagestory.ModDb/ModDbUtil.cs:383:				List<string> disabledMods = ClientSettings.DisabledMods;
+Vintagestory.ModDb/ModDbUtil.cs:384:				disabledMods.Remove(mod.Info.ModID + "@" + mod.Info.Version);
+Vintagestory.ModDb/ModDbUtil.cs:385:				ClientSettings.DisabledMods = disabledMods;
+Vintagestory.ModDb/ModDbUtil.cs-386-				ClientSettings.Inst.Save(force: true);
+Vintagestory.ModDb/ModDbUtil.cs-387-				return (ModEnableOutcome.NewlyEnabled, installedVersion: mod.Info.Version);
+Vintagestory.ModDb/ModDbUtil.cs-388-			}
+Vintagestory.ModDb/ModDbUtil.cs-389-			if (GameVersion.IsNewerVersionThan(mod.Info.Version, desiredVersion))
+Vintagestory.ModDb/ModDbUtil.cs-390-			{
+Vintagestory.ModDb/ModDbUtil.cs-391-				return (ModEnableOutcome.InstalledIsNewer, installedVersion: mod.Info.Version);
+Vintagestory.ModDb/ModDbUtil.cs-392-			}
+Vintagestory.ModDb/ModDbUtil.cs-393-			if (deleteOlder)
+Vintagestory.ModDb/ModDbUtil.cs-394-			{
+Vintagestory.ModDb/ModDbUtil.cs-395-				File.Delete(mod.SourcePath);
+Vintagestory.ModDb/ModDbUtil.cs-396-				return (ModEnableOutcome.DeletedOlder, installedVersion: mod.Info.Version);
+Vintagestory.ModDb/ModDbUtil.cs-397-			}
+Vintagestory.ModDb/ModDbUtil.cs-398-			return (ModEnableOutcome.InstalledIsOlder, installedVersion: mod.Info.Version);
+Vintagestory.ModDb/ModDbUtil.cs-399-		}
+Vintagestory.ModDb/ModDbUtil.cs-400-		return (ModEnableOutcome.NotFound, installedVersion: null);
+Vintagestory.ModDb/ModDbUtil.cs-401-	}
+Vintagestory.ModDb/ModDbUtil.cs-402-
+Vintagestory.ModDb/ModDbUtil.cs-403-	public async Task<Exception?> DownloadModAsync(string fileUrl, string fileName, DownloadProgressDelegate progressCallback, CancellationToken cancellationToken = default(CancellationToken))
+Vintagestory.ModDb/ModDbUtil.cs-404-	{
+Vintagestory.ModDb/ModDbUtil.cs-405-		GamePaths.EnsurePathExists(installPath);
+Vintagestory.ModDb/ModDbUtil.cs-406-		string filePath = Path.Combine(installPath, fileName);
+Vintagestory.ModDb/ModDbUtil.cs-407-		try
+Vintagestory.ModDb/ModDbUtil.cs-408-		{
+Vintagestory.ModDb/ModDbUtil.cs-409-			using Stream networkStream = await VSWebClient.Inst.GetStreamAsync(new Uri(modDbUrl, fileUrl));
+Vintagestory.ModDb/ModDbUtil.cs-410-			using FileStream fileStream = new FileStream(filePath, FileMode.Create);
+--
+Vintagestory.Client.NoObf/ClientSettings.cs-1388-			return Inst.GetStringListSetting("modPaths");
+Vintagestory.Client.NoObf/ClientSettings.cs-1389-		}
+Vintagestory.Client.NoObf/ClientSettings.cs-1390-		set
+Vintagestory.Client.NoObf/ClientSettings.cs-1391-		{
+Vintagestory.Client.NoObf/ClientSettings.cs-1392-			Inst.Strings["modPaths"] = value;
+Vintagestory.Client.NoObf/ClientSettings.cs-1393-		}
+Vintagestory.Client.NoObf/ClientSettings.cs-1394-	}
+Vintagestory.Client.NoObf/ClientSettings.cs-1395-
+Vintagestory.Client.NoObf/ClientSettings.cs-1396-	public static List<string> DisabledMods
+Vintagestory.Client.NoObf/ClientSettings.cs-1397-	{
+Vintagestory.Client.NoObf/ClientSettings.cs-1398-		get
+Vintagestory.Client.NoObf/ClientSettings.cs-1399-		{
+Vintagestory.Client.NoObf/ClientSettings.cs:1400:			return Inst.GetStringListSetting("disabledMods");
+Vintagestory.Client.NoObf/ClientSettings.cs-1401-		}
+Vintagestory.Client.NoObf/ClientSettings.cs-1402-		set
+Vintagestory.Client.NoObf/ClientSettings.cs-1403-		{
+Vintagestory.Client.NoObf/ClientSettings.cs:1404:			Inst.Strings["disabledMods"] = value;
+Vintagestory.Client.NoObf/ClientSettings.cs-1405-		}
+Vintagestory.Client.NoObf/ClientSettings.cs-1406-	}
+Vintagestory.Client.NoObf/ClientSettings.cs-1407-
+Vintagestory.Client.NoObf/ClientSettings.cs-1408-	public static bool ExtendedDebugInfo
+Vintagestory.Client.NoObf/ClientSettings.cs-1409-	{
+Vintagestory.Client.NoObf/ClientSettings.cs-1410-		get
+Vintagestory.Client.NoObf/ClientSettings.cs-1411-		{
+Vintagestory.Client.NoObf/ClientSettings.cs-1412-			return Inst.GetBoolSetting("extendedDebugInfo");
+Vintagestory.Client.NoObf/ClientSettings.cs-1413-		}
+Vintagestory.Client.NoObf/ClientSettings.cs-1414-		set
+Vintagestory.Client.NoObf/ClientSettings.cs-1415-		{
+Vintagestory.Client.NoObf/ClientSettings.cs-1416-			Inst.Bool["extendedDebugInfo"] = value;
+Vintagestory.Client.NoObf/ClientSettings.cs-1417-		}
+Vintagestory.Client.NoObf/ClientSettings.cs-1418-	}
+Vintagestory.Client.NoObf/ClientSettings.cs-1419-
+Vintagestory.Client.NoObf/ClientSettings.cs-1420-	public static bool ScaleScreenshot
+Vintagestory.Client.NoObf/ClientSettings.cs-1421-	{
+Vintagestory.Client.NoObf/ClientSettings.cs-1422-		get
+Vintagestory.Client.NoObf/ClientSettings.cs-1423-		{
+Vintagestory.Client.NoObf/ClientSettings.cs-1424-			return Inst.GetBoolSetting("scaleScreenshot");
+Vintagestory.Client.NoObf/ClientSettings.cs-1425-		}
+Vintagestory.Client.NoObf/ClientSettings.cs-1426-		set
+Vintagestory.Client.NoObf/ClientSettings.cs-1427-		{
+Vintagestory.Client.NoObf/ClientSettings.cs-1428-			Inst.Bool["scaleScreenshot"] = value;
+Vintagestory.Client.NoObf/ClientSettings.cs-1429-		}
+--
+Vintagestory.Client.NoObf/ClientSettings.cs-2019-		boolSettings["immersiveMouseMode"] = false;
+Vintagestory.Client.NoObf/ClientSettings.cs-2020-		boolSettings["startupErrorDialog"] = false;
+Vintagestory.Client.NoObf/ClientSettings.cs-2021-		boolSettings["allowSSBOs"] = DefaultSSBOsSetting();
+Vintagestory.Client.NoObf/ClientSettings.cs-2022-		stringSettings["glContextVersion"] = "4.3";
+Vintagestory.Client.NoObf/ClientSettings.cs-2023-		stringSettings["mptoken"] = "";
+Vintagestory.Client.NoObf/ClientSettings.cs-2024-		stringSettings["sessionkey"] = "";
+Vintagestory.Client.NoObf/ClientSettings.cs-2025-		stringSettings["sessionsignature"] = "";
+Vintagestory.Client.NoObf/ClientSettings.cs-2026-		stringSettings["useremail"] = "";
+Vintagestory.Client.NoObf/ClientSettings.cs-2027-		stringSettings["entitlements"] = "";
+Vintagestory.Client.NoObf/ClientSettings.cs-2028-		stringSettings["masterserverUrl"] = "https://masterserver.vintagestory.at/api/v1/servers/";
+Vintagestory.Client.NoObf/ClientSettings.cs-2029-		stringSettings["modDbUrl"] = "https://mods.vintagestory.at/";
+Vintagestory.Client.NoObf/ClientSettings.cs-2030-		stringListSettings["multiplayerservers"] = new List<string>();
+Vintagestory.Client.NoObf/ClientSettings.cs:2031:		stringListSettings["disabledMods"] = new List<string>();
+Vintagestory.Client.NoObf/ClientSettings.cs-2032-		stringListSettings["dialogPositions"] = new List<string>();
+Vintagestory.Client.NoObf/ClientSettings.cs-2033-		stringListSettings["modPaths"] = new List<string>(new string[2]
+Vintagestory.Client.NoObf/ClientSettings.cs-2034-		{
+Vintagestory.Client.NoObf/ClientSettings.cs-2035-			"Mods",
+Vintagestory.Client.NoObf/ClientSettings.cs-2036-			GamePaths.DataPathMods
+Vintagestory.Client.NoObf/ClientSettings.cs-2037-		});
+Vintagestory.Client.NoObf/ClientSettings.cs-2038-		stringListSettings["customPlayStyles"] = new List<string>();
+Vintagestory.Client.NoObf/ClientSettings.cs-2039-		intSettings["guiColorsPreset"] = 1;
+Vintagestory.Client.NoObf/ClientSettings.cs-2040-		boolSettings["disableModSafetyCheck"] = false;
+Vintagestory.Client.NoObf/ClientSettings.cs-2041-		boolSettings["forceUdpOverTcp"] = false;
+Vintagestory.Client.NoObf/ClientSettings.cs-2042-		Inst.Int["auctionSearchbarThreshold"] = 50;
+Vintagestory.Client.NoObf/ClientSettings.cs-2043-		GraphicsPreset high = GraphicsPreset.High;
+Vintagestory.Client.NoObf/ClientSettings.cs-2044-		GraphicsPresetId = high.PresetId;
+Vintagestory.Client.NoObf/ClientSettings.cs-2045-		ViewDistance = high.ViewDistance;
+Vintagestory.Client.NoObf/ClientSettings.cs-2046-		SmoothShadows = high.SmoothLight;
+Vintagestory.Client.NoObf/ClientSettings.cs-2047-		FXAA = high.FXAA;
+Vintagestory.Client.NoObf/ClientSettings.cs-2048-		SSAOQuality = high.SSAO;
+Vintagestory.Client.NoObf/ClientSettings.cs-2049-		WavingFoliage = high.WavingFoliage;
+Vintagestory.Client.NoObf/ClientSettings.cs-2050-		LiquidFoamAndShinyEffect = high.LiquidFoamEffect;
+Vintagestory.Client.NoObf/ClientSettings.cs-2051-		Bloom = high.Bloom;
+Vintagestory.Client.NoObf/ClientSettings.cs-2052-		GodRayQuality = (high.GodRays ? 1 : 0);
+Vintagestory.Client.NoObf/ClientSettings.cs-2053-		ShadowMapQuality = high.ShadowMapQuality;
+Vintagestory.Client.NoObf/ClientSettings.cs-2054-		ParticleLevel = high.ParticleLevel;
+Vintagestory.Client.NoObf/ClientSettings.cs-2055-		MaxDynamicLights = high.DynamicLights;
+Vintagestory.Client.NoObf/ClientSettings.cs-2056-		SSAA = high.Resolution;
+--
+Vintagestory.Client/GuiScreenMods.cs-68-			ingoreLoadOnce = false;
+Vintagestory.Client/GuiScreenMods.cs-69-			return;
+Vintagestory.Client/GuiScreenMods.cs-70-		}
+Vintagestory.Client/GuiScreenMods.cs-71-		InitGui();
+Vintagestory.Client/GuiScreenMods.cs-72-		ElementComposer.GetCellList<ModCellEntry>("modstable").ReloadCells(LoadModCells());
+Vintagestory.Client/GuiScreenMods.cs-73-		listBounds.CalcWorldBounds();
+Vintagestory.Client/GuiScreenMods.cs-74-		clippingBounds.CalcWorldBounds();
+Vintagestory.Client/GuiScreenMods.cs-75-		ElementComposer.GetScrollbar("scrollbar").SetHeights((float)clippingBounds.fixedHeight, (float)listBounds.fixedHeight);
+Vintagestory.Client/GuiScreenMods.cs-76-	}
+Vintagestory.Client/GuiScreenMods.cs-77-
+Vintagestory.Client/GuiScreenMods.cs-78-	private List<ModCellEntry> LoadModCells()
+Vintagestory.Client/GuiScreenMods.cs-79-	{
+Vintagestory.Client/GuiScreenMods.cs:80:		List<string> disabledMods = ClientSettings.DisabledMods;
+Vintagestory.Client/GuiScreenMods.cs-81-		List<ModCellEntry> list = new List<ModCellEntry>();
+Vintagestory.Client/GuiScreenMods.cs-82-		List<ModContainer> allMods = ScreenManager.allMods;
+Vintagestory.Client/GuiScreenMods.cs-83-		if (!ClientSettings.DisableModSafetyCheck)
+Vintagestory.Client/GuiScreenMods.cs-84-		{
+Vintagestory.Client/GuiScreenMods.cs-85-			ModDbUtil.ModBlockListMRE.WaitOne();
+Vintagestory.Client/GuiScreenMods.cs-86-		}
+Vintagestory.Client/GuiScreenMods.cs-87-		foreach (ModContainer item in allMods)
+Vintagestory.Client/GuiScreenMods.cs-88-		{
+Vintagestory.Client/GuiScreenMods.cs-89-			ModInfo info = item.Info;
+Vintagestory.Client/GuiScreenMods.cs-90-			CairoFont cairoFont = CairoFont.WhiteDetailText();
+Vintagestory.Client/GuiScreenMods.cs-91-			cairoFont.WithFontSize((float)GuiStyle.SmallFontSize);
+Vintagestory.Client/GuiScreenMods.cs-92-			string reason = string.Empty;
+Vintagestory.Client/GuiScreenMods.cs-93-			if (!item.Error.HasValue && ModDbUtil.IsModBlocked(item.Info.ModID, item.Info.Version, out reason))
+Vintagestory.Client/GuiScreenMods.cs-94-			{
+Vintagestory.Client/GuiScreenMods.cs-95-				item.SetError(ModError.Blocked);
+Vintagestory.Client/GuiScreenMods.cs-96-			}
+Vintagestory.Client/GuiScreenMods.cs-97-			if (item.Error.HasValue)
+Vintagestory.Client/GuiScreenMods.cs-98-			{
+Vintagestory.Client/GuiScreenMods.cs-99-				string detailText = item.Error switch
+Vintagestory.Client/GuiScreenMods.cs-100-				{
+Vintagestory.Client/GuiScreenMods.cs-101-					ModError.Loading => Lang.Get("Unable to load mod. Check log files."), 
+Vintagestory.Client/GuiScreenMods.cs-102-					ModError.Dependency => (item.MissingDependencies != null) ? ((item.MissingDependencies.Count != 1) ? Lang.Get("Unable to load mod. Requires dependencies {0}", string.Join(", ", item.MissingDependencies.Select((string str) => str.Replace("@", " v")))) : Lang.Get("Unable to load mod. Requires dependency {0}", string.Join(", ", item.MissingDependencies.Se
+Vintagestory.Client/GuiScreenMods.cs-103-					ModError.Blocked => Lang.Get("modloader-blockedmod", reason), 
+Vintagestory.Client/GuiScreenMods.cs-104-					_ => throw new InvalidOperationException(), 
+Vintagestory.Client/GuiScreenMods.cs-105-				};
+Vintagestory.Client/GuiScreenMods.cs-106-				list.Add(new ModCellEntry
+Vintagestory.Client/GuiScreenMods.cs-107-				{
+Vintagestory.Client/GuiScreenMods.cs-108-					Title = item.FileName,
+Vintagestory.Client/GuiScreenMods.cs-109-					DetailText = detailText,
+Vintagestory.Client/GuiScreenMods.cs:110:					Enabled = (!disabledMods.Contains(item.Info?.ModID + "@" + item.Info?.Version) && item.Error != ModError.Blocked),
+Vintagestory.Client/GuiScreenMods.cs-111-					Mod = item,
+Vintagestory.Client/GuiScreenMods.cs-112-					DetailTextFont = cairoFont
+Vintagestory.Client/GuiScreenMods.cs-113-				});
+Vintagestory.Client/GuiScreenMods.cs-114-				continue;
+Vintagestory.Client/GuiScreenMods.cs-115-			}
+Vintagestory.Client/GuiScreenMods.cs-116-			StringBuilder stringBuilder = new StringBuilder();
+Vintagestory.Client/GuiScreenMods.cs-117-			if (info.Authors.Count > 0)
+Vintagestory.Client/GuiScreenMods.cs-118-			{
+Vintagestory.Client/GuiScreenMods.cs-119-				stringBuilder.AppendLine(string.Join(", ", info.Authors));
+Vintagestory.Client/GuiScreenMods.cs-120-			}
+Vintagestory.Client/GuiScreenMods.cs-121-			if (!string.IsNullOrEmpty(info.Description))
+Vintagestory.Client/GuiScreenMods.cs-122-			{
+Vintagestory.Client/GuiScreenMods.cs-123-				stringBuilder.AppendLine(info.Description);
+Vintagestory.Client/GuiScreenMods.cs-124-			}
+Vintagestory.Client/GuiScreenMods.cs-125-			list.Add(new ModCellEntry
+Vintagestory.Client/GuiScreenMods.cs-126-			{
+Vintagestory.Client/GuiScreenMods.cs-127-				Title = info.Name + " (" + info.Type.ToString() + ")",
+Vintagestory.Client/GuiScreenMods.cs-128-				RightTopText = ((!string.IsNullOrEmpty(info.Version)) ? info.Version : "--"),
+Vintagestory.Client/GuiScreenMods.cs-129-				RightTopOffY = 3f,
+Vintagestory.Client/GuiScreenMods.cs-130-				DetailText = stringBuilder.ToString().Trim(),
+Vintagestory.Client/GuiScreenMods.cs:131:				Enabled = !disabledMods.Contains(item.Info.ModID + "@" + item.Info.Version),
+Vintagestory.Client/GuiScreenMods.cs-132-				Mod = item,
+Vintagestory.Client/GuiScreenMods.cs-133-				DetailTextFont = cairoFont
+Vintagestory.Client/GuiScreenMods.cs-134-			});
+Vintagestory.Client/GuiScreenMods.cs-135-		}
+Vintagestory.Client/GuiScreenMods.cs-136-		return list;
+Vintagestory.Client/GuiScreenMods.cs-137-	}
+Vintagestory.Client/GuiScreenMods.cs-138-
+Vintagestory.Client/GuiScreenMods.cs-139-	private void InitGui()
+Vintagestory.Client/GuiScreenMods.cs-140-	{
+Vintagestory.Client/GuiScreenMods.cs-141-		int height = ScreenManager.GamePlatform.WindowSize.Height;
+Vintagestory.Client/GuiScreenMods.cs-142-		int width = ScreenManager.GamePlatform.WindowSize.Width;
+Vintagestory.Client/GuiScreenMods.cs-143-		ElementBounds elementBounds = ElementBounds.FixedSize(60.0, 30.0).WithFixedPadding(10.0, 2.0).WithAlignment(EnumDialogArea.RightFixed);
+Vintagestory.Client/GuiScreenMods.cs-144-		ElementBounds elementBounds2 = ElementBounds.Fixed(EnumDialogArea.LeftTop, 0.0, 0.0, 690.0, 35.0);
+Vintagestory.Client/GuiScreenMods.cs-145-		_ = Math.Max(400.0, (double)width * 0.5) / (double)ClientSettings.GUIScale;
+Vintagestory.Client/GuiScreenMods.cs-146-		float num = (float)Math.Max(300, height) / ClientSettings.GUIScale;
+Vintagestory.Client/GuiScreenMods.cs-147-		ElementComposer?.Dispose();
+Vintagestory.Client/GuiScreenMods.cs-148-		ElementBounds elementBounds3;
+Vintagestory.Client/GuiScreenMods.cs-149-		ElementComposer = dialogBase("mainmenu-mods").AddStaticText(Lang.Get("Installed mods"), CairoFont.WhiteSmallishText(), ElementBounds.Fixed(EnumDialogArea.LeftTop, 0.0, 0.0, 690.0, 40.0)).AddInset(elementBounds3 = elementBounds2.BelowCopy(0.0, 3.0).WithFixedSize(Math.Max(400.0, (double)width * 0.5) / (double)ClientSettings.GUIScale, num - 190f)).AddVertica
+Vintagestory.Client/GuiScreenMods.cs-150-			.BeginClip(clippingBounds = elementBounds3.ForkContainingChild(3.0, 3.0, 3.0, 3.0))
+Vintagestory.Client/GuiScreenMods.cs-151-			.AddCellList(listBounds = clippingBounds.ForkContainingChild(0.0, 0.0, 0.0, -3.0).WithFixedPadding(5.0), createCellElem, LoadModCells(), "modstable")
+Vintagestory.Client/GuiScreenMods.cs-152-			.EndClip()
+Vintagestory.Client/GuiScreenMods.cs-153-			.AddSmallButton(Lang.Get("Browse Online Mods"), OnBrowseOnlineMods, elementBounds.FlatCopy().FixedUnder(elementBounds3, 10.0).WithAlignment(EnumDialogArea.LeftFixed))
+Vintagestory.Client/GuiScreenMods.cs-154-			.AddSmallButton(Lang.Get("Reload Mods"), OnReloadMods, elementBounds.FlatCopy().FixedUnder(elementBounds3, 10.0).WithFixedAlignmentOffset(-13.0, 0.0))
+Vintagestory.Client/GuiScreenMods.cs-155-			.AddSmallButton(Lang.Get("Open Mods Folder"), OnOpenModsFolder, elementBounds.FlatCopy().FixedUnder(elementBounds3, 10.0).WithFixedAlignmentOffset(-150.0, 0.0))
+Vintagestory.Client/GuiScreenMods.cs-156-			.EndChildElements()
+--
+Vintagestory.Client/GuiScreenMods.cs-205-		{
+Vintagestory.Client/GuiScreenMods.cs-206-			SwitchModStatus(guiElementModCell, mod);
+Vintagestory.Client/GuiScreenMods.cs-207-		}
+Vintagestory.Client/GuiScreenMods.cs-208-	}
+Vintagestory.Client/GuiScreenMods.cs-209-
+Vintagestory.Client/GuiScreenMods.cs-210-	private void SwitchModStatus(GuiElementModCell guicell, ModContainer mod)
+Vintagestory.Client/GuiScreenMods.cs-211-	{
+Vintagestory.Client/GuiScreenMods.cs-212-		guicell.On = !guicell.On;
+Vintagestory.Client/GuiScreenMods.cs-213-		if (mod.Status == ModStatus.Enabled || mod.Status == ModStatus.Disabled)
+Vintagestory.Client/GuiScreenMods.cs-214-		{
+Vintagestory.Client/GuiScreenMods.cs-215-			mod.Status = (guicell.On ? ModStatus.Enabled : ModStatus.Disabled);
+Vintagestory.Client/GuiScreenMods.cs-216-		}
+Vintagestory.Client/GuiScreenMods.cs:217:		List<string> disabledMods = ClientSettings.DisabledMods;
+Vintagestory.Client/GuiScreenMods.cs-218-		if (mod.Info != null)
+Vintagestory.Client/GuiScreenMods.cs-219-		{
+Vintagestory.Client/GuiScreenMods.cs:220:			disabledMods.Remove(mod.Info.ModID + "@" + mod.Info.Version);
+Vintagestory.Client/GuiScreenMods.cs-221-			if (!guicell.On)
+Vintagestory.Client/GuiScreenMods.cs-222-			{
+Vintagestory.Client/GuiScreenMods.cs:223:				disabledMods.Add(mod.Info.ModID + "@" + mod.Info.Version);
+Vintagestory.Client/GuiScreenMods.cs-224-			}
+Vintagestory.Client/GuiScreenMods.cs:225:			ClientSettings.DisabledMods = disabledMods;
+Vintagestory.Client/GuiScreenMods.cs-226-			ClientSettings.Inst.Save(force: true);
+Vintagestory.Client/GuiScreenMods.cs-227-		}
+Vintagestory.Client/GuiScreenMods.cs-228-	}
+Vintagestory.Client/GuiScreenMods.cs-229-
+Vintagestory.Client/GuiScreenMods.cs-230-	private void ShowConfirmationDialog(GuiElementModCell guicell, ModContainer mod)
+Vintagestory.Client/GuiScreenMods.cs-231-	{
+Vintagestory.Client/GuiScreenMods.cs-232-		screenManager.LoadScreen(new GuiScreenConfirmAction("coremod-warningtitle", Lang.Get("coremod-warning", mod.Info.Name), "general-back", "Confirm", (bool val) =>
+Vintagestory.Client/GuiScreenMods.cs-233-		{
+Vintagestory.Client/GuiScreenMods.cs-234-			if (val)
+Vintagestory.Client/GuiScreenMods.cs-235-			{
+Vintagestory.Client/GuiScreenMods.cs-236-				SwitchModStatus(guicell, mod);
+Vintagestory.Client/GuiScreenMods.cs-237-			}
+Vintagestory.Client/GuiScreenMods.cs-238-			screenManager.LoadScreen(this);
+Vintagestory.Client/GuiScreenMods.cs-239-		}, screenManager, this, "coremod-confirmation"));
+Vintagestory.Client/GuiScreenMods.cs-240-	}
+Vintagestory.Client/GuiScreenMods.cs-241-
+Vintagestory.Client/GuiScreenMods.cs-242-	private void OnClickCellLeft(int cellIndex)
+Vintagestory.Client/GuiScreenMods.cs-243-	{
+Vintagestory.Client/GuiScreenMods.cs-244-	}
+Vintagestory.Client/GuiScreenMods.cs-245-
+Vintagestory.Client/GuiScreenMods.cs-246-	private void OnNewScrollbarvalue(float value)
+Vintagestory.Client/GuiScreenMods.cs-247-	{
+Vintagestory.Client/GuiScreenMods.cs-248-		ElementBounds bounds = ElementComposer.GetCellList<ModCellEntry>("modstable").Bounds;
+Vintagestory.Client/GuiScreenMods.cs-249-		bounds.fixedY = 0f - value;
+Vintagestory.Client/GuiScreenMods.cs-250-		bounds.CalcWorldBounds();
+--
+Vintagestory.Common/ModLoader.cs-113-
+Vintagestory.Common/ModLoader.cs-114-	public List<ModContainer> LoadModInfos()
+Vintagestory.Common/ModLoader.cs-115-	{
+Vintagestory.Common/ModLoader.cs-116-		List<ModContainer> list = CollectMods();
+Vintagestory.Common/ModLoader.cs-117-		using ModAssemblyLoader loader = new ModAssemblyLoader(ModSearchPaths, list);
+Vintagestory.Common/ModLoader.cs-118-		foreach (ModContainer item in list)
+Vintagestory.Common/ModLoader.cs-119-		{
+Vintagestory.Common/ModLoader.cs-120-			item.LoadModInfo(compilationContext, loader);
+Vintagestory.Common/ModLoader.cs-121-		}
+Vintagestory.Common/ModLoader.cs-122-		return list;
+Vintagestory.Common/ModLoader.cs-123-	}
+Vintagestory.Common/ModLoader.cs-124-
+Vintagestory.Common/ModLoader.cs:125:	public List<ModContainer> LoadModInfosAndVerify(IEnumerable<string> disabledModsByIdAndVersion = null)
+Vintagestory.Common/ModLoader.cs-126-	{
+Vintagestory.Common/ModLoader.cs-127-		List<ModContainer> mods = LoadModInfos();
+Vintagestory.Common/ModLoader.cs:128:		return DisableAndVerify(mods, disabledModsByIdAndVersion);
+Vintagestory.Common/ModLoader.cs-129-	}
+Vintagestory.Common/ModLoader.cs-130-
+Vintagestory.Common/ModLoader.cs:131:	public List<ModContainer> DisableAndVerify(List<ModContainer> mods, IEnumerable<string> disabledModsByIdAndVersion = null)
+Vintagestory.Common/ModLoader.cs-132-	{
+Vintagestory.Common/ModLoader.cs:133:		if (disabledModsByIdAndVersion != null && disabledModsByIdAndVersion.Count() > 0)
+Vintagestory.Common/ModLoader.cs-134-		{
+Vintagestory.Common/ModLoader.cs:135:			DisableMods(mods, disabledModsByIdAndVersion);
+Vintagestory.Common/ModLoader.cs-136-		}
+Vintagestory.Common/ModLoader.cs-137-		return verifyMods(mods);
+Vintagestory.Common/ModLoader.cs-138-	}
+Vintagestory.Common/ModLoader.cs-139-
+Vintagestory.Common/ModLoader.cs:140:	public void LoadMods(IEnumerable<string> disabledModsByIdAndVersion = null)
+Vintagestory.Common/ModLoader.cs-141-	{
+Vintagestory.Common/ModLoader.cs-142-		List<ModContainer> mods = LoadModInfos();
+Vintagestory.Common/ModLoader.cs:143:		LoadMods(mods, disabledModsByIdAndVersion);
+Vintagestory.Common/ModLoader.cs-144-	}
+Vintagestory.Common/ModLoader.cs-145-
+Vintagestory.Common/ModLoader.cs:146:	public void LoadMods(List<ModContainer> mods, IEnumerable<string> disabledModsByIdAndVersion = null)
+Vintagestory.Common/ModLoader.cs-147-	{
+Vintagestory.Common/ModLoader.cs-148-		Dictionary<string, string>? modBlockList = ModDbUtil.ModBlockList;
+Vintagestory.Common/ModLoader.cs-149-		if (modBlockList != null && modBlockList.Count > 0)
+Vintagestory.Common/ModLoader.cs-150-		{
+Vintagestory.Common/ModLoader.cs-151-			List<string> list = new List<string>();
+Vintagestory.Common/ModLoader.cs-152-			foreach (ModContainer mod in mods)
+Vintagestory.Common/ModLoader.cs-153-			{
+Vintagestory.Common/ModLoader.cs-154-				if (!mod.Error.HasValue && ModDbUtil.IsModBlocked(mod.Info.ModID, mod.Info.Version, out string reason))
+Vintagestory.Common/ModLoader.cs-155-				{
+Vintagestory.Common/ModLoader.cs-156-					list.Add($"{mod.Info.ModID}@{mod.Info.Version}: {reason}");
+Vintagestory.Common/ModLoader.cs-157-				}
+Vintagestory.Common/ModLoader.cs-158-			}
+Vintagestory.Common/ModLoader.cs-159-			if (list.Count > 0)
+Vintagestory.Common/ModLoader.cs-160-			{
+Vintagestory.Common/ModLoader.cs-161-				logger.Warning("The following mods where blocked from loading:");
+Vintagestory.Common/ModLoader.cs-162-				foreach (string item in list)
+Vintagestory.Common/ModLoader.cs-163-				{
+Vintagestory.Common/ModLoader.cs-164-					logger.Warning("  " + item);
+Vintagestory.Common/ModLoader.cs-165-				}
+Vintagestory.Common/ModLoader.cs-166-			}
+Vintagestory.Common/ModLoader.cs:167:			disabledModsByIdAndVersion = ((disabledModsByIdAndVersion == null) ? new List<string>() : new List<string>(disabledModsByIdAndVersion));
+Vintagestory.Common/ModLoader.cs:168:			((List<string>)disabledModsByIdAndVersion).AddRange(ModDbUtil.ModBlockList.Keys);
+Vintagestory.Common/ModLoader.cs-169-		}
+Vintagestory.Common/ModLoader.cs:170:		if (disabledModsByIdAndVersion != null && disabledModsByIdAndVersion.Count() > 0)
+Vintagestory.Common/ModLoader.cs-171-		{
+Vintagestory.Common/ModLoader.cs-172-			using (ModAssemblyLoader loader = new ModAssemblyLoader(ModSearchPaths, mods))
+Vintagestory.Common/ModLoader.cs-173-			{
+Vintagestory.Common/ModLoader.cs-174-				foreach (ModContainer mod2 in mods)
+Vintagestory.Common/ModLoader.cs-175-				{
+Vintagestory.Common/ModLoader.cs-176-					mod2.LoadModInfo(compilationContext, loader);
+Vintagestory.Common/ModLoader.cs-177-				}
+Vintagestory.Common/ModLoader.cs-178-			}
+Vintagestory.Common/ModLoader.cs:179:			int num = DisableMods(mods, disabledModsByIdAndVersion);
+Vintagestory.Common/ModLoader.cs-180-			logger.Notification("Found {0} mods ({1} disabled)", mods.Count, num);
+Vintagestory.Common/ModLoader.cs-181-		}
+Vintagestory.Common/ModLoader.cs-182-		else
+Vintagestory.Common/ModLoader.cs-183-		{
+Vintagestory.Common/ModLoader.cs-184-			logger.Notification("Found {0} mods (0 disabled)", mods.Count);
+Vintagestory.Common/ModLoader.cs-185-		}
+Vintagestory.Common/ModLoader.cs-186-		mods = verifyMods(mods);
+Vintagestory.Common/ModLoader.cs-187-		logger.Notification("Mods, sorted by dependency: {0}", string.Join(", ", mods.Select((ModContainer m) => m.Info.ModID)));
+Vintagestory.Common/ModLoader.cs-188-		foreach (ModContainer mod3 in mods)
+Vintagestory.Common/ModLoader.cs-189-		{
+Vintagestory.Common/ModLoader.cs-190-			if (mod3.Enabled)
+Vintagestory.Common/ModLoader.cs-191-			{
+Vintagestory.Common/ModLoader.cs-192-				mod3.Unpack(UnpackPath);
+Vintagestory.Common/ModLoader.cs-193-			}
+Vintagestory.Common/ModLoader.cs-194-		}
+Vintagestory.Common/ModLoader.cs-195-		ClearCacheFolder(mods);
+Vintagestory.Common/ModLoader.cs-196-		enabledSystems = instantiateMods(mods);
+Vintagestory.Common/ModLoader.cs-197-	}
+Vintagestory.Common/ModLoader.cs-198-
+Vintagestory.Common/ModLoader.cs-199-	private List<ModContainer> verifyMods(List<ModContainer> mods)
+Vintagestory.Common/ModLoader.cs-200-	{
+Vintagestory.Common/ModLoader.cs-201-		CheckDuplicateModIDMods(mods);
+Vintagestory.Common/ModLoader.cs-202-		return CheckAndSortDependencies(mods);
+Vintagestory.Common/ModLoader.cs-203-	}
+Vintagestory.Common/ModLoader.cs-204-
+--
+Vintagestory.Common/ModLoader.cs-306-				logger.Notification("    {0}", GamePaths.RemoveUsername(item.FullName));
+Vintagestory.Common/ModLoader.cs-307-			}
+Vintagestory.Common/ModLoader.cs-308-			else
+Vintagestory.Common/ModLoader.cs-309-			{
+Vintagestory.Common/ModLoader.cs-310-				logger.Notification("    {0} (Not found?)", GamePaths.RemoveUsername(item.FullName));
+Vintagestory.Common/ModLoader.cs-311-			}
+Vintagestory.Common/ModLoader.cs-312-		}
+Vintagestory.Common/ModLoader.cs-313-		return (from fsInfo in list.Where((DirectoryInfo dirInfo) => dirInfo.Exists).SelectMany((DirectoryInfo dirInfo) => dirInfo.GetFileSystemInfos())
+Vintagestory.Common/ModLoader.cs-314-			where ModContainer.GetSourceType(fsInfo).HasValue
+Vintagestory.Common/ModLoader.cs-315-			select new ModContainer(fsInfo, logger, traceLog)).OrderBy((ModContainer mod) => mod.FileName, StringComparer.OrdinalIgnoreCase).ToList();
+Vintagestory.Common/ModLoader.cs-316-	}
+Vintagestory.Common/ModLoader.cs-317-
+Vintagestory.Common/ModLoader.cs:318:	private int DisableMods(IEnumerable<ModContainer> mods, IEnumerable<string> disabledModsByIdAndVersion)
+Vintagestory.Common/ModLoader.cs-319-	{
+Vintagestory.Common/ModLoader.cs:320:		if (disabledModsByIdAndVersion == null)
+Vintagestory.Common/ModLoader.cs-321-		{
+Vintagestory.Common/ModLoader.cs-322-			return 0;
+Vintagestory.Common/ModLoader.cs-323-		}
+Vintagestory.Common/ModLoader.cs:324:		HashSet<string> disabledSet = new HashSet<string>(disabledModsByIdAndVersion);
+Vintagestory.Common/ModLoader.cs-325-		List<ModContainer> list = mods.Where((ModContainer mod) => mod?.Info == null || disabledSet.Contains(mod.Info.ModID + "@" + mod.Info.Version) || disabledSet.Contains(mod.Info.ModID ?? "")).ToList();
+Vintagestory.Common/ModLoader.cs-326-		foreach (ModContainer item in list)
+Vintagestory.Common/ModLoader.cs-327-		{
+Vintagestory.Common/ModLoader.cs-328-			item.Status = ModStatus.Disabled;
+Vintagestory.Common/ModLoader.cs-329-		}
+Vintagestory.Common/ModLoader.cs-330-		return Enumerable.Count(list);
+Vintagestory.Common/ModLoader.cs-331-	}
+Vintagestory.Common/ModLoader.cs-332-
+Vintagestory.Common/ModLoader.cs-333-	private void CheckDuplicateModIDMods(IEnumerable<ModContainer> mods)
+Vintagestory.Common/ModLoader.cs-334-	{
+Vintagestory.Common/ModLoader.cs-335-		foreach (IGrouping<string, ModContainer> item in from mod in mods
+Vintagestory.Common/ModLoader.cs-336-			where mod.Info?.ModID != null && mod.Enabled
+Vintagestory.Common/ModLoader.cs-337-			group mod by mod.Info.ModID into @group
+Vintagestory.Common/ModLoader.cs-338-			where @group.Skip(1).Any()
+Vintagestory.Common/ModLoader.cs-339-			select @group)
+Vintagestory.Common/ModLoader.cs-340-		{
+Vintagestory.Common/ModLoader.cs-341-			IOrderedEnumerable<ModContainer> source = item.OrderBy((ModContainer mod) => mod.Info);
+Vintagestory.Common/ModLoader.cs-342-			logger.Warning("Multiple mods share the mod ID '{0}' ({1}). Will only load the highest version one - v{2}.", item.Key, string.Join(", ", item.Select((ModContainer m) => "'" + m.FileName + "'")), source.First().Info.Version);
+Vintagestory.Common/ModLoader.cs-343-			foreach (ModContainer item2 in source.Skip(1))
+Vintagestory.Common/ModLoader.cs-344-			{
+Vintagestory.Common/ModLoader.cs-345-				item2.SetError(ModError.Loading);
+Vintagestory.Common/ModLoader.cs-346-			}
+Vintagestory.Common/ModLoader.cs-347-		}
+Vintagestory.Common/ModLoader.cs-348-	}
+Vintagestory.Common/ModLoader.cs-349-

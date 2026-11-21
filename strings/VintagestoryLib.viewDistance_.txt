@@ -1,0 +1,1338 @@
+Vintagestory.Client.NoObf/ShaderProgramParticlesquad.cs-23-	public float FlatFogStart
+Vintagestory.Client.NoObf/ShaderProgramParticlesquad.cs-24-	{
+Vintagestory.Client.NoObf/ShaderProgramParticlesquad.cs-25-		set
+Vintagestory.Client.NoObf/ShaderProgramParticlesquad.cs-26-		{
+Vintagestory.Client.NoObf/ShaderProgramParticlesquad.cs-27-			Uniform("flatFogStart", value);
+Vintagestory.Client.NoObf/ShaderProgramParticlesquad.cs-28-		}
+Vintagestory.Client.NoObf/ShaderProgramParticlesquad.cs-29-	}
+Vintagestory.Client.NoObf/ShaderProgramParticlesquad.cs-30-
+Vintagestory.Client.NoObf/ShaderProgramParticlesquad.cs-31-	public float ViewDistance
+Vintagestory.Client.NoObf/ShaderProgramParticlesquad.cs-32-	{
+Vintagestory.Client.NoObf/ShaderProgramParticlesquad.cs-33-		set
+Vintagestory.Client.NoObf/ShaderProgramParticlesquad.cs-34-		{
+Vintagestory.Client.NoObf/ShaderProgramParticlesquad.cs:35:			Uniform("viewDistance", value);
+Vintagestory.Client.NoObf/ShaderProgramParticlesquad.cs-36-		}
+Vintagestory.Client.NoObf/ShaderProgramParticlesquad.cs-37-	}
+Vintagestory.Client.NoObf/ShaderProgramParticlesquad.cs-38-
+Vintagestory.Client.NoObf/ShaderProgramParticlesquad.cs-39-	public float ViewDistanceLod0
+Vintagestory.Client.NoObf/ShaderProgramParticlesquad.cs-40-	{
+Vintagestory.Client.NoObf/ShaderProgramParticlesquad.cs-41-		set
+Vintagestory.Client.NoObf/ShaderProgramParticlesquad.cs-42-		{
+Vintagestory.Client.NoObf/ShaderProgramParticlesquad.cs:43:			Uniform("viewDistanceLod0", value);
+Vintagestory.Client.NoObf/ShaderProgramParticlesquad.cs-44-		}
+Vintagestory.Client.NoObf/ShaderProgramParticlesquad.cs-45-	}
+Vintagestory.Client.NoObf/ShaderProgramParticlesquad.cs-46-
+Vintagestory.Client.NoObf/ShaderProgramParticlesquad.cs-47-	public float ZNear
+Vintagestory.Client.NoObf/ShaderProgramParticlesquad.cs-48-	{
+Vintagestory.Client.NoObf/ShaderProgramParticlesquad.cs-49-		set
+Vintagestory.Client.NoObf/ShaderProgramParticlesquad.cs-50-		{
+Vintagestory.Client.NoObf/ShaderProgramParticlesquad.cs-51-			Uniform("zNear", value);
+Vintagestory.Client.NoObf/ShaderProgramParticlesquad.cs-52-		}
+Vintagestory.Client.NoObf/ShaderProgramParticlesquad.cs-53-	}
+Vintagestory.Client.NoObf/ShaderProgramParticlesquad.cs-54-
+Vintagestory.Client.NoObf/ShaderProgramParticlesquad.cs-55-	public float ZFar
+Vintagestory.Client.NoObf/ShaderProgramParticlesquad.cs-56-	{
+Vintagestory.Client.NoObf/ShaderProgramParticlesquad.cs-57-		set
+Vintagestory.Client.NoObf/ShaderProgramParticlesquad.cs-58-		{
+Vintagestory.Client.NoObf/ShaderProgramParticlesquad.cs-59-			Uniform("zFar", value);
+Vintagestory.Client.NoObf/ShaderProgramParticlesquad.cs-60-		}
+Vintagestory.Client.NoObf/ShaderProgramParticlesquad.cs-61-	}
+Vintagestory.Client.NoObf/ShaderProgramParticlesquad.cs-62-
+Vintagestory.Client.NoObf/ShaderProgramParticlesquad.cs-63-	public Vec3f LightPosition
+Vintagestory.Client.NoObf/ShaderProgramParticlesquad.cs-64-	{
+Vintagestory.Client.NoObf/ShaderProgramParticlesquad.cs-65-		set
+Vintagestory.Client.NoObf/ShaderProgramParticlesquad.cs-66-		{
+Vintagestory.Client.NoObf/ShaderProgramParticlesquad.cs-67-			Uniform("lightPosition", value);
+Vintagestory.Client.NoObf/ShaderProgramParticlesquad.cs-68-		}
+--
+Vintagestory.Client.NoObf/ShaderProgramChunkopaque.cs-87-	public float FlatFogStart
+Vintagestory.Client.NoObf/ShaderProgramChunkopaque.cs-88-	{
+Vintagestory.Client.NoObf/ShaderProgramChunkopaque.cs-89-		set
+Vintagestory.Client.NoObf/ShaderProgramChunkopaque.cs-90-		{
+Vintagestory.Client.NoObf/ShaderProgramChunkopaque.cs-91-			Uniform("flatFogStart", value);
+Vintagestory.Client.NoObf/ShaderProgramChunkopaque.cs-92-		}
+Vintagestory.Client.NoObf/ShaderProgramChunkopaque.cs-93-	}
+Vintagestory.Client.NoObf/ShaderProgramChunkopaque.cs-94-
+Vintagestory.Client.NoObf/ShaderProgramChunkopaque.cs-95-	public float ViewDistance
+Vintagestory.Client.NoObf/ShaderProgramChunkopaque.cs-96-	{
+Vintagestory.Client.NoObf/ShaderProgramChunkopaque.cs-97-		set
+Vintagestory.Client.NoObf/ShaderProgramChunkopaque.cs-98-		{
+Vintagestory.Client.NoObf/ShaderProgramChunkopaque.cs:99:			Uniform("viewDistance", value);
+Vintagestory.Client.NoObf/ShaderProgramChunkopaque.cs-100-		}
+Vintagestory.Client.NoObf/ShaderProgramChunkopaque.cs-101-	}
+Vintagestory.Client.NoObf/ShaderProgramChunkopaque.cs-102-
+Vintagestory.Client.NoObf/ShaderProgramChunkopaque.cs-103-	public float ViewDistanceLod0
+Vintagestory.Client.NoObf/ShaderProgramChunkopaque.cs-104-	{
+Vintagestory.Client.NoObf/ShaderProgramChunkopaque.cs-105-		set
+Vintagestory.Client.NoObf/ShaderProgramChunkopaque.cs-106-		{
+Vintagestory.Client.NoObf/ShaderProgramChunkopaque.cs:107:			Uniform("viewDistanceLod0", value);
+Vintagestory.Client.NoObf/ShaderProgramChunkopaque.cs-108-		}
+Vintagestory.Client.NoObf/ShaderProgramChunkopaque.cs-109-	}
+Vintagestory.Client.NoObf/ShaderProgramChunkopaque.cs-110-
+Vintagestory.Client.NoObf/ShaderProgramChunkopaque.cs-111-	public float ZNear
+Vintagestory.Client.NoObf/ShaderProgramChunkopaque.cs-112-	{
+Vintagestory.Client.NoObf/ShaderProgramChunkopaque.cs-113-		set
+Vintagestory.Client.NoObf/ShaderProgramChunkopaque.cs-114-		{
+Vintagestory.Client.NoObf/ShaderProgramChunkopaque.cs-115-			Uniform("zNear", value);
+Vintagestory.Client.NoObf/ShaderProgramChunkopaque.cs-116-		}
+Vintagestory.Client.NoObf/ShaderProgramChunkopaque.cs-117-	}
+Vintagestory.Client.NoObf/ShaderProgramChunkopaque.cs-118-
+Vintagestory.Client.NoObf/ShaderProgramChunkopaque.cs-119-	public float ZFar
+Vintagestory.Client.NoObf/ShaderProgramChunkopaque.cs-120-	{
+Vintagestory.Client.NoObf/ShaderProgramChunkopaque.cs-121-		set
+Vintagestory.Client.NoObf/ShaderProgramChunkopaque.cs-122-		{
+Vintagestory.Client.NoObf/ShaderProgramChunkopaque.cs-123-			Uniform("zFar", value);
+Vintagestory.Client.NoObf/ShaderProgramChunkopaque.cs-124-		}
+Vintagestory.Client.NoObf/ShaderProgramChunkopaque.cs-125-	}
+Vintagestory.Client.NoObf/ShaderProgramChunkopaque.cs-126-
+Vintagestory.Client.NoObf/ShaderProgramChunkopaque.cs-127-	public Vec3f LightPosition
+Vintagestory.Client.NoObf/ShaderProgramChunkopaque.cs-128-	{
+Vintagestory.Client.NoObf/ShaderProgramChunkopaque.cs-129-		set
+Vintagestory.Client.NoObf/ShaderProgramChunkopaque.cs-130-		{
+Vintagestory.Client.NoObf/ShaderProgramChunkopaque.cs-131-			Uniform("lightPosition", value);
+Vintagestory.Client.NoObf/ShaderProgramChunkopaque.cs-132-		}
+--
+Vintagestory.Client.NoObf/ShaderProgramCloudmap.cs-87-	public float FlatFogStart
+Vintagestory.Client.NoObf/ShaderProgramCloudmap.cs-88-	{
+Vintagestory.Client.NoObf/ShaderProgramCloudmap.cs-89-		set
+Vintagestory.Client.NoObf/ShaderProgramCloudmap.cs-90-		{
+Vintagestory.Client.NoObf/ShaderProgramCloudmap.cs-91-			Uniform("flatFogStart", value);
+Vintagestory.Client.NoObf/ShaderProgramCloudmap.cs-92-		}
+Vintagestory.Client.NoObf/ShaderProgramCloudmap.cs-93-	}
+Vintagestory.Client.NoObf/ShaderProgramCloudmap.cs-94-
+Vintagestory.Client.NoObf/ShaderProgramCloudmap.cs-95-	public float ViewDistance
+Vintagestory.Client.NoObf/ShaderProgramCloudmap.cs-96-	{
+Vintagestory.Client.NoObf/ShaderProgramCloudmap.cs-97-		set
+Vintagestory.Client.NoObf/ShaderProgramCloudmap.cs-98-		{
+Vintagestory.Client.NoObf/ShaderProgramCloudmap.cs:99:			Uniform("viewDistance", value);
+Vintagestory.Client.NoObf/ShaderProgramCloudmap.cs-100-		}
+Vintagestory.Client.NoObf/ShaderProgramCloudmap.cs-101-	}
+Vintagestory.Client.NoObf/ShaderProgramCloudmap.cs-102-
+Vintagestory.Client.NoObf/ShaderProgramCloudmap.cs-103-	public float ViewDistanceLod0
+Vintagestory.Client.NoObf/ShaderProgramCloudmap.cs-104-	{
+Vintagestory.Client.NoObf/ShaderProgramCloudmap.cs-105-		set
+Vintagestory.Client.NoObf/ShaderProgramCloudmap.cs-106-		{
+Vintagestory.Client.NoObf/ShaderProgramCloudmap.cs:107:			Uniform("viewDistanceLod0", value);
+Vintagestory.Client.NoObf/ShaderProgramCloudmap.cs-108-		}
+Vintagestory.Client.NoObf/ShaderProgramCloudmap.cs-109-	}
+Vintagestory.Client.NoObf/ShaderProgramCloudmap.cs-110-
+Vintagestory.Client.NoObf/ShaderProgramCloudmap.cs-111-	public float ZNear
+Vintagestory.Client.NoObf/ShaderProgramCloudmap.cs-112-	{
+Vintagestory.Client.NoObf/ShaderProgramCloudmap.cs-113-		set
+Vintagestory.Client.NoObf/ShaderProgramCloudmap.cs-114-		{
+Vintagestory.Client.NoObf/ShaderProgramCloudmap.cs-115-			Uniform("zNear", value);
+Vintagestory.Client.NoObf/ShaderProgramCloudmap.cs-116-		}
+Vintagestory.Client.NoObf/ShaderProgramCloudmap.cs-117-	}
+Vintagestory.Client.NoObf/ShaderProgramCloudmap.cs-118-
+Vintagestory.Client.NoObf/ShaderProgramCloudmap.cs-119-	public float ZFar
+Vintagestory.Client.NoObf/ShaderProgramCloudmap.cs-120-	{
+Vintagestory.Client.NoObf/ShaderProgramCloudmap.cs-121-		set
+Vintagestory.Client.NoObf/ShaderProgramCloudmap.cs-122-		{
+Vintagestory.Client.NoObf/ShaderProgramCloudmap.cs-123-			Uniform("zFar", value);
+Vintagestory.Client.NoObf/ShaderProgramCloudmap.cs-124-		}
+Vintagestory.Client.NoObf/ShaderProgramCloudmap.cs-125-	}
+Vintagestory.Client.NoObf/ShaderProgramCloudmap.cs-126-
+Vintagestory.Client.NoObf/ShaderProgramCloudmap.cs-127-	public Vec3f LightPosition
+Vintagestory.Client.NoObf/ShaderProgramCloudmap.cs-128-	{
+Vintagestory.Client.NoObf/ShaderProgramCloudmap.cs-129-		set
+Vintagestory.Client.NoObf/ShaderProgramCloudmap.cs-130-		{
+Vintagestory.Client.NoObf/ShaderProgramCloudmap.cs-131-			Uniform("lightPosition", value);
+Vintagestory.Client.NoObf/ShaderProgramCloudmap.cs-132-		}
+--
+Vintagestory.Client.NoObf/ShaderProgramChunktopsoil.cs-47-	public float FlatFogStart
+Vintagestory.Client.NoObf/ShaderProgramChunktopsoil.cs-48-	{
+Vintagestory.Client.NoObf/ShaderProgramChunktopsoil.cs-49-		set
+Vintagestory.Client.NoObf/ShaderProgramChunktopsoil.cs-50-		{
+Vintagestory.Client.NoObf/ShaderProgramChunktopsoil.cs-51-			Uniform("flatFogStart", value);
+Vintagestory.Client.NoObf/ShaderProgramChunktopsoil.cs-52-		}
+Vintagestory.Client.NoObf/ShaderProgramChunktopsoil.cs-53-	}
+Vintagestory.Client.NoObf/ShaderProgramChunktopsoil.cs-54-
+Vintagestory.Client.NoObf/ShaderProgramChunktopsoil.cs-55-	public float ViewDistance
+Vintagestory.Client.NoObf/ShaderProgramChunktopsoil.cs-56-	{
+Vintagestory.Client.NoObf/ShaderProgramChunktopsoil.cs-57-		set
+Vintagestory.Client.NoObf/ShaderProgramChunktopsoil.cs-58-		{
+Vintagestory.Client.NoObf/ShaderProgramChunktopsoil.cs:59:			Uniform("viewDistance", value);
+Vintagestory.Client.NoObf/ShaderProgramChunktopsoil.cs-60-		}
+Vintagestory.Client.NoObf/ShaderProgramChunktopsoil.cs-61-	}
+Vintagestory.Client.NoObf/ShaderProgramChunktopsoil.cs-62-
+Vintagestory.Client.NoObf/ShaderProgramChunktopsoil.cs-63-	public float ViewDistanceLod0
+Vintagestory.Client.NoObf/ShaderProgramChunktopsoil.cs-64-	{
+Vintagestory.Client.NoObf/ShaderProgramChunktopsoil.cs-65-		set
+Vintagestory.Client.NoObf/ShaderProgramChunktopsoil.cs-66-		{
+Vintagestory.Client.NoObf/ShaderProgramChunktopsoil.cs:67:			Uniform("viewDistanceLod0", value);
+Vintagestory.Client.NoObf/ShaderProgramChunktopsoil.cs-68-		}
+Vintagestory.Client.NoObf/ShaderProgramChunktopsoil.cs-69-	}
+Vintagestory.Client.NoObf/ShaderProgramChunktopsoil.cs-70-
+Vintagestory.Client.NoObf/ShaderProgramChunktopsoil.cs-71-	public float ZNear
+Vintagestory.Client.NoObf/ShaderProgramChunktopsoil.cs-72-	{
+Vintagestory.Client.NoObf/ShaderProgramChunktopsoil.cs-73-		set
+Vintagestory.Client.NoObf/ShaderProgramChunktopsoil.cs-74-		{
+Vintagestory.Client.NoObf/ShaderProgramChunktopsoil.cs-75-			Uniform("zNear", value);
+Vintagestory.Client.NoObf/ShaderProgramChunktopsoil.cs-76-		}
+Vintagestory.Client.NoObf/ShaderProgramChunktopsoil.cs-77-	}
+Vintagestory.Client.NoObf/ShaderProgramChunktopsoil.cs-78-
+Vintagestory.Client.NoObf/ShaderProgramChunktopsoil.cs-79-	public float ZFar
+Vintagestory.Client.NoObf/ShaderProgramChunktopsoil.cs-80-	{
+Vintagestory.Client.NoObf/ShaderProgramChunktopsoil.cs-81-		set
+Vintagestory.Client.NoObf/ShaderProgramChunktopsoil.cs-82-		{
+Vintagestory.Client.NoObf/ShaderProgramChunktopsoil.cs-83-			Uniform("zFar", value);
+Vintagestory.Client.NoObf/ShaderProgramChunktopsoil.cs-84-		}
+Vintagestory.Client.NoObf/ShaderProgramChunktopsoil.cs-85-	}
+Vintagestory.Client.NoObf/ShaderProgramChunktopsoil.cs-86-
+Vintagestory.Client.NoObf/ShaderProgramChunktopsoil.cs-87-	public Vec3f LightPosition
+Vintagestory.Client.NoObf/ShaderProgramChunktopsoil.cs-88-	{
+Vintagestory.Client.NoObf/ShaderProgramChunktopsoil.cs-89-		set
+Vintagestory.Client.NoObf/ShaderProgramChunktopsoil.cs-90-		{
+Vintagestory.Client.NoObf/ShaderProgramChunktopsoil.cs-91-			Uniform("lightPosition", value);
+Vintagestory.Client.NoObf/ShaderProgramChunktopsoil.cs-92-		}
+--
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-339-				.AddHoverText(Lang.Get("setting-hover-lodbiasfar"), CairoFont.WhiteSmallText(), 250, elementBounds3.FlatCopy().WithFixedHeight(25.0));
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-340-			ActionConsumable<int> onNewSliderValue2 = onLodbiasFarChanged;
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-341-			ElementBounds elementBounds7 = elementBounds4.BelowCopy(0.0, 21.0).WithFixedSize(num, 20.0);
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-342-			GuiComposerHelpers.AddDropDown(bounds: elementBounds4 = elementBounds7.BelowCopy(0.0, 18.0).WithFixedSize(num, 26.0), composer: guiComposer3.AddSlider(onNewSliderValue2, elementBounds7, "lodbiasfarSlider").AddStaticText(Lang.Get("setting-name-windowborder"), CairoFont.WhiteSmallishText(), elementBounds3 = elementBounds3.BelowCopy(0.0, 4.0)),
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-343-			{
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-344-				Lang.Get("windowborder-resizable"),
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-345-				Lang.Get("windowborder-fixed"),
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-346-				Lang.Get("windowborder-hidden")
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-347-			}, selectedIndex: (int)ScreenManager.Platform.WindowBorder, onSelectionChanged: OnWindowBorderChanged, key: "windowBorder");
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-348-		}
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-349-		composer.AddStaticText(Lang.Get("setting-name-preset"), CairoFont.WhiteSmallishText(), elementBounds = elementBounds.FlatCopy().WithFixedOffset(0.0, 5.0)).AddDropDown(values, names, ClientSettings.GraphicsPresetId, onPresetChanged, elementBounds2 = elementBounds2.FlatCopy().WithFixedSize(num, 30.0), "graphicsPreset").AddStaticText(Lang.Get("s
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-350-			.AddStaticText(Lang.Get("setting-name-viewdist"), CairoFont.WhiteSmallishText(), elementBounds = elementBounds.BelowCopy(0.0, -6.0))
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs:351:			.AddSlider(onViewdistanceChanged, elementBounds2 = elementBounds2.BelowCopy(0.0, 68.0).WithFixedSize(num, 20.0), "viewDistanceSlider")
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-352-			.AddHoverText(array[0], CairoFont.WhiteSmallText(), 250, elementBounds.FlatCopy().WithFixedHeight(25.0));
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-353-		if (ClientSettings.ShowMoreGfxOptions)
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-354-		{
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-355-			GuiComposer guiComposer4 = composer.AddStaticText(Lang.Get("setting-name-smoothshadows"), CairoFont.WhiteSmallishText(), elementBounds = elementBounds.BelowCopy()).AddHoverText(array[7], CairoFont.WhiteSmallText(), 250, elementBounds.FlatCopy().WithFixedHeight(25.0)).AddSwitch(onSmoothShadowsToggled, elementBounds2 = elementBounds2.BelowCopy
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-356-				.AddStaticText(Lang.Get("setting-name-fxaa"), CairoFont.WhiteSmallishText(), elementBounds = elementBounds.BelowCopy())
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-357-				.AddHoverText(array[9], CairoFont.WhiteSmallText(), 250, elementBounds.FlatCopy().WithFixedHeight(25.0))
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-358-				.AddSwitch(onFxaaChanged, elementBounds2 = elementBounds2.BelowCopy(0.0, 12.0), "FxaaSwitch")
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-359-				.AddStaticText(Lang.Get("setting-name-grasswaves"), CairoFont.WhiteSmallishText(), elementBounds = elementBounds.BelowCopy())
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-360-				.AddHoverText(array[14], CairoFont.WhiteSmallText(), 250, elementBounds.FlatCopy().WithFixedHeight(25.0))
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-361-				.AddSwitch(onWavingFoliageChanged, elementBounds2 = elementBounds2.BelowCopy(0.0, 12.0), "wavingFoliageSwitch")
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-362-				.AddStaticText(Lang.Get("setting-name-foamandshinyeffect"), CairoFont.WhiteSmallishText(), elementBounds = elementBounds.BelowCopy())
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-363-				.AddHoverText(array[21], CairoFont.WhiteSmallText(), 250, elementBounds.FlatCopy().WithFixedHeight(25.0))
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-364-				.AddSwitch(onFoamAndShinyEffectChanged, elementBounds2 = elementBounds2.BelowCopy(0.0, 12.0), "liquidFoamEffectSwitch")
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-365-				.AddStaticText(Lang.Get("setting-name-bloom"), CairoFont.WhiteSmallishText(), elementBounds = elementBounds.BelowCopy())
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-366-				.AddHoverText(array[10], CairoFont.WhiteSmallText(), 250, elementBounds.FlatCopy().WithFixedHeight(25.0));
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-367-			Action<bool> onToggle = onBloomChanged;
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-368-			ElementBounds elementBounds8 = elementBounds2.BelowCopy(0.0, 12.0);
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-369-			GuiComposerHelpers.AddDropDown(bounds: elementBounds2 = elementBounds8.BelowCopy(0.0, 18.0).WithFixedSize(num, 26.0), composer: guiComposer4.AddSwitch(onToggle, elementBounds8, "BloomSwitch").AddStaticText(Lang.Get("setting-name-clouds"), CairoFont.WhiteSmallishText(), elementBounds = elementBounds.BelowCopy().WithFixedHeight(39.0)).AddHover
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-370-			{
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-371-				Lang.Get("settings-clouds-off"),
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-372-				Lang.Get("settings-clouds-volumetric"),
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-373-				Lang.Get("settings-clouds-classic")
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-374-			}, selectedIndex: ClientSettings.CloudRenderMode, onSelectionChanged: onCloudsChanged, key: "clouds").AddStaticText(Lang.Get("setting-name-godrays"), CairoFont.WhiteSmallishText(), elementBounds = elementBounds.BelowCopy(0.0, 3.0).WithFixedHeight(39.0)).AddSwitch(onGodRaysToggled, elementBounds2 = elementBounds2.BelowCopy(0.0, 15.0).WithFixe
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-375-				.AddHoverText(array[12], CairoFont.WhiteSmallText(), 250, elementBounds.FlatCopy().WithFixedHeight(25.0))
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-376-				.AddStaticText(Lang.Get("setting-name-ssao"), CairoFont.WhiteSmallishText(), elementBounds = elementBounds.BelowCopy(0.0, 4.0).WithFixedHeight(36.0))
+--
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-424-	{
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-425-		ClientSettings.VsyncMode = newvalue.ToInt();
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-426-	}
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-427-
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-428-	private void OnMoreOptions(LinkTextComponent comp)
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-429-	{
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-430-		ClientSettings.ShowMoreGfxOptions = !ClientSettings.ShowMoreGfxOptions;
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-431-		OnGraphicsOptions(on: true);
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-432-	}
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-433-
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-434-	private void SetGfxValues()
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-435-	{
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs:436:		composer.GetSlider("viewDistanceSlider").SetValues(ClientSettings.ViewDistance, 32, 1536, 32, " blocks");
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs:437:		composer.GetSlider("viewDistanceSlider").OnSliderTooltip = (int value) =>
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-438-		{
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-439-			string text = Lang.Get("createworld-worldheight", value);
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-440-			return (value <= 512) ? text : (text + "\n" + Lang.Get("vram-warning"));
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-441-		};
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs:442:		composer.GetSlider("viewDistanceSlider").TriggerOnlyOnMouseUp();
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-443-		if (handler.MaxViewDistanceAlarmValue.HasValue)
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-444-		{
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs:445:			composer.GetSlider("viewDistanceSlider").SetAlarmValue(handler.MaxViewDistanceAlarmValue.Value);
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-446-		}
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-447-		composer.GetSlider("ambientBloomSlider").SetValues((int)ClientSettings.AmbientBloomLevel, 0, 100, 10, "%");
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-448-		composer.GetSlider("ambientBloomSlider").TriggerOnlyOnMouseUp();
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-449-		if (ClientSettings.ShowMoreGfxOptions)
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-450-		{
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-451-			composer.GetSwitch("smoothShadowsLever").On = ClientSettings.SmoothShadows;
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-452-			composer.GetSwitch("FxaaSwitch").On = ClientSettings.FXAA;
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-453-			composer.GetDropDown("optimizeRamMode").SetSelectedIndex(ClientSettings.OptimizeRamMode - 1);
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-454-			composer.GetSwitch("occlusionCullingSwitch").On = ClientSettings.Occlusionculling;
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-455-			composer.GetSwitch("wavingFoliageSwitch").On = ClientSettings.WavingFoliage;
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-456-			composer.GetSwitch("liquidFoamEffectSwitch").On = ClientSettings.LiquidFoamAndShinyEffect;
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-457-			composer.GetSwitch("BloomSwitch").On = ClientSettings.Bloom;
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-458-			composer.GetSwitch("godraySwitch").On = ClientSettings.GodRayQuality > 0;
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-459-			composer.GetDropDown("windowModeSwitch").SetSelectedIndex(ClientSettings.CloudRenderMode);
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-460-			composer.GetSlider("ssaoSlider").SetValues(ClientSettings.SSAOQuality, 0, 2, 1);
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-461-			string[] qualityssao = new string[3]
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-462-			{
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-463-				Lang.Get("Off"),
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-464-				Lang.Get("Medium quality"),
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-465-				Lang.Get("High quality")
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-466-			};
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-467-			composer.GetSlider("ssaoSlider").OnSliderTooltip = (int value) => qualityssao[value];
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-468-			composer.GetSlider("ssaoSlider").ComposeHoverTextElement();
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-469-			composer.GetSlider("ssaoSlider").TriggerOnlyOnMouseUp();
+Vintagestory.Client.NoObf/GuiCompositeSettings.cs-470-			composer.GetSlider("shadowsSlider").SetValues(ClientSettings.ShadowMapQuality, 0, 4, 1);
+--
+Vintagestory.Client.NoObf/ShaderProgramEntityanimated.cs-65-	public float FlatFogStart
+Vintagestory.Client.NoObf/ShaderProgramEntityanimated.cs-66-	{
+Vintagestory.Client.NoObf/ShaderProgramEntityanimated.cs-67-		set
+Vintagestory.Client.NoObf/ShaderProgramEntityanimated.cs-68-		{
+Vintagestory.Client.NoObf/ShaderProgramEntityanimated.cs-69-			Uniform("flatFogStart", value);
+Vintagestory.Client.NoObf/ShaderProgramEntityanimated.cs-70-		}
+Vintagestory.Client.NoObf/ShaderProgramEntityanimated.cs-71-	}
+Vintagestory.Client.NoObf/ShaderProgramEntityanimated.cs-72-
+Vintagestory.Client.NoObf/ShaderProgramEntityanimated.cs-73-	public float ViewDistance
+Vintagestory.Client.NoObf/ShaderProgramEntityanimated.cs-74-	{
+Vintagestory.Client.NoObf/ShaderProgramEntityanimated.cs-75-		set
+Vintagestory.Client.NoObf/ShaderProgramEntityanimated.cs-76-		{
+Vintagestory.Client.NoObf/ShaderProgramEntityanimated.cs:77:			Uniform("viewDistance", value);
+Vintagestory.Client.NoObf/ShaderProgramEntityanimated.cs-78-		}
+Vintagestory.Client.NoObf/ShaderProgramEntityanimated.cs-79-	}
+Vintagestory.Client.NoObf/ShaderProgramEntityanimated.cs-80-
+Vintagestory.Client.NoObf/ShaderProgramEntityanimated.cs-81-	public float ViewDistanceLod0
+Vintagestory.Client.NoObf/ShaderProgramEntityanimated.cs-82-	{
+Vintagestory.Client.NoObf/ShaderProgramEntityanimated.cs-83-		set
+Vintagestory.Client.NoObf/ShaderProgramEntityanimated.cs-84-		{
+Vintagestory.Client.NoObf/ShaderProgramEntityanimated.cs:85:			Uniform("viewDistanceLod0", value);
+Vintagestory.Client.NoObf/ShaderProgramEntityanimated.cs-86-		}
+Vintagestory.Client.NoObf/ShaderProgramEntityanimated.cs-87-	}
+Vintagestory.Client.NoObf/ShaderProgramEntityanimated.cs-88-
+Vintagestory.Client.NoObf/ShaderProgramEntityanimated.cs-89-	public float ZNear
+Vintagestory.Client.NoObf/ShaderProgramEntityanimated.cs-90-	{
+Vintagestory.Client.NoObf/ShaderProgramEntityanimated.cs-91-		set
+Vintagestory.Client.NoObf/ShaderProgramEntityanimated.cs-92-		{
+Vintagestory.Client.NoObf/ShaderProgramEntityanimated.cs-93-			Uniform("zNear", value);
+Vintagestory.Client.NoObf/ShaderProgramEntityanimated.cs-94-		}
+Vintagestory.Client.NoObf/ShaderProgramEntityanimated.cs-95-	}
+Vintagestory.Client.NoObf/ShaderProgramEntityanimated.cs-96-
+Vintagestory.Client.NoObf/ShaderProgramEntityanimated.cs-97-	public float ZFar
+Vintagestory.Client.NoObf/ShaderProgramEntityanimated.cs-98-	{
+Vintagestory.Client.NoObf/ShaderProgramEntityanimated.cs-99-		set
+Vintagestory.Client.NoObf/ShaderProgramEntityanimated.cs-100-		{
+Vintagestory.Client.NoObf/ShaderProgramEntityanimated.cs-101-			Uniform("zFar", value);
+Vintagestory.Client.NoObf/ShaderProgramEntityanimated.cs-102-		}
+Vintagestory.Client.NoObf/ShaderProgramEntityanimated.cs-103-	}
+Vintagestory.Client.NoObf/ShaderProgramEntityanimated.cs-104-
+Vintagestory.Client.NoObf/ShaderProgramEntityanimated.cs-105-	public Vec3f LightPosition
+Vintagestory.Client.NoObf/ShaderProgramEntityanimated.cs-106-	{
+Vintagestory.Client.NoObf/ShaderProgramEntityanimated.cs-107-		set
+Vintagestory.Client.NoObf/ShaderProgramEntityanimated.cs-108-		{
+Vintagestory.Client.NoObf/ShaderProgramEntityanimated.cs-109-			Uniform("lightPosition", value);
+Vintagestory.Client.NoObf/ShaderProgramEntityanimated.cs-110-		}
+--
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-281-			Uniform("lightPosition", shaderUniforms.LightPosition3D);
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-282-			Uniform("shadowIntensity", shaderUniforms.DropShadowIntensity);
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-283-			Uniform("glitchStrength", shaderUniforms.GlitchStrength);
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-284-			Uniform("psychedelicStrength", shaderUniforms.PsychedelicStrength);
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-285-			if (shadowmapQuality > 0)
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-286-			{
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-287-				FrameBufferRef frameBufferRef = ScreenManager.Platform.FrameBuffers[11];
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-288-				FrameBufferRef frameBufferRef2 = ScreenManager.Platform.FrameBuffers[12];
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-289-				BindTexture2D("shadowMapFar", frameBufferRef.DepthTextureId);
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-290-				BindTexture2D("shadowMapNear", frameBufferRef2.DepthTextureId);
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-291-				Uniform("shadowMapWidthInv", 1f / (float)frameBufferRef.Width);
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-292-				Uniform("shadowMapHeightInv", 1f / (float)frameBufferRef.Height);
+Vintagestory.Client.NoObf/ShaderProgramBase.cs:293:				Uniform("viewDistance", (float)ClientSettings.ViewDistance);
+Vintagestory.Client.NoObf/ShaderProgramBase.cs:294:				Uniform("viewDistanceLod0", (float)Math.Min(640, ClientSettings.ViewDistance) * ClientSettings.LodBias);
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-295-			}
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-296-		}
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-297-		if (includes.Contains("fogandlight.vsh"))
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-298-		{
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-299-			int fogSphereQuantity = shaderUniforms.FogSphereQuantity;
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-300-			Uniform("fogSphereQuantity", fogSphereQuantity);
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-301-			Uniform("fogSpheres", fogSphereQuantity * 8, shaderUniforms.FogSpheres);
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-302-			int pointLightsCount = shaderUniforms.PointLightsCount;
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-303-			Uniform("pointLightQuantity", pointLightsCount);
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-304-			Uniforms3("pointLights", pointLightsCount, shaderUniforms.PointLights3);
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-305-			Uniforms3("pointLightColors", pointLightsCount, shaderUniforms.PointLightColors3);
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-306-			Uniform("flatFogDensity", shaderUniforms.FlagFogDensity);
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-307-			Uniform("flatFogStart", shaderUniforms.FlatFogStartYPos - shaderUniforms.PlayerPos.Y);
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-308-			Uniform("glitchStrengthFL", shaderUniforms.GlitchStrength);
+Vintagestory.Client.NoObf/ShaderProgramBase.cs:309:			Uniform("viewDistance", (float)ClientSettings.ViewDistance);
+Vintagestory.Client.NoObf/ShaderProgramBase.cs:310:			Uniform("viewDistanceLod0", (float)Math.Min(640, ClientSettings.ViewDistance) * ClientSettings.LodBias);
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-311-			Uniform("nightVisionStrength", shaderUniforms.NightVisionStrength);
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-312-		}
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-313-		if (includes.Contains("shadowcoords.vsh"))
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-314-		{
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-315-			Uniform("shadowRangeNear", shaderUniforms.ShadowRangeNear);
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-316-			Uniform("shadowRangeFar", shaderUniforms.ShadowRangeFar);
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-317-			UniformMatrix("toShadowMapSpaceMatrixNear", shaderUniforms.ToShadowMapSpaceMatrixNear);
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-318-			UniformMatrix("toShadowMapSpaceMatrixFar", shaderUniforms.ToShadowMapSpaceMatrixFar);
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-319-		}
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-320-		if (includes.Contains("vertexwarp.vsh"))
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-321-		{
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-322-			Uniform("timeCounter", shaderUniforms.TimeCounter);
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-323-			Uniform("windWaveCounter", shaderUniforms.WindWaveCounter);
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-324-			Uniform("windWaveCounterHighFreq", shaderUniforms.WindWaveCounterHighFreq);
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-325-			Uniform("windSpeed", shaderUniforms.WindSpeed);
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-326-			Uniform("waterWaveCounter", shaderUniforms.WaterWaveCounter);
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-327-			Uniform("playerpos", shaderUniforms.PlayerPos);
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-328-			Uniform("globalWarpIntensity", shaderUniforms.GlobalWorldWarp);
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-329-			Uniform("glitchWaviness", shaderUniforms.GlitchWaviness);
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-330-			Uniform("windWaveIntensity", shaderUniforms.WindWaveIntensity);
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-331-			Uniform("waterWaveIntensity", shaderUniforms.WaterWaveIntensity);
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-332-			Uniform("perceptionEffectId", shaderUniforms.PerceptionEffectId);
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-333-			Uniform("perceptionEffectIntensity", shaderUniforms.PerceptionEffectIntensity);
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-334-		}
+Vintagestory.Client.NoObf/ShaderProgramBase.cs-335-		if (includes.Contains("skycolor.fsh"))
+--
+Vintagestory.Client.NoObf/ChunkCuller.cs-26-
+Vintagestory.Client.NoObf/ChunkCuller.cs-27-	private Vec3i toPos = new Vec3i();
+Vintagestory.Client.NoObf/ChunkCuller.cs-28-
+Vintagestory.Client.NoObf/ChunkCuller.cs-29-	private int qCount;
+Vintagestory.Client.NoObf/ChunkCuller.cs-30-
+Vintagestory.Client.NoObf/ChunkCuller.cs-31-	private bool nowOff;
+Vintagestory.Client.NoObf/ChunkCuller.cs-32-
+Vintagestory.Client.NoObf/ChunkCuller.cs-33-	private const long ExtraDimensionsStart = 4503599627370496L;
+Vintagestory.Client.NoObf/ChunkCuller.cs-34-
+Vintagestory.Client.NoObf/ChunkCuller.cs-35-	public ChunkCuller(ClientMain game)
+Vintagestory.Client.NoObf/ChunkCuller.cs-36-	{
+Vintagestory.Client.NoObf/ChunkCuller.cs-37-		this.game = game;
+Vintagestory.Client.NoObf/ChunkCuller.cs:38:		ClientSettings.Inst.AddWatcher<int>("viewDistance", genShellVectors);
+Vintagestory.Client.NoObf/ChunkCuller.cs-39-		genShellVectors(ClientSettings.ViewDistance);
+Vintagestory.Client.NoObf/ChunkCuller.cs-40-	}
+Vintagestory.Client.NoObf/ChunkCuller.cs-41-
+Vintagestory.Client.NoObf/ChunkCuller.cs:42:	private void genShellVectors(int viewDistance)
+Vintagestory.Client.NoObf/ChunkCuller.cs-43-	{
+Vintagestory.Client.NoObf/ChunkCuller.cs:44:		Vec2i[] octagonPoints = ShapeUtil.GetOctagonPoints(0, 0, viewDistance / 32 + 1);
+Vintagestory.Client.NoObf/ChunkCuller.cs-45-		int chunkMapSizeY = game.WorldMap.ChunkMapSizeY;
+Vintagestory.Client.NoObf/ChunkCuller.cs-46-		HashSet<Vec3i> hashSet = new HashSet<Vec3i>();
+Vintagestory.Client.NoObf/ChunkCuller.cs-47-		foreach (Vec2i vec2i in octagonPoints)
+Vintagestory.Client.NoObf/ChunkCuller.cs-48-		{
+Vintagestory.Client.NoObf/ChunkCuller.cs-49-			for (int j = -chunkMapSizeY; j <= chunkMapSizeY; j++)
+Vintagestory.Client.NoObf/ChunkCuller.cs-50-			{
+Vintagestory.Client.NoObf/ChunkCuller.cs-51-				hashSet.Add(new Vec3i(vec2i.X, j, vec2i.Y));
+Vintagestory.Client.NoObf/ChunkCuller.cs-52-			}
+Vintagestory.Client.NoObf/ChunkCuller.cs-53-		}
+Vintagestory.Client.NoObf/ChunkCuller.cs:54:		for (int k = 0; k < viewDistance / 32 + 1; k++)
+Vintagestory.Client.NoObf/ChunkCuller.cs-55-		{
+Vintagestory.Client.NoObf/ChunkCuller.cs-56-			octagonPoints = ShapeUtil.GetOctagonPoints(0, 0, k);
+Vintagestory.Client.NoObf/ChunkCuller.cs-57-			foreach (Vec2i vec2i2 in octagonPoints)
+Vintagestory.Client.NoObf/ChunkCuller.cs-58-			{
+Vintagestory.Client.NoObf/ChunkCuller.cs-59-				hashSet.Add(new Vec3i(vec2i2.X, -chunkMapSizeY, vec2i2.Y));
+Vintagestory.Client.NoObf/ChunkCuller.cs-60-				hashSet.Add(new Vec3i(vec2i2.X, chunkMapSizeY, vec2i2.Y));
+Vintagestory.Client.NoObf/ChunkCuller.cs-61-			}
+Vintagestory.Client.NoObf/ChunkCuller.cs-62-		}
+Vintagestory.Client.NoObf/ChunkCuller.cs-63-		cubicShellPositions = hashSet.ToArray();
+Vintagestory.Client.NoObf/ChunkCuller.cs-64-	}
+Vintagestory.Client.NoObf/ChunkCuller.cs-65-
+Vintagestory.Client.NoObf/ChunkCuller.cs-66-	public void CullInvisibleChunks()
+Vintagestory.Client.NoObf/ChunkCuller.cs-67-	{
+Vintagestory.Client.NoObf/ChunkCuller.cs-68-		if (!ClientSettings.Occlusionculling || game.WorldMap.chunks.Count < 100)
+Vintagestory.Client.NoObf/ChunkCuller.cs-69-		{
+Vintagestory.Client.NoObf/ChunkCuller.cs-70-			if (nowOff)
+Vintagestory.Client.NoObf/ChunkCuller.cs-71-			{
+Vintagestory.Client.NoObf/ChunkCuller.cs-72-				return;
+Vintagestory.Client.NoObf/ChunkCuller.cs-73-			}
+Vintagestory.Client.NoObf/ChunkCuller.cs-74-			ClientChunk.bufIndex = 1;
+Vintagestory.Client.NoObf/ChunkCuller.cs-75-			lock (game.WorldMap.chunksLock)
+Vintagestory.Client.NoObf/ChunkCuller.cs-76-			{
+Vintagestory.Client.NoObf/ChunkCuller.cs-77-				foreach (KeyValuePair<long, ClientChunk> chunk in game.WorldMap.chunks)
+Vintagestory.Client.NoObf/ChunkCuller.cs-78-				{
+Vintagestory.Client.NoObf/ChunkCuller.cs-79-					if (chunk.Key / 4503599627370496L != 1)
+--
+Vintagestory.Client.NoObf/ShaderProgramCelestialobject.cs-103-	public float FlatFogStart
+Vintagestory.Client.NoObf/ShaderProgramCelestialobject.cs-104-	{
+Vintagestory.Client.NoObf/ShaderProgramCelestialobject.cs-105-		set
+Vintagestory.Client.NoObf/ShaderProgramCelestialobject.cs-106-		{
+Vintagestory.Client.NoObf/ShaderProgramCelestialobject.cs-107-			Uniform("flatFogStart", value);
+Vintagestory.Client.NoObf/ShaderProgramCelestialobject.cs-108-		}
+Vintagestory.Client.NoObf/ShaderProgramCelestialobject.cs-109-	}
+Vintagestory.Client.NoObf/ShaderProgramCelestialobject.cs-110-
+Vintagestory.Client.NoObf/ShaderProgramCelestialobject.cs-111-	public float ViewDistance
+Vintagestory.Client.NoObf/ShaderProgramCelestialobject.cs-112-	{
+Vintagestory.Client.NoObf/ShaderProgramCelestialobject.cs-113-		set
+Vintagestory.Client.NoObf/ShaderProgramCelestialobject.cs-114-		{
+Vintagestory.Client.NoObf/ShaderProgramCelestialobject.cs:115:			Uniform("viewDistance", value);
+Vintagestory.Client.NoObf/ShaderProgramCelestialobject.cs-116-		}
+Vintagestory.Client.NoObf/ShaderProgramCelestialobject.cs-117-	}
+Vintagestory.Client.NoObf/ShaderProgramCelestialobject.cs-118-
+Vintagestory.Client.NoObf/ShaderProgramCelestialobject.cs-119-	public float ViewDistanceLod0
+Vintagestory.Client.NoObf/ShaderProgramCelestialobject.cs-120-	{
+Vintagestory.Client.NoObf/ShaderProgramCelestialobject.cs-121-		set
+Vintagestory.Client.NoObf/ShaderProgramCelestialobject.cs-122-		{
+Vintagestory.Client.NoObf/ShaderProgramCelestialobject.cs:123:			Uniform("viewDistanceLod0", value);
+Vintagestory.Client.NoObf/ShaderProgramCelestialobject.cs-124-		}
+Vintagestory.Client.NoObf/ShaderProgramCelestialobject.cs-125-	}
+Vintagestory.Client.NoObf/ShaderProgramCelestialobject.cs-126-
+Vintagestory.Client.NoObf/ShaderProgramCelestialobject.cs-127-	public float ZNear
+Vintagestory.Client.NoObf/ShaderProgramCelestialobject.cs-128-	{
+Vintagestory.Client.NoObf/ShaderProgramCelestialobject.cs-129-		set
+Vintagestory.Client.NoObf/ShaderProgramCelestialobject.cs-130-		{
+Vintagestory.Client.NoObf/ShaderProgramCelestialobject.cs-131-			Uniform("zNear", value);
+Vintagestory.Client.NoObf/ShaderProgramCelestialobject.cs-132-		}
+Vintagestory.Client.NoObf/ShaderProgramCelestialobject.cs-133-	}
+Vintagestory.Client.NoObf/ShaderProgramCelestialobject.cs-134-
+Vintagestory.Client.NoObf/ShaderProgramCelestialobject.cs-135-	public float ZFar
+Vintagestory.Client.NoObf/ShaderProgramCelestialobject.cs-136-	{
+Vintagestory.Client.NoObf/ShaderProgramCelestialobject.cs-137-		set
+Vintagestory.Client.NoObf/ShaderProgramCelestialobject.cs-138-		{
+Vintagestory.Client.NoObf/ShaderProgramCelestialobject.cs-139-			Uniform("zFar", value);
+Vintagestory.Client.NoObf/ShaderProgramCelestialobject.cs-140-		}
+Vintagestory.Client.NoObf/ShaderProgramCelestialobject.cs-141-	}
+Vintagestory.Client.NoObf/ShaderProgramCelestialobject.cs-142-
+Vintagestory.Client.NoObf/ShaderProgramCelestialobject.cs-143-	public Vec3f LightPosition
+Vintagestory.Client.NoObf/ShaderProgramCelestialobject.cs-144-	{
+Vintagestory.Client.NoObf/ShaderProgramCelestialobject.cs-145-		set
+Vintagestory.Client.NoObf/ShaderProgramCelestialobject.cs-146-		{
+Vintagestory.Client.NoObf/ShaderProgramCelestialobject.cs-147-			Uniform("lightPosition", value);
+Vintagestory.Client.NoObf/ShaderProgramCelestialobject.cs-148-		}
+--
+Vintagestory.Client.NoObf/ShaderProgramAutocamera.cs-61-	public float FlatFogStart
+Vintagestory.Client.NoObf/ShaderProgramAutocamera.cs-62-	{
+Vintagestory.Client.NoObf/ShaderProgramAutocamera.cs-63-		set
+Vintagestory.Client.NoObf/ShaderProgramAutocamera.cs-64-		{
+Vintagestory.Client.NoObf/ShaderProgramAutocamera.cs-65-			Uniform("flatFogStart", value);
+Vintagestory.Client.NoObf/ShaderProgramAutocamera.cs-66-		}
+Vintagestory.Client.NoObf/ShaderProgramAutocamera.cs-67-	}
+Vintagestory.Client.NoObf/ShaderProgramAutocamera.cs-68-
+Vintagestory.Client.NoObf/ShaderProgramAutocamera.cs-69-	public float ViewDistance
+Vintagestory.Client.NoObf/ShaderProgramAutocamera.cs-70-	{
+Vintagestory.Client.NoObf/ShaderProgramAutocamera.cs-71-		set
+Vintagestory.Client.NoObf/ShaderProgramAutocamera.cs-72-		{
+Vintagestory.Client.NoObf/ShaderProgramAutocamera.cs:73:			Uniform("viewDistance", value);
+Vintagestory.Client.NoObf/ShaderProgramAutocamera.cs-74-		}
+Vintagestory.Client.NoObf/ShaderProgramAutocamera.cs-75-	}
+Vintagestory.Client.NoObf/ShaderProgramAutocamera.cs-76-
+Vintagestory.Client.NoObf/ShaderProgramAutocamera.cs-77-	public float ViewDistanceLod0
+Vintagestory.Client.NoObf/ShaderProgramAutocamera.cs-78-	{
+Vintagestory.Client.NoObf/ShaderProgramAutocamera.cs-79-		set
+Vintagestory.Client.NoObf/ShaderProgramAutocamera.cs-80-		{
+Vintagestory.Client.NoObf/ShaderProgramAutocamera.cs:81:			Uniform("viewDistanceLod0", value);
+Vintagestory.Client.NoObf/ShaderProgramAutocamera.cs-82-		}
+Vintagestory.Client.NoObf/ShaderProgramAutocamera.cs-83-	}
+Vintagestory.Client.NoObf/ShaderProgramAutocamera.cs-84-
+Vintagestory.Client.NoObf/ShaderProgramAutocamera.cs-85-	public float GlitchStrengthFL
+Vintagestory.Client.NoObf/ShaderProgramAutocamera.cs-86-	{
+Vintagestory.Client.NoObf/ShaderProgramAutocamera.cs-87-		set
+Vintagestory.Client.NoObf/ShaderProgramAutocamera.cs-88-		{
+Vintagestory.Client.NoObf/ShaderProgramAutocamera.cs-89-			Uniform("glitchStrengthFL", value);
+Vintagestory.Client.NoObf/ShaderProgramAutocamera.cs-90-		}
+Vintagestory.Client.NoObf/ShaderProgramAutocamera.cs-91-	}
+Vintagestory.Client.NoObf/ShaderProgramAutocamera.cs-92-
+Vintagestory.Client.NoObf/ShaderProgramAutocamera.cs-93-	public float NightVisionStrength
+Vintagestory.Client.NoObf/ShaderProgramAutocamera.cs-94-	{
+Vintagestory.Client.NoObf/ShaderProgramAutocamera.cs-95-		set
+Vintagestory.Client.NoObf/ShaderProgramAutocamera.cs-96-		{
+Vintagestory.Client.NoObf/ShaderProgramAutocamera.cs-97-			Uniform("nightVisionStrength", value);
+Vintagestory.Client.NoObf/ShaderProgramAutocamera.cs-98-		}
+Vintagestory.Client.NoObf/ShaderProgramAutocamera.cs-99-	}
+Vintagestory.Client.NoObf/ShaderProgramAutocamera.cs-100-
+Vintagestory.Client.NoObf/ShaderProgramAutocamera.cs-101-	public int PointLightQuantity
+Vintagestory.Client.NoObf/ShaderProgramAutocamera.cs-102-	{
+Vintagestory.Client.NoObf/ShaderProgramAutocamera.cs-103-		set
+Vintagestory.Client.NoObf/ShaderProgramAutocamera.cs-104-		{
+Vintagestory.Client.NoObf/ShaderProgramAutocamera.cs-105-			Uniform("pointLightQuantity", value);
+Vintagestory.Client.NoObf/ShaderProgramAutocamera.cs-106-		}
+--
+Vintagestory.Client.NoObf/ClientMain.cs-815-			KeyboardState[num] = false;
+Vintagestory.Client.NoObf/ClientMain.cs-816-			KeyboardStateRaw[num] = false;
+Vintagestory.Client.NoObf/ClientMain.cs-817-			PreviousKeyboardState[num] = false;
+Vintagestory.Client.NoObf/ClientMain.cs-818-		}
+Vintagestory.Client.NoObf/ClientMain.cs-819-		glScaleTempVec3 = Vec3Utilsd.Create();
+Vintagestory.Client.NoObf/ClientMain.cs-820-		glRotateTempVec3 = Vec3Utilsd.Create();
+Vintagestory.Client.NoObf/ClientMain.cs-821-		identityMatrix = Mat4d.Identity(Mat4d.Create());
+Vintagestory.Client.NoObf/ClientMain.cs-822-		set3DProjectionTempMat4 = Mat4d.Create();
+Vintagestory.Client.NoObf/ClientMain.cs-823-		PacketHandlers = new ServerPacketHandler<Packet_Server>[256];
+Vintagestory.Client.NoObf/ClientMain.cs-824-		csStartup = new ClientSystemStartup(this);
+Vintagestory.Client.NoObf/ClientMain.cs-825-		MainThreadTasks = new Queue<ClientTask>();
+Vintagestory.Client.NoObf/ClientMain.cs-826-		GameLaunchTasks = new Queue<ClientTask>();
+Vintagestory.Client.NoObf/ClientMain.cs:827:		ClientSettings.Inst.AddWatcher<int>("viewDistance", ViewDistanceChanged);
+Vintagestory.Client.NoObf/ClientMain.cs-828-		ClientSettings.Inst.AddWatcher<int>("vsyncMode", OnVsyncChanged);
+Vintagestory.Client.NoObf/ClientMain.cs-829-		api = new ClientCoreAPI(this);
+Vintagestory.Client.NoObf/ClientMain.cs-830-		GuiComposers = new GuiComposerManager(api);
+Vintagestory.Client.NoObf/ClientMain.cs-831-		ColorPreset = new ColorPresets(this, api);
+Vintagestory.Client.NoObf/ClientMain.cs-832-		eventManager?.AddGameTickListener(freeMouseOnDefocus, 500);
+Vintagestory.Client.NoObf/ClientMain.cs-833-	}
+Vintagestory.Client.NoObf/ClientMain.cs-834-
+Vintagestory.Client.NoObf/ClientMain.cs-835-	public void sendRuntimeSettings()
+Vintagestory.Client.NoObf/ClientMain.cs-836-	{
+Vintagestory.Client.NoObf/ClientMain.cs-837-		SendPacketClient(new Packet_Client
+Vintagestory.Client.NoObf/ClientMain.cs-838-		{
+Vintagestory.Client.NoObf/ClientMain.cs-839-			Id = 32,
+Vintagestory.Client.NoObf/ClientMain.cs-840-			RuntimeSetting = new Packet_RuntimeSetting
+Vintagestory.Client.NoObf/ClientMain.cs-841-			{
+Vintagestory.Client.NoObf/ClientMain.cs-842-				ImmersiveFpMode = (ClientSettings.ImmersiveFpMode ? 1 : 0),
+Vintagestory.Client.NoObf/ClientMain.cs-843-				ItemCollectMode = ClientSettings.ItemCollectMode
+Vintagestory.Client.NoObf/ClientMain.cs-844-			}
+Vintagestory.Client.NoObf/ClientMain.cs-845-		});
+Vintagestory.Client.NoObf/ClientMain.cs-846-	}
+Vintagestory.Client.NoObf/ClientMain.cs-847-
+Vintagestory.Client.NoObf/ClientMain.cs-848-	private void freeMouseOnDefocus(float t1)
+Vintagestory.Client.NoObf/ClientMain.cs-849-	{
+Vintagestory.Client.NoObf/ClientMain.cs-850-		if (!Platform.IsFocused && Platform.MouseGrabbed)
+Vintagestory.Client.NoObf/ClientMain.cs-851-		{
+Vintagestory.Client.NoObf/ClientMain.cs-852-			MouseGrabbed = false;
+--
+Vintagestory.Client.NoObf/ShaderProgramAurora.cs-47-	public float FlatFogStart
+Vintagestory.Client.NoObf/ShaderProgramAurora.cs-48-	{
+Vintagestory.Client.NoObf/ShaderProgramAurora.cs-49-		set
+Vintagestory.Client.NoObf/ShaderProgramAurora.cs-50-		{
+Vintagestory.Client.NoObf/ShaderProgramAurora.cs-51-			Uniform("flatFogStart", value);
+Vintagestory.Client.NoObf/ShaderProgramAurora.cs-52-		}
+Vintagestory.Client.NoObf/ShaderProgramAurora.cs-53-	}
+Vintagestory.Client.NoObf/ShaderProgramAurora.cs-54-
+Vintagestory.Client.NoObf/ShaderProgramAurora.cs-55-	public float ViewDistance
+Vintagestory.Client.NoObf/ShaderProgramAurora.cs-56-	{
+Vintagestory.Client.NoObf/ShaderProgramAurora.cs-57-		set
+Vintagestory.Client.NoObf/ShaderProgramAurora.cs-58-		{
+Vintagestory.Client.NoObf/ShaderProgramAurora.cs:59:			Uniform("viewDistance", value);
+Vintagestory.Client.NoObf/ShaderProgramAurora.cs-60-		}
+Vintagestory.Client.NoObf/ShaderProgramAurora.cs-61-	}
+Vintagestory.Client.NoObf/ShaderProgramAurora.cs-62-
+Vintagestory.Client.NoObf/ShaderProgramAurora.cs-63-	public float ViewDistanceLod0
+Vintagestory.Client.NoObf/ShaderProgramAurora.cs-64-	{
+Vintagestory.Client.NoObf/ShaderProgramAurora.cs-65-		set
+Vintagestory.Client.NoObf/ShaderProgramAurora.cs-66-		{
+Vintagestory.Client.NoObf/ShaderProgramAurora.cs:67:			Uniform("viewDistanceLod0", value);
+Vintagestory.Client.NoObf/ShaderProgramAurora.cs-68-		}
+Vintagestory.Client.NoObf/ShaderProgramAurora.cs-69-	}
+Vintagestory.Client.NoObf/ShaderProgramAurora.cs-70-
+Vintagestory.Client.NoObf/ShaderProgramAurora.cs-71-	public float ZNear
+Vintagestory.Client.NoObf/ShaderProgramAurora.cs-72-	{
+Vintagestory.Client.NoObf/ShaderProgramAurora.cs-73-		set
+Vintagestory.Client.NoObf/ShaderProgramAurora.cs-74-		{
+Vintagestory.Client.NoObf/ShaderProgramAurora.cs-75-			Uniform("zNear", value);
+Vintagestory.Client.NoObf/ShaderProgramAurora.cs-76-		}
+Vintagestory.Client.NoObf/ShaderProgramAurora.cs-77-	}
+Vintagestory.Client.NoObf/ShaderProgramAurora.cs-78-
+Vintagestory.Client.NoObf/ShaderProgramAurora.cs-79-	public float ZFar
+Vintagestory.Client.NoObf/ShaderProgramAurora.cs-80-	{
+Vintagestory.Client.NoObf/ShaderProgramAurora.cs-81-		set
+Vintagestory.Client.NoObf/ShaderProgramAurora.cs-82-		{
+Vintagestory.Client.NoObf/ShaderProgramAurora.cs-83-			Uniform("zFar", value);
+Vintagestory.Client.NoObf/ShaderProgramAurora.cs-84-		}
+Vintagestory.Client.NoObf/ShaderProgramAurora.cs-85-	}
+Vintagestory.Client.NoObf/ShaderProgramAurora.cs-86-
+Vintagestory.Client.NoObf/ShaderProgramAurora.cs-87-	public Vec3f LightPosition
+Vintagestory.Client.NoObf/ShaderProgramAurora.cs-88-	{
+Vintagestory.Client.NoObf/ShaderProgramAurora.cs-89-		set
+Vintagestory.Client.NoObf/ShaderProgramAurora.cs-90-		{
+Vintagestory.Client.NoObf/ShaderProgramAurora.cs-91-			Uniform("lightPosition", value);
+Vintagestory.Client.NoObf/ShaderProgramAurora.cs-92-		}
+--
+Vintagestory.Client.NoObf/ShaderProgramWireframe.cs-87-	public float FlatFogStart
+Vintagestory.Client.NoObf/ShaderProgramWireframe.cs-88-	{
+Vintagestory.Client.NoObf/ShaderProgramWireframe.cs-89-		set
+Vintagestory.Client.NoObf/ShaderProgramWireframe.cs-90-		{
+Vintagestory.Client.NoObf/ShaderProgramWireframe.cs-91-			Uniform("flatFogStart", value);
+Vintagestory.Client.NoObf/ShaderProgramWireframe.cs-92-		}
+Vintagestory.Client.NoObf/ShaderProgramWireframe.cs-93-	}
+Vintagestory.Client.NoObf/ShaderProgramWireframe.cs-94-
+Vintagestory.Client.NoObf/ShaderProgramWireframe.cs-95-	public float ViewDistance
+Vintagestory.Client.NoObf/ShaderProgramWireframe.cs-96-	{
+Vintagestory.Client.NoObf/ShaderProgramWireframe.cs-97-		set
+Vintagestory.Client.NoObf/ShaderProgramWireframe.cs-98-		{
+Vintagestory.Client.NoObf/ShaderProgramWireframe.cs:99:			Uniform("viewDistance", value);
+Vintagestory.Client.NoObf/ShaderProgramWireframe.cs-100-		}
+Vintagestory.Client.NoObf/ShaderProgramWireframe.cs-101-	}
+Vintagestory.Client.NoObf/ShaderProgramWireframe.cs-102-
+Vintagestory.Client.NoObf/ShaderProgramWireframe.cs-103-	public float ViewDistanceLod0
+Vintagestory.Client.NoObf/ShaderProgramWireframe.cs-104-	{
+Vintagestory.Client.NoObf/ShaderProgramWireframe.cs-105-		set
+Vintagestory.Client.NoObf/ShaderProgramWireframe.cs-106-		{
+Vintagestory.Client.NoObf/ShaderProgramWireframe.cs:107:			Uniform("viewDistanceLod0", value);
+Vintagestory.Client.NoObf/ShaderProgramWireframe.cs-108-		}
+Vintagestory.Client.NoObf/ShaderProgramWireframe.cs-109-	}
+Vintagestory.Client.NoObf/ShaderProgramWireframe.cs-110-
+Vintagestory.Client.NoObf/ShaderProgramWireframe.cs-111-	public float GlitchStrengthFL
+Vintagestory.Client.NoObf/ShaderProgramWireframe.cs-112-	{
+Vintagestory.Client.NoObf/ShaderProgramWireframe.cs-113-		set
+Vintagestory.Client.NoObf/ShaderProgramWireframe.cs-114-		{
+Vintagestory.Client.NoObf/ShaderProgramWireframe.cs-115-			Uniform("glitchStrengthFL", value);
+Vintagestory.Client.NoObf/ShaderProgramWireframe.cs-116-		}
+Vintagestory.Client.NoObf/ShaderProgramWireframe.cs-117-	}
+Vintagestory.Client.NoObf/ShaderProgramWireframe.cs-118-
+Vintagestory.Client.NoObf/ShaderProgramWireframe.cs-119-	public float NightVisionStrength
+Vintagestory.Client.NoObf/ShaderProgramWireframe.cs-120-	{
+Vintagestory.Client.NoObf/ShaderProgramWireframe.cs-121-		set
+Vintagestory.Client.NoObf/ShaderProgramWireframe.cs-122-		{
+Vintagestory.Client.NoObf/ShaderProgramWireframe.cs-123-			Uniform("nightVisionStrength", value);
+Vintagestory.Client.NoObf/ShaderProgramWireframe.cs-124-		}
+Vintagestory.Client.NoObf/ShaderProgramWireframe.cs-125-	}
+Vintagestory.Client.NoObf/ShaderProgramWireframe.cs-126-
+Vintagestory.Client.NoObf/ShaderProgramWireframe.cs-127-	public int PointLightQuantity
+Vintagestory.Client.NoObf/ShaderProgramWireframe.cs-128-	{
+Vintagestory.Client.NoObf/ShaderProgramWireframe.cs-129-		set
+Vintagestory.Client.NoObf/ShaderProgramWireframe.cs-130-		{
+Vintagestory.Client.NoObf/ShaderProgramWireframe.cs-131-			Uniform("pointLightQuantity", value);
+Vintagestory.Client.NoObf/ShaderProgramWireframe.cs-132-		}
+--
+Vintagestory.Client.NoObf/ShaderProgramChunkliquiddepth.cs-23-	public float[] ModelViewMatrix
+Vintagestory.Client.NoObf/ShaderProgramChunkliquiddepth.cs-24-	{
+Vintagestory.Client.NoObf/ShaderProgramChunkliquiddepth.cs-25-		set
+Vintagestory.Client.NoObf/ShaderProgramChunkliquiddepth.cs-26-		{
+Vintagestory.Client.NoObf/ShaderProgramChunkliquiddepth.cs-27-			UniformMatrix("modelViewMatrix", value);
+Vintagestory.Client.NoObf/ShaderProgramChunkliquiddepth.cs-28-		}
+Vintagestory.Client.NoObf/ShaderProgramChunkliquiddepth.cs-29-	}
+Vintagestory.Client.NoObf/ShaderProgramChunkliquiddepth.cs-30-
+Vintagestory.Client.NoObf/ShaderProgramChunkliquiddepth.cs-31-	public float ViewDistance
+Vintagestory.Client.NoObf/ShaderProgramChunkliquiddepth.cs-32-	{
+Vintagestory.Client.NoObf/ShaderProgramChunkliquiddepth.cs-33-		set
+Vintagestory.Client.NoObf/ShaderProgramChunkliquiddepth.cs-34-		{
+Vintagestory.Client.NoObf/ShaderProgramChunkliquiddepth.cs:35:			Uniform("viewDistance", value);
+Vintagestory.Client.NoObf/ShaderProgramChunkliquiddepth.cs-36-		}
+Vintagestory.Client.NoObf/ShaderProgramChunkliquiddepth.cs-37-	}
+Vintagestory.Client.NoObf/ShaderProgramChunkliquiddepth.cs-38-
+Vintagestory.Client.NoObf/ShaderProgramChunkliquiddepth.cs-39-	public float TimeCounter
+Vintagestory.Client.NoObf/ShaderProgramChunkliquiddepth.cs-40-	{
+Vintagestory.Client.NoObf/ShaderProgramChunkliquiddepth.cs-41-		set
+Vintagestory.Client.NoObf/ShaderProgramChunkliquiddepth.cs-42-		{
+Vintagestory.Client.NoObf/ShaderProgramChunkliquiddepth.cs-43-			Uniform("timeCounter", value);
+Vintagestory.Client.NoObf/ShaderProgramChunkliquiddepth.cs-44-		}
+Vintagestory.Client.NoObf/ShaderProgramChunkliquiddepth.cs-45-	}
+Vintagestory.Client.NoObf/ShaderProgramChunkliquiddepth.cs-46-
+Vintagestory.Client.NoObf/ShaderProgramChunkliquiddepth.cs-47-	public float WindWaveCounter
+Vintagestory.Client.NoObf/ShaderProgramChunkliquiddepth.cs-48-	{
+Vintagestory.Client.NoObf/ShaderProgramChunkliquiddepth.cs-49-		set
+Vintagestory.Client.NoObf/ShaderProgramChunkliquiddepth.cs-50-		{
+Vintagestory.Client.NoObf/ShaderProgramChunkliquiddepth.cs-51-			Uniform("windWaveCounter", value);
+Vintagestory.Client.NoObf/ShaderProgramChunkliquiddepth.cs-52-		}
+Vintagestory.Client.NoObf/ShaderProgramChunkliquiddepth.cs-53-	}
+Vintagestory.Client.NoObf/ShaderProgramChunkliquiddepth.cs-54-
+Vintagestory.Client.NoObf/ShaderProgramChunkliquiddepth.cs-55-	public float WindWaveCounterHighFreq
+Vintagestory.Client.NoObf/ShaderProgramChunkliquiddepth.cs-56-	{
+Vintagestory.Client.NoObf/ShaderProgramChunkliquiddepth.cs-57-		set
+Vintagestory.Client.NoObf/ShaderProgramChunkliquiddepth.cs-58-		{
+Vintagestory.Client.NoObf/ShaderProgramChunkliquiddepth.cs-59-			Uniform("windWaveCounterHighFreq", value);
+Vintagestory.Client.NoObf/ShaderProgramChunkliquiddepth.cs-60-		}
+--
+Vintagestory.Client.NoObf/ShaderProgramSky.cs-63-	public float FlatFogStart
+Vintagestory.Client.NoObf/ShaderProgramSky.cs-64-	{
+Vintagestory.Client.NoObf/ShaderProgramSky.cs-65-		set
+Vintagestory.Client.NoObf/ShaderProgramSky.cs-66-		{
+Vintagestory.Client.NoObf/ShaderProgramSky.cs-67-			Uniform("flatFogStart", value);
+Vintagestory.Client.NoObf/ShaderProgramSky.cs-68-		}
+Vintagestory.Client.NoObf/ShaderProgramSky.cs-69-	}
+Vintagestory.Client.NoObf/ShaderProgramSky.cs-70-
+Vintagestory.Client.NoObf/ShaderProgramSky.cs-71-	public float ViewDistance
+Vintagestory.Client.NoObf/ShaderProgramSky.cs-72-	{
+Vintagestory.Client.NoObf/ShaderProgramSky.cs-73-		set
+Vintagestory.Client.NoObf/ShaderProgramSky.cs-74-		{
+Vintagestory.Client.NoObf/ShaderProgramSky.cs:75:			Uniform("viewDistance", value);
+Vintagestory.Client.NoObf/ShaderProgramSky.cs-76-		}
+Vintagestory.Client.NoObf/ShaderProgramSky.cs-77-	}
+Vintagestory.Client.NoObf/ShaderProgramSky.cs-78-
+Vintagestory.Client.NoObf/ShaderProgramSky.cs-79-	public float ViewDistanceLod0
+Vintagestory.Client.NoObf/ShaderProgramSky.cs-80-	{
+Vintagestory.Client.NoObf/ShaderProgramSky.cs-81-		set
+Vintagestory.Client.NoObf/ShaderProgramSky.cs-82-		{
+Vintagestory.Client.NoObf/ShaderProgramSky.cs:83:			Uniform("viewDistanceLod0", value);
+Vintagestory.Client.NoObf/ShaderProgramSky.cs-84-		}
+Vintagestory.Client.NoObf/ShaderProgramSky.cs-85-	}
+Vintagestory.Client.NoObf/ShaderProgramSky.cs-86-
+Vintagestory.Client.NoObf/ShaderProgramSky.cs-87-	public float ZNear
+Vintagestory.Client.NoObf/ShaderProgramSky.cs-88-	{
+Vintagestory.Client.NoObf/ShaderProgramSky.cs-89-		set
+Vintagestory.Client.NoObf/ShaderProgramSky.cs-90-		{
+Vintagestory.Client.NoObf/ShaderProgramSky.cs-91-			Uniform("zNear", value);
+Vintagestory.Client.NoObf/ShaderProgramSky.cs-92-		}
+Vintagestory.Client.NoObf/ShaderProgramSky.cs-93-	}
+Vintagestory.Client.NoObf/ShaderProgramSky.cs-94-
+Vintagestory.Client.NoObf/ShaderProgramSky.cs-95-	public float ZFar
+Vintagestory.Client.NoObf/ShaderProgramSky.cs-96-	{
+Vintagestory.Client.NoObf/ShaderProgramSky.cs-97-		set
+Vintagestory.Client.NoObf/ShaderProgramSky.cs-98-		{
+Vintagestory.Client.NoObf/ShaderProgramSky.cs-99-			Uniform("zFar", value);
+Vintagestory.Client.NoObf/ShaderProgramSky.cs-100-		}
+Vintagestory.Client.NoObf/ShaderProgramSky.cs-101-	}
+Vintagestory.Client.NoObf/ShaderProgramSky.cs-102-
+Vintagestory.Client.NoObf/ShaderProgramSky.cs-103-	public Vec3f LightPosition
+Vintagestory.Client.NoObf/ShaderProgramSky.cs-104-	{
+Vintagestory.Client.NoObf/ShaderProgramSky.cs-105-		set
+Vintagestory.Client.NoObf/ShaderProgramSky.cs-106-		{
+Vintagestory.Client.NoObf/ShaderProgramSky.cs-107-			Uniform("lightPosition", value);
+Vintagestory.Client.NoObf/ShaderProgramSky.cs-108-		}
+--
+Vintagestory.Client.NoObf/ShaderProgramChunktransparent.cs-23-	public float FlatFogStart
+Vintagestory.Client.NoObf/ShaderProgramChunktransparent.cs-24-	{
+Vintagestory.Client.NoObf/ShaderProgramChunktransparent.cs-25-		set
+Vintagestory.Client.NoObf/ShaderProgramChunktransparent.cs-26-		{
+Vintagestory.Client.NoObf/ShaderProgramChunktransparent.cs-27-			Uniform("flatFogStart", value);
+Vintagestory.Client.NoObf/ShaderProgramChunktransparent.cs-28-		}
+Vintagestory.Client.NoObf/ShaderProgramChunktransparent.cs-29-	}
+Vintagestory.Client.NoObf/ShaderProgramChunktransparent.cs-30-
+Vintagestory.Client.NoObf/ShaderProgramChunktransparent.cs-31-	public float ViewDistance
+Vintagestory.Client.NoObf/ShaderProgramChunktransparent.cs-32-	{
+Vintagestory.Client.NoObf/ShaderProgramChunktransparent.cs-33-		set
+Vintagestory.Client.NoObf/ShaderProgramChunktransparent.cs-34-		{
+Vintagestory.Client.NoObf/ShaderProgramChunktransparent.cs:35:			Uniform("viewDistance", value);
+Vintagestory.Client.NoObf/ShaderProgramChunktransparent.cs-36-		}
+Vintagestory.Client.NoObf/ShaderProgramChunktransparent.cs-37-	}
+Vintagestory.Client.NoObf/ShaderProgramChunktransparent.cs-38-
+Vintagestory.Client.NoObf/ShaderProgramChunktransparent.cs-39-	public float ViewDistanceLod0
+Vintagestory.Client.NoObf/ShaderProgramChunktransparent.cs-40-	{
+Vintagestory.Client.NoObf/ShaderProgramChunktransparent.cs-41-		set
+Vintagestory.Client.NoObf/ShaderProgramChunktransparent.cs-42-		{
+Vintagestory.Client.NoObf/ShaderProgramChunktransparent.cs:43:			Uniform("viewDistanceLod0", value);
+Vintagestory.Client.NoObf/ShaderProgramChunktransparent.cs-44-		}
+Vintagestory.Client.NoObf/ShaderProgramChunktransparent.cs-45-	}
+Vintagestory.Client.NoObf/ShaderProgramChunktransparent.cs-46-
+Vintagestory.Client.NoObf/ShaderProgramChunktransparent.cs-47-	public float ZNear
+Vintagestory.Client.NoObf/ShaderProgramChunktransparent.cs-48-	{
+Vintagestory.Client.NoObf/ShaderProgramChunktransparent.cs-49-		set
+Vintagestory.Client.NoObf/ShaderProgramChunktransparent.cs-50-		{
+Vintagestory.Client.NoObf/ShaderProgramChunktransparent.cs-51-			Uniform("zNear", value);
+Vintagestory.Client.NoObf/ShaderProgramChunktransparent.cs-52-		}
+Vintagestory.Client.NoObf/ShaderProgramChunktransparent.cs-53-	}
+Vintagestory.Client.NoObf/ShaderProgramChunktransparent.cs-54-
+Vintagestory.Client.NoObf/ShaderProgramChunktransparent.cs-55-	public float ZFar
+Vintagestory.Client.NoObf/ShaderProgramChunktransparent.cs-56-	{
+Vintagestory.Client.NoObf/ShaderProgramChunktransparent.cs-57-		set
+Vintagestory.Client.NoObf/ShaderProgramChunktransparent.cs-58-		{
+Vintagestory.Client.NoObf/ShaderProgramChunktransparent.cs-59-			Uniform("zFar", value);
+Vintagestory.Client.NoObf/ShaderProgramChunktransparent.cs-60-		}
+Vintagestory.Client.NoObf/ShaderProgramChunktransparent.cs-61-	}
+Vintagestory.Client.NoObf/ShaderProgramChunktransparent.cs-62-
+Vintagestory.Client.NoObf/ShaderProgramChunktransparent.cs-63-	public Vec3f LightPosition
+Vintagestory.Client.NoObf/ShaderProgramChunktransparent.cs-64-	{
+Vintagestory.Client.NoObf/ShaderProgramChunktransparent.cs-65-		set
+Vintagestory.Client.NoObf/ShaderProgramChunktransparent.cs-66-		{
+Vintagestory.Client.NoObf/ShaderProgramChunktransparent.cs-67-			Uniform("lightPosition", value);
+Vintagestory.Client.NoObf/ShaderProgramChunktransparent.cs-68-		}
+--
+Vintagestory.Client.NoObf/ShaderProgramInstanced.cs-31-	public float FlatFogStart
+Vintagestory.Client.NoObf/ShaderProgramInstanced.cs-32-	{
+Vintagestory.Client.NoObf/ShaderProgramInstanced.cs-33-		set
+Vintagestory.Client.NoObf/ShaderProgramInstanced.cs-34-		{
+Vintagestory.Client.NoObf/ShaderProgramInstanced.cs-35-			Uniform("flatFogStart", value);
+Vintagestory.Client.NoObf/ShaderProgramInstanced.cs-36-		}
+Vintagestory.Client.NoObf/ShaderProgramInstanced.cs-37-	}
+Vintagestory.Client.NoObf/ShaderProgramInstanced.cs-38-
+Vintagestory.Client.NoObf/ShaderProgramInstanced.cs-39-	public float ViewDistance
+Vintagestory.Client.NoObf/ShaderProgramInstanced.cs-40-	{
+Vintagestory.Client.NoObf/ShaderProgramInstanced.cs-41-		set
+Vintagestory.Client.NoObf/ShaderProgramInstanced.cs-42-		{
+Vintagestory.Client.NoObf/ShaderProgramInstanced.cs:43:			Uniform("viewDistance", value);
+Vintagestory.Client.NoObf/ShaderProgramInstanced.cs-44-		}
+Vintagestory.Client.NoObf/ShaderProgramInstanced.cs-45-	}
+Vintagestory.Client.NoObf/ShaderProgramInstanced.cs-46-
+Vintagestory.Client.NoObf/ShaderProgramInstanced.cs-47-	public float ViewDistanceLod0
+Vintagestory.Client.NoObf/ShaderProgramInstanced.cs-48-	{
+Vintagestory.Client.NoObf/ShaderProgramInstanced.cs-49-		set
+Vintagestory.Client.NoObf/ShaderProgramInstanced.cs-50-		{
+Vintagestory.Client.NoObf/ShaderProgramInstanced.cs:51:			Uniform("viewDistanceLod0", value);
+Vintagestory.Client.NoObf/ShaderProgramInstanced.cs-52-		}
+Vintagestory.Client.NoObf/ShaderProgramInstanced.cs-53-	}
+Vintagestory.Client.NoObf/ShaderProgramInstanced.cs-54-
+Vintagestory.Client.NoObf/ShaderProgramInstanced.cs-55-	public float ZNear
+Vintagestory.Client.NoObf/ShaderProgramInstanced.cs-56-	{
+Vintagestory.Client.NoObf/ShaderProgramInstanced.cs-57-		set
+Vintagestory.Client.NoObf/ShaderProgramInstanced.cs-58-		{
+Vintagestory.Client.NoObf/ShaderProgramInstanced.cs-59-			Uniform("zNear", value);
+Vintagestory.Client.NoObf/ShaderProgramInstanced.cs-60-		}
+Vintagestory.Client.NoObf/ShaderProgramInstanced.cs-61-	}
+Vintagestory.Client.NoObf/ShaderProgramInstanced.cs-62-
+Vintagestory.Client.NoObf/ShaderProgramInstanced.cs-63-	public float ZFar
+Vintagestory.Client.NoObf/ShaderProgramInstanced.cs-64-	{
+Vintagestory.Client.NoObf/ShaderProgramInstanced.cs-65-		set
+Vintagestory.Client.NoObf/ShaderProgramInstanced.cs-66-		{
+Vintagestory.Client.NoObf/ShaderProgramInstanced.cs-67-			Uniform("zFar", value);
+Vintagestory.Client.NoObf/ShaderProgramInstanced.cs-68-		}
+Vintagestory.Client.NoObf/ShaderProgramInstanced.cs-69-	}
+Vintagestory.Client.NoObf/ShaderProgramInstanced.cs-70-
+Vintagestory.Client.NoObf/ShaderProgramInstanced.cs-71-	public Vec3f LightPosition
+Vintagestory.Client.NoObf/ShaderProgramInstanced.cs-72-	{
+Vintagestory.Client.NoObf/ShaderProgramInstanced.cs-73-		set
+Vintagestory.Client.NoObf/ShaderProgramInstanced.cs-74-		{
+Vintagestory.Client.NoObf/ShaderProgramInstanced.cs-75-			Uniform("lightPosition", value);
+Vintagestory.Client.NoObf/ShaderProgramInstanced.cs-76-		}
+--
+Vintagestory.Client.NoObf/ShaderProgramHelditem.cs-175-	public float FlatFogStart
+Vintagestory.Client.NoObf/ShaderProgramHelditem.cs-176-	{
+Vintagestory.Client.NoObf/ShaderProgramHelditem.cs-177-		set
+Vintagestory.Client.NoObf/ShaderProgramHelditem.cs-178-		{
+Vintagestory.Client.NoObf/ShaderProgramHelditem.cs-179-			Uniform("flatFogStart", value);
+Vintagestory.Client.NoObf/ShaderProgramHelditem.cs-180-		}
+Vintagestory.Client.NoObf/ShaderProgramHelditem.cs-181-	}
+Vintagestory.Client.NoObf/ShaderProgramHelditem.cs-182-
+Vintagestory.Client.NoObf/ShaderProgramHelditem.cs-183-	public float ViewDistance
+Vintagestory.Client.NoObf/ShaderProgramHelditem.cs-184-	{
+Vintagestory.Client.NoObf/ShaderProgramHelditem.cs-185-		set
+Vintagestory.Client.NoObf/ShaderProgramHelditem.cs-186-		{
+Vintagestory.Client.NoObf/ShaderProgramHelditem.cs:187:			Uniform("viewDistance", value);
+Vintagestory.Client.NoObf/ShaderProgramHelditem.cs-188-		}
+Vintagestory.Client.NoObf/ShaderProgramHelditem.cs-189-	}
+Vintagestory.Client.NoObf/ShaderProgramHelditem.cs-190-
+Vintagestory.Client.NoObf/ShaderProgramHelditem.cs-191-	public float ViewDistanceLod0
+Vintagestory.Client.NoObf/ShaderProgramHelditem.cs-192-	{
+Vintagestory.Client.NoObf/ShaderProgramHelditem.cs-193-		set
+Vintagestory.Client.NoObf/ShaderProgramHelditem.cs-194-		{
+Vintagestory.Client.NoObf/ShaderProgramHelditem.cs:195:			Uniform("viewDistanceLod0", value);
+Vintagestory.Client.NoObf/ShaderProgramHelditem.cs-196-		}
+Vintagestory.Client.NoObf/ShaderProgramHelditem.cs-197-	}
+Vintagestory.Client.NoObf/ShaderProgramHelditem.cs-198-
+Vintagestory.Client.NoObf/ShaderProgramHelditem.cs-199-	public float GlitchStrengthFL
+Vintagestory.Client.NoObf/ShaderProgramHelditem.cs-200-	{
+Vintagestory.Client.NoObf/ShaderProgramHelditem.cs-201-		set
+Vintagestory.Client.NoObf/ShaderProgramHelditem.cs-202-		{
+Vintagestory.Client.NoObf/ShaderProgramHelditem.cs-203-			Uniform("glitchStrengthFL", value);
+Vintagestory.Client.NoObf/ShaderProgramHelditem.cs-204-		}
+Vintagestory.Client.NoObf/ShaderProgramHelditem.cs-205-	}
+Vintagestory.Client.NoObf/ShaderProgramHelditem.cs-206-
+Vintagestory.Client.NoObf/ShaderProgramHelditem.cs-207-	public float NightVisionStrength
+Vintagestory.Client.NoObf/ShaderProgramHelditem.cs-208-	{
+Vintagestory.Client.NoObf/ShaderProgramHelditem.cs-209-		set
+Vintagestory.Client.NoObf/ShaderProgramHelditem.cs-210-		{
+Vintagestory.Client.NoObf/ShaderProgramHelditem.cs-211-			Uniform("nightVisionStrength", value);
+Vintagestory.Client.NoObf/ShaderProgramHelditem.cs-212-		}
+Vintagestory.Client.NoObf/ShaderProgramHelditem.cs-213-	}
+Vintagestory.Client.NoObf/ShaderProgramHelditem.cs-214-
+Vintagestory.Client.NoObf/ShaderProgramHelditem.cs-215-	public int PointLightQuantity
+Vintagestory.Client.NoObf/ShaderProgramHelditem.cs-216-	{
+Vintagestory.Client.NoObf/ShaderProgramHelditem.cs-217-		set
+Vintagestory.Client.NoObf/ShaderProgramHelditem.cs-218-		{
+Vintagestory.Client.NoObf/ShaderProgramHelditem.cs-219-			Uniform("pointLightQuantity", value);
+Vintagestory.Client.NoObf/ShaderProgramHelditem.cs-220-		}
+--
+Vintagestory.Client.NoObf/ShaderProgramGui.cs-209-	public float FlatFogStart
+Vintagestory.Client.NoObf/ShaderProgramGui.cs-210-	{
+Vintagestory.Client.NoObf/ShaderProgramGui.cs-211-		set
+Vintagestory.Client.NoObf/ShaderProgramGui.cs-212-		{
+Vintagestory.Client.NoObf/ShaderProgramGui.cs-213-			Uniform("flatFogStart", value);
+Vintagestory.Client.NoObf/ShaderProgramGui.cs-214-		}
+Vintagestory.Client.NoObf/ShaderProgramGui.cs-215-	}
+Vintagestory.Client.NoObf/ShaderProgramGui.cs-216-
+Vintagestory.Client.NoObf/ShaderProgramGui.cs-217-	public float ViewDistance
+Vintagestory.Client.NoObf/ShaderProgramGui.cs-218-	{
+Vintagestory.Client.NoObf/ShaderProgramGui.cs-219-		set
+Vintagestory.Client.NoObf/ShaderProgramGui.cs-220-		{
+Vintagestory.Client.NoObf/ShaderProgramGui.cs:221:			Uniform("viewDistance", value);
+Vintagestory.Client.NoObf/ShaderProgramGui.cs-222-		}
+Vintagestory.Client.NoObf/ShaderProgramGui.cs-223-	}
+Vintagestory.Client.NoObf/ShaderProgramGui.cs-224-
+Vintagestory.Client.NoObf/ShaderProgramGui.cs-225-	public float ViewDistanceLod0
+Vintagestory.Client.NoObf/ShaderProgramGui.cs-226-	{
+Vintagestory.Client.NoObf/ShaderProgramGui.cs-227-		set
+Vintagestory.Client.NoObf/ShaderProgramGui.cs-228-		{
+Vintagestory.Client.NoObf/ShaderProgramGui.cs:229:			Uniform("viewDistanceLod0", value);
+Vintagestory.Client.NoObf/ShaderProgramGui.cs-230-		}
+Vintagestory.Client.NoObf/ShaderProgramGui.cs-231-	}
+Vintagestory.Client.NoObf/ShaderProgramGui.cs-232-
+Vintagestory.Client.NoObf/ShaderProgramGui.cs-233-	public float GlitchStrengthFL
+Vintagestory.Client.NoObf/ShaderProgramGui.cs-234-	{
+Vintagestory.Client.NoObf/ShaderProgramGui.cs-235-		set
+Vintagestory.Client.NoObf/ShaderProgramGui.cs-236-		{
+Vintagestory.Client.NoObf/ShaderProgramGui.cs-237-			Uniform("glitchStrengthFL", value);
+Vintagestory.Client.NoObf/ShaderProgramGui.cs-238-		}
+Vintagestory.Client.NoObf/ShaderProgramGui.cs-239-	}
+Vintagestory.Client.NoObf/ShaderProgramGui.cs-240-
+Vintagestory.Client.NoObf/ShaderProgramGui.cs-241-	public float NightVisionStrength
+Vintagestory.Client.NoObf/ShaderProgramGui.cs-242-	{
+Vintagestory.Client.NoObf/ShaderProgramGui.cs-243-		set
+Vintagestory.Client.NoObf/ShaderProgramGui.cs-244-		{
+Vintagestory.Client.NoObf/ShaderProgramGui.cs-245-			Uniform("nightVisionStrength", value);
+Vintagestory.Client.NoObf/ShaderProgramGui.cs-246-		}
+Vintagestory.Client.NoObf/ShaderProgramGui.cs-247-	}
+Vintagestory.Client.NoObf/ShaderProgramGui.cs-248-
+Vintagestory.Client.NoObf/ShaderProgramGui.cs-249-	public int PointLightQuantity
+Vintagestory.Client.NoObf/ShaderProgramGui.cs-250-	{
+Vintagestory.Client.NoObf/ShaderProgramGui.cs-251-		set
+Vintagestory.Client.NoObf/ShaderProgramGui.cs-252-		{
+Vintagestory.Client.NoObf/ShaderProgramGui.cs-253-			Uniform("pointLightQuantity", value);
+Vintagestory.Client.NoObf/ShaderProgramGui.cs-254-		}
+--
+Vintagestory.Client.NoObf/ShaderProgramChunkliquid.cs-111-	public float FlatFogStart
+Vintagestory.Client.NoObf/ShaderProgramChunkliquid.cs-112-	{
+Vintagestory.Client.NoObf/ShaderProgramChunkliquid.cs-113-		set
+Vintagestory.Client.NoObf/ShaderProgramChunkliquid.cs-114-		{
+Vintagestory.Client.NoObf/ShaderProgramChunkliquid.cs-115-			Uniform("flatFogStart", value);
+Vintagestory.Client.NoObf/ShaderProgramChunkliquid.cs-116-		}
+Vintagestory.Client.NoObf/ShaderProgramChunkliquid.cs-117-	}
+Vintagestory.Client.NoObf/ShaderProgramChunkliquid.cs-118-
+Vintagestory.Client.NoObf/ShaderProgramChunkliquid.cs-119-	public float ViewDistance
+Vintagestory.Client.NoObf/ShaderProgramChunkliquid.cs-120-	{
+Vintagestory.Client.NoObf/ShaderProgramChunkliquid.cs-121-		set
+Vintagestory.Client.NoObf/ShaderProgramChunkliquid.cs-122-		{
+Vintagestory.Client.NoObf/ShaderProgramChunkliquid.cs:123:			Uniform("viewDistance", value);
+Vintagestory.Client.NoObf/ShaderProgramChunkliquid.cs-124-		}
+Vintagestory.Client.NoObf/ShaderProgramChunkliquid.cs-125-	}
+Vintagestory.Client.NoObf/ShaderProgramChunkliquid.cs-126-
+Vintagestory.Client.NoObf/ShaderProgramChunkliquid.cs-127-	public float ViewDistanceLod0
+Vintagestory.Client.NoObf/ShaderProgramChunkliquid.cs-128-	{
+Vintagestory.Client.NoObf/ShaderProgramChunkliquid.cs-129-		set
+Vintagestory.Client.NoObf/ShaderProgramChunkliquid.cs-130-		{
+Vintagestory.Client.NoObf/ShaderProgramChunkliquid.cs:131:			Uniform("viewDistanceLod0", value);
+Vintagestory.Client.NoObf/ShaderProgramChunkliquid.cs-132-		}
+Vintagestory.Client.NoObf/ShaderProgramChunkliquid.cs-133-	}
+Vintagestory.Client.NoObf/ShaderProgramChunkliquid.cs-134-
+Vintagestory.Client.NoObf/ShaderProgramChunkliquid.cs-135-	public float ZNear
+Vintagestory.Client.NoObf/ShaderProgramChunkliquid.cs-136-	{
+Vintagestory.Client.NoObf/ShaderProgramChunkliquid.cs-137-		set
+Vintagestory.Client.NoObf/ShaderProgramChunkliquid.cs-138-		{
+Vintagestory.Client.NoObf/ShaderProgramChunkliquid.cs-139-			Uniform("zNear", value);
+Vintagestory.Client.NoObf/ShaderProgramChunkliquid.cs-140-		}
+Vintagestory.Client.NoObf/ShaderProgramChunkliquid.cs-141-	}
+Vintagestory.Client.NoObf/ShaderProgramChunkliquid.cs-142-
+Vintagestory.Client.NoObf/ShaderProgramChunkliquid.cs-143-	public float ZFar
+Vintagestory.Client.NoObf/ShaderProgramChunkliquid.cs-144-	{
+Vintagestory.Client.NoObf/ShaderProgramChunkliquid.cs-145-		set
+Vintagestory.Client.NoObf/ShaderProgramChunkliquid.cs-146-		{
+Vintagestory.Client.NoObf/ShaderProgramChunkliquid.cs-147-			Uniform("zFar", value);
+Vintagestory.Client.NoObf/ShaderProgramChunkliquid.cs-148-		}
+Vintagestory.Client.NoObf/ShaderProgramChunkliquid.cs-149-	}
+Vintagestory.Client.NoObf/ShaderProgramChunkliquid.cs-150-
+Vintagestory.Client.NoObf/ShaderProgramChunkliquid.cs-151-	public Vec3f LightPosition
+Vintagestory.Client.NoObf/ShaderProgramChunkliquid.cs-152-	{
+Vintagestory.Client.NoObf/ShaderProgramChunkliquid.cs-153-		set
+Vintagestory.Client.NoObf/ShaderProgramChunkliquid.cs-154-		{
+Vintagestory.Client.NoObf/ShaderProgramChunkliquid.cs-155-			Uniform("lightPosition", value);
+Vintagestory.Client.NoObf/ShaderProgramChunkliquid.cs-156-		}
+--
+Vintagestory.Client.NoObf/ShaderProgramParticlescube.cs-15-	public float FlatFogStart
+Vintagestory.Client.NoObf/ShaderProgramParticlescube.cs-16-	{
+Vintagestory.Client.NoObf/ShaderProgramParticlescube.cs-17-		set
+Vintagestory.Client.NoObf/ShaderProgramParticlescube.cs-18-		{
+Vintagestory.Client.NoObf/ShaderProgramParticlescube.cs-19-			Uniform("flatFogStart", value);
+Vintagestory.Client.NoObf/ShaderProgramParticlescube.cs-20-		}
+Vintagestory.Client.NoObf/ShaderProgramParticlescube.cs-21-	}
+Vintagestory.Client.NoObf/ShaderProgramParticlescube.cs-22-
+Vintagestory.Client.NoObf/ShaderProgramParticlescube.cs-23-	public float ViewDistance
+Vintagestory.Client.NoObf/ShaderProgramParticlescube.cs-24-	{
+Vintagestory.Client.NoObf/ShaderProgramParticlescube.cs-25-		set
+Vintagestory.Client.NoObf/ShaderProgramParticlescube.cs-26-		{
+Vintagestory.Client.NoObf/ShaderProgramParticlescube.cs:27:			Uniform("viewDistance", value);
+Vintagestory.Client.NoObf/ShaderProgramParticlescube.cs-28-		}
+Vintagestory.Client.NoObf/ShaderProgramParticlescube.cs-29-	}
+Vintagestory.Client.NoObf/ShaderProgramParticlescube.cs-30-
+Vintagestory.Client.NoObf/ShaderProgramParticlescube.cs-31-	public float ViewDistanceLod0
+Vintagestory.Client.NoObf/ShaderProgramParticlescube.cs-32-	{
+Vintagestory.Client.NoObf/ShaderProgramParticlescube.cs-33-		set
+Vintagestory.Client.NoObf/ShaderProgramParticlescube.cs-34-		{
+Vintagestory.Client.NoObf/ShaderProgramParticlescube.cs:35:			Uniform("viewDistanceLod0", value);
+Vintagestory.Client.NoObf/ShaderProgramParticlescube.cs-36-		}
+Vintagestory.Client.NoObf/ShaderProgramParticlescube.cs-37-	}
+Vintagestory.Client.NoObf/ShaderProgramParticlescube.cs-38-
+Vintagestory.Client.NoObf/ShaderProgramParticlescube.cs-39-	public float ZNear
+Vintagestory.Client.NoObf/ShaderProgramParticlescube.cs-40-	{
+Vintagestory.Client.NoObf/ShaderProgramParticlescube.cs-41-		set
+Vintagestory.Client.NoObf/ShaderProgramParticlescube.cs-42-		{
+Vintagestory.Client.NoObf/ShaderProgramParticlescube.cs-43-			Uniform("zNear", value);
+Vintagestory.Client.NoObf/ShaderProgramParticlescube.cs-44-		}
+Vintagestory.Client.NoObf/ShaderProgramParticlescube.cs-45-	}
+Vintagestory.Client.NoObf/ShaderProgramParticlescube.cs-46-
+Vintagestory.Client.NoObf/ShaderProgramParticlescube.cs-47-	public float ZFar
+Vintagestory.Client.NoObf/ShaderProgramParticlescube.cs-48-	{
+Vintagestory.Client.NoObf/ShaderProgramParticlescube.cs-49-		set
+Vintagestory.Client.NoObf/ShaderProgramParticlescube.cs-50-		{
+Vintagestory.Client.NoObf/ShaderProgramParticlescube.cs-51-			Uniform("zFar", value);
+Vintagestory.Client.NoObf/ShaderProgramParticlescube.cs-52-		}
+Vintagestory.Client.NoObf/ShaderProgramParticlescube.cs-53-	}
+Vintagestory.Client.NoObf/ShaderProgramParticlescube.cs-54-
+Vintagestory.Client.NoObf/ShaderProgramParticlescube.cs-55-	public Vec3f LightPosition
+Vintagestory.Client.NoObf/ShaderProgramParticlescube.cs-56-	{
+Vintagestory.Client.NoObf/ShaderProgramParticlescube.cs-57-		set
+Vintagestory.Client.NoObf/ShaderProgramParticlescube.cs-58-		{
+Vintagestory.Client.NoObf/ShaderProgramParticlescube.cs-59-			Uniform("lightPosition", value);
+Vintagestory.Client.NoObf/ShaderProgramParticlescube.cs-60-		}
+--
+Vintagestory.Client.NoObf/ClientSettings.cs-619-			return Inst.GetBoolSetting("developerMode");
+Vintagestory.Client.NoObf/ClientSettings.cs-620-		}
+Vintagestory.Client.NoObf/ClientSettings.cs-621-		set
+Vintagestory.Client.NoObf/ClientSettings.cs-622-		{
+Vintagestory.Client.NoObf/ClientSettings.cs-623-			Inst.Bool["developerMode"] = value;
+Vintagestory.Client.NoObf/ClientSettings.cs-624-		}
+Vintagestory.Client.NoObf/ClientSettings.cs-625-	}
+Vintagestory.Client.NoObf/ClientSettings.cs-626-
+Vintagestory.Client.NoObf/ClientSettings.cs-627-	public static int ViewDistance
+Vintagestory.Client.NoObf/ClientSettings.cs-628-	{
+Vintagestory.Client.NoObf/ClientSettings.cs-629-		get
+Vintagestory.Client.NoObf/ClientSettings.cs-630-		{
+Vintagestory.Client.NoObf/ClientSettings.cs:631:			return Inst.GetIntSetting("viewDistance");
+Vintagestory.Client.NoObf/ClientSettings.cs-632-		}
+Vintagestory.Client.NoObf/ClientSettings.cs-633-		set
+Vintagestory.Client.NoObf/ClientSettings.cs-634-		{
+Vintagestory.Client.NoObf/ClientSettings.cs:635:			Inst.Int["viewDistance"] = value;
+Vintagestory.Client.NoObf/ClientSettings.cs-636-		}
+Vintagestory.Client.NoObf/ClientSettings.cs-637-	}
+Vintagestory.Client.NoObf/ClientSettings.cs-638-
+Vintagestory.Client.NoObf/ClientSettings.cs-639-	public static bool FXAA
+Vintagestory.Client.NoObf/ClientSettings.cs-640-	{
+Vintagestory.Client.NoObf/ClientSettings.cs-641-		get
+Vintagestory.Client.NoObf/ClientSettings.cs-642-		{
+Vintagestory.Client.NoObf/ClientSettings.cs-643-			return Inst.GetBoolSetting("fxaa");
+Vintagestory.Client.NoObf/ClientSettings.cs-644-		}
+Vintagestory.Client.NoObf/ClientSettings.cs-645-		set
+Vintagestory.Client.NoObf/ClientSettings.cs-646-		{
+Vintagestory.Client.NoObf/ClientSettings.cs-647-			Inst.Bool["fxaa"] = value;
+Vintagestory.Client.NoObf/ClientSettings.cs-648-		}
+Vintagestory.Client.NoObf/ClientSettings.cs-649-	}
+Vintagestory.Client.NoObf/ClientSettings.cs-650-
+Vintagestory.Client.NoObf/ClientSettings.cs-651-	public static bool RenderMetaBlocks
+Vintagestory.Client.NoObf/ClientSettings.cs-652-	{
+Vintagestory.Client.NoObf/ClientSettings.cs-653-		get
+Vintagestory.Client.NoObf/ClientSettings.cs-654-		{
+Vintagestory.Client.NoObf/ClientSettings.cs-655-			return Inst.GetBoolSetting("renderMetaBlocks");
+Vintagestory.Client.NoObf/ClientSettings.cs-656-		}
+Vintagestory.Client.NoObf/ClientSettings.cs-657-		set
+Vintagestory.Client.NoObf/ClientSettings.cs-658-		{
+Vintagestory.Client.NoObf/ClientSettings.cs-659-			Inst.Bool["renderMetaBlocks"] = value;
+Vintagestory.Client.NoObf/ClientSettings.cs-660-		}
+--
+Vintagestory.Client.NoObf/ClientSettings.cs-1946-		boolSettings["occlusionculling"] = true;
+Vintagestory.Client.NoObf/ClientSettings.cs-1947-		boolSettings["focusWindowOnModInstallRequest"] = true;
+Vintagestory.Client.NoObf/ClientSettings.cs-1948-		boolSettings["developerMode"] = false;
+Vintagestory.Client.NoObf/ClientSettings.cs-1949-		boolSettings["glDebugMode"] = false;
+Vintagestory.Client.NoObf/ClientSettings.cs-1950-		boolSettings["showWhitelistedServers"] = true;
+Vintagestory.Client.NoObf/ClientSettings.cs-1951-		boolSettings["showModdedServers"] = true;
+Vintagestory.Client.NoObf/ClientSettings.cs-1952-		boolSettings["showPasswordProtectedServers"] = true;
+Vintagestory.Client.NoObf/ClientSettings.cs-1953-		boolSettings["showOpenForAllServers"] = true;
+Vintagestory.Client.NoObf/ClientSettings.cs-1954-		boolSettings["liquidFoamAndShinyEffect"] = true;
+Vintagestory.Client.NoObf/ClientSettings.cs-1955-		boolSettings["testGlExtensions"] = true;
+Vintagestory.Client.NoObf/ClientSettings.cs-1956-		boolSettings["offThreadMipMaps"] = false;
+Vintagestory.Client.NoObf/ClientSettings.cs-1957-		intSettings["ssaoQuality"] = 0;
+Vintagestory.Client.NoObf/ClientSettings.cs:1958:		intSettings["viewDistance"] = 256;
+Vintagestory.Client.NoObf/ClientSettings.cs-1959-		intSettings["fieldOfView"] = 70;
+Vintagestory.Client.NoObf/ClientSettings.cs-1960-		intSettings["maxFps"] = 241;
+Vintagestory.Client.NoObf/ClientSettings.cs-1961-		intSettings["particleLevel"] = 100;
+Vintagestory.Client.NoObf/ClientSettings.cs-1962-		intSettings["maxDynamicLights"] = 10;
+Vintagestory.Client.NoObf/ClientSettings.cs-1963-		IntSettings["weirdMacOSMouseYOffset"] = 5;
+Vintagestory.Client.NoObf/ClientSettings.cs-1964-		IntSettings["screenshotExifDataMode"] = 0;
+Vintagestory.Client.NoObf/ClientSettings.cs-1965-		IntSettings["chunkVerticesUploadRateLimiter"] = 3;
+Vintagestory.Client.NoObf/ClientSettings.cs-1966-		intSettings["masterSoundLevel"] = 100;
+Vintagestory.Client.NoObf/ClientSettings.cs-1967-		intSettings["soundLevel"] = 100;
+Vintagestory.Client.NoObf/ClientSettings.cs-1968-		intSettings["entitySoundLevel"] = 100;
+Vintagestory.Client.NoObf/ClientSettings.cs-1969-		intSettings["ambientSoundLevel"] = 100;
+Vintagestory.Client.NoObf/ClientSettings.cs-1970-		intSettings["weatherSoundLevel"] = 100;
+Vintagestory.Client.NoObf/ClientSettings.cs-1971-		intSettings["musicLevel"] = 20;
+Vintagestory.Client.NoObf/ClientSettings.cs-1972-		intSettings["screenWidth"] = 1024;
+Vintagestory.Client.NoObf/ClientSettings.cs-1973-		intSettings["screenHeight"] = 768;
+Vintagestory.Client.NoObf/ClientSettings.cs-1974-		intSettings["gameWindowMode"] = 1;
+Vintagestory.Client.NoObf/ClientSettings.cs-1975-		intSettings["rightDialogMargin"] = 0;
+Vintagestory.Client.NoObf/ClientSettings.cs-1976-		intSettings["leftDialogMargin"] = 0;
+Vintagestory.Client.NoObf/ClientSettings.cs-1977-		stringSettings["language"] = "en";
+Vintagestory.Client.NoObf/ClientSettings.cs-1978-		stringSettings["defaultFontName"] = "sans-serif";
+Vintagestory.Client.NoObf/ClientSettings.cs-1979-		stringSettings["decorativeFontName"] = "Lora";
+Vintagestory.Client.NoObf/ClientSettings.cs-1980-		intSettings["maxQuadParticles"] = 8000;
+Vintagestory.Client.NoObf/ClientSettings.cs-1981-		intSettings["maxCubeParticles"] = 4000;
+Vintagestory.Client.NoObf/ClientSettings.cs-1982-		intSettings["maxAsyncQuadParticles"] = 80000;
+Vintagestory.Client.NoObf/ClientSettings.cs-1983-		intSettings["maxAsyncCubeParticles"] = 80000;
+--
+Vintagestory.Client.NoObf/ShaderProgramNightsky.cs-87-	public float FlatFogStart
+Vintagestory.Client.NoObf/ShaderProgramNightsky.cs-88-	{
+Vintagestory.Client.NoObf/ShaderProgramNightsky.cs-89-		set
+Vintagestory.Client.NoObf/ShaderProgramNightsky.cs-90-		{
+Vintagestory.Client.NoObf/ShaderProgramNightsky.cs-91-			Uniform("flatFogStart", value);
+Vintagestory.Client.NoObf/ShaderProgramNightsky.cs-92-		}
+Vintagestory.Client.NoObf/ShaderProgramNightsky.cs-93-	}
+Vintagestory.Client.NoObf/ShaderProgramNightsky.cs-94-
+Vintagestory.Client.NoObf/ShaderProgramNightsky.cs-95-	public float ViewDistance
+Vintagestory.Client.NoObf/ShaderProgramNightsky.cs-96-	{
+Vintagestory.Client.NoObf/ShaderProgramNightsky.cs-97-		set
+Vintagestory.Client.NoObf/ShaderProgramNightsky.cs-98-		{
+Vintagestory.Client.NoObf/ShaderProgramNightsky.cs:99:			Uniform("viewDistance", value);
+Vintagestory.Client.NoObf/ShaderProgramNightsky.cs-100-		}
+Vintagestory.Client.NoObf/ShaderProgramNightsky.cs-101-	}
+Vintagestory.Client.NoObf/ShaderProgramNightsky.cs-102-
+Vintagestory.Client.NoObf/ShaderProgramNightsky.cs-103-	public float ViewDistanceLod0
+Vintagestory.Client.NoObf/ShaderProgramNightsky.cs-104-	{
+Vintagestory.Client.NoObf/ShaderProgramNightsky.cs-105-		set
+Vintagestory.Client.NoObf/ShaderProgramNightsky.cs-106-		{
+Vintagestory.Client.NoObf/ShaderProgramNightsky.cs:107:			Uniform("viewDistanceLod0", value);
+Vintagestory.Client.NoObf/ShaderProgramNightsky.cs-108-		}
+Vintagestory.Client.NoObf/ShaderProgramNightsky.cs-109-	}
+Vintagestory.Client.NoObf/ShaderProgramNightsky.cs-110-
+Vintagestory.Client.NoObf/ShaderProgramNightsky.cs-111-	public float ZNear
+Vintagestory.Client.NoObf/ShaderProgramNightsky.cs-112-	{
+Vintagestory.Client.NoObf/ShaderProgramNightsky.cs-113-		set
+Vintagestory.Client.NoObf/ShaderProgramNightsky.cs-114-		{
+Vintagestory.Client.NoObf/ShaderProgramNightsky.cs-115-			Uniform("zNear", value);
+Vintagestory.Client.NoObf/ShaderProgramNightsky.cs-116-		}
+Vintagestory.Client.NoObf/ShaderProgramNightsky.cs-117-	}
+Vintagestory.Client.NoObf/ShaderProgramNightsky.cs-118-
+Vintagestory.Client.NoObf/ShaderProgramNightsky.cs-119-	public float ZFar
+Vintagestory.Client.NoObf/ShaderProgramNightsky.cs-120-	{
+Vintagestory.Client.NoObf/ShaderProgramNightsky.cs-121-		set
+Vintagestory.Client.NoObf/ShaderProgramNightsky.cs-122-		{
+Vintagestory.Client.NoObf/ShaderProgramNightsky.cs-123-			Uniform("zFar", value);
+Vintagestory.Client.NoObf/ShaderProgramNightsky.cs-124-		}
+Vintagestory.Client.NoObf/ShaderProgramNightsky.cs-125-	}
+Vintagestory.Client.NoObf/ShaderProgramNightsky.cs-126-
+Vintagestory.Client.NoObf/ShaderProgramNightsky.cs-127-	public Vec3f LightPosition
+Vintagestory.Client.NoObf/ShaderProgramNightsky.cs-128-	{
+Vintagestory.Client.NoObf/ShaderProgramNightsky.cs-129-		set
+Vintagestory.Client.NoObf/ShaderProgramNightsky.cs-130-		{
+Vintagestory.Client.NoObf/ShaderProgramNightsky.cs-131-			Uniform("lightPosition", value);
+Vintagestory.Client.NoObf/ShaderProgramNightsky.cs-132-		}
+--
+Vintagestory.Client.NoObf/ShaderProgramBlockhighlights.cs-23-	public float FlatFogStart
+Vintagestory.Client.NoObf/ShaderProgramBlockhighlights.cs-24-	{
+Vintagestory.Client.NoObf/ShaderProgramBlockhighlights.cs-25-		set
+Vintagestory.Client.NoObf/ShaderProgramBlockhighlights.cs-26-		{
+Vintagestory.Client.NoObf/ShaderProgramBlockhighlights.cs-27-			Uniform("flatFogStart", value);
+Vintagestory.Client.NoObf/ShaderProgramBlockhighlights.cs-28-		}
+Vintagestory.Client.NoObf/ShaderProgramBlockhighlights.cs-29-	}
+Vintagestory.Client.NoObf/ShaderProgramBlockhighlights.cs-30-
+Vintagestory.Client.NoObf/ShaderProgramBlockhighlights.cs-31-	public float ViewDistance
+Vintagestory.Client.NoObf/ShaderProgramBlockhighlights.cs-32-	{
+Vintagestory.Client.NoObf/ShaderProgramBlockhighlights.cs-33-		set
+Vintagestory.Client.NoObf/ShaderProgramBlockhighlights.cs-34-		{
+Vintagestory.Client.NoObf/ShaderProgramBlockhighlights.cs:35:			Uniform("viewDistance", value);
+Vintagestory.Client.NoObf/ShaderProgramBlockhighlights.cs-36-		}
+Vintagestory.Client.NoObf/ShaderProgramBlockhighlights.cs-37-	}
+Vintagestory.Client.NoObf/ShaderProgramBlockhighlights.cs-38-
+Vintagestory.Client.NoObf/ShaderProgramBlockhighlights.cs-39-	public float ViewDistanceLod0
+Vintagestory.Client.NoObf/ShaderProgramBlockhighlights.cs-40-	{
+Vintagestory.Client.NoObf/ShaderProgramBlockhighlights.cs-41-		set
+Vintagestory.Client.NoObf/ShaderProgramBlockhighlights.cs-42-		{
+Vintagestory.Client.NoObf/ShaderProgramBlockhighlights.cs:43:			Uniform("viewDistanceLod0", value);
+Vintagestory.Client.NoObf/ShaderProgramBlockhighlights.cs-44-		}
+Vintagestory.Client.NoObf/ShaderProgramBlockhighlights.cs-45-	}
+Vintagestory.Client.NoObf/ShaderProgramBlockhighlights.cs-46-
+Vintagestory.Client.NoObf/ShaderProgramBlockhighlights.cs-47-	public float ZNear
+Vintagestory.Client.NoObf/ShaderProgramBlockhighlights.cs-48-	{
+Vintagestory.Client.NoObf/ShaderProgramBlockhighlights.cs-49-		set
+Vintagestory.Client.NoObf/ShaderProgramBlockhighlights.cs-50-		{
+Vintagestory.Client.NoObf/ShaderProgramBlockhighlights.cs-51-			Uniform("zNear", value);
+Vintagestory.Client.NoObf/ShaderProgramBlockhighlights.cs-52-		}
+Vintagestory.Client.NoObf/ShaderProgramBlockhighlights.cs-53-	}
+Vintagestory.Client.NoObf/ShaderProgramBlockhighlights.cs-54-
+Vintagestory.Client.NoObf/ShaderProgramBlockhighlights.cs-55-	public float ZFar
+Vintagestory.Client.NoObf/ShaderProgramBlockhighlights.cs-56-	{
+Vintagestory.Client.NoObf/ShaderProgramBlockhighlights.cs-57-		set
+Vintagestory.Client.NoObf/ShaderProgramBlockhighlights.cs-58-		{
+Vintagestory.Client.NoObf/ShaderProgramBlockhighlights.cs-59-			Uniform("zFar", value);
+Vintagestory.Client.NoObf/ShaderProgramBlockhighlights.cs-60-		}
+Vintagestory.Client.NoObf/ShaderProgramBlockhighlights.cs-61-	}
+Vintagestory.Client.NoObf/ShaderProgramBlockhighlights.cs-62-
+Vintagestory.Client.NoObf/ShaderProgramBlockhighlights.cs-63-	public Vec3f LightPosition
+Vintagestory.Client.NoObf/ShaderProgramBlockhighlights.cs-64-	{
+Vintagestory.Client.NoObf/ShaderProgramBlockhighlights.cs-65-		set
+Vintagestory.Client.NoObf/ShaderProgramBlockhighlights.cs-66-		{
+Vintagestory.Client.NoObf/ShaderProgramBlockhighlights.cs-67-			Uniform("lightPosition", value);
+Vintagestory.Client.NoObf/ShaderProgramBlockhighlights.cs-68-		}
+--
+Vintagestory.Client.NoObf/ShaderProgramDecals.cs-119-	public float FlatFogStart
+Vintagestory.Client.NoObf/ShaderProgramDecals.cs-120-	{
+Vintagestory.Client.NoObf/ShaderProgramDecals.cs-121-		set
+Vintagestory.Client.NoObf/ShaderProgramDecals.cs-122-		{
+Vintagestory.Client.NoObf/ShaderProgramDecals.cs-123-			Uniform("flatFogStart", value);
+Vintagestory.Client.NoObf/ShaderProgramDecals.cs-124-		}
+Vintagestory.Client.NoObf/ShaderProgramDecals.cs-125-	}
+Vintagestory.Client.NoObf/ShaderProgramDecals.cs-126-
+Vintagestory.Client.NoObf/ShaderProgramDecals.cs-127-	public float ViewDistance
+Vintagestory.Client.NoObf/ShaderProgramDecals.cs-128-	{
+Vintagestory.Client.NoObf/ShaderProgramDecals.cs-129-		set
+Vintagestory.Client.NoObf/ShaderProgramDecals.cs-130-		{
+Vintagestory.Client.NoObf/ShaderProgramDecals.cs:131:			Uniform("viewDistance", value);
+Vintagestory.Client.NoObf/ShaderProgramDecals.cs-132-		}
+Vintagestory.Client.NoObf/ShaderProgramDecals.cs-133-	}
+Vintagestory.Client.NoObf/ShaderProgramDecals.cs-134-
+Vintagestory.Client.NoObf/ShaderProgramDecals.cs-135-	public float ViewDistanceLod0
+Vintagestory.Client.NoObf/ShaderProgramDecals.cs-136-	{
+Vintagestory.Client.NoObf/ShaderProgramDecals.cs-137-		set
+Vintagestory.Client.NoObf/ShaderProgramDecals.cs-138-		{
+Vintagestory.Client.NoObf/ShaderProgramDecals.cs:139:			Uniform("viewDistanceLod0", value);
+Vintagestory.Client.NoObf/ShaderProgramDecals.cs-140-		}
+Vintagestory.Client.NoObf/ShaderProgramDecals.cs-141-	}
+Vintagestory.Client.NoObf/ShaderProgramDecals.cs-142-
+Vintagestory.Client.NoObf/ShaderProgramDecals.cs-143-	public float GlitchStrengthFL
+Vintagestory.Client.NoObf/ShaderProgramDecals.cs-144-	{
+Vintagestory.Client.NoObf/ShaderProgramDecals.cs-145-		set
+Vintagestory.Client.NoObf/ShaderProgramDecals.cs-146-		{
+Vintagestory.Client.NoObf/ShaderProgramDecals.cs-147-			Uniform("glitchStrengthFL", value);
+Vintagestory.Client.NoObf/ShaderProgramDecals.cs-148-		}
+Vintagestory.Client.NoObf/ShaderProgramDecals.cs-149-	}
+Vintagestory.Client.NoObf/ShaderProgramDecals.cs-150-
+Vintagestory.Client.NoObf/ShaderProgramDecals.cs-151-	public float NightVisionStrength
+Vintagestory.Client.NoObf/ShaderProgramDecals.cs-152-	{
+Vintagestory.Client.NoObf/ShaderProgramDecals.cs-153-		set
+Vintagestory.Client.NoObf/ShaderProgramDecals.cs-154-		{
+Vintagestory.Client.NoObf/ShaderProgramDecals.cs-155-			Uniform("nightVisionStrength", value);
+Vintagestory.Client.NoObf/ShaderProgramDecals.cs-156-		}
+Vintagestory.Client.NoObf/ShaderProgramDecals.cs-157-	}
+Vintagestory.Client.NoObf/ShaderProgramDecals.cs-158-
+Vintagestory.Client.NoObf/ShaderProgramDecals.cs-159-	public int PointLightQuantity
+Vintagestory.Client.NoObf/ShaderProgramDecals.cs-160-	{
+Vintagestory.Client.NoObf/ShaderProgramDecals.cs-161-		set
+Vintagestory.Client.NoObf/ShaderProgramDecals.cs-162-		{
+Vintagestory.Client.NoObf/ShaderProgramDecals.cs-163-			Uniform("pointLightQuantity", value);
+Vintagestory.Client.NoObf/ShaderProgramDecals.cs-164-		}
+--
+Vintagestory.Client.NoObf/ShaderProgramStandard.cs-145-	public float FlatFogStart
+Vintagestory.Client.NoObf/ShaderProgramStandard.cs-146-	{
+Vintagestory.Client.NoObf/ShaderProgramStandard.cs-147-		set
+Vintagestory.Client.NoObf/ShaderProgramStandard.cs-148-		{
+Vintagestory.Client.NoObf/ShaderProgramStandard.cs-149-			Uniform("flatFogStart", value);
+Vintagestory.Client.NoObf/ShaderProgramStandard.cs-150-		}
+Vintagestory.Client.NoObf/ShaderProgramStandard.cs-151-	}
+Vintagestory.Client.NoObf/ShaderProgramStandard.cs-152-
+Vintagestory.Client.NoObf/ShaderProgramStandard.cs-153-	public float ViewDistance
+Vintagestory.Client.NoObf/ShaderProgramStandard.cs-154-	{
+Vintagestory.Client.NoObf/ShaderProgramStandard.cs-155-		set
+Vintagestory.Client.NoObf/ShaderProgramStandard.cs-156-		{
+Vintagestory.Client.NoObf/ShaderProgramStandard.cs:157:			Uniform("viewDistance", value);
+Vintagestory.Client.NoObf/ShaderProgramStandard.cs-158-		}
+Vintagestory.Client.NoObf/ShaderProgramStandard.cs-159-	}
+Vintagestory.Client.NoObf/ShaderProgramStandard.cs-160-
+Vintagestory.Client.NoObf/ShaderProgramStandard.cs-161-	public float ViewDistanceLod0
+Vintagestory.Client.NoObf/ShaderProgramStandard.cs-162-	{
+Vintagestory.Client.NoObf/ShaderProgramStandard.cs-163-		set
+Vintagestory.Client.NoObf/ShaderProgramStandard.cs-164-		{
+Vintagestory.Client.NoObf/ShaderProgramStandard.cs:165:			Uniform("viewDistanceLod0", value);
+Vintagestory.Client.NoObf/ShaderProgramStandard.cs-166-		}
+Vintagestory.Client.NoObf/ShaderProgramStandard.cs-167-	}
+Vintagestory.Client.NoObf/ShaderProgramStandard.cs-168-
+Vintagestory.Client.NoObf/ShaderProgramStandard.cs-169-	public float ZNear
+Vintagestory.Client.NoObf/ShaderProgramStandard.cs-170-	{
+Vintagestory.Client.NoObf/ShaderProgramStandard.cs-171-		set
+Vintagestory.Client.NoObf/ShaderProgramStandard.cs-172-		{
+Vintagestory.Client.NoObf/ShaderProgramStandard.cs-173-			Uniform("zNear", value);
+Vintagestory.Client.NoObf/ShaderProgramStandard.cs-174-		}
+Vintagestory.Client.NoObf/ShaderProgramStandard.cs-175-	}
+Vintagestory.Client.NoObf/ShaderProgramStandard.cs-176-
+Vintagestory.Client.NoObf/ShaderProgramStandard.cs-177-	public float ZFar
+Vintagestory.Client.NoObf/ShaderProgramStandard.cs-178-	{
+Vintagestory.Client.NoObf/ShaderProgramStandard.cs-179-		set
+Vintagestory.Client.NoObf/ShaderProgramStandard.cs-180-		{
+Vintagestory.Client.NoObf/ShaderProgramStandard.cs-181-			Uniform("zFar", value);
+Vintagestory.Client.NoObf/ShaderProgramStandard.cs-182-		}
+Vintagestory.Client.NoObf/ShaderProgramStandard.cs-183-	}
+Vintagestory.Client.NoObf/ShaderProgramStandard.cs-184-
+Vintagestory.Client.NoObf/ShaderProgramStandard.cs-185-	public Vec3f LightPosition
+Vintagestory.Client.NoObf/ShaderProgramStandard.cs-186-	{
+Vintagestory.Client.NoObf/ShaderProgramStandard.cs-187-		set
+Vintagestory.Client.NoObf/ShaderProgramStandard.cs-188-		{
+Vintagestory.Client.NoObf/ShaderProgramStandard.cs-189-			Uniform("lightPosition", value);
+Vintagestory.Client.NoObf/ShaderProgramStandard.cs-190-		}
+--
+Vintagestory.Server/CmdDebug.cs-782-			dumpList(server.EventManager.DelayedCallbacksEntity.Values);
+Vintagestory.Server/CmdDebug.cs-783-			break;
+Vintagestory.Server/CmdDebug.cs-784-		}
+Vintagestory.Server/CmdDebug.cs-785-		return TextCommandResult.Success();
+Vintagestory.Server/CmdDebug.cs-786-	}
+Vintagestory.Server/CmdDebug.cs-787-
+Vintagestory.Server/CmdDebug.cs-788-	private TextCommandResult countTickHandlers(TextCommandCallingArgs args)
+Vintagestory.Server/CmdDebug.cs-789-	{
+Vintagestory.Server/CmdDebug.cs-790-		server.EventManager.defragLists();
+Vintagestory.Server/CmdDebug.cs-791-		return TextCommandResult.Success(Lang.Get("GameTickListenersBlock={0}, GameTickListenersEntity={1}, DelayedCallbacksBlock={2}, DelayedCallbacksEntity={3}, SingleDelayedCallbacksBlock={4}", server.EventManager.GameTickListenersBlock.Count, server.EventManager.GameTickListenersEntity.Count, server.EventManager.DelayedCallbacksBlock.Count, server.EventManager.Del
+Vintagestory.Server/CmdDebug.cs-792-	}
+Vintagestory.Server/CmdDebug.cs-793-
+Vintagestory.Server/CmdDebug.cs:794:	private void PrintOctagonPoints(int viewDistance)
+Vintagestory.Server/CmdDebug.cs-795-	{
+Vintagestory.Server/CmdDebug.cs:796:		int num = (int)Math.Ceiling((float)viewDistance / (float)MagicNum.ServerChunkSize);
+Vintagestory.Server/CmdDebug.cs-797-		for (int i = 1; i < num; i++)
+Vintagestory.Server/CmdDebug.cs-798-		{
+Vintagestory.Server/CmdDebug.cs-799-			Vec2i[] octagonPoints = ShapeUtil.GetOctagonPoints(num / 2 + 25, num / 2 + 25, i);
+Vintagestory.Server/CmdDebug.cs-800-			SKBitmap sKBitmap = new SKBitmap(num + 50, num + 50);
+Vintagestory.Server/CmdDebug.cs-801-			Vec2i[] array = octagonPoints;
+Vintagestory.Server/CmdDebug.cs-802-			foreach (Vec2i vec2i in array)
+Vintagestory.Server/CmdDebug.cs-803-			{
+Vintagestory.Server/CmdDebug.cs-804-				sKBitmap.SetPixel(vec2i.X, vec2i.Y, new SKColor(byte.MaxValue, 0, 0, byte.MaxValue));
+Vintagestory.Server/CmdDebug.cs-805-			}
+Vintagestory.Server/CmdDebug.cs-806-			sKBitmap.Save("octapoints" + i + ".png");
+Vintagestory.Server/CmdDebug.cs-807-		}
+Vintagestory.Server/CmdDebug.cs-808-	}
+Vintagestory.Server/CmdDebug.cs-809-
+Vintagestory.Server/CmdDebug.cs-810-	private void dumpList<T>(ICollection<T> list)
+Vintagestory.Server/CmdDebug.cs-811-	{
+Vintagestory.Server/CmdDebug.cs-812-		StringBuilder stringBuilder = new StringBuilder();
+Vintagestory.Server/CmdDebug.cs-813-		foreach (T item in list)
+Vintagestory.Server/CmdDebug.cs-814-		{
+Vintagestory.Server/CmdDebug.cs-815-			if (item is GameTickListenerBase gameTickListenerBase)
+Vintagestory.Server/CmdDebug.cs-816-			{
+Vintagestory.Server/CmdDebug.cs-817-				stringBuilder.AppendLine(gameTickListenerBase.ToString());
+Vintagestory.Server/CmdDebug.cs-818-			}
+Vintagestory.Server/CmdDebug.cs-819-			if (item is DelayedCallbackBase delayedCallbackBase)
+Vintagestory.Server/CmdDebug.cs-820-			{
+Vintagestory.Server/CmdDebug.cs-821-				stringBuilder.AppendLine(delayedCallbackBase.ToString());

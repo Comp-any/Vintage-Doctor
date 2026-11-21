@@ -1,0 +1,154 @@
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-45-
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-46-	private void onToggleBackup(bool on)
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-47-	{
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-48-		genBackup = on;
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-49-	}
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-50-
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-51-	private void Event_ChatMessage(int groupId, string message, EnumChatType chattype, string data)
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-52-	{
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-53-		if (chattype == EnumChatType.CommandSuccess && data == "backupdone" && genBackup)
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-54-		{
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-55-			genBackup = false;
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-56-			capi.ShowChatMessage(Lang.Get("remappingwarning-wait"));
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs:57:			capi.SendChatMessage("/fixmapping applyall");
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-58-		}
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs:59:		if (chattype == EnumChatType.CommandSuccess && data == "fixmappingdone" && applynow)
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-60-		{
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-61-			applynow = false;
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-62-			if ((capi.World as ClientMain).IsSingleplayer)
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-63-			{
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-64-				reloadnow = true;
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-65-			}
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-66-		}
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-67-	}
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-68-
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-69-	public override void OnFinalizeFrame(float dt)
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-70-	{
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-71-		if (reloadnow)
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-72-		{
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-73-			capi.Input.HotKeys["reloadworld"].Handler?.Invoke(null);
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-74-		}
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-75-	}
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-76-
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-77-	private bool onApplyNow()
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-78-	{
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-79-		applynow = true;
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-80-		if (genBackup)
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-81-		{
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-82-			capi.SendChatMessage("/genbackup");
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-83-		}
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-84-		else
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-85-		{
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-86-			capi.ShowChatMessage(Lang.Get("remappingwarning-wait"));
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs:87:			capi.SendChatMessage("/fixmapping applyall");
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-88-		}
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-89-		TryClose();
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-90-		return true;
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-91-	}
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-92-
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-93-	private bool onIgnore()
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-94-	{
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs:95:		capi.SendChatMessage("/fixmapping ignoreall");
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-96-		TryClose();
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-97-		return true;
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-98-	}
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-99-
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-100-	private bool onRemindMeLater()
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-101-	{
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-102-		TryClose();
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-103-		return true;
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-104-	}
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-105-
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-106-	private void OnTitleBarClose()
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-107-	{
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-108-		TryClose();
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-109-	}
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-110-
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-111-	public override void OnGuiOpened()
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-112-	{
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-113-		Compose();
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-114-		base.OnGuiOpened();
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-115-	}
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-116-
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-117-	public override void OnLevelFinalize()
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-118-	{
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-119-		capi.Logger.VerboseDebug("Handling LevelFinalize packet; requires remapping is " + (capi.World as ClientMain).ServerInfo.RequiresRemappings);
+Vintagestory.Client.NoObf/GuiDialogConfirmRemapping.cs-120-		if ((capi.World as ClientMain).ServerInfo.RequiresRemappings)
+--
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-8-using Vintagestory.API.Server;
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-9-
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-10-namespace Vintagestory.Server;
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-11-
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-12-public class ServerSystemRemapperAssistant : ServerSystem
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-13-{
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-14-	private Vintagestory.API.Datastructures.OrderedDictionary<string, string[]> remaps = new Vintagestory.API.Datastructures.OrderedDictionary<string, string[]>();
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-15-
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-16-	public ServerSystemRemapperAssistant(ServerMain server)
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-17-		: base(server)
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-18-	{
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-19-		server.ModEventManager.AssetsFirstLoaded += AutoRemapBlocksAndItems;
+Vintagestory.Server/ServerSystemRemapperAssistant.cs:20:		server.api.ChatCommands.Create("fixmapping").RequiresPrivilege(Privilege.controlserver).BeginSubCommand("doremap")
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-21-			.WithDescription("Do remap")
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-22-			.WithArgs(server.api.ChatCommands.Parsers.Word("code"))
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-23-			.HandleWith(OnCmdDoremap)
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-24-			.EndSubCommand()
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-25-			.BeginSubCommand("ignoreall")
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-26-			.WithDescription("Ignore all remappings")
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-27-			.HandleWith(OnCmdIgnoreall)
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-28-			.EndSubCommand()
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-29-			.BeginSubCommand("applyall")
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-30-			.WithDescription("Apply all remappings")
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-31-			.WithArgs(server.api.ChatCommands.Parsers.OptionalWord("force"))
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-32-			.HandleWith(OnCmdApplyall)
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-33-			.EndSubCommand();
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-34-	}
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-35-
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-36-	private void AutoRemapBlocksAndItems()
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-37-	{
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-38-		Dictionary<AssetLocation, Vintagestory.API.Datastructures.OrderedDictionary<string, string[]>> many = server.AssetManager.GetMany<Vintagestory.API.Datastructures.OrderedDictionary<string, string[]>>(ServerMain.Logger, "config/remaps.json");
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-39-		remaps = many.First((KeyValuePair<AssetLocation, Vintagestory.API.Datastructures.OrderedDictionary<string, string[]>> v) => v.Key.Domain == "game").Value;
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-40-		foreach (KeyValuePair<AssetLocation, Vintagestory.API.Datastructures.OrderedDictionary<string, string[]>> item in many.Where((KeyValuePair<AssetLocation, Vintagestory.API.Datastructures.OrderedDictionary<string, string[]>> v) => v.Key.Domain != "game"))
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-41-		{
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-42-			foreach (KeyValuePair<string, string[]> item2 in item.Value)
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-43-			{
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-44-				if (item2.Value.Length != 0)
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-45-				{
+--
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-210-	}
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-211-
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-212-	private TextCommandResult OnCmdIgnoreall(TextCommandCallingArgs args)
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-213-	{
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-214-		foreach (KeyValuePair<string, string[]> remap in remaps)
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-215-		{
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-216-			string key = remap.Key;
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-217-			if (!server.SaveGameData.RemappingsAppliedByCode.ContainsKey(key))
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-218-			{
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-219-				server.SaveGameData.RemappingsAppliedByCode[key] = false;
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-220-			}
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-221-		}
+Vintagestory.Server/ServerSystemRemapperAssistant.cs:222:		return TextCommandResult.Success(Lang.Get("Okay, ignoring all new remappings. You can still manually remap them using /fixmapping doremap [code]"));
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-223-	}
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-224-
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-225-	private TextCommandResult OnCmdDoremap(TextCommandCallingArgs args)
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-226-	{
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-227-		string key = args[0] as string;
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-228-		if (!remaps.ContainsKey(key))
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-229-		{
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-230-			return TextCommandResult.Success(Lang.Get("No remapping group found under this code"));
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-231-		}
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-232-		string[] array = remaps[key];
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-233-		int num = 0;
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-234-		string[] array2 = array;
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-235-		for (int i = 0; i < array2.Length; i++)
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-236-		{
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-237-			string text = array2[i].Trim();
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-238-			if (text.Length != 0)
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-239-			{
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-240-				server.HandleChatMessage(args.Caller.Player as IServerPlayer, args.Caller.FromChatGroupId, text);
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-241-				num++;
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-242-			}
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-243-		}
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-244-		server.SaveGameData.RemappingsAppliedByCode[key] = true;
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-245-		return TextCommandResult.Success(Lang.Get("Ok, {0} commands executed.", num));
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-246-	}
+Vintagestory.Server/ServerSystemRemapperAssistant.cs-247-

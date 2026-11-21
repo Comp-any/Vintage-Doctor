@@ -1,0 +1,159 @@
+Vintagestory.GameContent/CloudRenderer.cs-87-		LoadShader();
+Vintagestory.GameContent/CloudRenderer.cs-88-		double num = capi.World.Calendar.TotalHours * 60.0;
+Vintagestory.GameContent/CloudRenderer.cs-89-		windOffsetX += 2.0 * num;
+Vintagestory.GameContent/CloudRenderer.cs-90-		windOffsetZ += 0.10000000149011612 * num;
+Vintagestory.GameContent/CloudRenderer.cs-91-		mainThreadState.WindTileOffsetX += (int)(windOffsetX / (double)CloudTileSize);
+Vintagestory.GameContent/CloudRenderer.cs-92-		windOffsetX %= CloudTileSize;
+Vintagestory.GameContent/CloudRenderer.cs-93-		mainThreadState.WindTileOffsetZ += (int)(windOffsetZ / (double)CloudTileSize);
+Vintagestory.GameContent/CloudRenderer.cs-94-		windOffsetZ %= CloudTileSize;
+Vintagestory.GameContent/CloudRenderer.cs-95-		offThreadState.Set(mainThreadState);
+Vintagestory.GameContent/CloudRenderer.cs-96-		committedState.Set(mainThreadState);
+Vintagestory.GameContent/CloudRenderer.cs-97-		InitCloudTiles(8 * capi.World.Player.WorldData.DesiredViewDistance);
+Vintagestory.GameContent/CloudRenderer.cs-98-		LoadCloudModel();
+Vintagestory.GameContent/CloudRenderer.cs:99:		capi.Settings.AddWatcher<int>("viewDistance", OnViewDistanceChanged);
+Vintagestory.GameContent/CloudRenderer.cs-100-		capi.Settings.AddWatcher("cloudRenderMode", (int val) =>
+Vintagestory.GameContent/CloudRenderer.cs-101-		{
+Vintagestory.GameContent/CloudRenderer.cs-102-			renderClouds = val == 2;
+Vintagestory.GameContent/CloudRenderer.cs-103-		});
+Vintagestory.GameContent/CloudRenderer.cs-104-		renderClouds = capi.Settings.Int.Get("cloudRenderMode", 0) == 2;
+Vintagestory.GameContent/CloudRenderer.cs-105-		InitCustomDataBuffers(updateMesh);
+Vintagestory.GameContent/CloudRenderer.cs-106-		capi.Event.LeaveWorld += () =>
+Vintagestory.GameContent/CloudRenderer.cs-107-		{
+Vintagestory.GameContent/CloudRenderer.cs-108-			isShuttingDown = true;
+Vintagestory.GameContent/CloudRenderer.cs-109-		};
+Vintagestory.GameContent/CloudRenderer.cs-110-		cloudTileUpdThread = new Thread(() =>
+Vintagestory.GameContent/CloudRenderer.cs-111-		{
+Vintagestory.GameContent/CloudRenderer.cs-112-			while (!isShuttingDown)
+Vintagestory.GameContent/CloudRenderer.cs-113-			{
+Vintagestory.GameContent/CloudRenderer.cs-114-				if (!newStateRready)
+Vintagestory.GameContent/CloudRenderer.cs-115-				{
+Vintagestory.GameContent/CloudRenderer.cs-116-					int num2 = (int)windOffsetX / CloudTileSize;
+Vintagestory.GameContent/CloudRenderer.cs-117-					int num3 = (int)windOffsetZ / CloudTileSize;
+Vintagestory.GameContent/CloudRenderer.cs-118-					int x = offThreadState.CenterTilePos.X;
+Vintagestory.GameContent/CloudRenderer.cs-119-					int z = offThreadState.CenterTilePos.Z;
+Vintagestory.GameContent/CloudRenderer.cs-120-					offThreadState.Set(mainThreadState);
+Vintagestory.GameContent/CloudRenderer.cs-121-					offThreadState.WindTileOffsetX += num2;
+Vintagestory.GameContent/CloudRenderer.cs-122-					offThreadState.WindTileOffsetZ += num3;
+Vintagestory.GameContent/CloudRenderer.cs-123-					int num4 = num2 + x - offThreadState.CenterTilePos.X;
+Vintagestory.GameContent/CloudRenderer.cs-124-					int num5 = num3 + z - offThreadState.CenterTilePos.Z;
+--
+Vintagestory.GameContent/CloudRenderer.cs-246-				prog.Uniform("cloudCounter", (float)(capi.World.Calendar.TotalHours * 20.0 % 578.0));
+Vintagestory.GameContent/CloudRenderer.cs-247-				prog.UniformMatrix("projectionMatrix", capi.Render.CurrentProjectionMatrix);
+Vintagestory.GameContent/CloudRenderer.cs-248-				prog.Uniform("flatFogDensity", capi.Ambient.BlendedFlatFogDensity);
+Vintagestory.GameContent/CloudRenderer.cs-249-				prog.Uniform("flatFogStart", capi.Ambient.BlendedFlatFogYPosForShader - (float)capi.World.Player.Entity.CameraPos.Y);
+Vintagestory.GameContent/CloudRenderer.cs-250-				mvMat.Set(capi.Render.CameraMatrixOriginf).Translate(num, num3, num2);
+Vintagestory.GameContent/CloudRenderer.cs-251-				prog.UniformMatrix("modelViewMatrix", mvMat.Values);
+Vintagestory.GameContent/CloudRenderer.cs-252-				capi.Render.RenderMeshInstanced(cloudTilesMeshRef, QuantityCloudTiles);
+Vintagestory.GameContent/CloudRenderer.cs-253-				prog.Stop();
+Vintagestory.GameContent/CloudRenderer.cs-254-			}
+Vintagestory.GameContent/CloudRenderer.cs-255-		}
+Vintagestory.GameContent/CloudRenderer.cs-256-	}
+Vintagestory.GameContent/CloudRenderer.cs-257-
+Vintagestory.GameContent/CloudRenderer.cs:258:	public void InitCloudTiles(int viewDistance)
+Vintagestory.GameContent/CloudRenderer.cs-259-	{
+Vintagestory.GameContent/CloudRenderer.cs:260:		CloudTileLength = GameMath.Clamp(viewDistance / CloudTileSize, 20, 200);
+Vintagestory.GameContent/CloudRenderer.cs-261-		QuantityCloudTiles = CloudTileLength * CloudTileLength;
+Vintagestory.GameContent/CloudRenderer.cs-262-		Tiles = new CloudTile[QuantityCloudTiles];
+Vintagestory.GameContent/CloudRenderer.cs-263-		tempTiles = new CloudTile[QuantityCloudTiles];
+Vintagestory.GameContent/CloudRenderer.cs-264-		int num = rand.Next();
+Vintagestory.GameContent/CloudRenderer.cs-265-		for (int i = 0; i < CloudTileLength; i++)
+Vintagestory.GameContent/CloudRenderer.cs-266-		{
+Vintagestory.GameContent/CloudRenderer.cs-267-			for (int j = 0; j < CloudTileLength; j++)
+Vintagestory.GameContent/CloudRenderer.cs-268-			{
+Vintagestory.GameContent/CloudRenderer.cs-269-				Tiles[i * CloudTileLength + j] = new CloudTile
+Vintagestory.GameContent/CloudRenderer.cs-270-				{
+Vintagestory.GameContent/CloudRenderer.cs-271-					GridXOffset = (short)(i - CloudTileLength / 2),
+Vintagestory.GameContent/CloudRenderer.cs-272-					GridZOffset = (short)(j - CloudTileLength / 2),
+Vintagestory.GameContent/CloudRenderer.cs-273-					brightnessRand = new LCGRandom(num)
+Vintagestory.GameContent/CloudRenderer.cs-274-				};
+Vintagestory.GameContent/CloudRenderer.cs-275-			}
+Vintagestory.GameContent/CloudRenderer.cs-276-		}
+Vintagestory.GameContent/CloudRenderer.cs-277-	}
+Vintagestory.GameContent/CloudRenderer.cs-278-
+Vintagestory.GameContent/CloudRenderer.cs-279-	public void UpdateCloudTilesOffThread(int changeSpeed)
+Vintagestory.GameContent/CloudRenderer.cs-280-	{
+Vintagestory.GameContent/CloudRenderer.cs-281-		bool flag = false;
+Vintagestory.GameContent/CloudRenderer.cs-282-		accum++;
+Vintagestory.GameContent/CloudRenderer.cs-283-		if (accum > 10)
+Vintagestory.GameContent/CloudRenderer.cs-284-		{
+Vintagestory.GameContent/CloudRenderer.cs-285-			accum = 0;
+--
+FluffyClouds/CloudRendererMap.cs-109-		capi.Event.ReloadShader += LoadShader;
+FluffyClouds/CloudRendererMap.cs-110-		LoadShader();
+FluffyClouds/CloudRendererMap.cs-111-		double num = capi.World.Calendar.TotalHours * 60.0;
+FluffyClouds/CloudRendererMap.cs-112-		windOffsetX += 2.0 * num;
+FluffyClouds/CloudRendererMap.cs-113-		windOffsetZ += 0.10000000149011612 * num;
+FluffyClouds/CloudRendererMap.cs-114-		mainThreadState.WindTileOffsetX += (int)(windOffsetX / (double)CloudTileSize);
+FluffyClouds/CloudRendererMap.cs-115-		windOffsetX %= CloudTileSize;
+FluffyClouds/CloudRendererMap.cs-116-		mainThreadState.WindTileOffsetZ += (int)(windOffsetZ / (double)CloudTileSize);
+FluffyClouds/CloudRendererMap.cs-117-		windOffsetZ %= CloudTileSize;
+FluffyClouds/CloudRendererMap.cs-118-		offThreadState.Set(mainThreadState);
+FluffyClouds/CloudRendererMap.cs-119-		committedState.Set(mainThreadState);
+FluffyClouds/CloudRendererMap.cs-120-		InitCloudTiles(8 * capi.World.Player.WorldData.DesiredViewDistance);
+FluffyClouds/CloudRendererMap.cs:121:		capi.Settings.AddWatcher<int>("viewDistance", OnViewDistanceChanged);
+FluffyClouds/CloudRendererMap.cs-122-		capi.Settings.AddWatcher("cloudRenderMode", (int val) =>
+FluffyClouds/CloudRendererMap.cs-123-		{
+FluffyClouds/CloudRendererMap.cs-124-			renderCloudMap = val == 1;
+FluffyClouds/CloudRendererMap.cs-125-		});
+FluffyClouds/CloudRendererMap.cs-126-		renderCloudMap = capi.Settings.Int.Get("cloudRenderMode", 0) == 1;
+FluffyClouds/CloudRendererMap.cs-127-		capi.Event.LeaveWorld += () =>
+FluffyClouds/CloudRendererMap.cs-128-		{
+FluffyClouds/CloudRendererMap.cs-129-			isShuttingDown = true;
+FluffyClouds/CloudRendererMap.cs-130-		};
+FluffyClouds/CloudRendererMap.cs-131-		cloudTileUpdThread = new Thread(() =>
+FluffyClouds/CloudRendererMap.cs-132-		{
+FluffyClouds/CloudRendererMap.cs-133-			while (!isShuttingDown)
+FluffyClouds/CloudRendererMap.cs-134-			{
+FluffyClouds/CloudRendererMap.cs-135-				if (!newStateRready)
+FluffyClouds/CloudRendererMap.cs-136-				{
+FluffyClouds/CloudRendererMap.cs-137-					int num2 = (int)windOffsetX / CloudTileSize;
+FluffyClouds/CloudRendererMap.cs-138-					int num3 = (int)windOffsetZ / CloudTileSize;
+FluffyClouds/CloudRendererMap.cs-139-					int x = offThreadState.CenterTilePos.X;
+FluffyClouds/CloudRendererMap.cs-140-					int z = offThreadState.CenterTilePos.Z;
+FluffyClouds/CloudRendererMap.cs-141-					offThreadState.Set(mainThreadState);
+FluffyClouds/CloudRendererMap.cs-142-					offThreadState.WindTileOffsetX += num2;
+FluffyClouds/CloudRendererMap.cs-143-					offThreadState.WindTileOffsetZ += num3;
+FluffyClouds/CloudRendererMap.cs-144-					int num4 = num2 + x - offThreadState.CenterTilePos.X;
+FluffyClouds/CloudRendererMap.cs-145-					int num5 = num3 + z - offThreadState.CenterTilePos.Z;
+FluffyClouds/CloudRendererMap.cs-146-					if (num4 != 0 || num5 != 0)
+--
+FluffyClouds/CloudRendererMap.cs-315-	private int makeTexture(int width, PixelInternalFormat internalFormat, PixelFormat format, PixelType type)
+FluffyClouds/CloudRendererMap.cs-316-	{
+FluffyClouds/CloudRendererMap.cs-317-		int num = GL.GenTexture();
+FluffyClouds/CloudRendererMap.cs-318-		GL.BindTexture(TextureTarget.Texture2D, num);
+FluffyClouds/CloudRendererMap.cs-319-		GL.TexImage2D(TextureTarget.Texture2D, 0, internalFormat, width, width, 0, format, type, 0);
+FluffyClouds/CloudRendererMap.cs-320-		GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, 9728);
+FluffyClouds/CloudRendererMap.cs-321-		GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, 9728);
+FluffyClouds/CloudRendererMap.cs-322-		GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, 33071);
+FluffyClouds/CloudRendererMap.cs-323-		GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, 33071);
+FluffyClouds/CloudRendererMap.cs-324-		return num;
+FluffyClouds/CloudRendererMap.cs-325-	}
+FluffyClouds/CloudRendererMap.cs-326-
+FluffyClouds/CloudRendererMap.cs:327:	public void InitCloudTiles(int viewDistance)
+FluffyClouds/CloudRendererMap.cs-328-	{
+FluffyClouds/CloudRendererMap.cs:329:		CloudTileLength = GameMath.Clamp(viewDistance / CloudTileSize, 20, 200);
+FluffyClouds/CloudRendererMap.cs-330-		QuantityCloudTiles = CloudTileLength * CloudTileLength;
+FluffyClouds/CloudRendererMap.cs-331-		Tiles = new CloudTile[QuantityCloudTiles];
+FluffyClouds/CloudRendererMap.cs-332-		tempTiles = new CloudTile[QuantityCloudTiles];
+FluffyClouds/CloudRendererMap.cs-333-		int num = rand.Next();
+FluffyClouds/CloudRendererMap.cs-334-		for (int i = 0; i < CloudTileLength; i++)
+FluffyClouds/CloudRendererMap.cs-335-		{
+FluffyClouds/CloudRendererMap.cs-336-			for (int j = 0; j < CloudTileLength; j++)
+FluffyClouds/CloudRendererMap.cs-337-			{
+FluffyClouds/CloudRendererMap.cs-338-				Tiles[i * CloudTileLength + j] = new CloudTile
+FluffyClouds/CloudRendererMap.cs-339-				{
+FluffyClouds/CloudRendererMap.cs-340-					GridXOffset = (short)(i - CloudTileLength / 2),
+FluffyClouds/CloudRendererMap.cs-341-					GridZOffset = (short)(j - CloudTileLength / 2),
+FluffyClouds/CloudRendererMap.cs-342-					brightnessRand = new LCGRandom(num)
+FluffyClouds/CloudRendererMap.cs-343-				};
+FluffyClouds/CloudRendererMap.cs-344-			}
+FluffyClouds/CloudRendererMap.cs-345-		}
+FluffyClouds/CloudRendererMap.cs-346-		FreeGlResources();
+FluffyClouds/CloudRendererMap.cs-347-		TextureData1 = makeTexture(CloudTileLength, PixelInternalFormat.Rgba16, PixelFormat.Rgba, PixelType.Short);
+FluffyClouds/CloudRendererMap.cs-348-		TextureData2 = makeTexture(CloudTileLength, PixelInternalFormat.Rgba16, PixelFormat.Rgba, PixelType.Short);
+FluffyClouds/CloudRendererMap.cs-349-		TextureDataBuffer1 = new short[CloudTileLength * CloudTileLength * 4];
+FluffyClouds/CloudRendererMap.cs-350-		TextureDataBuffer2 = new short[CloudTileLength * CloudTileLength * 4];
+FluffyClouds/CloudRendererMap.cs-351-		GL.GetInteger(GetPName.DrawFramebufferBinding, out var data);
+FluffyClouds/CloudRendererMap.cs-352-		TextureMap = makeTexture(CloudTileLength, PixelInternalFormat.Rgba32f, PixelFormat.Rgba, PixelType.Float);
+FluffyClouds/CloudRendererMap.cs-353-		TextureCol = makeTexture(CloudTileLength, PixelInternalFormat.Rgba32f, PixelFormat.Rgba, PixelType.Float);
+FluffyClouds/CloudRendererMap.cs-354-		Framebuffer = GL.GenFramebuffer();

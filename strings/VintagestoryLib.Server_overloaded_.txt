@@ -1,0 +1,77 @@
+Vintagestory.Client.NoObf/HudDisconnected.cs-10-
+Vintagestory.Client.NoObf/HudDisconnected.cs-11-	public override bool Focusable => false;
+Vintagestory.Client.NoObf/HudDisconnected.cs-12-
+Vintagestory.Client.NoObf/HudDisconnected.cs-13-	public HudDisconnected(ICoreClientAPI capi)
+Vintagestory.Client.NoObf/HudDisconnected.cs-14-		: base(capi)
+Vintagestory.Client.NoObf/HudDisconnected.cs-15-	{
+Vintagestory.Client.NoObf/HudDisconnected.cs-16-	}
+Vintagestory.Client.NoObf/HudDisconnected.cs-17-
+Vintagestory.Client.NoObf/HudDisconnected.cs-18-	public override void OnBlockTexturesLoaded()
+Vintagestory.Client.NoObf/HudDisconnected.cs-19-	{
+Vintagestory.Client.NoObf/HudDisconnected.cs-20-		ElementBounds bounds = ElementBounds.Fixed(EnumDialogArea.RightBottom, 0.0, 0.0, 45.0, 20.0);
+Vintagestory.Client.NoObf/HudDisconnected.cs-21-		ElementBounds bounds2 = ElementBounds.Fixed(10.0, 10.0, 330.0, 50.0);
+Vintagestory.Client.NoObf/HudDisconnected.cs:22:		string key = (ScreenManager.Platform.IsServerRunning ? "Server overloaded or crashed" : "Bad connection or server overloaded/crashed");
+Vintagestory.Client.NoObf/HudDisconnected.cs-23-		disconnectedDialog = capi.Gui.CreateCompo("disconnecteddialog", ElementBounds.Fixed(EnumDialogArea.RightTop, 0.0, 0.0, 380.0, 60.0).WithFixedAlignmentOffset(-10.0, 10.0)).AddShadedDialogBG(ElementBounds.Fill, withTitleBar: false).AddDynamicText("", CairoFont.WhiteDetailText().WithOrientation(EnumTextOrientation.Center), bounds, "countertext")
+Vintagestory.Client.NoObf/HudDisconnected.cs-24-			.AddStaticText(Lang.Get("Host not responding. Possible causes: {0}", Lang.Get(key)), CairoFont.WhiteDetailText(), bounds2)
+Vintagestory.Client.NoObf/HudDisconnected.cs-25-			.AddStaticCustomDraw(ElementBounds.Fixed(EnumDialogArea.RightTop, 0.0, 0.0, 25.0, 25.0).WithFixedPadding(10.0, 10.0), OnDialogDraw)
+Vintagestory.Client.NoObf/HudDisconnected.cs-26-			.Compose();
+Vintagestory.Client.NoObf/HudDisconnected.cs-27-		TryOpen();
+Vintagestory.Client.NoObf/HudDisconnected.cs-28-		ClientMain obj = capi.World as ClientMain;
+Vintagestory.Client.NoObf/HudDisconnected.cs-29-		obj.LastReceivedMilliseconds = obj.ElapsedMilliseconds;
+Vintagestory.Client.NoObf/HudDisconnected.cs-30-	}
+Vintagestory.Client.NoObf/HudDisconnected.cs-31-
+Vintagestory.Client.NoObf/HudDisconnected.cs-32-	public override bool TryClose()
+Vintagestory.Client.NoObf/HudDisconnected.cs-33-	{
+Vintagestory.Client.NoObf/HudDisconnected.cs-34-		return false;
+Vintagestory.Client.NoObf/HudDisconnected.cs-35-	}
+Vintagestory.Client.NoObf/HudDisconnected.cs-36-
+Vintagestory.Client.NoObf/HudDisconnected.cs-37-	public override void OnRenderGUI(float deltaTime)
+Vintagestory.Client.NoObf/HudDisconnected.cs-38-	{
+Vintagestory.Client.NoObf/HudDisconnected.cs-39-		ClientMain clientMain = capi.World as ClientMain;
+Vintagestory.Client.NoObf/HudDisconnected.cs-40-		if (!clientMain.IsPaused)
+Vintagestory.Client.NoObf/HudDisconnected.cs-41-		{
+Vintagestory.Client.NoObf/HudDisconnected.cs-42-			float num = (float)(clientMain.ElapsedMilliseconds - clientMain.LastReceivedMilliseconds) / 1000f;
+Vintagestory.Client.NoObf/HudDisconnected.cs-43-			if (disconnectedDialog != null && (num >= 5f || (clientMain.IsSingleplayer && !ScreenManager.Platform.IsServerRunning)))
+Vintagestory.Client.NoObf/HudDisconnected.cs-44-			{
+Vintagestory.Client.NoObf/HudDisconnected.cs-45-				disconnectedDialog.GetDynamicText("countertext").SetNewText(((int)num).ToString() ?? "");
+Vintagestory.Client.NoObf/HudDisconnected.cs-46-				disconnectedDialog.Render(deltaTime);
+Vintagestory.Client.NoObf/HudDisconnected.cs-47-				disconnectedDialog.PostRender(deltaTime);
+--
+Vintagestory.Server/ServerMain.cs-1546-				{
+Vintagestory.Server/ServerMain.cs-1547-					StatsCollector[StatsCollectorIndex].tickTimes[k] = 0L;
+Vintagestory.Server/ServerMain.cs-1548-				}
+Vintagestory.Server/ServerMain.cs-1549-			}
+Vintagestory.Server/ServerMain.cs-1550-			long elapsedMilliseconds2 = lastFramePassedTime.ElapsedMilliseconds;
+Vintagestory.Server/ServerMain.cs-1551-			StatsCollection statsCollection = StatsCollector[StatsCollectorIndex];
+Vintagestory.Server/ServerMain.cs-1552-			statsCollection.tickTimeTotal += elapsedMilliseconds2;
+Vintagestory.Server/ServerMain.cs-1553-			statsCollection.ticksTotal++;
+Vintagestory.Server/ServerMain.cs-1554-			statsCollection.tickTimes[statsCollection.tickTimeIndex] = elapsedMilliseconds2;
+Vintagestory.Server/ServerMain.cs-1555-			statsCollection.tickTimeIndex = (statsCollection.tickTimeIndex + 1) % statsCollection.tickTimes.Length;
+Vintagestory.Server/ServerMain.cs-1556-			if (elapsedMilliseconds2 > 500 && totalUnpausedTime.ElapsedMilliseconds > 5000 && !stopped)
+Vintagestory.Server/ServerMain.cs-1557-			{
+Vintagestory.Server/ServerMain.cs:1558:				Logger.Warning("Server overloaded. A tick took {0}ms to complete.", elapsedMilliseconds2);
+Vintagestory.Server/ServerMain.cs-1559-			}
+Vintagestory.Server/ServerMain.cs-1560-			FrameProfiler.Mark("timers-updated");
+Vintagestory.Server/ServerMain.cs-1561-			int num3 = (int)Math.Max(0f, Config.TickTime - (float)elapsedMilliseconds2);
+Vintagestory.Server/ServerMain.cs-1562-			if (num3 > 0)
+Vintagestory.Server/ServerMain.cs-1563-			{
+Vintagestory.Server/ServerMain.cs-1564-				Thread.Sleep(num3);
+Vintagestory.Server/ServerMain.cs-1565-				FrameProfiler.Mark("sleep");
+Vintagestory.Server/ServerMain.cs-1566-			}
+Vintagestory.Server/ServerMain.cs-1567-			TickPosition++;
+Vintagestory.Server/ServerMain.cs-1568-		}
+Vintagestory.Server/ServerMain.cs-1569-		catch (Exception e)
+Vintagestory.Server/ServerMain.cs-1570-		{
+Vintagestory.Server/ServerMain.cs-1571-			Logger.Fatal(e);
+Vintagestory.Server/ServerMain.cs-1572-		}
+Vintagestory.Server/ServerMain.cs-1573-		FrameProfiler.End();
+Vintagestory.Server/ServerMain.cs-1574-	}
+Vintagestory.Server/ServerMain.cs-1575-
+Vintagestory.Server/ServerMain.cs-1576-	public void ProcessMain()
+Vintagestory.Server/ServerMain.cs-1577-	{
+Vintagestory.Server/ServerMain.cs-1578-		if (MainSockets == null)
+Vintagestory.Server/ServerMain.cs-1579-		{
+Vintagestory.Server/ServerMain.cs-1580-			return;
+Vintagestory.Server/ServerMain.cs-1581-		}
+Vintagestory.Server/ServerMain.cs-1582-		ProcessMainThreadTasks();
+Vintagestory.Server/ServerMain.cs-1583-		FrameProfiler.Mark("mtasks");

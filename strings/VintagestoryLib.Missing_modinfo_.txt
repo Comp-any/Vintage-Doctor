@@ -1,0 +1,38 @@
+Vintagestory.Common/ModContainer.cs-365-									Icon = new BitmapExternal(text2, Logger);
+Vintagestory.Common/ModContainer.cs-366-								}
+Vintagestory.Common/ModContainer.cs-367-							}
+Vintagestory.Common/ModContainer.cs-368-						}
+Vintagestory.Common/ModContainer.cs-369-					}
+Vintagestory.Common/ModContainer.cs-370-					if (WorldConfig != null)
+Vintagestory.Common/ModContainer.cs-371-					{
+Vintagestory.Common/ModContainer.cs-372-						Unpack(Path.Combine(GamePaths.Cache, "unpack"));
+Vintagestory.Common/ModContainer.cs-373-					}
+Vintagestory.Common/ModContainer.cs-374-				}
+Vintagestory.Common/ModContainer.cs-375-				if (Info == null)
+Vintagestory.Common/ModContainer.cs-376-				{
+Vintagestory.Common/ModContainer.cs:377:					Logger.Error("Missing modinfo.json");
+Vintagestory.Common/ModContainer.cs-378-					SetError(ModError.Loading);
+Vintagestory.Common/ModContainer.cs-379-				}
+Vintagestory.Common/ModContainer.cs-380-				if (WorldConfig != null)
+Vintagestory.Common/ModContainer.cs-381-				{
+Vintagestory.Common/ModContainer.cs-382-					Lang.PreLoadModWorldConfig(FolderPath, Info?.ModID, Lang.CurrentLocale);
+Vintagestory.Common/ModContainer.cs-383-				}
+Vintagestory.Common/ModContainer.cs-384-			}
+Vintagestory.Common/ModContainer.cs-385-			else
+Vintagestory.Common/ModContainer.cs-386-			{
+Vintagestory.Common/ModContainer.cs-387-				Info = LoadModInfoFromCode(compilationContext, loader, out var modWorldConfig);
+Vintagestory.Common/ModContainer.cs-388-				Info?.Init();
+Vintagestory.Common/ModContainer.cs-389-				WorldConfig = modWorldConfig;
+Vintagestory.Common/ModContainer.cs-390-				if (Info == null)
+Vintagestory.Common/ModContainer.cs-391-				{
+Vintagestory.Common/ModContainer.cs-392-					Logger.Error("Missing ModInfoAttribute");
+Vintagestory.Common/ModContainer.cs-393-					SetError(ModError.Loading);
+Vintagestory.Common/ModContainer.cs-394-				}
+Vintagestory.Common/ModContainer.cs-395-				string text3 = null;
+Vintagestory.Common/ModContainer.cs-396-				if (!string.IsNullOrWhiteSpace(Info?.IconPath))
+Vintagestory.Common/ModContainer.cs-397-				{
+Vintagestory.Common/ModContainer.cs-398-					try
+Vintagestory.Common/ModContainer.cs-399-					{
+Vintagestory.Common/ModContainer.cs-400-						text3 = Path.GetFullPath(Path.Combine(GamePaths.AssetsPath, Info.IconPath));
+Vintagestory.Common/ModContainer.cs-401-					}
+Vintagestory.Common/ModContainer.cs-402-					catch (Exception ex2)

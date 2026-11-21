@@ -1,0 +1,179 @@
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-243-		{
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-244-			decal.PoolLocation = null;
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-245-			decals.Remove(decal.DecalId);
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-246-			return false;
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-247-		}
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-248-		MeshData meshData = null;
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-249-		try
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-250-		{
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-251-			meshData = game.TesselatorManager.GetDefaultBlockMesh(block);
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-252-		}
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-253-		catch (Exception)
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-254-		{
+Vintagestory.Client.NoObf/SystemRenderDecals.cs:255:			game.Logger.Error("An exception was thrown getting the shape for {0}, likely the shape file was not found", block.Code.ToShortString());
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-256-			return false;
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-257-		}
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-258-		if (decalModeldatas[block.BlockId] == null)
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-259-		{
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-260-			tesselateBlockDecal(block.BlockId);
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-261-		}
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-262-		MeshData decalModelData;
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-263-		if (block.HasAlternates)
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-264-		{
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-265-			int k = GameMath.MurmurHash3(decal.pos.X, (block.RandomizeAxes == EnumRandomizeAxes.XYZ) ? decal.pos.Y : 0, decal.pos.Z);
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-266-			int num = GameMath.Mod(k, decalModeldatas[block.BlockId].Length);
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-267-			decalModelData = decalModeldatas[block.BlockId][num].Clone();
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-268-			int num2 = GameMath.Mod(k, game.TesselatorManager.altblockModelDatasLod1[block.BlockId].Length);
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-269-			meshData = game.TesselatorManager.altblockModelDatasLod1[block.BlockId][num2];
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-270-			if (block.Lod0Shape != null)
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-271-			{
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-272-				meshData = meshData.Clone();
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-273-				meshData.AddMeshData(game.TesselatorManager.altblockModelDatasLod0[block.BlockId][num2]);
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-274-			}
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-275-		}
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-276-		else
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-277-		{
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-278-			decalModelData = decalModeldatas[block.BlockId][0].Clone();
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-279-			if (block.Lod0Shape != null)
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-280-			{
+--
+Vintagestory.Common/ModLoader.cs-524-			case ModRunPhase.Dispose:
+Vintagestory.Common/ModLoader.cs-525-				system.Dispose();
+Vintagestory.Common/ModLoader.cs-526-				break;
+Vintagestory.Common/ModLoader.cs-527-			}
+Vintagestory.Common/ModLoader.cs-528-			return true;
+Vintagestory.Common/ModLoader.cs-529-		}
+Vintagestory.Common/ModLoader.cs-530-		catch (FormatException ex)
+Vintagestory.Common/ModLoader.cs-531-		{
+Vintagestory.Common/ModLoader.cs-532-			throw ex;
+Vintagestory.Common/ModLoader.cs-533-		}
+Vintagestory.Common/ModLoader.cs-534-		catch (Exception e)
+Vintagestory.Common/ModLoader.cs-535-		{
+Vintagestory.Common/ModLoader.cs:536:			mod.Logger.Error("An exception was thrown when trying to start the mod:");
+Vintagestory.Common/ModLoader.cs-537-			mod.Logger.Error(e);
+Vintagestory.Common/ModLoader.cs-538-		}
+Vintagestory.Common/ModLoader.cs-539-		return false;
+Vintagestory.Common/ModLoader.cs-540-	}
+Vintagestory.Common/ModLoader.cs-541-
+Vintagestory.Common/ModLoader.cs-542-	public void Dispose()
+Vintagestory.Common/ModLoader.cs-543-	{
+Vintagestory.Common/ModLoader.cs-544-		RunModPhase(ModRunPhase.Dispose);
+Vintagestory.Common/ModLoader.cs-545-	}
+Vintagestory.Common/ModLoader.cs-546-}
+--
+Vintagestory.Common/ModContainer.cs-146-						string directoryName = Path.GetDirectoryName(path);
+Vintagestory.Common/ModContainer.cs-147-						if (!Directory.Exists(directoryName))
+Vintagestory.Common/ModContainer.cs-148-						{
+Vintagestory.Common/ModContainer.cs-149-							Directory.CreateDirectory(directoryName);
+Vintagestory.Common/ModContainer.cs-150-						}
+Vintagestory.Common/ModContainer.cs-151-						using Stream stream = zipFile.GetInputStream(item2);
+Vintagestory.Common/ModContainer.cs-152-						using FileStream destination = new FileStream(path, FileMode.Create);
+Vintagestory.Common/ModContainer.cs-153-						stream.CopyTo(destination);
+Vintagestory.Common/ModContainer.cs-154-					}
+Vintagestory.Common/ModContainer.cs-155-				}
+Vintagestory.Common/ModContainer.cs-156-				catch (Exception e)
+Vintagestory.Common/ModContainer.cs-157-				{
+Vintagestory.Common/ModContainer.cs:158:					Logger.Error("An exception was thrown when trying to extract the mod archive to '{0}':", FolderPath);
+Vintagestory.Common/ModContainer.cs-159-					Logger.Error(e);
+Vintagestory.Common/ModContainer.cs-160-					SetError(ModError.Loading);
+Vintagestory.Common/ModContainer.cs-161-					try
+Vintagestory.Common/ModContainer.cs-162-					{
+Vintagestory.Common/ModContainer.cs-163-						Directory.Delete(FolderPath, recursive: true);
+Vintagestory.Common/ModContainer.cs-164-						return;
+Vintagestory.Common/ModContainer.cs-165-					}
+Vintagestory.Common/ModContainer.cs-166-					catch (Exception)
+Vintagestory.Common/ModContainer.cs-167-					{
+Vintagestory.Common/ModContainer.cs-168-						Logger.Error("Additionally, there was an exception when deleting cached mod folder path '{0}':", FolderPath);
+Vintagestory.Common/ModContainer.cs-169-						Logger.Error(e);
+Vintagestory.Common/ModContainer.cs-170-						return;
+Vintagestory.Common/ModContainer.cs-171-					}
+Vintagestory.Common/ModContainer.cs-172-				}
+Vintagestory.Common/ModContainer.cs-173-			}
+Vintagestory.Common/ModContainer.cs-174-		}
+Vintagestory.Common/ModContainer.cs-175-		string text = Path.Combine(FolderPath, ".ignore");
+Vintagestory.Common/ModContainer.cs-176-		IgnoreFile ignoreFile = (File.Exists(text) ? new IgnoreFile(text, FolderPath) : null);
+Vintagestory.Common/ModContainer.cs-177-		foreach (string item3 in EnumerateModFiles(FolderPath))
+Vintagestory.Common/ModContainer.cs-178-		{
+Vintagestory.Common/ModContainer.cs-179-			if (ignoreFile != null && !ignoreFile.Available(item3))
+Vintagestory.Common/ModContainer.cs-180-			{
+Vintagestory.Common/ModContainer.cs-181-				continue;
+Vintagestory.Common/ModContainer.cs-182-			}
+Vintagestory.Common/ModContainer.cs-183-			EnumModSourceType? sourceTypeFromExtension = GetSourceTypeFromExtension(item3);
+--
+Vintagestory.Common/ModContainer.cs-417-				if (File.Exists(text3))
+Vintagestory.Common/ModContainer.cs-418-				{
+Vintagestory.Common/ModContainer.cs-419-					Icon = new BitmapExternal(text3, Logger);
+Vintagestory.Common/ModContainer.cs-420-				}
+Vintagestory.Common/ModContainer.cs-421-			}
+Vintagestory.Common/ModContainer.cs-422-			if (Info != null)
+Vintagestory.Common/ModContainer.cs-423-			{
+Vintagestory.Common/ModContainer.cs-424-				CheckProperVersions();
+Vintagestory.Common/ModContainer.cs-425-			}
+Vintagestory.Common/ModContainer.cs-426-		}
+Vintagestory.Common/ModContainer.cs-427-		catch (Exception e)
+Vintagestory.Common/ModContainer.cs-428-		{
+Vintagestory.Common/ModContainer.cs:429:			Logger.Error("An exception was thrown trying to to load the ModInfo:");
+Vintagestory.Common/ModContainer.cs-430-			Logger.Error(e);
+Vintagestory.Common/ModContainer.cs-431-			SetError(ModError.Loading);
+Vintagestory.Common/ModContainer.cs-432-		}
+Vintagestory.Common/ModContainer.cs-433-		static string GetFallbackIconPath()
+Vintagestory.Common/ModContainer.cs-434-		{
+Vintagestory.Common/ModContainer.cs-435-			return Path.Combine(GamePaths.AssetsPath, "game/textures/gui/3rdpartymodicon.png");
+Vintagestory.Common/ModContainer.cs-436-		}
+Vintagestory.Common/ModContainer.cs-437-	}
+Vintagestory.Common/ModContainer.cs-438-
+Vintagestory.Common/ModContainer.cs-439-	private BitmapExternal loadBackground(string path)
+Vintagestory.Common/ModContainer.cs-440-	{
+Vintagestory.Common/ModContainer.cs-441-		using ZipFile zipFile = new ZipFile(SourcePath);
+Vintagestory.Common/ModContainer.cs-442-		ZipEntry entry = zipFile.GetEntry(path);
+Vintagestory.Common/ModContainer.cs-443-		if (entry != null)
+Vintagestory.Common/ModContainer.cs-444-		{
+Vintagestory.Common/ModContainer.cs-445-			using (MemoryStream memoryStream = new MemoryStream(1048576))
+Vintagestory.Common/ModContainer.cs-446-			{
+Vintagestory.Common/ModContainer.cs-447-				using Stream stream = zipFile.GetInputStream(entry);
+Vintagestory.Common/ModContainer.cs-448-				stream.CopyTo(memoryStream);
+Vintagestory.Common/ModContainer.cs-449-				return new BitmapExternal(memoryStream, Logger);
+Vintagestory.Common/ModContainer.cs-450-			}
+Vintagestory.Common/ModContainer.cs-451-		}
+Vintagestory.Common/ModContainer.cs-452-		return null;
+Vintagestory.Common/ModContainer.cs-453-	}
+Vintagestory.Common/ModContainer.cs-454-
+--
+Vintagestory.Common/ModContainer.cs-555-			Assembly = list[0];
+Vintagestory.Common/ModContainer.cs-556-			Logger.VerboseDebug("Loaded assembly {0}", Assembly.Location);
+Vintagestory.Common/ModContainer.cs-557-		}
+Vintagestory.Common/ModContainer.cs-558-		catch (Exception ex)
+Vintagestory.Common/ModContainer.cs-559-		{
+Vintagestory.Common/ModContainer.cs-560-			if (ex.Message == "Assembly with same name is already loaded")
+Vintagestory.Common/ModContainer.cs-561-			{
+Vintagestory.Common/ModContainer.cs-562-				string message = "Please restart the game. The mod's .dll was already loaded and cannot be reloaded. Most likely cause is switching mod versions after already playing one world. Other rare causes include two mods with .dlls with the same name. Mod filename is " + FileName + ". Erroring path is: " + errorPath;
+Vintagestory.Common/ModContainer.cs-563-				Logger.Error(message);
+Vintagestory.Common/ModContainer.cs-564-				SetError(ModError.ChangedVersion);
+Vintagestory.Common/ModContainer.cs-565-				throw new Exception(message, ex);
+Vintagestory.Common/ModContainer.cs-566-			}
+Vintagestory.Common/ModContainer.cs:567:			Logger.Error("An exception was thrown when trying to load assembly:");
+Vintagestory.Common/ModContainer.cs-568-			Logger.Error(ex);
+Vintagestory.Common/ModContainer.cs-569-			SetError(ModError.Loading);
+Vintagestory.Common/ModContainer.cs-570-		}
+Vintagestory.Common/ModContainer.cs-571-	}
+Vintagestory.Common/ModContainer.cs-572-
+Vintagestory.Common/ModContainer.cs-573-	public void InstantiateModSystems(EnumAppSide side)
+Vintagestory.Common/ModContainer.cs-574-	{
+Vintagestory.Common/ModContainer.cs-575-		if (!Enabled || Assembly == null || Systems.Count > 0)
+Vintagestory.Common/ModContainer.cs-576-		{
+Vintagestory.Common/ModContainer.cs-577-			return;
+Vintagestory.Common/ModContainer.cs-578-		}
+Vintagestory.Common/ModContainer.cs-579-		if (Info == null)
+Vintagestory.Common/ModContainer.cs-580-		{
+Vintagestory.Common/ModContainer.cs-581-			throw new InvalidOperationException("LoadModInfo was not called before InstantiateModSystems");
+Vintagestory.Common/ModContainer.cs-582-		}
+Vintagestory.Common/ModContainer.cs-583-		if (!Info.Side.Is(side))
+Vintagestory.Common/ModContainer.cs-584-		{
+Vintagestory.Common/ModContainer.cs-585-			Status = ModStatus.Unused;
+Vintagestory.Common/ModContainer.cs-586-			return;
+Vintagestory.Common/ModContainer.cs-587-		}
+Vintagestory.Common/ModContainer.cs-588-		List<ModSystem> list = new List<ModSystem>();
+Vintagestory.Common/ModContainer.cs-589-		foreach (Type modSystem2 in GetModSystems(Assembly))
+Vintagestory.Common/ModContainer.cs-590-		{
+Vintagestory.Common/ModContainer.cs-591-			try
+Vintagestory.Common/ModContainer.cs-592-			{

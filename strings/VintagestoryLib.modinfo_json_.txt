@@ -1,0 +1,155 @@
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-428-	{
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-429-		List<IAsset> manyInCategory = game.Platform.AssetManager.GetManyInCategory("textures", "decal/");
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-430-		int num = game.textureSize * (int)Math.Ceiling(Math.Sqrt(manyInCategory.Count));
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-431-		decalAtlasSize = new Size2i(num, num);
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-432-		game.Logger.Notification("Texture size is {0} so decal atlas size of {1}x{2} should suffice", game.textureSize, decalAtlasSize.Width, decalAtlasSize.Height);
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-433-		TextureAtlas textureAtlas = new TextureAtlas(decalAtlasSize.Width, decalAtlasSize.Height, 0f, 0f);
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-434-		DecalTextureAtlasPositionsByTextureSubId = new TextureAtlasPosition[manyInCategory.Count];
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-435-		TextureNameToIdMapping = new Dictionary<string, int>();
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-436-		for (int i = 0; i < manyInCategory.Count; i++)
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-437-		{
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-438-			if (!textureAtlas.InsertTexture(i, game.api, manyInCategory[i]))
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-439-			{
+Vintagestory.Client.NoObf/SystemRenderDecals.cs:440:				throw new Exception("Texture decal atlas overflow. Did you create a high res texture pack without setting the correct textureSize value in the modinfo.json?");
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-441-			}
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-442-			TextureNameToIdMapping[manyInCategory[i].Name] = i;
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-443-		}
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-444-		decalTextureAtlas = textureAtlas.Upload(game);
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-445-		game.Platform.BuildMipMaps(decalTextureAtlas.TextureId);
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-446-		textureAtlas.PopulateAtlasPositions(DecalTextureAtlasPositionsByTextureSubId, 0);
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-447-		int num2 = decalPoolSize * 24 * 10;
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-448-		CustomMeshDataPartFloat customMeshDataPartFloat = new CustomMeshDataPartFloat();
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-449-		customMeshDataPartFloat.Instanced = false;
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-450-		customMeshDataPartFloat.StaticDraw = true;
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-451-		customMeshDataPartFloat.InterleaveSizes = new int[3] { 2, 2, 2 };
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-452-		customMeshDataPartFloat.InterleaveStride = 24;
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-453-		customMeshDataPartFloat.InterleaveOffsets = new int[3] { 0, 8, 16 };
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-454-		customMeshDataPartFloat.Count = num2;
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-455-		CustomMeshDataPartFloat customFloats = customMeshDataPartFloat;
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-456-		decalPool = MeshDataPool.AllocateNewPool(game.api, num2, (int)((float)num2 * 1.5f), 2 * decalPoolSize, customFloats);
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-457-	}
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-458-
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-459-	public override EnumClientSystemType GetSystemType()
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-460-	{
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-461-		return EnumClientSystemType.Render;
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-462-	}
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-463-
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-464-	public override void Dispose(ClientMain game)
+Vintagestory.Client.NoObf/SystemRenderDecals.cs-465-	{
+--
+Vintagestory.Common/ModContainer.cs-227-	public void LoadModInfo(ModCompilationContext compilationContext, ModAssemblyLoader loader)
+Vintagestory.Common/ModContainer.cs-228-	{
+Vintagestory.Common/ModContainer.cs-229-		if (!Enabled || Info != null)
+Vintagestory.Common/ModContainer.cs-230-		{
+Vintagestory.Common/ModContainer.cs-231-			return;
+Vintagestory.Common/ModContainer.cs-232-		}
+Vintagestory.Common/ModContainer.cs-233-		try
+Vintagestory.Common/ModContainer.cs-234-		{
+Vintagestory.Common/ModContainer.cs-235-			if (SourceType == EnumModSourceType.ZIP || SourceType == EnumModSourceType.Folder)
+Vintagestory.Common/ModContainer.cs-236-			{
+Vintagestory.Common/ModContainer.cs-237-				if (FolderPath != null)
+Vintagestory.Common/ModContainer.cs-238-				{
+Vintagestory.Common/ModContainer.cs:239:					string path = Path.Combine(FolderPath, "modinfo.json");
+Vintagestory.Common/ModContainer.cs-240-					if (File.Exists(path))
+Vintagestory.Common/ModContainer.cs-241-					{
+Vintagestory.Common/ModContainer.cs-242-						string value = File.ReadAllText(path);
+Vintagestory.Common/ModContainer.cs-243-						Info = JsonConvert.DeserializeObject<ModInfo>(value);
+Vintagestory.Common/ModContainer.cs-244-						Info?.Init();
+Vintagestory.Common/ModContainer.cs-245-					}
+Vintagestory.Common/ModContainer.cs-246-					if (Info?.BackgroundPaths != null)
+Vintagestory.Common/ModContainer.cs-247-					{
+Vintagestory.Common/ModContainer.cs-248-						Info.Backgrounds = new BitmapSupplierDelegate[Info.BackgroundPaths.Length];
+Vintagestory.Common/ModContainer.cs-249-						for (int i = 0; i < Info.BackgroundPaths.Length; i++)
+Vintagestory.Common/ModContainer.cs-250-						{
+Vintagestory.Common/ModContainer.cs-251-							string path2 = Info.BackgroundPaths[i];
+Vintagestory.Common/ModContainer.cs-252-							if (RuntimeEnv.IsDevEnvironment)
+Vintagestory.Common/ModContainer.cs-253-							{
+Vintagestory.Common/ModContainer.cs-254-								_003C_003Ey__InlineArray6<string> buffer = default;
+Vintagestory.Common/ModContainer.cs-255-								buffer[0] = FolderPath;
+Vintagestory.Common/ModContainer.cs-256-								buffer[1] = "..";
+Vintagestory.Common/ModContainer.cs-257-								buffer[2] = "..";
+Vintagestory.Common/ModContainer.cs-258-								buffer[3] = "..";
+Vintagestory.Common/ModContainer.cs-259-								buffer[4] = "..";
+Vintagestory.Common/ModContainer.cs-260-								buffer[5] = path2;
+Vintagestory.Common/ModContainer.cs-261-								string p = Path.Combine(buffer);
+Vintagestory.Common/ModContainer.cs-262-								Info.Backgrounds[i] = () => new BitmapExternal(p);
+Vintagestory.Common/ModContainer.cs-263-							}
+Vintagestory.Common/ModContainer.cs-264-							else
+--
+Vintagestory.Common/ModContainer.cs-299-							text = GetFallbackIconPath();
+Vintagestory.Common/ModContainer.cs-300-						}
+Vintagestory.Common/ModContainer.cs-301-					}
+Vintagestory.Common/ModContainer.cs-302-					if (File.Exists(text))
+Vintagestory.Common/ModContainer.cs-303-					{
+Vintagestory.Common/ModContainer.cs-304-						Icon = new BitmapExternal(text, Logger);
+Vintagestory.Common/ModContainer.cs-305-					}
+Vintagestory.Common/ModContainer.cs-306-				}
+Vintagestory.Common/ModContainer.cs-307-				else
+Vintagestory.Common/ModContainer.cs-308-				{
+Vintagestory.Common/ModContainer.cs-309-					using (ZipFile zipFile = new ZipFile(SourcePath))
+Vintagestory.Common/ModContainer.cs-310-					{
+Vintagestory.Common/ModContainer.cs:311:						ZipEntry entry = zipFile.GetEntry("modinfo.json");
+Vintagestory.Common/ModContainer.cs-312-						if (entry != null)
+Vintagestory.Common/ModContainer.cs-313-						{
+Vintagestory.Common/ModContainer.cs-314-							using StreamReader streamReader = new StreamReader(zipFile.GetInputStream(entry));
+Vintagestory.Common/ModContainer.cs-315-							string value3 = streamReader.ReadToEnd();
+Vintagestory.Common/ModContainer.cs-316-							Info = JsonConvert.DeserializeObject<ModInfo>(value3);
+Vintagestory.Common/ModContainer.cs-317-							Info?.Init();
+Vintagestory.Common/ModContainer.cs-318-						}
+Vintagestory.Common/ModContainer.cs-319-						if (Info.BackgroundPaths != null)
+Vintagestory.Common/ModContainer.cs-320-						{
+Vintagestory.Common/ModContainer.cs-321-							Info.Backgrounds = new BitmapSupplierDelegate[Info.BackgroundPaths.Length];
+Vintagestory.Common/ModContainer.cs-322-							for (int num = 0; num < Info.BackgroundPaths.Length; num++)
+Vintagestory.Common/ModContainer.cs-323-							{
+Vintagestory.Common/ModContainer.cs-324-								string path4 = Info.BackgroundPaths[num];
+Vintagestory.Common/ModContainer.cs-325-								Info.Backgrounds[num] = () => loadBackground(path4);
+Vintagestory.Common/ModContainer.cs-326-							}
+Vintagestory.Common/ModContainer.cs-327-						}
+Vintagestory.Common/ModContainer.cs-328-						ZipEntry entry2 = zipFile.GetEntry("worldconfig.json");
+Vintagestory.Common/ModContainer.cs-329-						if (entry2 != null)
+Vintagestory.Common/ModContainer.cs-330-						{
+Vintagestory.Common/ModContainer.cs-331-							using StreamReader streamReader2 = new StreamReader(zipFile.GetInputStream(entry2));
+Vintagestory.Common/ModContainer.cs-332-							string value4 = streamReader2.ReadToEnd();
+Vintagestory.Common/ModContainer.cs-333-							WorldConfig = JsonConvert.DeserializeObject<ModWorldConfiguration>(value4);
+Vintagestory.Common/ModContainer.cs-334-						}
+Vintagestory.Common/ModContainer.cs-335-						if (!string.IsNullOrWhiteSpace(Info?.IconPath))
+Vintagestory.Common/ModContainer.cs-336-						{
+--
+Vintagestory.Common/ModContainer.cs-365-									Icon = new BitmapExternal(text2, Logger);
+Vintagestory.Common/ModContainer.cs-366-								}
+Vintagestory.Common/ModContainer.cs-367-							}
+Vintagestory.Common/ModContainer.cs-368-						}
+Vintagestory.Common/ModContainer.cs-369-					}
+Vintagestory.Common/ModContainer.cs-370-					if (WorldConfig != null)
+Vintagestory.Common/ModContainer.cs-371-					{
+Vintagestory.Common/ModContainer.cs-372-						Unpack(Path.Combine(GamePaths.Cache, "unpack"));
+Vintagestory.Common/ModContainer.cs-373-					}
+Vintagestory.Common/ModContainer.cs-374-				}
+Vintagestory.Common/ModContainer.cs-375-				if (Info == null)
+Vintagestory.Common/ModContainer.cs-376-				{
+Vintagestory.Common/ModContainer.cs:377:					Logger.Error("Missing modinfo.json");
+Vintagestory.Common/ModContainer.cs-378-					SetError(ModError.Loading);
+Vintagestory.Common/ModContainer.cs-379-				}
+Vintagestory.Common/ModContainer.cs-380-				if (WorldConfig != null)
+Vintagestory.Common/ModContainer.cs-381-				{
+Vintagestory.Common/ModContainer.cs-382-					Lang.PreLoadModWorldConfig(FolderPath, Info?.ModID, Lang.CurrentLocale);
+Vintagestory.Common/ModContainer.cs-383-				}
+Vintagestory.Common/ModContainer.cs-384-			}
+Vintagestory.Common/ModContainer.cs-385-			else
+Vintagestory.Common/ModContainer.cs-386-			{
+Vintagestory.Common/ModContainer.cs-387-				Info = LoadModInfoFromCode(compilationContext, loader, out var modWorldConfig);
+Vintagestory.Common/ModContainer.cs-388-				Info?.Init();
+Vintagestory.Common/ModContainer.cs-389-				WorldConfig = modWorldConfig;
+Vintagestory.Common/ModContainer.cs-390-				if (Info == null)
+Vintagestory.Common/ModContainer.cs-391-				{
+Vintagestory.Common/ModContainer.cs-392-					Logger.Error("Missing ModInfoAttribute");
+Vintagestory.Common/ModContainer.cs-393-					SetError(ModError.Loading);
+Vintagestory.Common/ModContainer.cs-394-				}
+Vintagestory.Common/ModContainer.cs-395-				string text3 = null;
+Vintagestory.Common/ModContainer.cs-396-				if (!string.IsNullOrWhiteSpace(Info?.IconPath))
+Vintagestory.Common/ModContainer.cs-397-				{
+Vintagestory.Common/ModContainer.cs-398-					try
+Vintagestory.Common/ModContainer.cs-399-					{
+Vintagestory.Common/ModContainer.cs-400-						text3 = Path.GetFullPath(Path.Combine(GamePaths.AssetsPath, Info.IconPath));
+Vintagestory.Common/ModContainer.cs-401-					}
+Vintagestory.Common/ModContainer.cs-402-					catch (Exception ex2)

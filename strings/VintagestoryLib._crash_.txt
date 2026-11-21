@@ -1,0 +1,38 @@
+Vintagestory.ClientNative/CrashReporter.cs-28-
+Vintagestory.ClientNative/CrashReporter.cs-29-	private static bool s_blnIsConsole = false;
+Vintagestory.ClientNative/CrashReporter.cs-30-
+Vintagestory.ClientNative/CrashReporter.cs-31-	public static List<ModContainer> LoadedMods { get; set; } = new List<ModContainer>();
+Vintagestory.ClientNative/CrashReporter.cs-32-
+Vintagestory.ClientNative/CrashReporter.cs-33-	public static void SetLogger(Logger logger)
+Vintagestory.ClientNative/CrashReporter.cs-34-	{
+Vintagestory.ClientNative/CrashReporter.cs-35-		CrashReporter.logger = logger;
+Vintagestory.ClientNative/CrashReporter.cs-36-	}
+Vintagestory.ClientNative/CrashReporter.cs-37-
+Vintagestory.ClientNative/CrashReporter.cs-38-	public CrashReporter(EnumAppSide side)
+Vintagestory.ClientNative/CrashReporter.cs-39-	{
+Vintagestory.ClientNative/CrashReporter.cs:40:		crashLogFileName = ((side == EnumAppSide.Client) ? "client-crash.log" : "server-crash.log");
+Vintagestory.ClientNative/CrashReporter.cs-41-		launchCrashReporterGui = side == EnumAppSide.Client;
+Vintagestory.ClientNative/CrashReporter.cs-42-	}
+Vintagestory.ClientNative/CrashReporter.cs-43-
+Vintagestory.ClientNative/CrashReporter.cs-44-	public static void EnableGlobalExceptionHandling(bool blnIsConsole)
+Vintagestory.ClientNative/CrashReporter.cs-45-	{
+Vintagestory.ClientNative/CrashReporter.cs-46-		s_blnIsConsole = blnIsConsole;
+Vintagestory.ClientNative/CrashReporter.cs-47-		AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+Vintagestory.ClientNative/CrashReporter.cs-48-	}
+Vintagestory.ClientNative/CrashReporter.cs-49-
+Vintagestory.ClientNative/CrashReporter.cs-50-	private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+Vintagestory.ClientNative/CrashReporter.cs-51-	{
+Vintagestory.ClientNative/CrashReporter.cs-52-		if (s_blnIsConsole)
+Vintagestory.ClientNative/CrashReporter.cs-53-		{
+Vintagestory.ClientNative/CrashReporter.cs-54-			Console.ForegroundColor = ConsoleColor.Red;
+Vintagestory.ClientNative/CrashReporter.cs-55-			Console.Out.WriteLine("Unhandled Exception occurred");
+Vintagestory.ClientNative/CrashReporter.cs-56-		}
+Vintagestory.ClientNative/CrashReporter.cs-57-		Exception exCrash = e.ExceptionObject as Exception;
+Vintagestory.ClientNative/CrashReporter.cs-58-		new CrashReporter(Process.GetCurrentProcess().MainModule.FileName.ToLowerInvariant().Contains("server") ? EnumAppSide.Server : EnumAppSide.Client).Crash(exCrash);
+Vintagestory.ClientNative/CrashReporter.cs-59-	}
+Vintagestory.ClientNative/CrashReporter.cs-60-
+Vintagestory.ClientNative/CrashReporter.cs-61-	public void Start(ThreadStart start)
+Vintagestory.ClientNative/CrashReporter.cs-62-	{
+Vintagestory.ClientNative/CrashReporter.cs-63-		if (!Debugger.IsAttached)
+Vintagestory.ClientNative/CrashReporter.cs-64-		{
+Vintagestory.ClientNative/CrashReporter.cs-65-			try

@@ -1,0 +1,38 @@
+Vintagestory.Common/ModLoader.cs-383-			{
+Vintagestory.Common/ModLoader.cs-384-				hashSet.Remove(item2);
+Vintagestory.Common/ModLoader.cs-385-				list.Add(item2);
+Vintagestory.Common/ModLoader.cs-386-			}
+Vintagestory.Common/ModLoader.cs-387-		}
+Vintagestory.Common/ModLoader.cs-388-		while (list2.Count > 0);
+Vintagestory.Common/ModLoader.cs-389-		foreach (ModContainer mod in mods)
+Vintagestory.Common/ModLoader.cs-390-		{
+Vintagestory.Common/ModLoader.cs-391-			if (mod.Enabled || mod.Status == ModStatus.Disabled)
+Vintagestory.Common/ModLoader.cs-392-			{
+Vintagestory.Common/ModLoader.cs-393-				continue;
+Vintagestory.Common/ModLoader.cs-394-			}
+Vintagestory.Common/ModLoader.cs:395:			mod.Logger.Error("Could not resolve some dependencies:");
+Vintagestory.Common/ModLoader.cs-396-			foreach (ModDependency dependency2 in mod.Info.Dependencies)
+Vintagestory.Common/ModLoader.cs-397-			{
+Vintagestory.Common/ModLoader.cs-398-				if (!dictionary.TryGetValue(dependency2.ModID, out var value2))
+Vintagestory.Common/ModLoader.cs-399-				{
+Vintagestory.Common/ModLoader.cs-400-					mod.Logger.Error("    {0} - Missing", dependency2);
+Vintagestory.Common/ModLoader.cs-401-					MissingDependencies.Add(dependency2.ModID + "@" + dependency2.Version);
+Vintagestory.Common/ModLoader.cs-402-					if (mod.MissingDependencies == null)
+Vintagestory.Common/ModLoader.cs-403-					{
+Vintagestory.Common/ModLoader.cs-404-						mod.MissingDependencies = new List<string>();
+Vintagestory.Common/ModLoader.cs-405-					}
+Vintagestory.Common/ModLoader.cs-406-					mod.MissingDependencies.Add(dependency2.ModID + "@" + dependency2.Version);
+Vintagestory.Common/ModLoader.cs-407-				}
+Vintagestory.Common/ModLoader.cs-408-				else if (!SatisfiesVersion(dependency2.Version, value2.Info.Version))
+Vintagestory.Common/ModLoader.cs-409-				{
+Vintagestory.Common/ModLoader.cs-410-					mod.Logger.Error("    {0} - Version mismatch (has {1})", dependency2, value2.Info.Version);
+Vintagestory.Common/ModLoader.cs-411-					MissingDependencies.Add(dependency2.ModID + "@" + dependency2.Version);
+Vintagestory.Common/ModLoader.cs-412-					if (mod.MissingDependencies == null)
+Vintagestory.Common/ModLoader.cs-413-					{
+Vintagestory.Common/ModLoader.cs-414-						mod.MissingDependencies = new List<string>();
+Vintagestory.Common/ModLoader.cs-415-					}
+Vintagestory.Common/ModLoader.cs-416-					mod.MissingDependencies.Add(dependency2.ModID + "@" + dependency2.Version);
+Vintagestory.Common/ModLoader.cs-417-				}
+Vintagestory.Common/ModLoader.cs-418-				else if (value2.Error == ModError.Loading)
+Vintagestory.Common/ModLoader.cs-419-				{
+Vintagestory.Common/ModLoader.cs-420-					mod.Logger.Error("    {0} - Dependency {1} failed loading", dependency2, value2);
