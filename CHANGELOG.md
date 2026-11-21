@@ -4,7 +4,8 @@
 
 The ways mods break themselves and each other. A new page, **Are any mods getting in each other's way?** (`/doctor clashes`), and what matters from it on the check-up.
 
-- **Blocks and items whose code is missing:** a block or item that names code no loaded mod has is still in the game, but does nothing (machines don't open, tools don't work). The doctor lists them by mod with the code each needs, and says when it is because the mod's code failed to start.
+- **Blocks and items whose code is missing:** a block or item that names code no loaded mod has (its class, its data class or a behaviour) is still in the game, but does nothing (machines don't open, tools don't work). The doctor lists them by mod with the code each needs, and says when it is because the mod's code failed to start.
+- **Blocks and items the game refused to add,** which is what happens when two mods, or two files of one mod, add a thing with the same name.
 - **Block and item files the game couldn't read,** by mod, and **a mod whose blocks and items never arrived** at all (with the repack button when it is a zip packed with `\`).
 - **Code the game leaves out:** a mod with a `.dll` that calls itself a content mod, and a zip with a `.dll` in a subfolder, which the game refuses to load whole.
 - **Patches for files that aren't there:** told apart into the harmless kind (a patch for a mod you don't have, which is how mods support each other) and the kind that has stopped working (the game's file or an installed mod's file was renamed or removed).

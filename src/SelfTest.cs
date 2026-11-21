@@ -232,7 +232,8 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
                 WhyFor(doctor, "System.ArgumentException: An item with the same key has already been added. Key: pump") == WhyFor(doctor, "Block class 'Pump' is already registered")
                 && WhyFor(doctor, "System.DllNotFoundException: Unable to load shared library 'thing'") != null && WhyFor(doctor, "System.BadImageFormatException: Bad IL format.") != null
                 && WhyFor(doctor, "Found multiple .dll files with ModSystems and/or ModInfo attributes") != null
-                && WhyFor(doctor, "Please restart the game. The mod's .dll was already loaded and cannot be reloaded.") != null && WhyFor(doctor, "Block class 'Pump' is already registered") != null);
+                && WhyFor(doctor, "Please restart the game. The mod's .dll was already loaded and cannot be reloaded.") != null && WhyFor(doctor, "Block class 'Pump' is already registered") != null
+                && WhyFor(doctor, "Attempted to register Item with code a:b, but an item with such code already exists. Must use a unique code") == WhyFor(doctor, "Block class 'Pump' is already registered"));
             var growing = new MemoryWatch();
             var steady = new MemoryWatch();
             for (int step = 0; step < 8; step++) { growing.Add(40 - step * 5, (1000L + step * 150) * 1024 * 1024); steady.Add(40 - step * 5, (1000L + step % 2 * 30) * 1024 * 1024); }

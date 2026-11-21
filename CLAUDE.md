@@ -19,6 +19,12 @@ and fixes what it can. More is in the "vintage story mods" project doc `claude/v
   uses is there with the right number of `{n}` places. The workflow runs it first.
 - **Game internals** the doctor relies on (the crash report's format, the mod loader's messages, the profiler's
   marks, the settings' names) were read from decompiled code with `.github/workflows/decompile.yml`. Run it again
-  before trusting them on a new game version.
+  before trusting them on a new game version. The content loader's messages (missing classes and behaviours, files it
+  can't read, patches without a file, things registered twice) come from the public VSEssentials source and from what
+  the sick server really logged: every one has a case in `tests/mods/doctorsick` or `tools/ci_sick_server.py`, so a
+  game version that words them differently fails the sick-server test instead of going unnoticed.
+- **A new kind of problem gets a sick-server case** (a broken file in `tests/mods/doctorsick`, or a zip made by
+  `tools/ci_sick_server.py`) and an assertion in `SelfTest.SickServer` on what the page says. The first run shows what
+  the game really writes; read `sick-server-main.log` on the results branch before guessing.
 - **Nothing client-side has been seen by a session** (the window, the hotkey, the frame-rate and settings checks):
   CI only runs a server. Say so when reporting, and ask the user to look.

@@ -47,7 +47,7 @@ namespace VintageDoctor
             if (m.Contains("harmonyexception") || m.Contains("patching exception") || m.Contains("il compile error") || m.Contains("invalidprogramexception")
                 || m.Contains("detected an invalid program")) return "why-harmony";
             if (m.Contains("already registered") || m.Contains("already been registered") || m.Contains("has already been added")
-                || m.Contains("duplicate key")) return "why-duplicate";
+                || m.Contains("duplicate key") || m.Contains("with such code already exists") || m.Contains("must use a unique code")) return "why-duplicate";
             if (m.Contains("index (zero based) must be greater than or equal to zero and less than the size of the argument list")) return "why-format";
             if (m.Contains("jsonreaderexception") || m.Contains("jsonserializationexception") || m.Contains("unexpected character encountered while parsing")
                 || m.Contains("error converting value") || m.Contains("unterminated string") || m.Contains("after parsing a value an unexpected character")
