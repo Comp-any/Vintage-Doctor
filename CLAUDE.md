@@ -26,5 +26,19 @@ and fixes what it can. More is in the "vintage story mods" project doc `claude/v
 - **A new kind of problem gets a sick-server case** (a broken file in `tests/mods/doctorsick`, or a zip made by
   `tools/ci_sick_server.py`) and an assertion in `SelfTest.SickServer` on what the page says. The first run shows what
   the game really writes; read `sick-server-main.log` on the results branch before guessing.
+- **Characters the game can draw.** The game draws text with the computer's own default font (`defaultFontName` is
+  "sans-serif"; only headings and big buttons use Lora, which it brings) and has no second font to fall back on: a
+  character the font lacks is an empty box. Arrows, ticks, warning signs, hammers and small triangles can't be
+  counted on (the user's Linux has none). `tools/game-font-chars.txt` is what is safe; `tools/check_lang.py` holds the
+  lang file and every string in the code to it (`// font-ok: why` on a line lets it be). A report keeps its marks
+  (`DoctorReport.OkMark`...): they are what the window, the other side and other mods read. Whatever is handed to the
+  game to draw goes through `GameFont.Drawable` (the window's texts, button labels, chat), and the window draws its
+  own triangle and arrows (`DrawCheckCard`). `decompile.yml` also lists what the game's own font files have.
+- **The check-up is by mod** (1.3.0). Each side builds its cards flat, `Pages.BySection` tags every card with the mods
+  it is about (`DoctorLine.Section`: tagged with `x.About`, named by a button, or named in its words), and
+  `Pages.Arrange` puts the halves together: the game's section, a section per mod with its cards and its own buttons,
+  then the mods nothing was found against. The window's list at the top shows one section alone. There is no
+  "deeper" round: every check runs every time, so anything slow is done off the main thread or remembered
+  (`ZipHealth`, `CountNames`, the patch targets). A check that finds nothing says so on the check-up (`Listed`).
 - **Nothing client-side has been seen by a session** (the window, the hotkey, the frame-rate and settings checks):
   CI only runs a server. Say so when reporting, and ask the user to look.
