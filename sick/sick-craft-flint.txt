@@ -1,0 +1,11 @@
+== Why can't I craft it? ==
+Flint (game:flint) is made by 1 crafting-grid recipe(s).
+✓ Recipe 1: Flint (game:flint), Stick (game:stick)
+  Recipe doctorsick:recipes/grid/shadow-b.json
+⚠ Another recipe has exactly the same ingredients and makes something else
+  Flint (game:flint), Stick (game:stick) →
+    Flint (game:flint) ×2  (Doctor Sick, recipes/grid/shadow-b.json)
+    Stick (game:stick) ×2  (Doctor Sick, recipes/grid/shadow-a.json)
+  The crafting grid can only offer one result for one set of ingredients, so only one of each pair can ever be crafted. This happens when two mods each add a recipe without knowing of the other.
+  → Many mods can switch single recipes off in their config. Otherwise tell both authors: one of them has to change an ingredient.
+If the grid stays empty with a recipe that should work: check the exact variant of each ingredient (the wood or metal type), that tools are in the grid, and that no ingredient is a stack of a different kind than it looks.

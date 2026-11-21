@@ -1,0 +1,8 @@
+== A block or item ==
+• Copper ingot (game:ingot-copper) comes from the game itself
+  An item with the code game:ingot-copper; class ItemIngot; run by Vintagestory.GameContent.ItemIngot
+  Behaviours: CollectibleBehaviorGroundStorable
+✓ The log has no error or warning that mentions it.
+
+== Next ==
+Why can't I craft it? (/doctor craft game:ingot-copper) Back to the check-up (/doctor)

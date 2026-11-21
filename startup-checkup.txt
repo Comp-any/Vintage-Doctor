@@ -1,0 +1,49 @@
+== The server ==
+✓ No crash reports: the game hasn't crashed on this side.
+⚠ 1 mod(s) were left out because something they need is missing: configlib (needs vsimgui@1.2.0)
+  The game doesn't load a mod whose requirements aren't met, so nothing of these mods is in the game.
+  → Install what they need (the name after 'needs' is a mod id, with the lowest version that will do), or remove them.
+  Find vsimgui on the Mod DB (https://mods.vintagestory.at/list/mod?text=vsimgui)
+  Everything from start-up (/doctor startup)
+⚠ Doctor Example: An example pump jammed
+  [doctorexample] pump 3 jammed (a made-up warning from the example mod)
+  This line in the log comes from the example mod; the JSON example mod knows what it means.
+  → Nothing to do: it is only an example.
+  Start the example's config afresh (/doctor fix doctorexamplejson:pump-jammed/fix)
+✓ No errors in the log this session.
+✓ 6 mod file(s) in 2 folder(s), nothing wrong with them.
+✓ 5 config file(s) read without a problem.
+✓ The server keeps up: a tick every 33.1 ms (30 a second).
+  Last minute: average 33.1 ms, 95% under 34 ms, worst 34 ms (124 ticks).
+  Measure where the time goes (20 seconds) (/doctor fix doctor:profile 20)
+✓ 24 creatures and things loaded (0 items on the ground), 392 chunks, 0 player(s).
+  Most of: game:raccoon 13, game:hare 5, game:fish 2, game:fox 2, game:wolf 2
+  392 chunks loaded for 0 player(s).
+✓ Memory: the game holds 1.3 GB of the 7.7 GB it can use.
+  930.3 MB in the game's own objects; 15 full clean-ups so far; 2 processor threads.
+✓ 14.0 GB free where the world is saved.
+  The save file is 4 KB.
+• Doctor Example (JSON) and Doctor Example don't get on
+  Nothing is really wrong: the two example mods say they clash so the doctor has a clash to show.
+  Doctor Example (JSON) says so itself (in its vintagedoctor.json).
+  Doctor Example (JSON)'s page (/doctor mod doctorexamplejson) Doctor Example's page (/doctor mod doctorexample)
+• 1 mod(s) change the game's code in 1 place(s) (0 shared with another mod)
+  Carry On (1)
+  Mods patch the game's own code where it offers no other way in. It is normal, but it is also what breaks first when the game updates, and two mods patching the same place can get in each other's way.
+  All code patches (/doctor patches)
+
+== Checks from your mods ==
+⚠ Doctor Example: 3 example pumps are jammed
+  pump at 10 5 10
+  A pump jams when its outlet is blocked.
+  → Clear the outlets, or let the doctor restart the pumps.
+  Restart the example pumps (/doctor fix doctorexample:unjam all)
+  1 message(s) from this mod in the log
+• Doctor Example: 2 example tanks are half empty
+  tank at 10 3 10
+  tank at 12 3 10
+  → Fill them from a pump.
+  Fill the example tanks (/doctor fix bus:doctorexample:fill)
+• Doctor Example: The example mod started
+  reported with ReportIncident
+  Last at 2026-11-21 06:44.

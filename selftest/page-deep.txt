@@ -1,0 +1,51 @@
+== Deeper checks ==
+
+== The Mods folder ==
+Every file in 4 zip(s) was read to the end.
+✓ 6 mod file(s) in 2 folder(s), nothing wrong with them.
+  ~/work/Vintage-Doctor/Vintage-Doctor/data/Mods
+  ~/work/Vintage-Doctor/Vintage-Doctor/vs/Mods
+
+== Config files ==
+✓ 5 config file(s) read without a problem.
+
+== Mods that change the game's code ==
+• 1 mod(s) change the game's code in 1 place(s) (0 shared with another mod)
+  Carry On (1)
+  Mods patch the game's own code where it offers no other way in. It is normal, but it is also what breaks first when the game updates, and two mods patching the same place can get in each other's way.
+
+== Mods getting in each other's way, or their own ==
+✓ Every block and item that needs code has it.
+✓ No mod tries to change a file that isn't there.
+✓ Every mod that has block and item files has them in the game.
+✓ No mod brings its own copy of a library the game or another mod already has.
+✓ No two mods replace the same file, and none replaces the game's own.
+✓ No recipe from a mod has the same ingredients as another recipe that makes something else (13748 crafting recipes looked at).
+
+== Mods changing the same thing ==
+✓ 33 JSON patches in 85 files, no two mods replacing the same thing.
+
+== The world and its save ==
+✓ 14.0 GB free where the world is saved.
+  The save file is 4 KB.
+✓ Nothing in this world comes from a mod that isn't installed.
+✓ Time runs at the normal pace.
+
+== Things without a name ==
+✓ Every mod's blocks and items have names.
+
+== Checks from your mods ==
+⚠ Doctor Example: 3 example pumps are jammed
+  pump at 10 5 10
+  A pump jams when its outlet is blocked.
+  → Clear the outlets, or let the doctor restart the pumps.
+  Restart the example pumps (/doctor fix doctorexample:unjam all)
+  1 message(s) from this mod in the log
+• Doctor Example: 2 example tanks are half empty
+  tank at 10 3 10
+  tank at 12 3 10
+  → Fill them from a pump.
+  Fill the example tanks (/doctor fix bus:doctorexample:fill)
+• Doctor Example: The example mod started
+  reported with ReportIncident
+  Last at 2026-11-21 06:44.

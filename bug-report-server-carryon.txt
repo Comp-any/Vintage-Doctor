@@ -1,0 +1,16 @@
+Vintage Doctor 1.1.0 on Vintage Story v1.22.7 (Stable), dedicated server, 2026-11-21 06:45
+Linux (Ubuntu 26.04.1 LTS) [Kernel 7.0.0.1020]; AMD EPYC 9V45 96-Core Processor; 7931 MB RAM; .net 10.0.15
+About: Carry On 1.14.3 (carryon)
+
+== Mods (5) ==
+carryon 1.14.3, doctorexample 1.0.0, doctorexamplejson 1.0.0, primitivesurvival 5.1.4, vintagedoctor 1.1.0
+
+== Findings ==
+• Carry On 1.14.3, by copygirl, NerdScurvy
+  Mod id carryon; Code mod; runs on: Universal; file CarryOn-1.22.0_v1.14.3.zip
+✓ Everything it needs is there (1).
+  The game: wants 1.22.0 or newer, this is 1.22.7
+✓ Its config file(s) read fine: CarryOnConfig.json
+• It changes the game's code in 1 place(s), 0 of them shared with other mods
+  EntitySeat.onControls
+✓ Nothing from Carry On in the log this session.

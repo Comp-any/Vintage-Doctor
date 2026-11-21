@@ -1,0 +1,22 @@
+== Doctor Example (JSON) ==
+• Doctor Example (JSON) 1.0.0, by demonic69
+  Mod id doctorexamplejson; Content mod; runs on: Universal; file doctorexamplejson
+  Shows how a mod without any code tells Vintage Doctor about its known problems. Only for trying the API out.
+  Find Doctor Example (JSON) on the Mod DB (https://mods.vintagestory.at/list/mod?text=Doctor%20Example%20%28JSON%29)
+✓ Everything it needs is there (1).
+  The game: wants 1.22.0 or newer, this is 1.22.7
+• Nothing with this mod's id is in the game
+  For a mod that adds things, that means its files didn't load (see the Mods folder page). A mod that only changes other things has nothing of its own, and this is fine.
+• Doctor Example (JSON) and Doctor Example don't get on
+  Nothing is really wrong: the two example mods say they clash so the doctor has a clash to show.
+  Doctor Example (JSON) says so itself (in its vintagedoctor.json).
+  Doctor Example (JSON)'s page (/doctor mod doctorexamplejson) Doctor Example's page (/doctor mod doctorexample)
+• Doctor Example (JSON) works better with doctorexamplemissing, which isn't installed
+  A mod that doesn't exist, so the recommendation shows.
+  Find doctorexamplemissing on the Mod DB (https://mods.vintagestory.at/list/mod?text=doctorexamplemissing)
+
+== Errors and warnings from Doctor Example (JSON) ==
+✓ Nothing from Doctor Example (JSON) in the log this session.
+
+== Next ==
+Switch Doctor Example (JSON) off (/doctor fix doctor:disable-mod doctorexamplejson) A report about Doctor Example (JSON) (/doctor bugreport doctorexamplejson) Every mod at a glance (/doctor mods) Back to the check-up (/doctor)
