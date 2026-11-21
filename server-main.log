@@ -1,0 +1,438 @@
+21.11.2026 15:41:19 [Notification] Server logger started.
+21.11.2026 15:41:19 [Notification] Game Version: v1.22.7 (Stable)
+21.11.2026 15:41:20 [Notification] C# Framework: .net 10.0.15
+21.11.2026 15:41:20 [Notification] Zstd Version: 1.5.7
+21.11.2026 15:41:20 [Notification] Operating System: Linux (Ubuntu 26.04.1 LTS) [Kernel 7.0.0.1016]
+21.11.2026 15:41:20 [Notification] CPU Cores: 2
+21.11.2026 15:41:20 [Notification] CPU: Intel(R) Xeon(R) 6975P-C
+21.11.2026 15:41:20 [Notification] Available RAM: 7775 MB
+21.11.2026 15:41:20 [Event] It begins...
+21.11.2026 15:41:20 [Event] Launching server...
+21.11.2026 15:41:20 [Event] It senses...
+21.11.2026 15:41:20 [Event] Server v1.22.7, network v1.22.6, api v1.22.0
+21.11.2026 15:41:20 [Notification] Entering runphase Initialization
+21.11.2026 15:41:20 [Event] Loading configuration...
+21.11.2026 15:41:20 [Notification] Entering runphase Configuration
+21.11.2026 15:41:20 [Notification] serverconfig.json not found, creating new one
+21.11.2026 15:41:20 [Notification] Loading savegame
+21.11.2026 15:41:20 [Notification] Create new save game data. Playstyle: surviveandbuild
+21.11.2026 15:41:20 [Notification] Savegame ~/work/Vintage-Doctor/Vintage-Doctor/data/Saves/default.vcdbs loaded
+21.11.2026 15:41:20 [Notification] World size = 1024000 256 1024000
+21.11.2026 15:41:20 [Notification] Start discovering assets
+21.11.2026 15:41:20 [Notification] Found 2 base assets in category blocktypes
+21.11.2026 15:41:20 [Notification] Found 0 base assets in category itemtypes
+21.11.2026 15:41:20 [Notification] Found 35 base assets in category lang
+21.11.2026 15:41:20 [Notification] Found 0 base assets in category patches
+21.11.2026 15:41:20 [Notification] Found 24 base assets in category config
+21.11.2026 15:41:20 [Notification] Found 0 base assets in category worldproperties
+21.11.2026 15:41:20 [Notification] Found 1 base assets in category sounds
+21.11.2026 15:41:20 [Notification] Found 230 base assets in category shapes
+21.11.2026 15:41:20 [Notification] Found 21 base assets in category textures
+21.11.2026 15:41:20 [Notification] Found 0 base assets in category recipes
+21.11.2026 15:41:20 [Notification] Found 0 base assets in category worldgen
+21.11.2026 15:41:20 [Notification] Found 3 base assets in category entities
+21.11.2026 15:41:20 [Notification] Found 316 base assets in total
+21.11.2026 15:41:20 [Event] Building assets...
+21.11.2026 15:41:20 [Notification] Entering runphase LoadAssets
+21.11.2026 15:41:20 [Notification] Will search the following paths for mods:
+21.11.2026 15:41:20 [Notification]     ~/work/Vintage-Doctor/Vintage-Doctor/vs/Mods
+21.11.2026 15:41:20 [Notification]     ~/work/Vintage-Doctor/Vintage-Doctor/data/Mods
+21.11.2026 15:41:22 [Notification] Found 9 mods (0 disabled)
+21.11.2026 15:41:22 [Error] [configlib] Could not resolve some dependencies:
+21.11.2026 15:41:22 [Error] [configlib]     vsimgui@1.2.0 - Missing
+21.11.2026 15:41:22 [Notification] Mods, sorted by dependency: configlib, primitivesurvival, game, carryon, doctorexample, doctorexamplejson, vintagedoctor, creative, survival
+21.11.2026 15:41:23 [Notification] Instantiated 153 mod systems from 8 enabled mods
+21.11.2026 15:41:23 [Notification] CarryOn: Disabled AutoConfigLib patches.
+21.11.2026 15:41:23 [Notification] CarryOn: Harmony patches enabled.
+21.11.2026 15:41:23 [Event] started 'CarryOn' mod
+21.11.2026 15:41:23 [Notification] External Origins in load order: modorigin@~/work/Vintage-Doctor/Vintage-Doctor/vs/assets/creative/, modorigin@~/work/Vintage-Doctor/Vintage-Doctor/vs/assets/survival/, mod@primitivesurvival_5.1.4.zip, mod@CarryOn-1.22.0_v1.14.3.zip, mod@doctorexamplejson, mod@vintagedoctor_1.3.0.zip
+21.11.2026 15:41:23 [Notification] Found 610 external assets in category blocktypes
+21.11.2026 15:41:23 [Notification] Found 347 external assets in category itemtypes
+21.11.2026 15:41:23 [Notification] Found 31 external assets in category lang
+21.11.2026 15:41:23 [Notification] Found 95 external assets in category patches
+21.11.2026 15:41:23 [Notification] Found 133 external assets in category config
+21.11.2026 15:41:23 [Notification] Found 25 external assets in category worldproperties
+21.11.2026 15:41:23 [Notification] Found 13 external assets in category sounds
+21.11.2026 15:41:23 [Notification] Found 6255 external assets in category shapes
+21.11.2026 15:41:23 [Notification] Found 278 external assets in category textures
+21.11.2026 15:41:23 [Notification] Found 452 external assets in category recipes
+21.11.2026 15:41:23 [Notification] Found 1455 external assets in category worldgen
+21.11.2026 15:41:23 [Notification] Found 86 external assets in category entities
+21.11.2026 15:41:23 [Notification] Found 23 external assets in category compatibility
+21.11.2026 15:41:23 [Notification] Reloaded lang file with mod assets
+21.11.2026 15:41:23 [Notification] Compatibility lib: 0 assets added, 0 assets replaced.
+21.11.2026 15:41:23 [Notification] JsonPatch Loader: 164 patches total, successfully applied 167 patches, unmet conditions on 137 patches, no errors
+21.11.2026 15:41:24 [Event] It remembers...
+21.11.2026 15:41:26 [Notification] Loaded 4634 unique items
+21.11.2026 15:41:26 [Event] All that came before...
+21.11.2026 15:41:32 [Notification] Loaded 14781 unique blocks
+21.11.2026 15:41:33 [Notification] Loaded 843 unique entitiess
+21.11.2026 15:41:33 [Notification] BlockLoader: Entities, Blocks and Items loaded
+21.11.2026 15:41:33 [Event] Remapping blocks and items...
+21.11.2026 15:41:33 [Event] 15 cooking recipes loaded
+21.11.2026 15:41:33 [Event] Taste and smell...
+21.11.2026 15:41:33 [Event] 9 metal alloys loaded
+21.11.2026 15:41:33 [Event] Glimmers in the soil...
+21.11.2026 15:41:34 [Event] 1208 grid recipes loaded from 295 files
+21.11.2026 15:41:34 [Event] Grand inventions...
+21.11.2026 15:41:34 [Event] 44 smithing recipes loaded from 43 files
+21.11.2026 15:41:34 [Event] Burning sparks...
+21.11.2026 15:41:34 [Event] 34 clay forming recipes loaded from 34 files
+21.11.2026 15:41:34 [Event] Molded forms...
+21.11.2026 15:41:34 [Event] 14 knapping recipes loaded from 14 files
+21.11.2026 15:41:34 [Event] Simple tools...
+21.11.2026 15:41:34 [Event] 91 barrel recipe recipes loaded from 42 files
+21.11.2026 15:41:34 [Notification] Tags registry was locked.
+21.11.2026 15:41:34 [Notification] Entering runphase AssetsFinalize
+21.11.2026 15:41:35 [Event] Server assets loaded, parsed, registered and finalized
+21.11.2026 15:41:35 [Event] Initialising systems...
+21.11.2026 15:41:35 [Notification] Entering runphase LoadGamePre
+21.11.2026 15:41:35 [Notification] Reloaded 19 weather patterns, 5 wind patterns and 5 weather events
+21.11.2026 15:41:35 [Warning] [doctorexample] pump 3 jammed (a made-up warning from the example mod)
+21.11.2026 15:41:35 [Notification] Started 130 systems on Server:
+21.11.2026 15:41:35 [Notification]     Mod 'VSEssentials.dll' (game):
+21.11.2026 15:41:35 [Notification]         Vintagestory.ServerMods.Core
+21.11.2026 15:41:35 [Notification]         Vintagestory.ServerMods.GenTerra
+21.11.2026 15:41:35 [Notification]         Vintagestory.ServerMods.GenSnowLayer
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.EntityPartitioning
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ErrorReporter
+21.11.2026 15:41:35 [Notification]         Vintagestory.ServerMods.GenTerraPostProcess
+21.11.2026 15:41:35 [Notification]         Vintagestory.ServerMods.ModCompatiblityUtil
+21.11.2026 15:41:35 [Notification]         Vintagestory.ServerMods.NoObf.ModJsonPatchLoader
+21.11.2026 15:41:35 [Notification]         FluffyClouds.FluffyCloudsModSystem
+21.11.2026 15:41:35 [Notification]         Vintagestory.Systems.ModSystemTfEditFromAttributes
+21.11.2026 15:41:35 [Notification]         Vintagestory.Essentials.PathfindSystem
+21.11.2026 15:41:35 [Notification]         Vintagestory.Essentials.PathFindDebug
+21.11.2026 15:41:35 [Notification]         Vintagestory.Essentials.PathfindingAsync
+21.11.2026 15:41:35 [Notification]         Vintagestory.ServerMods.JsonExport
+21.11.2026 15:41:35 [Notification]         Vintagestory.ServerMods.ModBasicBlocksLoader
+21.11.2026 15:41:35 [Notification]         Vintagestory.ServerMods.GenMaps
+21.11.2026 15:41:35 [Notification]         Vintagestory.ServerMods.GenRockStrataNew
+21.11.2026 15:41:35 [Notification]         Vintagestory.ServerMods.GenHotSprings
+21.11.2026 15:41:35 [Notification]         Vintagestory.ServerMods.GenCreatures
+21.11.2026 15:41:35 [Notification]         Vintagestory.ServerMods.ModSystemWorldGenStructures
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ModSystemItemRendererOptimizer
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.AiRuntimeConfig
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ModSystemSyncHarvestableDropsToClient
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ModSystemEmotes
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.LeafBlockDecay
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.POIRegistry
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.RoomRegistry
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.WeatherSystemCommands
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.WeatherSystemServer
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.SystemRemotePlayerTracking
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.WorldMapManager
+21.11.2026 15:41:35 [Notification]         Vintagestory.ServerMods.GenDeposits
+21.11.2026 15:41:35 [Notification]         Vintagestory.ServerMods.NoObf.ModRegistryObjectTypeLoader
+21.11.2026 15:41:35 [Notification]         Vintagestory.ServerMods.LoadColorMaps
+21.11.2026 15:41:35 [Notification]         Vintagestory.ServerMods.GenCaves
+21.11.2026 15:41:35 [Notification]         Vintagestory.ServerMods.GenStructures
+21.11.2026 15:41:35 [Notification]         Vintagestory.ServerMods.WgenCommands
+21.11.2026 15:41:35 [Notification]         Vintagestory.ServerMods.GenBlockLayers
+21.11.2026 15:41:35 [Notification]         Vintagestory.ServerMods.GenPonds
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ClothManager
+21.11.2026 15:41:35 [Notification]         Vintagestory.ServerMods.GenStructuresPosPass
+21.11.2026 15:41:35 [Notification]         Vintagestory.ServerMods.GenVegetationAndPatches
+21.11.2026 15:41:35 [Notification]         Vintagestory.ServerMods.GenRivulets
+21.11.2026 15:41:35 [Notification]         Vintagestory.ServerMods.GenLightSurvival
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.CollectibleBuffDebug
+21.11.2026 15:41:35 [Notification]     Mod 'VSSurvivalMod.dll' (survival):
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ModSystemControlPoints
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.SurvivalCoreSystem
+21.11.2026 15:41:35 [Notification]         Vintagestory.Systems.StoryLockableDoor
+21.11.2026 15:41:35 [Notification]         Vintagestory.Client.NoObf.StoryGenFailedSystem
+21.11.2026 15:41:35 [Notification]         Vintagestory.ServerMods.UpgradeTasks
+21.11.2026 15:41:35 [Notification]         Vintagestory.ServerMods.ChiselBlockBulkSetMaterial
+21.11.2026 15:41:35 [Notification]         Vintagestory.ServerMods.ModSystemDetailModeSync
+21.11.2026 15:41:35 [Notification]         Vintagestory.ServerMods.NpcControl
+21.11.2026 15:41:35 [Notification]         Vintagestory.ServerMods.ModSystemTiledDungeons
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ModSystemExplosionAffectedStability
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.MyceliumSystem
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ModsystemButterflySpawnCondsExtra
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ModSystemFishInstaFlee
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ModSystemCatchCreature
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.FishingSupportModSystem
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ModSystemGliding
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ModSystemSnowShoveling
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ModSystemSubTongsDurability
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ModSystemSwoopDev
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.Timeswitch
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ClutterBookshelfUtil
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ScreenshakeToClientModSystem
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ModSystemResoArchiveCommands
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.StoryStructuresSpawnConditions
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ModSystemNPCHairStyling
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ModSystemSkinnableAdditions
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ModSystemVillagerDebug
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ModSystemAuction
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ModSystemBlockReinforcement
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.Core
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ModSystemBoatingSoundAndRatlineStamina
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.CharacterSystem
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.CustomSpawnConditions
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.VariablesModSystem
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ModsystemElevator
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ActivityModSystem
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ActivityEditorSystem
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ModSystemFarming
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ModSystemCommandHandbook
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ModSystemTutorial
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.HeldItemMouseInputHandler
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ModSystemCorpseReturnTeleporter
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ModSystemNightVision
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.TobiasTeleporter
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ModJournal
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.LiquidItemStackRenderer
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ModSystemStructureLocator
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ModLootRandomizer
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ModSystemEntityOwnership
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ModSystemRifts
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ModSystemRiftWeather
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ModSleeping
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ModSystemSupportBeamPlacer
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.TeleporterManager
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ModTemperature
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.SystemTemporalStability
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.TemporalStabilityEffects
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ModSystemClimateSpecificTraderTypes
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ModSystemWearableStats
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ModSystemEditableBook
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.Mechanics.ModSystemWindTurbulence
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.Mechanics.MechanicalPowerMod
+21.11.2026 15:41:35 [Notification]         Vintagestory.ServerMods.GenDungeons
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.GenStoryStructures
+21.11.2026 15:41:35 [Notification]         Vintagestory.ServerMods.WgenCommandsExt
+21.11.2026 15:41:35 [Notification]         Vintagestory.ServerMods.GenDevastationLayer
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.RecipeRegistrySystem
+21.11.2026 15:41:35 [Notification]         Vintagestory.ServerMods.RecipeLoader
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ModSystemFishDepletion
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ModSystemWormGrunting
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ModSystemFireFromLightning
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ModSystemOreMap
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ModSystemSnowballs
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.HumanoidOutfits
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.ModSystemDevastationEffects
+21.11.2026 15:41:35 [Notification]         Vintagestory.GameContent.DisableRecipeRegisteringSystem
+21.11.2026 15:41:35 [Notification]     Mod 'VSCreativeMod.dll' (creative):
+21.11.2026 15:41:35 [Notification]         Vintagestory.ServerMods.Core
+21.11.2026 15:41:35 [Notification]         Vintagestory.ServerMods.WorldEdit.WorldEdit
+21.11.2026 15:41:35 [Notification]         Vintagestory.ServerMods.GenBlockLayersFlat
+21.11.2026 15:41:35 [Notification]         Vintagestory.ServerMods.GenLightCreative
+21.11.2026 15:41:35 [Notification]     Mod 'vintagedoctor_1.3.0.zip' (vintagedoctor):
+21.11.2026 15:41:35 [Notification]         VintageDoctor.VintageDoctorSystem
+21.11.2026 15:41:35 [Notification]     Mod 'primitivesurvival_5.1.4.zip' (primitivesurvival):
+21.11.2026 15:41:35 [Notification]         PrimitiveSurvival.ModSystem.PrimitiveSurvivalSystem
+21.11.2026 15:41:35 [Notification]         PrimitiveSurvival.ModSystem.TreeHollows
+21.11.2026 15:41:35 [Notification]     Mod 'CarryOn-1.22.0_v1.14.3.zip' (carryon):
+21.11.2026 15:41:35 [Notification]         CarryOn.CarrySystem
+21.11.2026 15:41:35 [Notification]     Mod 'doctorexample' (doctorexample):
+21.11.2026 15:41:35 [Notification]         DoctorExample.DoctorExampleSystem
+21.11.2026 15:41:35 [Event] 26 traits loaded from 1 files
+21.11.2026 15:41:35 [Event] 6 classes loaded from 1 files
+21.11.2026 15:41:37 [Notification] Server map set
+21.11.2026 15:41:37 [Event] A world unbroken...
+21.11.2026 15:41:37 [Notification] Entering runphase GameReady
+21.11.2026 15:41:37 [Notification] Entering runphase WorldReady
+21.11.2026 15:41:37 [Event] The center unfolding...
+21.11.2026 15:41:37 [Event] Starting world generators...
+21.11.2026 15:41:41 [Notification] Reloaded 35 tree generators
+21.11.2026 15:41:41 [Event] Loading 7x7x8 spawn chunks...
+21.11.2026 15:41:41 [Event] 0% (49 in queue)
+21.11.2026 15:41:41 [Event] The carved mountains...
+21.11.2026 15:41:43 [Event] 0% (49 in queue)
+21.11.2026 15:41:43 [Event] The rolling hills...
+21.11.2026 15:41:45 [Event] 0% (81 in queue)
+21.11.2026 15:41:45 [Event] The sheer cliffs...
+21.11.2026 15:41:47 [Event] 0% (138 in queue)
+21.11.2026 15:41:47 [Event] The endless plains...
+21.11.2026 15:41:49 [Event] 0% (170 in queue)
+21.11.2026 15:41:49 [Event] The winter snows...
+21.11.2026 15:41:50 [Event] Begin game ticking...
+21.11.2026 15:41:50 [Event] ... it calls to you
+21.11.2026 15:41:50 [Notification] Entering runphase RunGame
+21.11.2026 15:41:50 [Notification] Starting server threads
+21.11.2026 15:41:50 [Event] Dedicated Server now running on Port 42420 and all ips!
+21.11.2026 15:41:50 [Event] Return again.
+21.11.2026 15:41:50 [Notification] Please be aware that as of 1.20, servers default configurations have changed - servers no longer register themselves to the public servers list and are invite-only (whitelisted) out of the box. If you desire so, you can enable server advertising with '/serverconfig advertise on' and disable the whitelist mode with '/serverconfig whitelistmode off'
+21.11.2026 15:41:55 [Notification] [vintagedoctor] Check-up after start-up: 0 problem(s), 3 warning(s). Type /doctor to see them.
+21.11.2026 15:41:55 [Warning] [doctorselftest] Its check 'doctorselftest:throws' for Vintage Doctor failed: System.InvalidOperationException: the check's own bug
+   at VintageDoctor.SelfTest.<>c.<Api>b__16_1(IDoctorContext ctx)
+   at VintageDoctor.Checks.RunChecks(DoctorContext x, List`1 checks)
+21.11.2026 15:41:55 [Notification] [vintagedoctor] Fix 'doctorselftest:reconnect' (all) asked for by the console: Reconnected 3 pipes
+21.11.2026 15:41:55 [Notification] [vintagedoctor] Fix 'doctorselftest:reconnect' () asked for by the console: ⚠ which?
+21.11.2026 15:41:55 [Warning] [doctorselftest] Its check 'doctorselftest:throws' for Vintage Doctor failed: System.InvalidOperationException: the check's own bug
+   at VintageDoctor.SelfTest.<>c.<Api>b__16_1(IDoctorContext ctx)
+   at VintageDoctor.Checks.RunChecks(DoctorContext x, List`1 checks)
+21.11.2026 15:41:55 [Warning] [vintagedoctor] A mod offered a page with the id 'crash', which is taken by the doctor itself or has characters other than a-z, 0-9 and '-'. It was left out.
+21.11.2026 15:41:55 [Warning] [vintagedoctor] guestmod said it would deliver 'guest-notes' later and didn't in time.
+21.11.2026 15:41:55 [Notification] [vintagedoctor] Fix 'bus:guestmod:read' (7) asked for by the console: Read note 7
+21.11.2026 15:41:55 [Notification] [vintagedoctor] Fix 'bus:guestmod:slowread' (8) asked for by the console: its mod is working on it.
+21.11.2026 15:41:55 [Notification] [vintagedoctor] Fix 'bus:guestmod:slowread' (9) asked for by the console: its mod is working on it.
+21.11.2026 15:41:55 [Warning] [vintagedoctor] guestmod said it would deliver 'guestmod:slowread' later and didn't in time.
+21.11.2026 15:41:55 [Notification] [vintagedoctor] Fix 'doctorexample:unjam' (all) asked for by the console: Restarted 3 example pumps
+21.11.2026 15:41:55 [Notification] [vintagedoctor] Fix 'doctorexamplejson:pump-jammed/fix' () asked for by the console: Moved doctorexample.json to ModData/vintagedoctor/backups/2026-11-21_15-41-55/doctorexample.json. A fresh one is written the next time its mod starts (restart the game or the server).
+21.11.2026 15:41:55 [Notification] [vintagedoctor] Fix 'doctor:reset-config' (doctor-selftest-broken.json) asked for by the console: Moved doctor-selftest-broken.json to ModData/vintagedoctor/backups/2026-11-21_15-41-55/doctor-selftest-broken.json. A fresh one is written the next time its mod starts (restart the game or the server).
+21.11.2026 15:41:55 [Notification] [vintagedoctor] Fix 'doctor:reset-config' (../serverconfig.json) asked for by the console: ⚠ '../serverconfig.json' isn't a file the doctor may touch (it only moves files in ModConfig and the Mods folders it listed).
+21.11.2026 15:41:55 [Notification] [vintagedoctor] Fix 'doctor:reset-config' (vintagedoctor.json) asked for by the console: ⚠ The doctor leaves its own config file alone.
+21.11.2026 15:41:55 [Notification] [vintagedoctor] Fix 'doctor:remove-items' () asked for by the console: Removed 0 items from the ground.
+21.11.2026 15:41:55 [Notification] [vintagedoctor] Fix 'doctor:move-file' (9/whatever.zip) asked for by the console: ⚠ '9/whatever.zip' isn't a file the doctor may touch (it only moves files in ModConfig and the Mods folders it listed).
+21.11.2026 15:41:55 [Notification] [vintagedoctor] Fix 'doctor:disable-mod' (doctorexamplejson) asked for by the console: Doctor Example (JSON) is switched off from the next server start (the world's list of disabled mods in serverconfig.json; take it out there to bring it back).
+21.11.2026 15:41:55 [Notification] [vintagedoctor] Fix 'doctor:disable-mod' (vintagedoctor) asked for by the console: ⚠ Vintage Doctor isn't something the doctor switches off.
+21.11.2026 15:41:55 [Notification] [vintagedoctor] Fix 'bus:doctorexample:slowfill' () asked for by the console: its mod is working on it.
+21.11.2026 15:41:55 [Notification] Handling Console Command /doctor example-tanks slow
+21.11.2026 15:41:55 [Notification] A mod is still working on that. The result follows in a moment.
+21.11.2026 15:41:55 [Warning] Server overloaded. A tick took 1426ms to complete.
+21.11.2026 15:41:55 [Warning] Over 400ms tick. Skipping 31 physics ticks.
+21.11.2026 15:41:56 [Notification] [vintagedoctor] /doctor example-tanks slow
+== The example tanks ==
+⚠ 2 example tanks are half empty
+  tank at 10 3 10
+  → Fill them from a pump.
+  Fill the example tanks (/doctor fix bus:doctorexample:fill) Fill them slowly (/doctor fix bus:doctorexample:slowfill) The same page, slowly (/doctor example-tanks slow)
+This page came a moment later.
+Saved to ModData/vintagedoctor/last-report-server.txt
+21.11.2026 15:42:00 [Warning] Server overloaded. A tick took 734ms to complete.
+21.11.2026 15:42:00 [Warning] Over 400ms tick. Skipping 10 physics ticks.
+21.11.2026 15:42:03 [Notification] [vintagedoctor self-test] Self-test: 202 passed, 0 failed
+21.11.2026 15:42:03 [Notification] Handling Console Command /doctor 
+21.11.2026 15:42:03 [Notification] == The game (Vintage Story 1.22.7) ==
+✓ No crash reports: the game hasn't crashed on this side.
+✓ No errors in the log this session (4 kind(s) of warnings, 7 line(s)).
+  Every error and warning (/doctor log)
+✓ 6 mod file(s) in 2 folder(s), nothing wrong with them.
+  Every file in 4 zip(s) was read to the end.
+✓ 5 config file(s) read without a problem.
+✓ The server keeps up: a tick every 39.3 ms (25 a second).
+  Last minute: average 39.3 ms, 95% under 34 ms, worst 1427 ms (343 ticks).
+  The game itself logged 2 tick(s) over half a second this session (the worst 1426 ms; 2 in the last 10 minutes).
+  Measure where the time goes (20 seconds) (/doctor fix doctor:profile 20) The whole performance page (/doctor perf)
+✓ 5 creatures and things loaded (0 items on the ground), 160 chunks, 0 player(s).
+  Most of: game:wolf 2, game:raccoon 2, game:armorstand 1
+  160 chunks loaded for 0 player(s).
+✓ Memory: the game holds 1.3 GB of the 7.6 GB it can use.
+  775.7 MB in the game's own objects; 13 full clean-ups so far; 2 processor threads.
+✓ 17.4 GB free where the world is saved.
+  The save file is 4 KB.
+✓ Nothing in this world comes from a mod that isn't installed.
+✓ Time runs at the normal pace.
+✓ Every block and item that needs code has it.
+✓ No mod tries to change a file that isn't there.
+✓ Every mod that has block and item files has them in the game.
+✓ No mod brings its own copy of a library the game or another mod already has.
+✓ No two mods replace the same file, and none replaces the game's own.
+✓ No recipe from a mod has the same ingredients as another recipe that makes something else (13748 crafting recipes looked at).
+✓ 33 JSON patches in 85 files, no two mods replacing the same thing.
+✓ Every mod's blocks and items have names.
+• This is the first session the doctor has seen here, so there is nothing to compare with yet.
+  From now on it notes the mods and their versions at every start, and shows here what changed.
+Pick what matches; each opens a page that looks into just that.
+The game crashed (/doctor crash)
+The game is slow or stutters (/doctor perf)
+A mod isn't working (/doctor mods)
+Something broke after I added or updated mods (/doctor changes)
+An item looks or acts wrong (hold it first) (/doctor item hand)
+The block I'm looking at looks or acts wrong (/doctor block)
+I can't craft something (/doctor craft hand)
+Show me what happened while the game started (/doctor startup)
+Show me every error and warning (/doctor log)
+Check my Mods folder and config files (/doctor files)
+Are any mods getting in each other's way? (/doctor clashes)
+Which mods change the game's code? (/doctor patches)
+Is my world all right? (/doctor world)
+Put together a report to post (/doctor bugreport)
+For mod authors: what mods told the doctor (/doctor api)
+
+== Config lib (not loaded) ==
+⚠ 1 mod(s) were left out because something they need is missing: configlib (needs vsimgui@1.2.0)
+  The game doesn't load a mod whose requirements aren't met, so nothing of these mods is in the game.
+  → Install what they need (the name after 'needs' is a mod id, with the lowest version that will do), or remove them.
+  Find vsimgui on the Mod DB (https://mods.vintagestory.at/list/mod?text=vsimgui)
+  Everything from start-up (/doctor startup)
+
+== Doctor Example (JSON) 1.0.0 ==
+⚠ Doctor Example: An example pump jammed
+  [doctorexample] pump 3 jammed (a made-up warning from the example mod)
+  This line in the log comes from the example mod; the JSON example mod knows what it means.
+  → Nothing to do: it is only an example.
+  Start the example's config afresh (/doctor fix doctorexamplejson:pump-jammed/fix)
+• Doctor Example (JSON) and Doctor Example don't get on
+  Nothing is really wrong: the two example mods say they clash so the doctor has a clash to show.
+  Doctor Example (JSON) says so itself (in its vintagedoctor.json).
+  Doctor Example (JSON)'s page (/doctor mod doctorexamplejson) Doctor Example's page (/doctor mod doctorexample)
+Everything about Doctor Example (JSON) (/doctor mod doctorexamplejson)
+
+== Doctor Example 1.0.0 ==
+⚠ An example pump jammed
+  [doctorexample] pump 3 jammed (a made-up warning from the example mod)
+  This line in the log comes from the example mod; the JSON example mod knows what it means.
+  → Nothing to do: it is only an example.
+  Start the example's config afresh (/doctor fix doctorexamplejson:pump-jammed/fix)
+• By mod: Vintage Doctor 0.03 ms, Doctor Example 0.01 ms, Primitive Survival 0.00 ms
+  0.03 ms  1%  Vintage Doctor its page (/doctor mod vintagedoctor)
+  0.01 ms  0%  Doctor Example its page (/doctor mod doctorexample)
+  0.00 ms  0%  Primitive Survival its page (/doctor mod primitivesurvival)
+  Only the work the game can tell apart by its code (things that tick, windows, timers) is counted against a mod; what a mod adds to creatures or to the world's generation isn't. A mod with many machines running is not broken for being first here.
+  Measure again (20 seconds) (/doctor fix doctor:profile 20)
+• Doctor Example (JSON) and Doctor Example don't get on
+  Nothing is really wrong: the two example mods say they clash so the doctor has a clash to show.
+  Doctor Example (JSON) says so itself (in its vintagedoctor.json).
+  Doctor Example (JSON)'s page (/doctor mod doctorexamplejson) Doctor Example's page (/doctor mod doctorexample)
+✓ All example pumps are running
+• 2 example tanks are half empty
+  tank at 10 3 10
+  tank at 12 3 10
+  → Fill them from a pump.
+  Fill the example tanks (/doctor fix bus:doctorexample:fill)
+• The example mod started
+  reported with ReportIncident
+  Last at 2026-11-21 15:41.
+My example pipes leak (/doctor example-pipes)
+My example pumps aren't pumping (/doctor example-pumps)
+My example tanks are empty (/doctor example-tanks)
+Everything about Doctor Example (/doctor mod doctorexample)
+
+== Carry On 1.14.3 ==
+• 1 mod(s) change the game's code in 1 place(s) (0 shared with another mod)
+  Carry On (1)
+  Mods patch the game's own code where it offers no other way in. It is normal, but it is also what breaks first when the game updates, and two mods patching the same place can get in each other's way.
+  All code patches (/doctor patches)
+Everything about Carry On (/doctor mod carryon)
+
+== Primitive Survival 5.1.4 ==
+• By mod: Vintage Doctor 0.03 ms, Doctor Example 0.01 ms, Primitive Survival 0.00 ms
+  0.03 ms  1%  Vintage Doctor its page (/doctor mod vintagedoctor)
+  0.01 ms  0%  Doctor Example its page (/doctor mod doctorexample)
+  0.00 ms  0%  Primitive Survival its page (/doctor mod primitivesurvival)
+  Only the work the game can tell apart by its code (things that tick, windows, timers) is counted against a mod; what a mod adds to creatures or to the world's generation isn't. A mod with many machines running is not broken for being first here.
+  Measure again (20 seconds) (/doctor fix doctor:profile 20)
+Everything about Primitive Survival (/doctor mod primitivesurvival)
+
+== Vintage Doctor 1.3.0 ==
+• Measured for 5 seconds (131 ticks): 5.99 ms of work per tick, at 2026-11-21 15:42
+  The parts that took the most time, per tick. The name in square brackets is the mod the code belongs to; (N×) is how many of them ran each tick.
+  5.56 ms  93%  garbagecollector (no clients online)
+  0.13 ms  2%  Ticking: BlockEntityGenericTypedContainer
+  0.04 ms  1%  despawned-1-raccoon-common-adult-male
+  0.03 ms  1%  Ticking: VintageDoctorSystem [Vintage Doctor]
+  0.03 ms  0%  Timer: BlockBehaviorFiniteSpreadingLiquid
+• By mod: Vintage Doctor 0.03 ms, Doctor Example 0.01 ms, Primitive Survival 0.00 ms
+  0.03 ms  1%  Vintage Doctor its page (/doctor mod vintagedoctor)
+  0.01 ms  0%  Doctor Example its page (/doctor mod doctorexample)
+  0.00 ms  0%  Primitive Survival its page (/doctor mod primitivesurvival)
+  Only the work the game can tell apart by its code (things that tick, windows, timers) is counted against a mod; what a mod adds to creatures or to the world's generation isn't. A mod with many machines running is not broken for being first here.
+  Measure again (20 seconds) (/doctor fix doctor:profile 20)
+Everything about Vintage Doctor (/doctor mod vintagedoctor)
+Every page is a command: /doctor crash, perf, mods, mod <mod id>, log [mod id], startup, files, patches, changes, world, item <code>, craft <code>, bugreport [mod id], api. A fix: /doctor fix <id> [argument].
+Saved to ModData/vintagedoctor/last-report-server.txt
+21.11.2026 15:42:03 [Notification] Handling Console Command /doctor mods
+21.11.2026 15:42:03 [Notification] == Every mod at a glance ==
+5 mod(s) loaded; 2 have something against them. A mod's page shows everything the doctor knows about it.
+• Vintage Doctor 1.3.0: 2 kind(s) of warnings
+  Vintage Doctor's page (/doctor mod vintagedoctor)
+• Doctor Example 1.0.0: 1 kind(s) of warnings
+  Doctor Example's page (/doctor mod doctorexample)
+✓ 3 mod(s) have nothing against them
+  Carry On 1.14.3 (/doctor mod carryon) Doctor Example (JSON) 1.0.0 (/doctor mod doctorexamplejson) Primitive Survival 5.1.4 (/doctor mod primitivesurvival)
+⚠ 1 more left out by the game: configlib
+  Everything from start-up (/doctor startup)
+Saved to ModData/vintagedoctor/last-report-server.txt

@@ -1,0 +1,19 @@
+== Errors and warnings in the log ==
+7 kind(s) of errors (9 line(s)) and 1 kind(s) of warnings (1 line(s)) in server-main.log, most frequent first. The same message counts once however often it was written.
+⚠ Doctor Sick: 6 kind(s) of errors, 1 kind(s) of warnings
+  [Error] Syntax error in json file 'doctorsick:itemtypes/broken.json': Failed deserializing broken.json: Unexpected end when reading token. Path ''.
+    A JSON file can't be read: a missing comma or bracket, usually in a config file edited by hand or a file cut short by a crash. The message says which line.
+  [Error] Item with code doctorsick:ghost has defined an item class DoctorGhostItem, but no such class registered. Will ignore.
+  [Error] Failed registering item doctorsick:ghost:
+  [Error] Exception: Attempted to register Item with code doctorsick:ghost, but an item with such code already exists. Must use a unique code
+    at Vintagestory.Server.ServerMain.RegisterItem(Item item) in VintagestoryLib\Server\ServerMain.cs:line 1980
+    at Vintagestory.Server.ServerCoreAPI.RegisterItem(Item item) in VintagestoryLib\Server\API\ServerCoreAPI.cs:line 132
+    at Vintagestory.ServerMods.NoObf.ModRegistryObjectTypeLoader.<LoadItems>b__14_0(List`1 variants) in VSEssentials\Loading\RegistryObjectTypeLoader.cs:line 253
+    Something was added under a name that is already taken: two mods add a thing with the same name, the same mod was loaded twice, or one mod adds the same thing twice. One of the two is left out, and what depends on it may misbehave.
+  [Error] Block with code doctorsick:ghostblock has defined a block class DoctorGhostBlock, no such class registered. Will ignore.
+  [Error] Block with code doctorsick:ghostblock has defined a block entity class DoctorGhostEntity, no such class registered. Will ignore.
+  [Warning] Collectible behavior DoctorGhostBehavior for item doctorsick:ghost not found
+  Doctor Sick's page (/doctor mod doctorsick)
+⚠ Doctor Crashy: 1 kind(s) of errors, 0 kind(s) of warnings
+  ×3 [Error] [doctorcrashy] a made-up error from the broken test mod
+  Doctor Crashy's page (/doctor mod doctorcrashy)

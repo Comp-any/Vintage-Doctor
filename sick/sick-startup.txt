@@ -1,0 +1,29 @@
+== Start-up ==
+✖ 5 file(s) in the Mods folder aren't mods the game can load: doctor-sick-corrupt.zip, doctor-sick-nested.zip, doctor-sick-notamod.zip, doctor-sick-wrapped.zip, doctor-sick-straydll.zip
+  doctor-sick-corrupt.zip: the zip is damaged
+  doctor-sick-nested.zip: the mod sits one folder down inside it (in 'Nested-main')
+  doctor-sick-notamod.zip: it has no modinfo.json, so it isn't a mod
+  doctor-sick-wrapped.zip: it holds another zip (doctorwrapped_1.0.0.zip) instead of the mod
+  doctor-sick-straydll.zip: it has code in the wrong place (lib/Helper.dll)
+  The game tries everything in the Mods folder at every start, and reports an error for each of these. The Mods folder page says what each one is and offers the fix.
+  The Mods folder and config files (/doctor files)
+✖ Doctor Crashy threw an error while starting: Method not found: 'Void Vintagestory.API.Common.DoesNotExist.Gone()'.
+  An exception was thrown when trying to start the mod:
+    Method not found: 'Void Vintagestory.API.Common.DoesNotExist.Gone()'.
+    at DoctorCrashy.DoctorCrashySystem.StartServerSide(ICoreServerAPI api) in /home/<user>/work/Vintage-Doctor/Vintage-Doctor/tests/mods/DoctorCrashy/DoctorCrashySystem.cs:line 16
+    at Vintagestory.Common.ModLoader.TryRunModPhase(Mod mod, ModSystem system, ICoreAPI api, ModRunPhase phase) in VintagestoryLib\Common\API\ModLoader.cs:line 680
+    Not started: DoctorCrashy.DoctorCrashySystem
+  The mod calls something that doesn't exist in this version of the game (or of another mod it uses): it was built for a different version. Update the mod, or use the game version it was made for.
+  → Look for an update of Doctor Crashy that fits this game version, check it has every mod it needs, or switch it off. Its author needs the lines above.
+  Doctor Crashy's page (/doctor mod doctorcrashy) Switch Doctor Crashy off (/doctor fix doctor:disable-mod doctorcrashy)
+⚠ 1 mod(s) are in the Mods folder more than once
+  doctordup: 'doctordup_1.0.0.zip', 'doctordup_1.1.0.zip', loaded: v1.1.0
+  The game loads only the newest copy. The spare copies are harmless but confusing, and a spare copy of a mod with code can stop it loading at all.
+  The Mods folder and config files (/doctor files)
+⚠ 2 JSON patch(es) didn't apply: Doctor Sick (2)
+    Patch 0 (target: game:itemtypes/resource/ingot.json) in doctorsick:patches/bad.json failed because supplied path /doesnotexist/deeper/still is invalid: The json path /doesnotexist/deeper/still was not found. No such element 'doesnotexist' at the root path
+  A patch is how one mod changes another's (or the game's) blocks, items and recipes. One that doesn't fit is skipped, so that change isn't in the game: the thing it was for behaves as if the mod weren't there.
+  → Usually the patching mod is made for another version of what it patches. Its author can fix the patch; an update may already have.
+• 1 recipe(s) or drop(s) name things that don't exist, by the mod of the missing thing: doctorsick (1)
+    doctorsick:doesnotexist
+  The game skips those recipes. Usually the mod expects another mod (or another version of one) to be installed.

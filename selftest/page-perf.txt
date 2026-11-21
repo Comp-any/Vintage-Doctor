@@ -1,0 +1,14 @@
+== Is the server keeping up? ==
+✓ The server keeps up: a tick every 33.1 ms (30 a second).
+  Last minute: average 33.1 ms, 95% under 34 ms, worst 40 ms (122 ticks).
+  Measure where the time goes (20 seconds) (/doctor fix doctor:profile 20)
+✓ 17 creatures and things loaded (0 items on the ground), 392 chunks, 0 player(s).
+  Most of: game:raccoon 7, game:wolf 4, game:bear 3, game:fox 2, game:armorstand 1
+  392 chunks loaded for 0 player(s).
+✓ Memory: the game holds 1.3 GB of the 7.6 GB it can use.
+  1.0 GB in the game's own objects; 12 full clean-ups so far; 2 processor threads.
+
+== Where the server's time goes ==
+• Nothing measured yet.
+  The game can time every part of a tick: creatures, each kind of machine and block that does something, each mod's own work. The doctor switches that on for 20 seconds, adds it up, and switches it off again.
+  Measure where the time goes (20 seconds) (/doctor fix doctor:profile 20)

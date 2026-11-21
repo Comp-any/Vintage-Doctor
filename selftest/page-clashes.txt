@@ -1,0 +1,18 @@
+== Mods getting in each other's way, or their own ==
+✓ Every block and item that needs code has it.
+✓ No mod tries to change a file that isn't there.
+✓ Every mod that has block and item files has them in the game.
+✓ No mod brings its own copy of a library the game or another mod already has.
+✓ No two mods replace the same file, and none replaces the game's own.
+✓ No recipe from a mod has the same ingredients as another recipe that makes something else (13748 crafting recipes looked at).
+• Doctor Example (JSON) and Doctor Example don't get on
+  Nothing is really wrong: the two example mods say they clash so the doctor has a clash to show.
+  Doctor Example (JSON) says so itself (in its vintagedoctor.json).
+  Doctor Example (JSON)'s page (/doctor mod doctorexamplejson) Doctor Example's page (/doctor mod doctorexample)
+• 1 mod(s) change the game's code in 1 place(s) (0 shared with another mod)
+  Carry On (1)
+  Mods patch the game's own code where it offers no other way in. It is normal, but it is also what breaks first when the game updates, and two mods patching the same place can get in each other's way.
+  All code patches (/doctor patches)
+
+== Mods changing the same thing ==
+✓ 33 JSON patches in 85 files, no two mods replacing the same thing.
