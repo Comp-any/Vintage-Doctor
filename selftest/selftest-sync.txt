@@ -1,0 +1,176 @@
+PASS versions: 1.10.0 is newer than 1.9.2
+PASS versions: 1.0.0 is newer than 1.0.0-rc.1
+PASS versions: rc.2 is newer than rc.1
+PASS versions: v1.2 equals 1.2.0
+PASS addresses and user folders are taken out (from <address> at /home/<user>/data and C:\Users\<user> One\x, Version=1.2.3.4)
+PASS messages that differ only in a code or a number count as one
+PASS a page as text names the commands behind its buttons (✓ fine / ✖ bad Do it (/doctor fix doctor:x a/b(c)) /   Carry On's page (/doctor mod carryon))
+PASS a page counts its problems
+PASS a page survives being sent
+PASS log: read without error
+PASS log: the game version (v1.22.7 (Stable))
+PASS log: a mod left out for missing dependencies, with both reasons (1 skipped)
+PASS log: a blocked mod (badmod@1.0.0: known to corrupt saves)
+PASS log: a mod id installed twice (twice: 'twice_1.0.0.zip', 'twice_1.1.0.zip' → v1.1.0)
+PASS log: mods found and disabled (9/1)
+PASS log: a mod that threw while starting, with its error, trace and system (Method not found: 'Void Vintagestory.API.Common.Something.Gone()'. / 2 frames / Crashy.CrashySystem)
+PASS log: a file that isn't a mod (broken.zip;crashy)
+PASS log: failed JSON patches by mod (patchy=2;oldpatchy=1)
+PASS log: recipes naming things that don't exist, once each (armory=1)
+PASS log: a patch for a mod that isn't installed is noted, not counted as failed (patchy=selftestabsentmod:itemtypes/thing.json;oldpatchy=game:itemtypes/removed.json)
+PASS log: a patch for a file the game no longer has counts as failed
+PASS log: blocks and items whose code is missing (block ghosty:machine-north GhostMachine;entity ghosty:machine-north GhostMachineEntity;item ghosty:wand GhostWand;behavior ghosty:wand GhostGlow;behavior ghosty:machine-north GhostHum;behavior ghosty:machine-north GhostPower)
+PASS log: files of a mod the game couldn't read, in the words of two game versions (ghosty=itemtypes/broken.json,recipes/grid/cutshort.json)
+PASS log: blocks and items the game refused to add (item ghosty:wand;block ghosty:machine-north)
+PASS log: code in a mod that calls itself a content mod (ghosty)
+PASS log: a slow tick
+PASS log: the same warning twice is one entry with a count (2)
+PASS log: an exception keeps its stack trace and count (2x, 2 frames)
+PASS log: start-up lines aren't counted as errors of their own (13 issues)
+PASS an error is explained in plain words
+PASS more errors explained: a name taken twice, a library for another system, a mod packed wrong
+PASS memory that keeps growing is told from memory that is only large (35.00001666666667 min, 1150 to 1900 MB)
+PASS a known problem is recognised by its pattern and counted against its mod (tester)
+PASS ignored messages are left out
+PASS crash: two reports read (2)
+PASS crash: the mod the game named, and its version then (crashy@0.9.0)
+PASS crash: the error and its trace (System.NullReferenceException / 2)
+PASS crash: the Harmony ids involved
+PASS crash: when it happened is kept as written (11/20/2026 9:15:01 PM)
+PASS crash: one with no mod named (System.IO.FileNotFoundException)
+PASS crash: the latest is the last in the file
+PASS crash: a server's report with an empty mod list (System.NullReferenceException / Object reference not set to an instance of an object.)
+PASS folder: every mod file found, a text file left alone (16: twice_1.10.0.zip,libs_1.0.0.zip,future.zip,badinfo.zip,nested.zip,half.zip.crdownload,corrupt.zip,twice_1.0.0.zip,foldermod,backslash.zip,good_1.0.0.zip,packed.rar,wrapped-download.zip,source.zip,stray.zip,notamod.zip)
+PASS folder: a good zip
+PASS folder: backslashes in file names
+PASS folder: modinfo one folder down
+PASS folder: a zip that isn't a mod
+PASS folder: source code instead of a release
+PASS folder: a broken modinfo.json
+PASS folder: a zip inside a zip
+PASS folder: a damaged zip
+PASS folder: an archive the game can't read, and a download that didn't finish
+PASS folder: a mod in a folder
+PASS folder: what a mod brings: its libraries, its own files, and what it puts into the game's and other mods' folders (libs.dll,0Harmony.dll / itemtypes/thing.json / game:recipes/grid/x.json,game:textures/block/z.png,othermod:itemtypes/y.json / )
+PASS folder: the same for a mod kept as a folder (game:recipes/grid/x.json)
+PASS folder: a .dll in a subfolder, which the game refuses to load
+PASS folder: a mod installed twice, newest first (1 duplicates)
+PASS folder: reading a damaged zip to the end fails, a good one doesn't
+PASS fix: backslashes repacked, the original kept (changed 1)
+PASS fix: the outer folder taken away, the original kept
+PASS fix: a library the game already has taken out of a mod, the rest and the original kept (dropped 1, 9 entries)
+PASS fix: a zip that can't be made right is left as it was
+PASS fix: a file and a folder moved aside, not deleted
+PASS fix: a second file of the same name doesn't overwrite the first backup
+PASS config: a good file with a comment passes
+PASS config: a broken file fails with where (Unexpected character encountered while parsing value: }. Path 'b[1]', line 3, position 0.)
+PASS config: an empty file and one full of zeros
+PASS config: a file cut short fails
+PASS config: a folder is read, and a declared owner kept (5 files)
+PASS json: known problems read, the incomplete one refused (3 read, errors: test.json: a known problem needs "match" and "title" | test.json: unknown fix type "format-disk" (resetConfig, command or url))
+PASS json: fixes read, an unknown kind refused (2)
+PASS json: conflicts, recommendations and config files
+PASS json: a pattern matches on its side only
+PASS api: other mods can find the doctor
+PASS api: a registered check shows in the check-up with its details and fix
+PASS api: a deep check stays out of the check-up
+PASS api: a check that throws is reported, and the rest still runs
+PASS api: an incident reported twice is shown once with a count
+PASS api: findings handed over on the event bus show too
+PASS api: the deeper checks run the deep check
+PASS api: a registered fix runs and reports (Reconnected 3 pipes)
+PASS api: a fix can say it failed
+PASS api: an unknown fix is refused
+PASS api: a fix over the event bus runs
+PASS api: a fix nobody answers on the event bus is reported
+PASS api: a registered page opens with its argument (== My pipes aren't moving anything == / ✓ doctorselftest: page built with north)
+PASS api: a page can't take one of the doctor's own names
+PASS api: a registered page is among the questions
+PASS api: a registered known problem matches
+PASS api: unregistering takes everything of that mod away
+PASS guests: a page offered on the event bus is known, one with a name the doctor uses isn't (example-pipes,example-pumps,example-tanks,guest-keyed,guest-notes)
+PASS guests: it is among the questions
+PASS guests: a question given as a lang key is shown in words, here and for a player's game (The game crashed (/doctor guest-keyed))
+PASS guests: what mods send along from the player's game is gathered, packed and unpacked; too much and the wrong kind are left out (2 entries)
+PASS guests: the mod's own lines make the page, at once, under its own heading (== Guest notes == / ⚠ 1 note is unread /   note 7 /   Read it (/doctor fix bus:guestmod:read 7) Show it (.doctor fix bus:guestmod:show 7) All notes (/doctor guest-notes all) / argument: all)
+PASS guests: its buttons: a fix for the event bus on this side, one for the player's side, a link (Read it (/doctor fix bus:guestmod:read 7) Show it (.doctor fix bus:guestmod:show 7) All notes (/doctor guest-notes all))
+PASS guests: what the player's game sent along and what they hold reach the mod (table 5 for guest-notes all / item:game:ingot-copper)
+PASS guests: a page that comes later isn't handed on yet, and how long it may take is passed on (told 30, waiting s-4)
+PASS guests: it is handed on when the mod delivers
+PASS guests: a second delivery for the same page is ignored
+PASS guests: a mod that never delivers leaves a warning, not a page that hangs (⚠ guestmod said it needed a moment and then didn't answer. Its part is missing here; the server log may say why.)
+PASS guests: where nothing can wait, the page says the mod is still working (guestmod is still putting its part together. Open the page again in a moment.)
+PASS guests: a fix over the event bus answers at once when it can (Read note 7)
+PASS guests: a fix that needs time is waited for (Read note 8, slowly, told 60)
+PASS guests: a fix that is never finished says so (⚠ guestmod said it needed a moment and then didn't answer. Its part is missing here; the server log may say why.)
+PASS guests: where nothing can wait, the fix says the mod is working on it
+PASS guests: a mod's card on an item's page, with a link to its own page (item item:game:ingot-copper / • guestmod: Worth 3 guest notes)
+PASS guests: a check registered for the item page runs there, with the thing and the facts (• guestmod: typed check about game:ingot-copper with facts)
+PASS guests: and on the crafting page (• guestmod: typed check about game:ingot-copper)
+PASS guests: but not on the check-up
+PASS guests: a page in code with its own heading, buttons on one line and the block looked at (== My own heading == /   Plain line notes (/doctor guest-notes all) do it (/doctor fix guestmod:x 1) / • guestmod: looked at 1,2,3)
+PASS guests: a page only the other side has gets nothing from this side (0 lines, only-on-the-client|x)
+PASS guests: opening the window for a player who isn't there says it couldn't
+PASS guests: when the mod stops answering, its page is gone
+PASS real: the server's log was read (277 lines, 4 kinds of errors and warnings, read in 2 ms)
+PASS real: the Mods folders were looked through (2 folders, 6 files)
+PASS real: the doctor knows its own mod
+PASS real: the doctor's own list of known problems was read from its assets (16 known, sources: doctorexamplejson:config/vintagedoctor.json, vintagedoctor:config/vintagedoctor.json)
+PASS real: no known-problem list failed to load
+PASS real: page-overview (4194 chars)
+PASS real: page-deep (2071 chars)
+PASS real: page-crash (146 chars)
+PASS real: page-startup (414 chars)
+PASS real: page-log (1322 chars)
+PASS real: page-log-carryon (88 chars)
+PASS real: page-mods (608 chars)
+PASS real: page-mod-vintagedoctor (1686 chars)
+PASS real: page-mod-carryon (1341 chars)
+PASS real: page-mod-nosuchmod (211 chars)
+PASS real: page-perf (956 chars)
+PASS real: page-files (237 chars)
+PASS real: page-patches (436 chars)
+PASS real: page-clashes (1261 chars)
+PASS real: page-changes (225 chars)
+PASS real: page-world (189 chars)
+PASS real: page-item-game_ingot-copper (642 chars)
+PASS real: page-item-game_nosuchitem (200 chars)
+PASS real: page-item (215 chars)
+PASS real: page-block (82 chars)
+PASS real: page-craft-game_axe-copper (180 chars)
+PASS real: page-craft-game_ingot-copper (577 chars)
+PASS real: page-bugreport (2941 chars)
+PASS real: page-bugreport-carryon (1129 chars)
+PASS real: page-api (1010 chars)
+PASS real: page-example-tanks (296 chars)
+PASS real: page-example-pipes (187 chars)
+PASS real: page-nosuchpage (4269 chars)
+PASS real: page-carryon (1341 chars)
+PASS real: page-game_ingot-copper (642 chars)
+PASS real: the check-up has cards and questions
+PASS real: the bug report has the mod list and no addresses
+PASS real: the bug report was saved
+PASS example: a mod's check, registered without the doctor being a requirement
+PASS example: the check can read the log through the doctor
+PASS example: a finding over the event bus, and an incident
+PASS example: a known problem and a clash from a JSON file, with no code
+PASS example: the mod's own page has its check, its event-bus finding and its log lines
+PASS example: a recommended mod that isn't installed shows on the mod's page
+PASS example: the mod's own page of the doctor
+PASS example: the mod's fix runs
+PASS example: after the fix the check passes
+PASS example: the fix over the event bus runs
+PASS example: the fix described in JSON runs (Moved doctorexample.json to ModData/vintagedoctor/backups/2026-11-21_07-57-19/doctorexample.json. A fresh one is written the next time its mod starts (restart the game or the server).)
+PASS example: a whole page written by the mod over the event bus (== The example tanks == / ⚠ 2 example tanks are half empty /   tank at 10 3 10 /   → Fill them from a pump. /   Fill the example tanks (/doctor fix bus:doctorexample:fill) Fill them slowly (/doctor fix bus:doctorexample:slowfill) The same page, slowly (/doctor example-tanks slow) / This page came at once.)
+PASS example: the mod's cards on an item's page, over the event bus and from code (The example pumps (/doctor example-pumps) / • Doctor Example: The example mod uses Copper ingot (game:ingot-copper) for its pipes)
+PASS example: a page in code with its own heading and three buttons on a line (== The example pipes == / ✓ Doctor Example: No example pipe leaks / The pumps (/doctor example-pumps) The tanks (/doctor example-tanks) Restart the pumps (/doctor fix doctorexample:unjam all))
+PASS example: the page for mod authors lists what was handed over
+PASS real fix: a broken config file is found
+PASS real fix: it is moved aside (Moved doctor-selftest-broken.json to ModData/vintagedoctor/backups/2026-11-21_07-57-19/doctor-selftest-broken.json. A fresh one is written the next time its mod starts (restart the game or the server).)
+PASS real fix: a path outside ModConfig is refused
+PASS real fix: the doctor's own config is refused
+PASS real fix: removing dropped items runs (Removed 0 items from the ground.)
+PASS real fix: a loaded mod's file can't be moved by a made-up argument
+PASS real fix: switching a mod off on a dedicated server (Doctor Example (JSON) is switched off from the next server start (the world's list of disabled mods in serverconfig.json; take it out there to bring it back).)
+PASS real fix: the doctor won't switch itself off
+175 passed, 0 failed before the profiler

@@ -1,0 +1,14 @@
+== A block or item ==
+• Copper ingot (game:ingot-copper) comes from the game itself
+  An item with the code game:ingot-copper; class ItemIngot; run by Vintagestory.GameContent.ItemIngot
+  Behaviours: CollectibleBehaviorGroundStorable
+✓ The log has no error or warning that mentions it.
+
+== What your mods say about it ==
+• Doctor Example: The example mod uses Copper ingot (game:ingot-copper) for its pipes
+  The example pumps (/doctor example-pumps)
+• Doctor Example: Example pumps are made of this
+  The example tanks (/doctor example-tanks)
+
+== Next ==
+Why can't I craft it? (/doctor craft game:ingot-copper) Back to the check-up (/doctor)

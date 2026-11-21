@@ -1,0 +1,26 @@
+== Is the server keeping up? ==
+✓ The server keeps up: a tick every 39.5 ms (25 a second).
+  Last minute: average 39.5 ms, 95% under 34 ms, worst 1522 ms (344 ticks).
+  Measure where the time goes (20 seconds) (/doctor fix doctor:profile 20) The whole performance page (/doctor perf)
+✓ 9 creatures and things loaded (0 items on the ground), 192 chunks, 0 player(s).
+  Most of: game:raccoon 4, game:wolf 4, primitivesurvival:coachwhip 1
+  192 chunks loaded for 0 player(s).
+✓ Memory: the game holds 1.3 GB of the 7.7 GB it can use.
+  778.9 MB in the game's own objects; 16 full clean-ups so far; 2 processor threads.
+
+== Where the server's time goes ==
+• Measured for 5 seconds (132 ticks): 5.82 ms of work per tick, at 2026-11-21 07:57
+  The parts that took the most time, per tick. The name in square brackets is the mod the code belongs to; (N×) is how many of them ran each tick.
+  5.12 ms  88%  garbagecollector (no clients online)
+  0.23 ms  4%  Ticking: BlockEntityGenericTypedContainer
+  0.05 ms  1%  Ticking: ClothManager
+  0.04 ms  1%  Ticking: VintageDoctorSystem [Vintage Doctor]
+  0.04 ms  1%  despawned-1-raccoon-common-adult-male
+  0.03 ms  1%  Ticking: BETreeHollowGrown [Primitive Survival]
+  0.03 ms  1%  Timer: BlockBehaviorFiniteSpreadingLiquid
+• By mod: Vintage Doctor 0.04 ms, Primitive Survival 0.03 ms, Doctor Example 0.01 ms
+  0.04 ms  1%  Vintage Doctor its page (/doctor mod vintagedoctor)
+  0.03 ms  1%  Primitive Survival its page (/doctor mod primitivesurvival)
+  0.01 ms  0%  Doctor Example its page (/doctor mod doctorexample)
+  Only the work the game can tell apart by its code (things that tick, windows, timers) is counted against a mod; what a mod adds to creatures or to the world's generation isn't. A mod with many machines running is not broken for being first here.
+  Measure again (20 seconds) (/doctor fix doctor:profile 20)

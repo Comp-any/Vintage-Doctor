@@ -1,0 +1,17 @@
+{
+  "Sessions": [
+    {
+      "Time": "2026-11-21 07:56",
+      "GameVersion": "1.22.7",
+      "Mods": {
+        "carryon": "1.14.3",
+        "doctorexample": "1.0.0",
+        "doctorexamplejson": "1.0.0",
+        "primitivesurvival": "5.1.4",
+        "vintagedoctor": "1.2.0"
+      },
+      "CleanExit": false
+    }
+  ],
+  "CrashLogBytes": 0
+}

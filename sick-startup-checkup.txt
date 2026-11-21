@@ -1,0 +1,142 @@
+== The server ==
+⚠ The game crashed (11/21/2026 05:56:18): NullReferenceException
+  System.NullReferenceException: Object reference not set to an instance of an object.
+  The code used something that wasn't there. That is a bug in the code named in the trace; nothing you set up wrong.
+  The game didn't name a mod and no mod's code is in the trace, so this may be the game itself, a mod that changes the game's code without showing in the trace, or the computer (memory, graphics driver).
+    at Vintagestory.API.Common.FrameProfilerUtil.End() in VintagestoryApi\Common\FrameProfilerUtil.cs:line 213
+    at Vintagestory.Server.ServerMain.Process() in VintagestoryLib\Server\ServerMain.cs:line 941
+    at Vintagestory.Server.ServerProgram.Main() in VintagestoryLib\Server\ServerProgram.cs:line 156
+    at Vintagestory.ClientNative.CrashReporter.Start(ThreadStart start) in VintagestoryLib\Client\ClientPlatform\ClientNative\CrashReporter.cs:line 95
+  → If it happens again, try without the mods you added or updated last, and post the report on the game's forum or Discord.
+  Put together a report to post (/doctor bugreport)
+✖ 5 file(s) in the Mods folder aren't mods the game can load: doctor-sick-corrupt.zip, doctor-sick-nested.zip, doctor-sick-notamod.zip, doctor-sick-wrapped.zip, doctor-sick-straydll.zip
+  doctor-sick-corrupt.zip: the zip is damaged
+  doctor-sick-nested.zip: the mod sits one folder down inside it (in 'Nested-main')
+  doctor-sick-notamod.zip: it has no modinfo.json, so it isn't a mod
+  doctor-sick-wrapped.zip: it holds another zip (doctorwrapped_1.0.0.zip) instead of the mod
+  doctor-sick-straydll.zip: it has code in the wrong place (lib/Helper.dll)
+  The game tries everything in the Mods folder at every start, and reports an error for each of these. The Mods folder page says what each one is and offers the fix.
+  The Mods folder and config files (/doctor files)
+✖ Doctor Crashy threw an error while starting: Method not found: 'Void Vintagestory.API.Common.DoesNotExist.Gone()'.
+  An exception was thrown when trying to start the mod:
+    Method not found: 'Void Vintagestory.API.Common.DoesNotExist.Gone()'.
+    at DoctorCrashy.DoctorCrashySystem.StartServerSide(ICoreServerAPI api) in /home/<user>/work/Vintage-Doctor/Vintage-Doctor/tests/mods/DoctorCrashy/DoctorCrashySystem.cs:line 16
+    at Vintagestory.Common.ModLoader.TryRunModPhase(Mod mod, ModSystem system, ICoreAPI api, ModRunPhase phase) in VintagestoryLib\Common\API\ModLoader.cs:line 680
+    Not started: DoctorCrashy.DoctorCrashySystem
+  The mod calls something that doesn't exist in this version of the game (or of another mod it uses): it was built for a different version. Update the mod, or use the game version it was made for.
+  → Look for an update of Doctor Crashy that fits this game version, check it has every mod it needs, or switch it off. Its author needs the lines above.
+  Doctor Crashy's page (/doctor mod doctorcrashy) Switch Doctor Crashy off (/doctor fix doctor:disable-mod doctorcrashy)
+⚠ 1 mod(s) are in the Mods folder more than once
+  doctordup: 'doctordup_1.0.0.zip', 'doctordup_1.1.0.zip' → v1.1.0
+  The game loads only the newest copy. The spare copies are harmless but confusing, and a spare copy of a mod with code can stop it loading at all.
+  The Mods folder and config files (/doctor files)
+⚠ 2 JSON patch(es) didn't apply: Doctor Sick (2)
+    Patch 0 (target: game:itemtypes/resource/ingot.json) in doctorsick:patches/bad.json failed because supplied path /doesnotexist/deeper/still is invalid: The json path /doesnotexist/deeper/still was not found. No such element 'doesnotexist' at the root path
+  A patch is how one mod changes another's (or the game's) blocks, items and recipes. One that doesn't fit is skipped, so that change isn't in the game: the thing it was for behaves as if the mod weren't there.
+  → Usually the patching mod is made for another version of what it patches. Its author can fix the patch; an update may already have.
+• 1 recipe(s) or drop(s) name things that don't exist, by the mod of the missing thing: doctorsick (1)
+    doctorsick:doesnotexist
+  The game skips those recipes. Usually the mod expects another mod (or another version of one) to be installed.
+  Everything from start-up (/doctor startup)
+⚠ 7 kind(s) of errors in the log this session (9 line(s)), and 1 kind(s) of warnings
+  Doctor Sick: 6 kind(s), 6 line(s) its page (/doctor mod doctorsick)
+    Syntax error in json file 'doctorsick:itemtypes/broken.json': Failed deserializing broken.json: Unexpected end when reading token. Path ''.
+  Doctor Crashy: 1 kind(s), 3 line(s) its page (/doctor mod doctorcrashy)
+    [doctorcrashy] a made-up error from the broken test mod
+  An error in the log doesn't always show in the game, but each is something that didn't work as its author meant. The ones that repeat, and the ones from a mod you're having trouble with, are the ones to look at.
+  Every error and warning (/doctor log)
+⚠ doctor-sick-notamod.zip isn't a mod: it has no modinfo.json
+  The game tries to load everything in the Mods folder and reports an error for this at every start.
+  Move doctor-sick-notamod.zip out of the Mods folder (/doctor fix doctor:move-file 0/doctor-sick-notamod.zip)
+✖ doctor-sick-backslash.zip was packed with '\' in its file names, so nothing in it loads on this computer
+  Some Windows tools write folder separators the wrong way round into a zip. Windows reads them anyway; Linux and macOS see one long file name instead of folders, so the mod has no blocks, items or textures.
+  Repack doctor-sick-backslash.zip the right way (the original is kept) (/doctor fix doctor:repack 0/doctor-sick-backslash.zip)
+✖ doctor-sick-corrupt.zip can't be opened
+  End of Central Directory record could not be found.
+  The zip is damaged, most often a download that was cut short. The game can't load it.
+  → Download the mod again.
+  Move doctor-sick-corrupt.zip out of the Mods folder (/doctor fix doctor:move-file 0/doctor-sick-corrupt.zip)
+⚠ doctor-sick-packed.rar is an archive the game can't read
+  The game only loads .zip files (and folders).
+  → Unpack it and look inside: if there is a .zip, that is the mod; if there are loose files with a modinfo.json, put them in a folder of their own in Mods.
+  Move doctor-sick-packed.rar out of the Mods folder (/doctor fix doctor:move-file 0/doctor-sick-packed.rar)
+✖ doctor-sick-nested.zip has its files one folder down, in 'Nested-main', so the game can't see the mod
+  The game looks for modinfo.json at the top. This happens when a folder is zipped instead of what's in it.
+  Repack doctor-sick-nested.zip the right way (the original is kept) (/doctor fix doctor:repack 0/doctor-sick-nested.zip)
+✖ doctor-sick-straydll.zip has code where the game doesn't accept it (lib/Helper.dll), so the game won't load it
+  The game's rule: a mod's .dll files sit at the top of the zip (only libraries that aren't .NET go in a folder, native/), and .cs files sit in src/. One file elsewhere and the game refuses the whole mod.
+  → This is how the mod was packed: get it again from its page, and tell the author if the download is the same.
+  Move doctor-sick-straydll.zip out of the Mods folder (/doctor fix doctor:move-file 0/doctor-sick-straydll.zip)
+✖ doctor-sick-wrapped.zip holds nothing but another zip, doctorwrapped_1.0.0.zip
+  The mod was zipped twice (some sites and browsers do that). The game looks for modinfo.json at the top of the zip and doesn't find it.
+  Take doctorwrapped_1.0.0.zip out of it (/doctor fix doctor:unwrap 0/doctor-sick-wrapped.zip)
+⚠ doctordup is installed 2 times (1.1.0, 1.0.0)
+  doctordup_1.1.0.zip (1.1.0, loaded)
+  doctordup_1.0.0.zip (1.0.0)
+  The game loads only the newest. The game's own 1-click install leaves the old file next to the new one.
+  Move the 1 older one(s) out of the Mods folder (/doctor fix doctor:move-duplicates doctordup)
+  The Mods folder and config files (/doctor files)
+✖ The config file doctorcrashy.json can't be read (most likely Doctor Crashy's)
+  Unexpected end when reading JSON. Path 'enabled', line 1, position 16.
+  The file isn't valid JSON any more (a missing comma or bracket after editing by hand, most often). The mod it belongs to then starts with its defaults, or fails to start.
+  → Open it in a text editor and fix the line the message names, or let the mod write a fresh one.
+  Move doctorcrashy.json aside so a fresh one is written (/doctor fix doctor:reset-config doctorcrashy.json)
+✓ The server keeps up: a tick every 33.2 ms (30 a second).
+  Last minute: average 33.2 ms, 95% under 34 ms, worst 36 ms (122 ticks).
+  Measure where the time goes (20 seconds) (/doctor fix doctor:profile 20)
+✓ 16 creatures and things loaded (0 items on the ground), 392 chunks, 0 player(s).
+  Most of: game:raccoon 4, game:wolf 4, game:hare 3, game:fish 3, game:armorstand 1
+  392 chunks loaded for 0 player(s).
+✓ Memory: the game holds 1.2 GB of the 7.7 GB it can use.
+  869.9 MB in the game's own objects; 12 full clean-ups so far; 2 processor threads.
+✓ 13.9 GB free where the world is saved.
+  The save file is 4 KB.
+✖ Doctor Sick: 2 block(s) or item(s) need code that isn't in the game (DoctorGhostItem, DoctorGhostBehavior, DoctorGhostBlock, DoctorGhostEntity)
+  doctorsick:ghost (its code: DoctorGhostItem)
+  doctorsick:ghost (a behaviour: DoctorGhostBehavior)
+  doctorsick:ghostblock (its code: DoctorGhostBlock)
+  doctorsick:ghostblock (its data code: DoctorGhostEntity)
+  Each of these names a piece of code that should make it work, and no loaded mod has that code: the mod's own code didn't load, it needs another mod that isn't installed, or this version of the mod doesn't match its files. They are in the game but act like plain blocks and items: machines don't open, tools don't do their job.
+  → Update the mod and install every mod its page lists as required. For a mod of your own: the name in the file has to be exactly the one given to RegisterBlockClass, RegisterItemClass or RegisterBlockEntityClass.
+  Doctor Sick's page (/doctor mod doctorsick)
+⚠ Doctor Sick: 1 block(s) or item(s) couldn't be added to the game
+  doctorsick:ghost
+  The game refused them while loading. Most often something with the same name was already there: two mods, or two files of one mod, add a thing with the same name, and only the first one exists. The log has the game's reason for each.
+  Doctor Sick's page (/doctor mod doctorsick)
+⚠ Doctor Sick: 1 of its files couldn't be read, so what they describe isn't in the game
+  doctorsick:itemtypes/broken.json
+  Each of these files has a mistake in it (most often a missing comma or bracket) or uses something this version of the game doesn't know, and the game skipped the whole file: the blocks, items or recipes in it don't exist. The mod's page has the game's own error for each, with the place.
+  Doctor Sick's page (/doctor mod doctorsick)
+⚠ Doctor Sick tries to change 1 file(s) that aren't there
+  game:itemtypes/doctor-no-such-file.json
+  A patch changes one thing inside another file. These files don't exist in this version of the game (or of the mod they belong to): they were renamed, moved or removed in an update, and the mod hasn't caught up. Whatever those patches were for doesn't happen.
+  Doctor Sick's page (/doctor mod doctorsick)
+⚠ doctorsickbundled has code in it (0Harmony.dll, SickShared.dll) but calls itself a content mod, so the game leaves the code out
+  The game only runs code from mods whose modinfo.json says "type": "code". Whatever this mod's code was meant to do doesn't happen; its blocks, items and recipes still load.
+  → Tell the mod's author. Changing the type to "code" in the modinfo.json inside the zip puts it right.
+  doctorsickbundled's page (/doctor mod doctorsickbundled)
+⚠ doctorsickshared has code in it (SickShared.dll) but calls itself a content mod, so the game leaves the code out
+  The game only runs code from mods whose modinfo.json says "type": "code". Whatever this mod's code was meant to do doesn't happen; its blocks, items and recipes still load.
+  → Tell the mod's author. Changing the type to "code" in the modinfo.json inside the zip puts it right.
+  doctorsickshared's page (/doctor mod doctorsickshared)
+⚠ doctorsickslash has 1 block and item file(s), but none of its blocks or items are in the game
+  Some Windows tools write folder separators the wrong way round into a zip. Windows reads them anyway; Linux and macOS see one long file name instead of folders, so the mod has no blocks, items or textures.
+  Repack doctor-sick-backslash.zip the right way (the original is kept) (/doctor fix doctor:repack 0/doctor-sick-backslash.zip)
+  doctorsickslash's page (/doctor mod doctorsickslash)
+⚠ 2 file(s) are replaced by more than one mod: only one copy of each is used
+  doctorsick:config/note.json ← doctorsickold, Doctor Sick
+  game:recipes/grid/anchor.json ← Doctor Sick, doctorsickold
+  When two mods ship the same file, the game takes one and drops the other without a word. One of these mods isn't doing all it was meant to. Which one wins depends on the order the game loads them in.
+  → Check both mods' pages for a note about each other. If they do the same job, keep one. Mods that change a file with a patch instead of replacing it can work side by side.
+⚠ 1 mod(s) made for an older game replace 1 of the game's own files (the game is 1.22.7)
+  doctorsickold (made for 1.19.0): 1 file(s)
+    game:recipes/grid/anchor.json
+  These mods ship whole copies of the game's files as they were in an older version. Everything the game has changed in those files since is undone: recipes and items that went missing, things from the update that don't work, shaders that give a black screen or stop the game from starting.
+  → Look for an update of each. If something from the last game update is missing or broken, try without these mods first.
+  doctorsickold's page (/doctor mod doctorsickold)
+⚠ 1 mod(s) with code were made for an older game than 1.22.7 and have errors now: Doctor Crashy (1.20.0)
+  Mods that add code are built against one version of the game. After a game update most keep working, but when one of them has errors, the version is the first suspect.
+  → Update these first. If there is no update, the mod's page or comments usually say whether it works on this version.
+  Doctor Crashy's page (/doctor mod doctorcrashy)
+  All clashes between mods (/doctor clashes)
+✓ No mod changes the game's code.

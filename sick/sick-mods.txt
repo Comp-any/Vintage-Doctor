@@ -1,0 +1,9 @@
+== Every mod at a glance ==
+8 mod(s) loaded; 2 have something against them. A mod's page shows everything the doctor knows about it.
+✖ Doctor Crashy 1.0.0: 1 error(s) while starting, 1 unreadable config file(s), 1 kind(s) of errors in the log
+  Doctor Crashy's page (/doctor mod doctorcrashy) Switch Doctor Crashy off (/doctor fix doctor:disable-mod doctorcrashy)
+⚠ Doctor Sick 1.0.0: 6 kind(s) of errors in the log, 2 patch(es) that didn't apply, 1 kind(s) of warnings
+  Doctor Sick's page (/doctor mod doctorsick) Switch Doctor Sick off (/doctor fix doctor:disable-mod doctorsick)
+✓ 6 mod(s) have nothing against them
+  doctordup 1.1.0 (/doctor mod doctordup) doctorsickbundled 1.0.0 (/doctor mod doctorsickbundled) doctorsickold 1.0.0 (/doctor mod doctorsickold) doctorsickshared 1.0.0 (/doctor mod doctorsickshared) doctorsickslash 1.0.0 (/doctor mod doctorsickslash)
+  Vintage Doctor 1.2.0 (/doctor mod vintagedoctor)
