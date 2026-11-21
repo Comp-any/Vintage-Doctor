@@ -571,6 +571,18 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             t.Check("check-up: every line that is shown is in one section, so the window can show one mod alone",
                 whole.Lines.Where(l => l.Style == DoctorLineStyle.Check || l.Style == DoctorLineStyle.Heading).All(l => !string.IsNullOrEmpty(l.Section) && l.Section.IndexOf(',') < 0),
                 string.Join(" | ", whole.Lines.Where(l => (l.Style == DoctorLineStyle.Check || l.Style == DoctorLineStyle.Heading) && (string.IsNullOrEmpty(l.Section) || l.Section.IndexOf(',') >= 0)).Select(l => l.Text).Take(3)));
+            // Two halves, as a player's game puts its own and the server's together.
+            DoctorReport other = DoctorReport.FromPacket(half.ToPacket(1));
+            other.Lines.Add(new DoctorLine { Text = DoctorReport.WarnMark + " only the server saw this", Style = DoctorLineStyle.Check, Section = DoctorReport.GameSection });
+            var both = new DoctorReport();
+            var bothX = new DoctorContext { Doctor = doctor, Api = sapi, Side = EnumAppSide.Server, LanguageCode = "en", Topic = Pages.Overview, Ev = ev, R = both };
+            Pages.Arrange(bothX, new List<(DoctorReport half, string note)> { (half, null), (other, "On the server:") }, null, true, false);
+            string merged = both.PlainText(sapi.World);
+            int noteAt = merged.IndexOf("On the server:", StringComparison.Ordinal), onlyAt = merged.IndexOf("only the server saw this", StringComparison.Ordinal);
+            t.Check("check-up: two halves make one list: what both found alike is said once, and what only the server found comes under a line saying so",
+                both.Lines.Count(l => l.Text == "On the server:") == 1 && noteAt > 0 && onlyAt > noteAt && both.Lines.First(l => l.Text == "On the server:").Style == DoctorLineStyle.Text
+                && both.Lines.Where(l => l.Style == DoctorLineStyle.Check).GroupBy(l => l.Section + "|" + l.Text).All(g => g.Count() == 1) && both.Lines.Count(l => l.Style == DoctorLineStyle.Check) == whole.Lines.Count(l => l.Style == DoctorLineStyle.Check) + 1,
+                both.Lines.Count(l => l.Style == DoctorLineStyle.Check) + " cards from two halves, " + whole.Lines.Count(l => l.Style == DoctorLineStyle.Check) + " from one; the note at " + noteAt + ", the server's card at " + onlyAt);
             int gameAt = shown.IndexOf("== The game (", StringComparison.Ordinal), mineAt = shown.IndexOf(me, StringComparison.Ordinal), restAt = shown.IndexOf("== The other mods ==", StringComparison.Ordinal);
             t.Check("check-up: the game first, then the mods with something to say, then the rest in one card", gameAt == 0 && mineAt > gameAt && (restAt < 0 || restAt > mineAt), gameAt + ", " + mineAt + ", " + restAt);
             t.Check("check-up: nothing in it needs a character the game's font may lack once it is made drawable", Undrawable(GameFont.Drawable(shown)).Length == 0, Undrawable(GameFont.Drawable(shown)));

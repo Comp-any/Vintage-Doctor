@@ -37,6 +37,7 @@
   "sec-othermods": "The other mods",
   "sec-mod-notloaded": "{0} (not loaded)",
   "note-server": "On the server:",
+  "note-world": "From the world's side of the game (its built-in server):",
   "sec-next": "Next",
   "sec-modchecks": "Checks from your mods",
   "sec-crash": "Crash reports",

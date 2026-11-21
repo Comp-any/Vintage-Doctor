@@ -433,11 +433,23 @@ namespace VintageDoctor
                 string title = Title(key);
                 r.Lines.Add(new DoctorLine { Text = title, Style = DoctorLineStyle.Heading, Section = key });
                 ModEntry mod = key == DoctorReport.GameSection ? null : x.Ev?.Mods?.Get(key);
+                var said = new HashSet<string>(StringComparer.Ordinal);
                 for (int h = 0; h < halves.Count; h++)
                 {
-                    List<DoctorLine> list = cards[key][h];
-                    if (list == null || list.Count == 0) continue;
-                    if (!string.IsNullOrEmpty(halves[h].note)) r.Lines.Add(new DoctorLine { Text = halves[h].note, Style = DoctorLineStyle.Note, Section = key });
+                    List<DoctorLine> all = cards[key][h];
+                    if (all == null || all.Count == 0) continue;
+                    // What both sides found alike (no crash reports, a clean log) is said once.
+                    var list = new List<DoctorLine>();
+                    bool again = false;
+                    foreach (DoctorLine l in all)
+                    {
+                        if (l.Style == DoctorLineStyle.Check && l.Indent == 0) again = !said.Add(l.Text);
+                        else if (!IsDetail(l)) again = false;
+                        if (!again) list.Add(l);
+                    }
+                    if (list.Count == 0) continue;
+                    // Plain text, not a note: the window takes a note under a card for one of the card's details.
+                    if (!string.IsNullOrEmpty(halves[h].note)) r.Lines.Add(new DoctorLine { Text = halves[h].note, Style = DoctorLineStyle.Text, Section = key });
                     foreach (DoctorLine l in list)
                     {
                         // Under the mod's own heading a card needn't start with the mod's name.
@@ -467,17 +479,20 @@ namespace VintageDoctor
                 r.Lines.Add(new DoctorLine { Text = SectionTitle(x, DoctorReport.RestSection), Style = DoctorLineStyle.Heading, Section = DoctorReport.RestSection });
                 r.Lines.Add(new DoctorLine { Text = DoctorReport.OkMark + " " + x.T("mods-fine", rest.Count), Style = DoctorLineStyle.Check, Section = DoctorReport.RestSection });
                 r.Lines.Add(new DoctorLine { Text = string.Join(", ", rest.OrderBy(n => n, StringComparer.OrdinalIgnoreCase)), Style = DoctorLineStyle.Note, Indent = 1, Section = DoctorReport.RestSection });
-                if (!x.Compact) r.Lines.Add(new DoctorLine { Text = DoctorReport.Open(Checks.TopicMods, "", x.T("btn-mods-all")), Style = DoctorLineStyle.Text, Indent = 1, Section = DoctorReport.RestSection });
+                if (!x.Compact) r.Lines.Add(new DoctorLine { Text = DoctorReport.Open(Checks.TopicMods, "", x.T("btn-mods-all")), Style = DoctorLineStyle.Text, Section = DoctorReport.RestSection });
             }
             r.Lines.AddRange(asIs);
-            r.Lines.Add(new DoctorLine { Text = hasClient ? x.T("questions-commands") : x.T("questions-console"), Style = DoctorLineStyle.Note });
+            // A note right under a card would be taken for one of its details: then it is plain text.
+            DoctorLine last = r.Lines.Count > 0 ? r.Lines[r.Lines.Count - 1] : null;
+            bool underCard = last != null && (IsDetail(last) || (last.Style == DoctorLineStyle.Check && last.Indent == 0));
+            r.Lines.Add(new DoctorLine { Text = hasClient ? x.T("questions-commands") : x.T("questions-console"), Style = underCard ? DoctorLineStyle.Text : DoctorLineStyle.Note });
         }
 
         /// <summary>The doctor's own pages, as buttons in the game's section: what the player may be seeing, and where to look into it.</summary>
         static void GameButtons(DoctorContext x, string key, bool hasServer, bool hasClient)
         {
             void Line(string text, DoctorLineStyle style = DoctorLineStyle.Text) => x.R.Lines.Add(new DoctorLine { Text = text, Style = style, Section = key });
-            Line(x.T("questions-help"), DoctorLineStyle.Note);
+            Line(x.T("questions-help"));   // plain text: a note under the last card would be taken for one of its details
             Line(DoctorReport.Open(Checks.TopicCrash, "", x.T("q-crash")));
             Line(DoctorReport.Open(Checks.TopicPerf, "", x.T("q-perf")));
             Line(DoctorReport.Open(Checks.TopicMods, "", x.T("q-mods")));

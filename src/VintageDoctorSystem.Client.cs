@@ -278,7 +278,7 @@ namespace VintageDoctor
                     // The check-up is one list by mod: each mod's cards from this game, then from the server.
                     if (without != null) final.Add(without, DoctorLineStyle.Note);
                     var halves = new List<(DoctorReport half, string note)> { (local, null) };
-                    if (server != null) halves.Add((server, capi.IsSinglePlayer ? null : Lang.Get("vintagedoctor:note-server")));
+                    if (server != null) halves.Add((server, Lang.Get(capi.IsSinglePlayer ? "vintagedoctor:note-world" : "vintagedoctor:note-server")));
                     Pages.Arrange(x, halves, two ? Pages.OtherTopics(serverTopics, serverTopicMods) : null, two, true);
                 }
                 else
