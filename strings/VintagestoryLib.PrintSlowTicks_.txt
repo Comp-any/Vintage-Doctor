@@ -1,0 +1,91 @@
+Vintagestory.Client.NoObf/ClientSystemDebugCommands.cs-398-			game.Logger.Notification("Renderer summary:");
+Vintagestory.Client.NoObf/ClientSystemDebugCommands.cs-399-			foreach (KeyValuePair<string, int> item2 in dictionary)
+Vintagestory.Client.NoObf/ClientSystemDebugCommands.cs-400-			{
+Vintagestory.Client.NoObf/ClientSystemDebugCommands.cs-401-				game.Logger.Notification(item2.Value + "x " + item2.Key);
+Vintagestory.Client.NoObf/ClientSystemDebugCommands.cs-402-			}
+Vintagestory.Client.NoObf/ClientSystemDebugCommands.cs-403-			game.ShowChatMessage("Summary printed to client log file");
+Vintagestory.Client.NoObf/ClientSystemDebugCommands.cs-404-		}
+Vintagestory.Client.NoObf/ClientSystemDebugCommands.cs-405-		return TextCommandResult.Success();
+Vintagestory.Client.NoObf/ClientSystemDebugCommands.cs-406-	}
+Vintagestory.Client.NoObf/ClientSystemDebugCommands.cs-407-
+Vintagestory.Client.NoObf/ClientSystemDebugCommands.cs-408-	private TextCommandResult OnCmdLogticks(TextCommandCallingArgs args)
+Vintagestory.Client.NoObf/ClientSystemDebugCommands.cs-409-	{
+Vintagestory.Client.NoObf/ClientSystemDebugCommands.cs:410:		ScreenManager.FrameProfiler.PrintSlowTicks = !ScreenManager.FrameProfiler.PrintSlowTicks;
+Vintagestory.Client.NoObf/ClientSystemDebugCommands.cs:411:		ScreenManager.FrameProfiler.Enabled = ScreenManager.FrameProfiler.PrintSlowTicks;
+Vintagestory.Client.NoObf/ClientSystemDebugCommands.cs:412:		ScreenManager.FrameProfiler.PrintSlowTicksThreshold = (int)args[0];
+Vintagestory.Client.NoObf/ClientSystemDebugCommands.cs-413-		ScreenManager.FrameProfiler.Begin(null);
+Vintagestory.Client.NoObf/ClientSystemDebugCommands.cs:414:		game.ShowChatMessage("Client Tick Profiling now " + (ScreenManager.FrameProfiler.PrintSlowTicks ? ("on, threshold " + ScreenManager.FrameProfiler.PrintSlowTicksThreshold + " ms") : "off"));
+Vintagestory.Client.NoObf/ClientSystemDebugCommands.cs-415-		return TextCommandResult.Success();
+Vintagestory.Client.NoObf/ClientSystemDebugCommands.cs-416-	}
+Vintagestory.Client.NoObf/ClientSystemDebugCommands.cs-417-
+Vintagestory.Client.NoObf/ClientSystemDebugCommands.cs-418-	private TextCommandResult OnCmdChunksummary(TextCommandCallingArgs args)
+Vintagestory.Client.NoObf/ClientSystemDebugCommands.cs-419-	{
+Vintagestory.Client.NoObf/ClientSystemDebugCommands.cs-420-		int num = 0;
+Vintagestory.Client.NoObf/ClientSystemDebugCommands.cs-421-		int num2 = 0;
+Vintagestory.Client.NoObf/ClientSystemDebugCommands.cs-422-		int num3 = 0;
+Vintagestory.Client.NoObf/ClientSystemDebugCommands.cs-423-		int num4 = 0;
+Vintagestory.Client.NoObf/ClientSystemDebugCommands.cs-424-		foreach (KeyValuePair<long, ClientChunk> chunk in game.WorldMap.chunks)
+Vintagestory.Client.NoObf/ClientSystemDebugCommands.cs-425-		{
+Vintagestory.Client.NoObf/ClientSystemDebugCommands.cs-426-			num++;
+Vintagestory.Client.NoObf/ClientSystemDebugCommands.cs-427-			if (chunk.Value.IsPacked())
+Vintagestory.Client.NoObf/ClientSystemDebugCommands.cs-428-			{
+Vintagestory.Client.NoObf/ClientSystemDebugCommands.cs-429-				num2++;
+Vintagestory.Client.NoObf/ClientSystemDebugCommands.cs-430-			}
+Vintagestory.Client.NoObf/ClientSystemDebugCommands.cs-431-			if (chunk.Value.Empty)
+Vintagestory.Client.NoObf/ClientSystemDebugCommands.cs-432-			{
+Vintagestory.Client.NoObf/ClientSystemDebugCommands.cs-433-				num4++;
+Vintagestory.Client.NoObf/ClientSystemDebugCommands.cs-434-			}
+Vintagestory.Client.NoObf/ClientSystemDebugCommands.cs-435-			else
+Vintagestory.Client.NoObf/ClientSystemDebugCommands.cs-436-			{
+Vintagestory.Client.NoObf/ClientSystemDebugCommands.cs-437-				num3++;
+Vintagestory.Client.NoObf/ClientSystemDebugCommands.cs-438-			}
+Vintagestory.Client.NoObf/ClientSystemDebugCommands.cs-439-		}
+--
+Vintagestory.Server/CmdDebug.cs-139-			.HandleWith((TextCommandCallingArgs args) =>
+Vintagestory.Server/CmdDebug.cs-140-			{
+Vintagestory.Server/CmdDebug.cs-141-				GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+Vintagestory.Server/CmdDebug.cs-142-				GC.Collect();
+Vintagestory.Server/CmdDebug.cs-143-				return TextCommandResult.Success("Ok, compacted large object heap");
+Vintagestory.Server/CmdDebug.cs-144-			})
+Vintagestory.Server/CmdDebug.cs-145-			.EndSub()
+Vintagestory.Server/CmdDebug.cs-146-			.BeginSub("logticks")
+Vintagestory.Server/CmdDebug.cs-147-			.WithDesc("Toggle slow tick profiler")
+Vintagestory.Server/CmdDebug.cs-148-			.WithArgs(parsers.Int("millisecond threshold"), parsers.OptionalBool("include offthreads"))
+Vintagestory.Server/CmdDebug.cs-149-			.HandleWith((TextCommandCallingArgs args) =>
+Vintagestory.Server/CmdDebug.cs-150-			{
+Vintagestory.Server/CmdDebug.cs:151:				ServerMain.FrameProfiler.PrintSlowTicks = !ServerMain.FrameProfiler.PrintSlowTicks;
+Vintagestory.Server/CmdDebug.cs:152:				ServerMain.FrameProfiler.Enabled = ServerMain.FrameProfiler.PrintSlowTicks;
+Vintagestory.Server/CmdDebug.cs:153:				ServerMain.FrameProfiler.PrintSlowTicksThreshold = (int)args[0];
+Vintagestory.Server/CmdDebug.cs-154-				if ((!args.Parsers[1].IsMissing && (bool)args[1]) || !ServerMain.FrameProfiler.Enabled)
+Vintagestory.Server/CmdDebug.cs-155-				{
+Vintagestory.Server/CmdDebug.cs:156:					FrameProfilerUtil.PrintSlowTicks_Offthreads = ServerMain.FrameProfiler.PrintSlowTicks;
+Vintagestory.Server/CmdDebug.cs:157:					FrameProfilerUtil.PrintSlowTicksThreshold_Offthreads = ServerMain.FrameProfiler.PrintSlowTicksThreshold;
+Vintagestory.Server/CmdDebug.cs-158-					FrameProfilerUtil.offThreadProfiles = new ConcurrentQueue<string>();
+Vintagestory.Server/CmdDebug.cs-159-				}
+Vintagestory.Server/CmdDebug.cs-160-				ServerMain.FrameProfiler.Begin(null);
+Vintagestory.Server/CmdDebug.cs:161:				return TextCommandResult.Success("Server Tick Profiling now " + (ServerMain.FrameProfiler.PrintSlowTicks ? ("on, threshold " + ServerMain.FrameProfiler.PrintSlowTicksThreshold + " ms") : "off"));
+Vintagestory.Server/CmdDebug.cs-162-			})
+Vintagestory.Server/CmdDebug.cs-163-			.EndSub()
+Vintagestory.Server/CmdDebug.cs-164-			.BeginSub("octagonpoints")
+Vintagestory.Server/CmdDebug.cs-165-			.WithDesc("Exports a map of chunks that ought to be sent to the client as a png image")
+Vintagestory.Server/CmdDebug.cs-166-			.HandleWith((TextCommandCallingArgs args) =>
+Vintagestory.Server/CmdDebug.cs-167-			{
+Vintagestory.Server/CmdDebug.cs-168-				cmdDebug.PrintOctagonPoints(args.Caller.Player.WorldData.DesiredViewDistance);
+Vintagestory.Server/CmdDebug.cs-169-				return TextCommandResult.Success("Printed octagon points");
+Vintagestory.Server/CmdDebug.cs-170-			})
+Vintagestory.Server/CmdDebug.cs-171-			.EndSub()
+Vintagestory.Server/CmdDebug.cs-172-			.BeginSub("tickposition")
+Vintagestory.Server/CmdDebug.cs-173-			.WithDesc("Print current server tick position (for debugging a frozen server)")
+Vintagestory.Server/CmdDebug.cs-174-			.HandleWith((TextCommandCallingArgs args) => TextCommandResult.Success(server.TickPosition.ToString() ?? ""))
+Vintagestory.Server/CmdDebug.cs-175-			.EndSub()
+Vintagestory.Server/CmdDebug.cs-176-			.BeginSub("mainthreadstate")
+Vintagestory.Server/CmdDebug.cs-177-			.WithDesc("Print current main thread state")
+Vintagestory.Server/CmdDebug.cs-178-			.HandleWith((TextCommandCallingArgs args) => TextCommandResult.Success(cmdDebug.MainThread.ThreadState.ToString()))
+Vintagestory.Server/CmdDebug.cs-179-			.EndSub()
+Vintagestory.Server/CmdDebug.cs-180-			.BeginSub("threadpoolstate")
+Vintagestory.Server/CmdDebug.cs-181-			.WithDesc("Print current thread pool state")
+Vintagestory.Server/CmdDebug.cs-182-			.HandleWith((TextCommandCallingArgs args) => TextCommandResult.Success(TyronThreadPool.Inst.ListAllRunningTasks() + "\n" + TyronThreadPool.Inst.ListAllThreads()))
+Vintagestory.Server/CmdDebug.cs-183-			.EndSub()
+Vintagestory.Server/CmdDebug.cs-184-			.BeginSub("tickhandlers")
+Vintagestory.Server/CmdDebug.cs-185-			.WithDesc("Counts amount of game tick listeners grouped by listener type")
+Vintagestory.Server/CmdDebug.cs-186-			.HandleWith(countTickHandlers)

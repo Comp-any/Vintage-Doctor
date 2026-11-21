@@ -1,0 +1,116 @@
+Vintagestory.GameContent/BlockEntityClayForm.cs-113-		if (SelectedRecipe == null && Api.Side == EnumAppSide.Client)
+Vintagestory.GameContent/BlockEntityClayForm.cs-114-		{
+Vintagestory.GameContent/BlockEntityClayForm.cs-115-			OpenDialog(Api.World as IClientWorldAccessor, Pos, byPlayer.InventoryManager.ActiveHotbarSlot.Itemstack);
+Vintagestory.GameContent/BlockEntityClayForm.cs-116-		}
+Vintagestory.GameContent/BlockEntityClayForm.cs-117-	}
+Vintagestory.GameContent/BlockEntityClayForm.cs-118-
+Vintagestory.GameContent/BlockEntityClayForm.cs-119-	public void OnUseOver(IPlayer byPlayer, int selectionBoxIndex, BlockFacing facing, bool mouseBreakMode)
+Vintagestory.GameContent/BlockEntityClayForm.cs-120-	{
+Vintagestory.GameContent/BlockEntityClayForm.cs-121-		if (selectionBoxIndex >= 0 && selectionBoxIndex < selectionBoxes.Length)
+Vintagestory.GameContent/BlockEntityClayForm.cs-122-		{
+Vintagestory.GameContent/BlockEntityClayForm.cs-123-			Cuboidf cuboidf = selectionBoxes[selectionBoxIndex];
+Vintagestory.GameContent/BlockEntityClayForm.cs-124-			Vec3i voxelPos = new Vec3i((int)(16f * cuboidf.X1), (int)(16f * cuboidf.Y1), (int)(16f * cuboidf.Z1));
+Vintagestory.GameContent/BlockEntityClayForm.cs:125:			Api.World.FrameProfiler.Enter("clayforming");
+Vintagestory.GameContent/BlockEntityClayForm.cs-126-			OnUseOver(byPlayer, voxelPos, facing, mouseBreakMode);
+Vintagestory.GameContent/BlockEntityClayForm.cs-127-			Api.World.FrameProfiler.Leave();
+Vintagestory.GameContent/BlockEntityClayForm.cs-128-		}
+Vintagestory.GameContent/BlockEntityClayForm.cs-129-	}
+Vintagestory.GameContent/BlockEntityClayForm.cs-130-
+Vintagestory.GameContent/BlockEntityClayForm.cs-131-	public void OnUseOver(IPlayer byPlayer, Vec3i voxelPos, BlockFacing facing, bool mouseBreakMode)
+Vintagestory.GameContent/BlockEntityClayForm.cs-132-	{
+Vintagestory.GameContent/BlockEntityClayForm.cs-133-		if (SelectedRecipe == null || voxelPos == null)
+Vintagestory.GameContent/BlockEntityClayForm.cs-134-		{
+Vintagestory.GameContent/BlockEntityClayForm.cs-135-			return;
+Vintagestory.GameContent/BlockEntityClayForm.cs-136-		}
+Vintagestory.GameContent/BlockEntityClayForm.cs-137-		if (Api.Side == EnumAppSide.Client)
+Vintagestory.GameContent/BlockEntityClayForm.cs-138-		{
+Vintagestory.GameContent/BlockEntityClayForm.cs-139-			SendUseOverPacket(byPlayer, voxelPos, facing, mouseBreakMode);
+Vintagestory.GameContent/BlockEntityClayForm.cs-140-		}
+Vintagestory.GameContent/BlockEntityClayForm.cs-141-		ItemSlot activeHotbarSlot = byPlayer.InventoryManager.ActiveHotbarSlot;
+Vintagestory.GameContent/BlockEntityClayForm.cs-142-		if (activeHotbarSlot.Itemstack == null || !CanWorkCurrent)
+Vintagestory.GameContent/BlockEntityClayForm.cs-143-		{
+Vintagestory.GameContent/BlockEntityClayForm.cs-144-			return;
+Vintagestory.GameContent/BlockEntityClayForm.cs-145-		}
+Vintagestory.GameContent/BlockEntityClayForm.cs-146-		int num = activeHotbarSlot.Itemstack.Collectible.GetToolMode(activeHotbarSlot, byPlayer, new BlockSelection
+Vintagestory.GameContent/BlockEntityClayForm.cs-147-		{
+Vintagestory.GameContent/BlockEntityClayForm.cs-148-			Position = Pos
+Vintagestory.GameContent/BlockEntityClayForm.cs-149-		});
+Vintagestory.GameContent/BlockEntityClayForm.cs-150-		bool flag = false;
+--
+Vintagestory.GameContent/BlockEntityClayForm.cs-706-			return;
+Vintagestory.GameContent/BlockEntityClayForm.cs-707-		}
+Vintagestory.GameContent/BlockEntityClayForm.cs-708-		Vec3i voxelPos;
+Vintagestory.GameContent/BlockEntityClayForm.cs-709-		bool mouseBreakMode;
+Vintagestory.GameContent/BlockEntityClayForm.cs-710-		BlockFacing facing;
+Vintagestory.GameContent/BlockEntityClayForm.cs-711-		using (MemoryStream input = new MemoryStream(data))
+Vintagestory.GameContent/BlockEntityClayForm.cs-712-		{
+Vintagestory.GameContent/BlockEntityClayForm.cs-713-			BinaryReader binaryReader = new BinaryReader(input);
+Vintagestory.GameContent/BlockEntityClayForm.cs-714-			voxelPos = new Vec3i(binaryReader.ReadInt32(), binaryReader.ReadInt32(), binaryReader.ReadInt32());
+Vintagestory.GameContent/BlockEntityClayForm.cs-715-			mouseBreakMode = binaryReader.ReadBoolean();
+Vintagestory.GameContent/BlockEntityClayForm.cs-716-			facing = BlockFacing.ALLFACES[binaryReader.ReadInt16()];
+Vintagestory.GameContent/BlockEntityClayForm.cs-717-		}
+Vintagestory.GameContent/BlockEntityClayForm.cs:718:		Api.World.FrameProfiler.Enter("clayforming");
+Vintagestory.GameContent/BlockEntityClayForm.cs-719-		OnUseOver(player, voxelPos, facing, mouseBreakMode);
+Vintagestory.GameContent/BlockEntityClayForm.cs-720-		Api.World.FrameProfiler.Leave();
+Vintagestory.GameContent/BlockEntityClayForm.cs-721-	}
+Vintagestory.GameContent/BlockEntityClayForm.cs-722-
+Vintagestory.GameContent/BlockEntityClayForm.cs-723-	public override void OnReceivedServerPacket(int packetId, byte[] data)
+Vintagestory.GameContent/BlockEntityClayForm.cs-724-	{
+Vintagestory.GameContent/BlockEntityClayForm.cs-725-		if (packetId == 1003)
+Vintagestory.GameContent/BlockEntityClayForm.cs-726-		{
+Vintagestory.GameContent/BlockEntityClayForm.cs-727-			selectedRecipe = null;
+Vintagestory.GameContent/BlockEntityClayForm.cs-728-			selectedRecipeId = -1;
+Vintagestory.GameContent/BlockEntityClayForm.cs-729-			CreateInitialWorkItem();
+Vintagestory.GameContent/BlockEntityClayForm.cs-730-			RegenMeshAndSelectionBoxes(0);
+Vintagestory.GameContent/BlockEntityClayForm.cs-731-		}
+Vintagestory.GameContent/BlockEntityClayForm.cs-732-		base.OnReceivedServerPacket(packetId, data);
+Vintagestory.GameContent/BlockEntityClayForm.cs-733-	}
+Vintagestory.GameContent/BlockEntityClayForm.cs-734-
+Vintagestory.GameContent/BlockEntityClayForm.cs-735-	private bool CanDoRecipe(IClientWorldAccessor world, IRecipeBase recipe, ItemStack ingredient)
+Vintagestory.GameContent/BlockEntityClayForm.cs-736-	{
+Vintagestory.GameContent/BlockEntityClayForm.cs-737-		DummySlot dummySlot = new DummySlot(ingredient);
+Vintagestory.GameContent/BlockEntityClayForm.cs-738-		return world.Api.Event.TriggerMatchesRecipe(world.Player, recipe, new ItemSlot[1] { dummySlot });
+Vintagestory.GameContent/BlockEntityClayForm.cs-739-	}
+Vintagestory.GameContent/BlockEntityClayForm.cs-740-
+Vintagestory.GameContent/BlockEntityClayForm.cs-741-	public void OpenDialog(IClientWorldAccessor world, BlockPos pos, ItemStack ingredient)
+Vintagestory.GameContent/BlockEntityClayForm.cs-742-	{
+Vintagestory.GameContent/BlockEntityClayForm.cs-743-		if (dlg != null && dlg.IsOpened())
+--
+Vintagestory.GameContent/GuiElementFlatList.cs-81-		double num2 = insideBounds.absY;
+Vintagestory.GameContent/GuiElementFlatList.cs-82-		foreach (IFlatListItem element in Elements)
+Vintagestory.GameContent/GuiElementFlatList.cs-83-		{
+Vintagestory.GameContent/GuiElementFlatList.cs-84-			if (!element.Visible)
+Vintagestory.GameContent/GuiElementFlatList.cs-85-			{
+Vintagestory.GameContent/GuiElementFlatList.cs-86-				num++;
+Vintagestory.GameContent/GuiElementFlatList.cs-87-				continue;
+Vintagestory.GameContent/GuiElementFlatList.cs-88-			}
+Vintagestory.GameContent/GuiElementFlatList.cs-89-			float num3 = (float)(5.0 + Bounds.absY + num2);
+Vintagestory.GameContent/GuiElementFlatList.cs-90-			double num4 = GuiElement.scaled(unscalledYPad);
+Vintagestory.GameContent/GuiElementFlatList.cs-91-			if ((double)mouseX > Bounds.absX && (double)mouseX <= Bounds.absX + Bounds.InnerWidth && (double)mouseY >= (double)num3 - num4 && (double)mouseY <= (double)num3 + GuiElement.scaled(unscaledCellHeight) - num4)
+Vintagestory.GameContent/GuiElementFlatList.cs-92-			{
+Vintagestory.GameContent/GuiElementFlatList.cs:93:				api.World.FrameProfiler.Enter("guielement-clicked");
+Vintagestory.GameContent/GuiElementFlatList.cs-94-				try
+Vintagestory.GameContent/GuiElementFlatList.cs-95-				{
+Vintagestory.GameContent/GuiElementFlatList.cs-96-					api.Gui.PlaySound("menubutton_press");
+Vintagestory.GameContent/GuiElementFlatList.cs-97-					onLeftClick?.Invoke(num);
+Vintagestory.GameContent/GuiElementFlatList.cs-98-					args.Handled = true;
+Vintagestory.GameContent/GuiElementFlatList.cs-99-					break;
+Vintagestory.GameContent/GuiElementFlatList.cs-100-				}
+Vintagestory.GameContent/GuiElementFlatList.cs-101-				finally
+Vintagestory.GameContent/GuiElementFlatList.cs-102-				{
+Vintagestory.GameContent/GuiElementFlatList.cs-103-					api.World.FrameProfiler.Leave();
+Vintagestory.GameContent/GuiElementFlatList.cs-104-				}
+Vintagestory.GameContent/GuiElementFlatList.cs-105-			}
+Vintagestory.GameContent/GuiElementFlatList.cs-106-			num2 += GuiElement.scaled(unscaledCellHeight + unscaledCellSpacing);
+Vintagestory.GameContent/GuiElementFlatList.cs-107-			num++;
+Vintagestory.GameContent/GuiElementFlatList.cs-108-		}
+Vintagestory.GameContent/GuiElementFlatList.cs-109-	}
+Vintagestory.GameContent/GuiElementFlatList.cs-110-
+Vintagestory.GameContent/GuiElementFlatList.cs-111-	public override void OnMouseMove(ICoreClientAPI api, MouseEvent args)
+Vintagestory.GameContent/GuiElementFlatList.cs-112-	{
+Vintagestory.GameContent/GuiElementFlatList.cs-113-		if (!Bounds.ParentBounds.PointInside(args.X, args.Y))
+Vintagestory.GameContent/GuiElementFlatList.cs-114-		{
+Vintagestory.GameContent/GuiElementFlatList.cs-115-			return;
+Vintagestory.GameContent/GuiElementFlatList.cs-116-		}
+Vintagestory.GameContent/GuiElementFlatList.cs-117-		EachVisibleElem((IFlatListItem elem) =>
+Vintagestory.GameContent/GuiElementFlatList.cs-118-		{

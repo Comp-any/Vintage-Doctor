@@ -1,0 +1,1500 @@
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-55-				value.RemainingResistance += 0.1f * value.Block.GetResistance(game.BlockAccessor, value.Position);
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-56-				game.eventManager?.TriggerBlockUnbreaking(value);
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-57-				if (value.RemainingResistance >= value.Block.GetResistance(game.BlockAccessor, value.Position))
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-58-				{
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-59-					list.Add(damagedBlock.Key);
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-60-				}
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-61-			}
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-62-		}
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-63-		foreach (BlockPos item in list)
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-64-		{
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-65-			game.damagedBlocks.Remove(item);
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-66-		}
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs:67:		ScreenManager.FrameProfiler.Mark("miw-1s");
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-68-	}
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-69-
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-70-	public void OnFinalizeFrame(float dt)
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-71-	{
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-72-		if (game.Player.WorldData.CurrentGameMode != EnumGameMode.Spectator)
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-73-		{
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs:74:			ScreenManager.FrameProfiler.Mark("finaframe-beg");
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-75-			if (game.MouseGrabbed || game.mouseWorldInteractAnyway || game.player.worlddata.AreaSelectionMode)
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-76-			{
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-77-				UpdatePicking(dt);
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-78-			}
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-79-			prevMouseLeft = game.InWorldMouseState.Left;
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-80-			prevMouseRight = game.InWorldMouseState.Right;
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs:81:			ScreenManager.FrameProfiler.Mark("finaframe-miw");
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-82-		}
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-83-	}
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-84-
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-85-	public override void OnMouseUp(MouseEvent args)
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-86-	{
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-87-		if (game.Player.WorldData.CurrentGameMode != EnumGameMode.Spectator)
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-88-		{
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-89-			if (game.player.worlddata.CurrentGameMode == EnumGameMode.Creative)
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-90-			{
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-91-				lastbuildMilliseconds = 0L;
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-92-			}
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-93-			StopBlockBreakSurvival();
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-94-		}
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-95-	}
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-96-
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-97-	private void OnGameTick(float dt)
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-98-	{
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-99-		ItemStack itemStack = game.player.inventoryMgr?.ActiveHotbarSlot?.Itemstack;
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-100-		if (game.EntityPlayer.Controls.HandUse == EnumHandInteract.None)
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-101-		{
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-102-			itemStack?.Collectible.OnHeldIdle(game.player.inventoryMgr.ActiveHotbarSlot, game.EntityPlayer);
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-103-		}
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-104-		if (!game.EntityPlayer.LeftHandItemSlot.Empty)
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-105-		{
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-106-			game.EntityPlayer.LeftHandItemSlot.Itemstack.Collectible.OnHeldIdle(game.EntityPlayer.LeftHandItemSlot, game.EntityPlayer);
+--
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-125-				}
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-126-			}
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-127-		}
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-128-		else
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-129-		{
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-130-			accum += dt;
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-131-			if ((double)accum > 0.25)
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-132-			{
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-133-				accum = 0f;
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-134-				game.SendHandInteraction(2, game.BlockSelection, game.EntitySelection, game.EntityPlayer.Controls.HandUse, EnumHandInteractNw.StepHeldItemUse, firstEvent: false);
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-135-			}
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-136-			HandleHandInteraction(dt);
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs:137:			ScreenManager.FrameProfiler.Mark("miw-handlehandinteraction");
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-138-		}
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-139-	}
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-140-
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-141-	private void OnRenderOrtho(float dt)
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-142-	{
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-143-		if (game.player.inventoryMgr.ActiveHotbarSlot.Itemstack != null)
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-144-		{
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-145-			game.player.inventoryMgr.ActiveHotbarSlot.Itemstack.Collectible.OnHeldRenderOrtho(game.player.inventoryMgr.ActiveHotbarSlot, game.player);
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-146-		}
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-147-	}
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-148-
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-149-	private void OnRenderOit(float dt)
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-150-	{
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-151-		if (game.player.inventoryMgr.ActiveHotbarSlot.Itemstack != null)
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-152-		{
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-153-			game.player.inventoryMgr.ActiveHotbarSlot.Itemstack.Collectible.OnHeldRenderOit(game.player.inventoryMgr.ActiveHotbarSlot, game.player);
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-154-		}
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-155-	}
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-156-
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-157-	private void OnRenderOpaque(float dt)
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-158-	{
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-159-		if (game.player.inventoryMgr.ActiveHotbarSlot.Itemstack != null)
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-160-		{
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-161-			game.player.inventoryMgr.ActiveHotbarSlot.Itemstack.Collectible.OnHeldRenderOpaque(game.player.inventoryMgr.ActiveHotbarSlot, game.player);
+Vintagestory.Client.NoObf/SystemMouseInWorldInteractions.cs-162-		}
+--
+Vintagestory.Client.NoObf/GuiManager.cs-207-		string text = null;
+Vintagestory.Client.NoObf/GuiManager.cs-208-		foreach (GuiDialog item in Enumerable.Reverse(game.OpenedGuis))
+Vintagestory.Client.NoObf/GuiManager.cs-209-		{
+Vintagestory.Client.NoObf/GuiManager.cs-210-			if (item.ShouldReceiveRenderEvents())
+Vintagestory.Client.NoObf/GuiManager.cs-211-			{
+Vintagestory.Client.NoObf/GuiManager.cs-212-				item.OnRenderGUI(deltaTime);
+Vintagestory.Client.NoObf/GuiManager.cs-213-				game.Platform.CheckGlError(item.DebugName);
+Vintagestory.Client.NoObf/GuiManager.cs-214-				game.GlTranslate(0.0, 0.0, item.ZSize);
+Vintagestory.Client.NoObf/GuiManager.cs-215-				if (item.MouseOverCursor != null)
+Vintagestory.Client.NoObf/GuiManager.cs-216-				{
+Vintagestory.Client.NoObf/GuiManager.cs-217-					text = item.MouseOverCursor;
+Vintagestory.Client.NoObf/GuiManager.cs-218-				}
+Vintagestory.Client.NoObf/GuiManager.cs:219:				ScreenManager.FrameProfiler.Mark("rendGui", item.DebugName);
+Vintagestory.Client.NoObf/GuiManager.cs-220-			}
+Vintagestory.Client.NoObf/GuiManager.cs-221-		}
+Vintagestory.Client.NoObf/GuiManager.cs-222-		game.Platform.UseMouseCursor((text != null) ? text : "normal");
+Vintagestory.Client.NoObf/GuiManager.cs-223-		game.GlPopMatrix();
+Vintagestory.Client.NoObf/GuiManager.cs:224:		ScreenManager.FrameProfiler.Mark("rendGuiDone");
+Vintagestory.Client.NoObf/GuiManager.cs-225-	}
+Vintagestory.Client.NoObf/GuiManager.cs-226-
+Vintagestory.Client.NoObf/GuiManager.cs-227-	public void OnFinalizeFrame(float dt)
+Vintagestory.Client.NoObf/GuiManager.cs-228-	{
+Vintagestory.Client.NoObf/GuiManager.cs-229-		foreach (GuiDialog item in game.LoadedGuis.ToList())
+Vintagestory.Client.NoObf/GuiManager.cs-230-		{
+Vintagestory.Client.NoObf/GuiManager.cs-231-			item.OnFinalizeFrame(dt);
+Vintagestory.Client.NoObf/GuiManager.cs:232:			ScreenManager.FrameProfiler.Mark("gdm-finFr-", item.DebugName);
+Vintagestory.Client.NoObf/GuiManager.cs-233-		}
+Vintagestory.Client.NoObf/GuiManager.cs-234-	}
+Vintagestory.Client.NoObf/GuiManager.cs-235-
+Vintagestory.Client.NoObf/GuiManager.cs-236-	public override void OnKeyDown(KeyEvent args)
+Vintagestory.Client.NoObf/GuiManager.cs-237-	{
+Vintagestory.Client.NoObf/GuiManager.cs-238-		int keyCode = args.KeyCode;
+Vintagestory.Client.NoObf/GuiManager.cs-239-		List<GuiDialog> list = game.OpenedGuis.ToList();
+Vintagestory.Client.NoObf/GuiManager.cs-240-		foreach (GuiDialog item in list)
+Vintagestory.Client.NoObf/GuiManager.cs-241-		{
+Vintagestory.Client.NoObf/GuiManager.cs-242-			if (item.CaptureAllInputs())
+Vintagestory.Client.NoObf/GuiManager.cs-243-			{
+Vintagestory.Client.NoObf/GuiManager.cs-244-				item.OnKeyDown(args);
+Vintagestory.Client.NoObf/GuiManager.cs-245-				if (args.Handled)
+Vintagestory.Client.NoObf/GuiManager.cs-246-				{
+Vintagestory.Client.NoObf/GuiManager.cs-247-					return;
+Vintagestory.Client.NoObf/GuiManager.cs-248-				}
+Vintagestory.Client.NoObf/GuiManager.cs-249-			}
+Vintagestory.Client.NoObf/GuiManager.cs-250-		}
+Vintagestory.Client.NoObf/GuiManager.cs-251-		if (keyCode == 50 && game.DialogsOpened > 0)
+Vintagestory.Client.NoObf/GuiManager.cs-252-		{
+Vintagestory.Client.NoObf/GuiManager.cs-253-			OnEscapePressed();
+Vintagestory.Client.NoObf/GuiManager.cs-254-			args.Handled = true;
+Vintagestory.Client.NoObf/GuiManager.cs-255-			return;
+Vintagestory.Client.NoObf/GuiManager.cs-256-		}
+Vintagestory.Client.NoObf/GuiManager.cs-257-		foreach (GuiDialog item2 in list)
+--
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-466-		}
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-467-		ScreenManager.FrameProfiler.Begin(null);
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-468-		if (ClientSettings.VsyncMode != 1 && MaxFps > 10f && MaxFps < 241f)
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-469-		{
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-470-			int num = (int)(1000f / MaxFps - 1000f * (float)frameStopWatch.ElapsedTicks / (float)Stopwatch.Frequency);
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-471-			if (num > 0)
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-472-			{
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-473-				Thread.Sleep(num);
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-474-			}
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-475-		}
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-476-		float dt = (float)frameStopWatch.ElapsedTicks / (float)Stopwatch.Frequency;
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-477-		frameStopWatch.Restart();
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs:478:		ScreenManager.FrameProfiler.Mark("sleep");
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-479-		UpdateMousePosition();
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-480-		RenderBloom = ClientSettings.Bloom && DoPostProcessingEffects;
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-481-		RenderGodRays = ClientSettings.GodRayQuality > 0 && DoPostProcessingEffects;
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-482-		RenderFXAA = ClientSettings.FXAA && DoPostProcessingEffects;
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-483-		RenderSSAO = ClientSettings.SSAOQuality > 0 && DoPostProcessingEffects;
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-484-		SetupSSAO = ClientSettings.SSAOQuality > 0;
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-485-		ShadowMapQuality = ClientSettings.ShadowMapQuality;
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-486-		ShaderProgramBase.shadowmapQuality = ShadowMapQuality;
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-487-		frameHandler.OnNewFrame(dt);
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-488-		window.SwapBuffers();
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-489-		ScreenManager.FrameProfiler.End();
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-490-	}
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-491-
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-492-	public string GetGraphicsCardRenderer()
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-493-	{
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-494-		return GL.GetString(StringName.Renderer);
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-495-	}
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-496-
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-497-	public void LogAndTestHardwareInfosStage1()
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-498-	{
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-499-		logger.Notification("Process path: {0}", GamePaths.RemoveUsername(Environment.ProcessPath));
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-500-		logger.Notification("Operating System: " + RuntimeEnv.GetOsString());
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-501-		logger.Notification("CPU Cores: {0}", Environment.ProcessorCount);
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-502-		logger.Notification("CPU: {0}", XPlatInterface.GetCpuInfo());
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-503-		logger.Notification("Available RAM: {0} MB", XPlatInterface.GetRamCapacity() / 1024);
+--
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-1573-			GL.ClearBuffer(ClearBuffer.Color, 2, new float[4]);
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-1574-			break;
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-1575-		}
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-1576-	}
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-1577-
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-1578-	public override void LoadFrameBuffer(EnumFrameBuffer framebuffer)
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-1579-	{
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-1580-		switch (framebuffer)
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-1581-		{
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-1582-		case EnumFrameBuffer.Transparent:
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-1583-		{
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-1584-			CurrentFrameBufferKeepVw = frameBuffers[1];
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs:1585:			ScreenManager.FrameProfiler.Mark("rendTransp-fbbound");
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-1586-			GlDisableCullFace();
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-1587-			GlDepthMask(flag: false);
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-1588-			GlEnableDepthTest();
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs:1589:			ScreenManager.FrameProfiler.Mark("rendTransp-dbset");
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-1590-			DrawBuffersEnum[] bufs = new DrawBuffersEnum[3]
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-1591-			{
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-1592-				DrawBuffersEnum.ColorAttachment0,
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-1593-				DrawBuffersEnum.ColorAttachment1,
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-1594-				DrawBuffersEnum.ColorAttachment2
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-1595-			};
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-1596-			GL.DrawBuffers(3, bufs);
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-1597-			GL.Enable(EnableCap.Blend);
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-1598-			GL.BlendEquation(0, BlendEquationMode.FuncAdd);
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-1599-			GL.BlendFunc(0, BlendingFactorSrc.One, BlendingFactorDest.One);
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-1600-			GL.BlendEquation(1, BlendEquationMode.FuncAdd);
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-1601-			GL.BlendFunc(1, BlendingFactorSrc.Zero, BlendingFactorDest.OneMinusSrcColor);
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-1602-			GL.BlendEquation(2, BlendEquationMode.FuncAdd);
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-1603-			GL.BlendFunc(2, BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-1604-			break;
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-1605-		}
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-1606-		case EnumFrameBuffer.Default:
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-1607-			CurrentFrameBufferKeepVw = null;
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-1608-			GL.Viewport(0, 0, window.ClientSize.X, window.ClientSize.Y);
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-1609-			GL.DrawBuffer(DrawBufferMode.Back);
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-1610-			break;
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-1611-		case EnumFrameBuffer.BlurHorizontalMedRes:
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-1612-		case EnumFrameBuffer.BlurVerticalMedRes:
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-1613-			GL.Viewport(0, 0, (int)(ssaaLevel * (float)window.ClientSize.X / 2f), (int)(ssaaLevel * (float)window.ClientSize.Y / 2f));
+Vintagestory.Client.NoObf/ClientPlatformWindows.cs-1614-			CurrentFrameBufferKeepVw = frameBuffers[(int)framebuffer];
+--
+Vintagestory.Client.NoObf/ClientMain.cs-1022-			return;
+Vintagestory.Client.NoObf/ClientMain.cs-1023-		}
+Vintagestory.Client.NoObf/ClientMain.cs-1024-		if (DeltaTimeLimiter > 0f)
+Vintagestory.Client.NoObf/ClientMain.cs-1025-		{
+Vintagestory.Client.NoObf/ClientMain.cs-1026-			deltaTime = DeltaTimeLimiter;
+Vintagestory.Client.NoObf/ClientMain.cs-1027-		}
+Vintagestory.Client.NoObf/ClientMain.cs-1028-		MainRenderLoop(deltaTime);
+Vintagestory.Client.NoObf/ClientMain.cs-1029-		ExecuteMainThreadTasks(deltaTime);
+Vintagestory.Client.NoObf/ClientMain.cs-1030-	}
+Vintagestory.Client.NoObf/ClientMain.cs-1031-
+Vintagestory.Client.NoObf/ClientMain.cs-1032-	public void ExecuteMainThreadTasks(float deltaTime)
+Vintagestory.Client.NoObf/ClientMain.cs-1033-	{
+Vintagestory.Client.NoObf/ClientMain.cs:1034:		ScreenManager.FrameProfiler.Mark("beginMTT");
+Vintagestory.Client.NoObf/ClientMain.cs-1035-		if (GameLaunchTasks.Count > 0)
+Vintagestory.Client.NoObf/ClientMain.cs-1036-		{
+Vintagestory.Client.NoObf/ClientMain.cs-1037-			GameLaunchTasks.Dequeue().Action();
+Vintagestory.Client.NoObf/ClientMain.cs-1038-		}
+Vintagestory.Client.NoObf/ClientMain.cs-1039-		else
+Vintagestory.Client.NoObf/ClientMain.cs-1040-		{
+Vintagestory.Client.NoObf/ClientMain.cs-1041-			if (SuspendMainThreadTasks)
+Vintagestory.Client.NoObf/ClientMain.cs-1042-			{
+Vintagestory.Client.NoObf/ClientMain.cs-1043-				return;
+Vintagestory.Client.NoObf/ClientMain.cs-1044-			}
+Vintagestory.Client.NoObf/ClientMain.cs-1045-			lock (MainThreadTasksLock)
+Vintagestory.Client.NoObf/ClientMain.cs-1046-			{
+Vintagestory.Client.NoObf/ClientMain.cs-1047-				while (MainThreadTasks.Count > 0)
+Vintagestory.Client.NoObf/ClientMain.cs-1048-				{
+Vintagestory.Client.NoObf/ClientMain.cs-1049-					reversedQueue.Enqueue(MainThreadTasks.Dequeue());
+Vintagestory.Client.NoObf/ClientMain.cs-1050-				}
+Vintagestory.Client.NoObf/ClientMain.cs-1051-			}
+Vintagestory.Client.NoObf/ClientMain.cs-1052-			while (reversedQueue.Count > 0)
+Vintagestory.Client.NoObf/ClientMain.cs-1053-			{
+Vintagestory.Client.NoObf/ClientMain.cs-1054-				ClientTask clientTask = reversedQueue.Dequeue();
+Vintagestory.Client.NoObf/ClientMain.cs-1055-				clientTask.Action();
+Vintagestory.Client.NoObf/ClientMain.cs-1056-				if (extendedDebugInfo)
+Vintagestory.Client.NoObf/ClientMain.cs-1057-				{
+Vintagestory.Client.NoObf/ClientMain.cs-1058-					ScreenManager.FrameProfiler.Mark(clientTask.Code);
+Vintagestory.Client.NoObf/ClientMain.cs-1059-				}
+Vintagestory.Client.NoObf/ClientMain.cs-1060-				if (SuspendMainThreadTasks && reversedQueue.Count > 0)
+Vintagestory.Client.NoObf/ClientMain.cs-1061-				{
+Vintagestory.Client.NoObf/ClientMain.cs-1062-					requeueTasks();
+Vintagestory.Client.NoObf/ClientMain.cs-1063-				}
+Vintagestory.Client.NoObf/ClientMain.cs-1064-			}
+Vintagestory.Client.NoObf/ClientMain.cs:1065:			ScreenManager.FrameProfiler.Mark("doneMTT");
+Vintagestory.Client.NoObf/ClientMain.cs-1066-		}
+Vintagestory.Client.NoObf/ClientMain.cs-1067-	}
+Vintagestory.Client.NoObf/ClientMain.cs-1068-
+Vintagestory.Client.NoObf/ClientMain.cs-1069-	private void requeueTasks()
+Vintagestory.Client.NoObf/ClientMain.cs-1070-	{
+Vintagestory.Client.NoObf/ClientMain.cs-1071-		lock (MainThreadTasksLock)
+Vintagestory.Client.NoObf/ClientMain.cs-1072-		{
+Vintagestory.Client.NoObf/ClientMain.cs-1073-			while (MainThreadTasks.Count > 0)
+Vintagestory.Client.NoObf/ClientMain.cs-1074-			{
+Vintagestory.Client.NoObf/ClientMain.cs-1075-				holdingQueue.Enqueue(MainThreadTasks.Dequeue());
+Vintagestory.Client.NoObf/ClientMain.cs-1076-			}
+Vintagestory.Client.NoObf/ClientMain.cs-1077-			while (reversedQueue.Count > 0)
+Vintagestory.Client.NoObf/ClientMain.cs-1078-			{
+Vintagestory.Client.NoObf/ClientMain.cs-1079-				MainThreadTasks.Enqueue(reversedQueue.Dequeue());
+Vintagestory.Client.NoObf/ClientMain.cs-1080-			}
+Vintagestory.Client.NoObf/ClientMain.cs-1081-			while (holdingQueue.Count > 0)
+Vintagestory.Client.NoObf/ClientMain.cs-1082-			{
+Vintagestory.Client.NoObf/ClientMain.cs-1083-				MainThreadTasks.Enqueue(holdingQueue.Dequeue());
+Vintagestory.Client.NoObf/ClientMain.cs-1084-			}
+Vintagestory.Client.NoObf/ClientMain.cs-1085-		}
+Vintagestory.Client.NoObf/ClientMain.cs-1086-	}
+Vintagestory.Client.NoObf/ClientMain.cs-1087-
+Vintagestory.Client.NoObf/ClientMain.cs-1088-	public void TriggerRenderStage(EnumRenderStage stage, float dt)
+Vintagestory.Client.NoObf/ClientMain.cs-1089-	{
+Vintagestory.Client.NoObf/ClientMain.cs:1090:		ScreenManager.FrameProfiler.Mark("beginrenderstage-", stage);
+Vintagestory.Client.NoObf/ClientMain.cs-1091-		currentRenderStage = stage;
+Vintagestory.Client.NoObf/ClientMain.cs-1092-		eventManager?.TriggerRenderStage(stage, dt);
+Vintagestory.Client.NoObf/ClientMain.cs-1093-		Platform.CheckGlError("After render stage " + stage);
+Vintagestory.Client.NoObf/ClientMain.cs-1094-	}
+Vintagestory.Client.NoObf/ClientMain.cs-1095-
+Vintagestory.Client.NoObf/ClientMain.cs-1096-	public void MainRenderLoop(float dt)
+Vintagestory.Client.NoObf/ClientMain.cs-1097-	{
+Vintagestory.Client.NoObf/ClientMain.cs:1098:		ScreenManager.FrameProfiler.Mark("mrl");
+Vintagestory.Client.NoObf/ClientMain.cs-1099-		if ((timelapsedCurrent += timelapse) > timelapseEnd)
+Vintagestory.Client.NoObf/ClientMain.cs-1100-		{
+Vintagestory.Client.NoObf/ClientMain.cs-1101-			timelapse = 0f;
+Vintagestory.Client.NoObf/ClientMain.cs-1102-			timelapsedCurrent = 0f;
+Vintagestory.Client.NoObf/ClientMain.cs-1103-			timelapseEnd = float.MaxValue;
+Vintagestory.Client.NoObf/ClientMain.cs-1104-			ShouldRender2DOverlays = true;
+Vintagestory.Client.NoObf/ClientMain.cs-1105-		}
+Vintagestory.Client.NoObf/ClientMain.cs-1106-		GameWorldCalendar.Timelapse = timelapsedCurrent;
+Vintagestory.Client.NoObf/ClientMain.cs-1107-		UpdateResize();
+Vintagestory.Client.NoObf/ClientMain.cs-1108-		UpdateFreeMouse();
+Vintagestory.Client.NoObf/ClientMain.cs-1109-		UpdateCameraYawPitch(dt);
+Vintagestory.Client.NoObf/ClientMain.cs-1110-		if (EntityPlayer?.Pos != null)
+Vintagestory.Client.NoObf/ClientMain.cs-1111-		{
+Vintagestory.Client.NoObf/ClientMain.cs-1112-			shUniforms.FlagFogDensity = AmbientManager.BlendedFlatFogDensity;
+Vintagestory.Client.NoObf/ClientMain.cs-1113-			shUniforms.FlatFogStartYPos = AmbientManager.BlendedFlatFogYPosForShader;
+Vintagestory.Client.NoObf/ClientMain.cs-1114-		}
+Vintagestory.Client.NoObf/ClientMain.cs-1115-		if (!IsPaused)
+Vintagestory.Client.NoObf/ClientMain.cs-1116-		{
+Vintagestory.Client.NoObf/ClientMain.cs-1117-			eventManager?.TriggerGameTick(InWorldEllapsedMs, this);
+Vintagestory.Client.NoObf/ClientMain.cs-1118-		}
+Vintagestory.Client.NoObf/ClientMain.cs:1119:		ScreenManager.FrameProfiler.Mark("gametick");
+Vintagestory.Client.NoObf/ClientMain.cs-1120-		if (LagSimulation)
+Vintagestory.Client.NoObf/ClientMain.cs-1121-		{
+Vintagestory.Client.NoObf/ClientMain.cs-1122-			Platform.ThreadSpinWait(10000000);
+Vintagestory.Client.NoObf/ClientMain.cs-1123-		}
+Vintagestory.Client.NoObf/ClientMain.cs-1124-		shUniforms.Update(dt, api);
+Vintagestory.Client.NoObf/ClientMain.cs-1125-		shUniforms.ZNear = MainCamera.ZNear;
+Vintagestory.Client.NoObf/ClientMain.cs-1126-		shUniforms.ZFar = MainCamera.ZFar;
+Vintagestory.Client.NoObf/ClientMain.cs-1127-		TriggerRenderStage(EnumRenderStage.Before, dt);
+Vintagestory.Client.NoObf/ClientMain.cs-1128-		Platform.GlEnableDepthTest();
+Vintagestory.Client.NoObf/ClientMain.cs-1129-		Platform.GlDepthMask(flag: true);
+Vintagestory.Client.NoObf/ClientMain.cs:1130:		ScreenManager.FrameProfiler.Mark("rendOpaque-12before");
+Vintagestory.Client.NoObf/ClientMain.cs-1131-		if (AmbientManager.ShadowQuality > 0 && (double)AmbientManager.DropShadowIntensity > 0.01)
+Vintagestory.Client.NoObf/ClientMain.cs-1132-		{
+Vintagestory.Client.NoObf/ClientMain.cs-1133-			TriggerRenderStage(EnumRenderStage.ShadowFar, dt);
+Vintagestory.Client.NoObf/ClientMain.cs-1134-			TriggerRenderStage(EnumRenderStage.ShadowFarDone, dt);
+Vintagestory.Client.NoObf/ClientMain.cs-1135-			if (AmbientManager.ShadowQuality > 1)
+Vintagestory.Client.NoObf/ClientMain.cs-1136-			{
+Vintagestory.Client.NoObf/ClientMain.cs-1137-				TriggerRenderStage(EnumRenderStage.ShadowNear, dt);
+Vintagestory.Client.NoObf/ClientMain.cs-1138-				TriggerRenderStage(EnumRenderStage.ShadowNearDone, dt);
+Vintagestory.Client.NoObf/ClientMain.cs-1139-			}
+Vintagestory.Client.NoObf/ClientMain.cs-1140-		}
+Vintagestory.Client.NoObf/ClientMain.cs:1141:		ScreenManager.FrameProfiler.Mark("rendOpaque-3shadows");
+Vintagestory.Client.NoObf/ClientMain.cs-1142-		GlMatrixModeModelView();
+Vintagestory.Client.NoObf/ClientMain.cs-1143-		GlLoadMatrix(MainCamera.CameraMatrix);
+Vintagestory.Client.NoObf/ClientMain.cs-1144-		double[] top = api.Render.PMatrix.Top;
+Vintagestory.Client.NoObf/ClientMain.cs-1145-		double[] top2 = api.Render.MvMatrix.Top;
+Vintagestory.Client.NoObf/ClientMain.cs-1146-		for (int i = 0; i < 16; i++)
+Vintagestory.Client.NoObf/ClientMain.cs-1147-		{
+Vintagestory.Client.NoObf/ClientMain.cs-1148-			PerspectiveProjectionMat[i] = top[i];
+Vintagestory.Client.NoObf/ClientMain.cs-1149-			PerspectiveViewMat[i] = top2[i];
+Vintagestory.Client.NoObf/ClientMain.cs-1150-		}
+Vintagestory.Client.NoObf/ClientMain.cs-1151-		frustumCuller.CalcFrustumEquations(player.Entity.Pos.AsBlockPos, top, top2);
+Vintagestory.Client.NoObf/ClientMain.cs-1152-		float num = (float)Math.Min(640, ClientSettings.ViewDistance) * ClientSettings.LodBias;
+Vintagestory.Client.NoObf/ClientMain.cs-1153-		float num2 = (float)Math.Min(640, ClientSettings.ViewDistance) * ClientSettings.LodBiasFar;
+Vintagestory.Client.NoObf/ClientMain.cs-1154-		if (ClientSettings.ViewDistance <= 64)
+Vintagestory.Client.NoObf/ClientMain.cs-1155-		{
+Vintagestory.Client.NoObf/ClientMain.cs-1156-			num2 = ClientSettings.ViewDistance;
+Vintagestory.Client.NoObf/ClientMain.cs-1157-		}
+Vintagestory.Client.NoObf/ClientMain.cs-1158-		frustumCuller.lod0BiasSq = num * num;
+Vintagestory.Client.NoObf/ClientMain.cs-1159-		frustumCuller.lod2BiasSq = num2 * num2;
+Vintagestory.Client.NoObf/ClientMain.cs:1160:		ScreenManager.FrameProfiler.Mark("rendOpaque-4setup");
+Vintagestory.Client.NoObf/ClientMain.cs-1161-		TriggerRenderStage(EnumRenderStage.Opaque, dt);
+Vintagestory.Client.NoObf/ClientMain.cs:1162:		ScreenManager.FrameProfiler.Mark("rendOpaque-4");
+Vintagestory.Client.NoObf/ClientMain.cs-1163-		if (doTransparentRenderPass)
+Vintagestory.Client.NoObf/ClientMain.cs-1164-		{
+Vintagestory.Client.NoObf/ClientMain.cs-1165-			ScreenManager.FrameProfiler.Enter("rendTransparent");
+Vintagestory.Client.NoObf/ClientMain.cs-1166-			Platform.LoadFrameBuffer(EnumFrameBuffer.Transparent);
+Vintagestory.Client.NoObf/ClientMain.cs:1167:			ScreenManager.FrameProfiler.Mark("rendTransp-fbloaded");
+Vintagestory.Client.NoObf/ClientMain.cs-1168-			Platform.ClearFrameBuffer(EnumFrameBuffer.Transparent);
+Vintagestory.Client.NoObf/ClientMain.cs:1169:			ScreenManager.FrameProfiler.Mark("rendTransp-bufscleared");
+Vintagestory.Client.NoObf/ClientMain.cs-1170-			TriggerRenderStage(EnumRenderStage.OIT, dt);
+Vintagestory.Client.NoObf/ClientMain.cs-1171-			Platform.UnloadFrameBuffer(EnumFrameBuffer.Transparent);
+Vintagestory.Client.NoObf/ClientMain.cs:1172:			ScreenManager.FrameProfiler.Mark("rendTranspDone");
+Vintagestory.Client.NoObf/ClientMain.cs-1173-			Platform.MergeTransparentRenderPass();
+Vintagestory.Client.NoObf/ClientMain.cs-1174-			ScreenManager.FrameProfiler.Leave();
+Vintagestory.Client.NoObf/ClientMain.cs-1175-		}
+Vintagestory.Client.NoObf/ClientMain.cs-1176-		Platform.GlDepthMask(flag: true);
+Vintagestory.Client.NoObf/ClientMain.cs-1177-		Platform.GlEnableDepthTest();
+Vintagestory.Client.NoObf/ClientMain.cs-1178-		Platform.GlCullFaceBack();
+Vintagestory.Client.NoObf/ClientMain.cs-1179-		Platform.GlEnableCullFace();
+Vintagestory.Client.NoObf/ClientMain.cs-1180-		TriggerRenderStage(EnumRenderStage.AfterOIT, dt);
+Vintagestory.Client.NoObf/ClientMain.cs-1181-	}
+Vintagestory.Client.NoObf/ClientMain.cs-1182-
+Vintagestory.Client.NoObf/ClientMain.cs-1183-	public void RenderAfterPostProcessing(float dt)
+Vintagestory.Client.NoObf/ClientMain.cs-1184-	{
+Vintagestory.Client.NoObf/ClientMain.cs-1185-		if (DeltaTimeLimiter > 0f)
+Vintagestory.Client.NoObf/ClientMain.cs-1186-		{
+Vintagestory.Client.NoObf/ClientMain.cs-1187-			dt = DeltaTimeLimiter;
+Vintagestory.Client.NoObf/ClientMain.cs-1188-		}
+Vintagestory.Client.NoObf/ClientMain.cs-1189-		TriggerRenderStage(EnumRenderStage.AfterPostProcessing, dt);
+Vintagestory.Client.NoObf/ClientMain.cs-1190-	}
+Vintagestory.Client.NoObf/ClientMain.cs-1191-
+Vintagestory.Client.NoObf/ClientMain.cs-1192-	public void RenderAfterFinalComposition(float dt)
+Vintagestory.Client.NoObf/ClientMain.cs-1193-	{
+Vintagestory.Client.NoObf/ClientMain.cs-1194-		if (DeltaTimeLimiter > 0f)
+Vintagestory.Client.NoObf/ClientMain.cs-1195-		{
+Vintagestory.Client.NoObf/ClientMain.cs-1196-			dt = DeltaTimeLimiter;
+Vintagestory.Client.NoObf/ClientMain.cs-1197-		}
+--
+Vintagestory.Client.NoObf/ClientMain.cs-1214-		if (DeltaTimeLimiter > 0f)
+Vintagestory.Client.NoObf/ClientMain.cs-1215-		{
+Vintagestory.Client.NoObf/ClientMain.cs-1216-			dt = DeltaTimeLimiter;
+Vintagestory.Client.NoObf/ClientMain.cs-1217-		}
+Vintagestory.Client.NoObf/ClientMain.cs-1218-		if (ShouldRender2DOverlays)
+Vintagestory.Client.NoObf/ClientMain.cs-1219-		{
+Vintagestory.Client.NoObf/ClientMain.cs-1220-			guiShaderProg = ShaderPrograms.Gui;
+Vintagestory.Client.NoObf/ClientMain.cs-1221-			guiShaderProg.Use();
+Vintagestory.Client.NoObf/ClientMain.cs-1222-			OrthoMode(Platform.WindowSize.Width, Platform.WindowSize.Height);
+Vintagestory.Client.NoObf/ClientMain.cs-1223-			TriggerRenderStage(EnumRenderStage.Ortho, dt);
+Vintagestory.Client.NoObf/ClientMain.cs-1224-			guiShaderProg.Stop();
+Vintagestory.Client.NoObf/ClientMain.cs-1225-		}
+Vintagestory.Client.NoObf/ClientMain.cs:1226:		ScreenManager.FrameProfiler.Mark("rendOrthoDone");
+Vintagestory.Client.NoObf/ClientMain.cs-1227-		PerspectiveMode();
+Vintagestory.Client.NoObf/ClientMain.cs-1228-		Platform.GlDepthFunc(EnumDepthFunction.Less);
+Vintagestory.Client.NoObf/ClientMain.cs-1229-		TriggerRenderStage(EnumRenderStage.Done, dt);
+Vintagestory.Client.NoObf/ClientMain.cs:1230:		ScreenManager.FrameProfiler.Mark("finfr");
+Vintagestory.Client.NoObf/ClientMain.cs-1231-		tickSummary = ScreenManager.FrameProfiler.summary;
+Vintagestory.Client.NoObf/ClientMain.cs-1232-	}
+Vintagestory.Client.NoObf/ClientMain.cs-1233-
+Vintagestory.Client.NoObf/ClientMain.cs-1234-	public void Render2DBitmapFile(AssetLocation filename, float x, float y, float w, float h)
+Vintagestory.Client.NoObf/ClientMain.cs-1235-	{
+Vintagestory.Client.NoObf/ClientMain.cs-1236-		if (tmpTex == null)
+Vintagestory.Client.NoObf/ClientMain.cs-1237-		{
+Vintagestory.Client.NoObf/ClientMain.cs-1238-			tmpTex = new LoadedTexture(api);
+Vintagestory.Client.NoObf/ClientMain.cs-1239-		}
+Vintagestory.Client.NoObf/ClientMain.cs-1240-		GetOrLoadCachedTexture(filename, ref tmpTex);
+Vintagestory.Client.NoObf/ClientMain.cs-1241-		Render2DTexture(tmpTex.TextureId, x, y, w, h);
+Vintagestory.Client.NoObf/ClientMain.cs-1242-	}
+Vintagestory.Client.NoObf/ClientMain.cs-1243-
+Vintagestory.Client.NoObf/ClientMain.cs-1244-	public void Render2DLoadedTexture(LoadedTexture texture, float posX, float posY, float z = 50f, Vec4f color = null)
+Vintagestory.Client.NoObf/ClientMain.cs-1245-	{
+Vintagestory.Client.NoObf/ClientMain.cs-1246-		Render2DTexture(texture.TextureId, posX, posY, texture.Width, texture.Height, z, color);
+Vintagestory.Client.NoObf/ClientMain.cs-1247-	}
+Vintagestory.Client.NoObf/ClientMain.cs-1248-
+Vintagestory.Client.NoObf/ClientMain.cs-1249-	public void RenderTextureIntoTexture(LoadedTexture fromTexture, LoadedTexture intoTexture, float x1, float y1)
+Vintagestory.Client.NoObf/ClientMain.cs-1250-	{
+Vintagestory.Client.NoObf/ClientMain.cs-1251-		RenderTextureIntoTexture(fromTexture, 0f, 0f, fromTexture.Width, fromTexture.Height, intoTexture, x1, y1);
+Vintagestory.Client.NoObf/ClientMain.cs-1252-	}
+Vintagestory.Client.NoObf/ClientMain.cs-1253-
+Vintagestory.Client.NoObf/ClientMain.cs-1254-	public FrameBufferRef CreateFrameBuffer(FramebufferAttrs fbattributes)
+Vintagestory.Client.NoObf/ClientMain.cs-1255-	{
+--
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-219-			if (!particleBase.Alive)
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-220-			{
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-221-				ParticleBase next = particleBase.Next;
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-222-				ParticlesPool.Kill(particleBase);
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-223-				particleBase = next;
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-224-			}
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-225-			else
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-226-			{
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-227-				particleBase.UpdateBuffers(updateBuffer, cameraPos, ref posPosition, ref rgbaPosition, ref flagPosition);
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-228-				particleBase = particleBase.Next;
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-229-			}
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-230-		}
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs:231:		((IWorldAccessor)game).FrameProfiler.Mark("particles-tick");
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-232-		updateBuffer.CustomFloats.Count = ParticlesPool.AliveCount * 4;
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-233-		updateBuffer.CustomBytes.Count = ParticlesPool.AliveCount * 12;
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-234-		updateBuffer.VerticesCount = ParticlesPool.AliveCount;
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-235-		QuantityAlive = ParticlesPool.AliveCount;
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-236-		UpdateDebugScreen();
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-237-		game.Platform.UpdateMesh(particleModelRef, updateBuffer);
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs:238:		((IWorldAccessor)game).FrameProfiler.Mark("particles-updatemesh");
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-239-	}
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-240-
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-241-	private void ProcessParticlesFromOffThread(float dt, Vec3d cameraPos)
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-242-	{
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-243-		accumPhysics += dt;
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-244-		float num = tickTimes[readPosition];
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-245-		if (accumPhysics >= num)
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-246-		{
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-247-			lock (advanceCountLock)
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-248-			{
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-249-				if (advanceCount > 0)
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-250-				{
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-251-					readPosition = (readPosition + 1) % updateBuffers.Length;
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-252-					advanceCount--;
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-253-					accumPhysics -= num;
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-254-					num = tickTimes[readPosition];
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-255-				}
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-256-			}
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-257-			if (accumPhysics > 1f)
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-258-			{
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-259-				accumPhysics = 0f;
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-260-			}
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-261-		}
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-262-		float num2 = dt / num;
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-263-		MeshData meshData = updateBuffers[readPosition];
+--
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-292-			{
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-293-				game.DebugScreenInfo["asyncquadparticlepool"] = "";
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-294-			}
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-295-		}
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-296-		else if (game.extendedDebugInfo)
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-297-		{
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-298-			game.DebugScreenInfo["asynccubeparticlepool"] = "Async Cube Particle pool: " + ParticlesPool.AliveCount + " / " + (int)((float)poolSize * (float)game.particleLevel / 100f);
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-299-		}
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-300-		else
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-301-		{
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-302-			game.DebugScreenInfo["asynccubeparticlepool"] = "";
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-303-		}
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs:304:		((IWorldAccessor)game).FrameProfiler.Mark("otparticles-tick");
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-305-	}
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-306-
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-307-	public void OnNewFrameOffThread(float dt, Vec3d cameraPos)
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-308-	{
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-309-		if (game.IsPaused || !offthread)
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-310-		{
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-311-			return;
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-312-		}
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-313-		lock (advanceCountLock)
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-314-		{
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-315-			if (advanceCount >= updateBuffers.Length - 1)
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-316-			{
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-317-				return;
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-318-			}
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-319-		}
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-320-		currentGamespeed = game.Calendar.SpeedOfTime / 60f;
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-321-		ParticleBase particleBase = ParticlesPool.FirstAlive;
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-322-		int posPosition = 0;
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-323-		int rgbaPosition = 0;
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-324-		int flagPosition = 0;
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-325-		MeshData meshData = updateBuffers[writePosition];
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-326-		float[] array = velocities[writePosition];
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-327-		Vec3d vec3d = this.cameraPos[writePosition].Set(cameraPos);
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-328-		if (ParticlesPool.AliveCount < 20000)
+Vintagestory.Client.NoObf/ParticlePoolQuads.cs-329-		{
+--
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-30-		foreach (KeyValuePair<long, EntityRenderer> entityRenderer in game.EntityRenderers)
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-31-		{
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-32-			Entity entity = entityRenderer.Value.entity;
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-33-			if (game.frustumCuller.SphereInFrustum((float)entity.Pos.X, (float)entity.Pos.InternalY, (float)entity.Pos.Z, entity.FrustumSphereRadius) && entity.Pos.Dimension == dimension && (entity.AllowOutsideLoadedRange || (xYZ.HorizontalSquareDistanceTo(entity.Pos.X, entity.Pos.Z) < (float)num && (entity == game.EntityPlayer || game.WorldMap.IsChunkRe
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-34-			{
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-35-				entity.IsRendered = true;
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-36-				entityRenderer.Value.BeforeRender(dt);
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-37-			}
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-38-			else
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-39-			{
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-40-				entity.IsRendered = false;
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-41-			}
+Vintagestory.Client.NoObf/SystemRenderEntities.cs:42:			game.api.World.FrameProfiler.Mark("esr-beforeanim");
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-43-			try
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-44-			{
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-45-				entity.AnimManager?.OnClientFrame(dt);
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-46-			}
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-47-			catch (Exception)
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-48-			{
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-49-				game.Logger.Error("Animations error for entity " + entity.Code.ToShortString() + " at " + entity.Pos.AsBlockPos);
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-50-				throw;
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-51-			}
+Vintagestory.Client.NoObf/SystemRenderEntities.cs:52:			game.api.World.FrameProfiler.Mark("esr-afteranim");
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-53-		}
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-54-	}
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-55-
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-56-	public void OnRenderOpaque3D(float deltaTime)
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-57-	{
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-58-		RuntimeStats.renderedEntities = 0;
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-59-		game.GlMatrixModeModelView();
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-60-		game.Platform.GlDisableCullFace();
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-61-		game.Platform.GlToggleBlend(on: true);
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-62-		game.Platform.GlEnableDepthTest();
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-63-		foreach (KeyValuePair<long, EntityRenderer> entityRenderer in game.EntityRenderers)
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-64-		{
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-65-			if (entityRenderer.Value.entity.IsRendered)
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-66-			{
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-67-				entityRenderer.Value.DoRender3DOpaque(deltaTime, isShadowPass: false);
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-68-				RuntimeStats.renderedEntities++;
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-69-			}
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-70-		}
+Vintagestory.Client.NoObf/SystemRenderEntities.cs:71:		ScreenManager.FrameProfiler.Mark("ree-op");
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-72-		ShaderProgramEntityanimated entityanimated = ShaderPrograms.Entityanimated;
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-73-		entityanimated.Use();
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-74-		entityanimated.RgbaAmbientIn = game.api.renderapi.AmbientColor;
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-75-		entityanimated.RgbaFogIn = game.api.renderapi.FogColor;
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-76-		entityanimated.FogMinIn = game.api.renderapi.FogMin;
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-77-		entityanimated.FogDensityIn = game.api.renderapi.FogDensity;
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-78-		entityanimated.ProjectionMatrix = game.CurrentProjectionMatrix;
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-79-		entityanimated.EntityTex2D = game.EntityAtlasManager.AtlasTextures[0].TextureId;
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-80-		entityanimated.AlphaTest = 0.05f;
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-81-		entityanimated.LightPosition = game.shUniforms.LightPosition3D;
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-82-		game.Platform.GlDisableCullFace();
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-83-		game.GlMatrixModeModelView();
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-84-		game.GlPushMatrix();
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-85-		game.GlLoadMatrix(game.MainCamera.CameraMatrixOrigin);
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-86-		game.Platform.GlToggleBlend(on: true);
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-87-		foreach (KeyValuePair<long, EntityRenderer> entityRenderer2 in game.EntityRenderers)
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-88-		{
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-89-			if (entityRenderer2.Value.entity.IsRendered)
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-90-			{
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-91-				entityRenderer2.Value.DoRender3DOpaqueBatched(deltaTime, isShadowPass: false);
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-92-			}
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-93-		}
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-94-		game.GlPopMatrix();
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-95-		entityanimated.Stop();
+Vintagestory.Client.NoObf/SystemRenderEntities.cs:96:		ScreenManager.FrameProfiler.Mark("ree-op-b");
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-97-		game.Platform.GlToggleBlend(on: false);
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-98-	}
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-99-
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-100-	private void OnRenderOIT(float dt)
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-101-	{
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-102-	}
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-103-
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-104-	private void OnRenderAfterOIT(float dt)
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-105-	{
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-106-		game.GlMatrixModeModelView();
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-107-		game.Platform.GlDisableCullFace();
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-108-		game.Platform.GlToggleBlend(on: true);
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-109-		game.Platform.GlEnableDepthTest();
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-110-		foreach (KeyValuePair<long, EntityRenderer> entityRenderer in game.EntityRenderers)
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-111-		{
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-112-			if (entityRenderer.Value.entity.IsRendered)
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-113-			{
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-114-				entityRenderer.Value.DoRender3DAfterOIT(dt, isShadowPass: false);
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-115-			}
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-116-		}
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-117-	}
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-118-
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-119-	private void OnRenderFrameShadows(float dt)
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-120-	{
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-121-		int dimension = game.EntityPlayer.Pos.Dimension;
+--
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-160-
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-161-	private void OnRenderFrame2D(float dt)
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-162-	{
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-163-		foreach (KeyValuePair<long, EntityRenderer> entityRenderer in game.EntityRenderers)
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-164-		{
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-165-			Entity entity = entityRenderer.Value.entity;
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-166-			EntityRenderer value = entityRenderer.Value;
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-167-			if (entity.IsRendered)
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-168-			{
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-169-				value.DoRender2D(dt);
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-170-			}
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-171-		}
+Vintagestory.Client.NoObf/SystemRenderEntities.cs:172:		ScreenManager.FrameProfiler.Mark("ree2d-d");
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-173-	}
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-174-
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-175-	public override void Dispose(ClientMain game)
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-176-	{
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-177-		foreach (KeyValuePair<long, EntityRenderer> entityRenderer in game.EntityRenderers)
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-178-		{
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-179-			entityRenderer.Value.Dispose();
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-180-		}
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-181-	}
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-182-
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-183-	public override EnumClientSystemType GetSystemType()
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-184-	{
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-185-		return EnumClientSystemType.Render;
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-186-	}
+Vintagestory.Client.NoObf/SystemRenderEntities.cs-187-}
+--
+Vintagestory.Client.NoObf/SystemUnloadChunks.cs-61-			bool flag = false;
+Vintagestory.Client.NoObf/SystemUnloadChunks.cs-62-			int num3 = 0;
+Vintagestory.Client.NoObf/SystemUnloadChunks.cs-63-			while (!flag && num3 < game.WorldMap.ChunkMapSizeY)
+Vintagestory.Client.NoObf/SystemUnloadChunks.cs-64-			{
+Vintagestory.Client.NoObf/SystemUnloadChunks.cs-65-				flag |= game.WorldMap.GetChunk(x2, num3, y) != null;
+Vintagestory.Client.NoObf/SystemUnloadChunks.cs-66-				num3++;
+Vintagestory.Client.NoObf/SystemUnloadChunks.cs-67-			}
+Vintagestory.Client.NoObf/SystemUnloadChunks.cs-68-			if (!flag)
+Vintagestory.Client.NoObf/SystemUnloadChunks.cs-69-			{
+Vintagestory.Client.NoObf/SystemUnloadChunks.cs-70-				game.WorldMap.MapChunks.Remove(game.WorldMap.MapChunkIndex2D(x2, y));
+Vintagestory.Client.NoObf/SystemUnloadChunks.cs-71-			}
+Vintagestory.Client.NoObf/SystemUnloadChunks.cs-72-		}
+Vintagestory.Client.NoObf/SystemUnloadChunks.cs:73:		ScreenManager.FrameProfiler.Mark("doneUnlCh");
+Vintagestory.Client.NoObf/SystemUnloadChunks.cs-74-	}
+Vintagestory.Client.NoObf/SystemUnloadChunks.cs-75-
+Vintagestory.Client.NoObf/SystemUnloadChunks.cs-76-	private void UnloadChunk(ClientChunk clientchunk)
+Vintagestory.Client.NoObf/SystemUnloadChunks.cs-77-	{
+Vintagestory.Client.NoObf/SystemUnloadChunks.cs-78-		if (clientchunk == null)
+Vintagestory.Client.NoObf/SystemUnloadChunks.cs-79-		{
+Vintagestory.Client.NoObf/SystemUnloadChunks.cs-80-			return;
+Vintagestory.Client.NoObf/SystemUnloadChunks.cs-81-		}
+Vintagestory.Client.NoObf/SystemUnloadChunks.cs-82-		clientchunk.RemoveDataPoolLocations(game.chunkRenderer);
+Vintagestory.Client.NoObf/SystemUnloadChunks.cs-83-		for (int i = 0; i < clientchunk.EntitiesCount; i++)
+Vintagestory.Client.NoObf/SystemUnloadChunks.cs-84-		{
+Vintagestory.Client.NoObf/SystemUnloadChunks.cs-85-			Entity entity = clientchunk.Entities[i];
+Vintagestory.Client.NoObf/SystemUnloadChunks.cs-86-			if (entity != null && (game.EntityPlayer == null || entity.EntityId != game.EntityPlayer.EntityId))
+Vintagestory.Client.NoObf/SystemUnloadChunks.cs-87-			{
+Vintagestory.Client.NoObf/SystemUnloadChunks.cs-88-				EntityDespawnData entityDespawnData = new EntityDespawnData
+Vintagestory.Client.NoObf/SystemUnloadChunks.cs-89-				{
+Vintagestory.Client.NoObf/SystemUnloadChunks.cs-90-					Reason = EnumDespawnReason.Unload
+Vintagestory.Client.NoObf/SystemUnloadChunks.cs-91-				};
+Vintagestory.Client.NoObf/SystemUnloadChunks.cs-92-				game.eventManager?.TriggerEntityDespawn(entity, entityDespawnData);
+Vintagestory.Client.NoObf/SystemUnloadChunks.cs-93-				entity.OnEntityDespawn(entityDespawnData);
+Vintagestory.Client.NoObf/SystemUnloadChunks.cs-94-				game.RemoveEntityRenderer(entity);
+Vintagestory.Client.NoObf/SystemUnloadChunks.cs-95-				game.LoadedEntities.Remove(entity.EntityId);
+Vintagestory.Client.NoObf/SystemUnloadChunks.cs-96-			}
+Vintagestory.Client.NoObf/SystemUnloadChunks.cs-97-		}
+Vintagestory.Client.NoObf/SystemUnloadChunks.cs-98-		BlockEntity[] array = clientchunk.BlockEntities.Values.ToArray();
+--
+Vintagestory.Client.NoObf/ChunkRenderer.cs-155-		chunkliquiddepth.Use();
+Vintagestory.Client.NoObf/ChunkRenderer.cs-156-		chunkliquiddepth.ViewDistance = ClientSettings.ViewDistance;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-157-		chunkliquiddepth.ProjectionMatrix = game.CurrentProjectionMatrix;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-158-		chunkliquiddepth.ModelViewMatrix = game.CurrentModelViewMatrix;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-159-		bool useSSBOs = game.api.renderapi.useSSBOs;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-160-		game.api.renderapi.useSSBOs = false;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-161-		for (int i = 0; i < textureIds.Length; i++)
+Vintagestory.Client.NoObf/ChunkRenderer.cs-162-		{
+Vintagestory.Client.NoObf/ChunkRenderer.cs-163-			poolsByRenderPass[4][i].Render(cameraPos, "origin");
+Vintagestory.Client.NoObf/ChunkRenderer.cs-164-		}
+Vintagestory.Client.NoObf/ChunkRenderer.cs-165-		game.api.renderapi.useSSBOs = useSSBOs;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-166-		chunkliquiddepth.Stop();
+Vintagestory.Client.NoObf/ChunkRenderer.cs:167:		ScreenManager.FrameProfiler.Mark("rend3D-ret-lide");
+Vintagestory.Client.NoObf/ChunkRenderer.cs-168-		game.GlPopMatrix();
+Vintagestory.Client.NoObf/ChunkRenderer.cs-169-		game.Platform.UnloadFrameBuffer(EnumFrameBuffer.LiquidDepth);
+Vintagestory.Client.NoObf/ChunkRenderer.cs-170-		game.Platform.LoadFrameBuffer(EnumFrameBuffer.Primary);
+Vintagestory.Client.NoObf/ChunkRenderer.cs-171-	}
+Vintagestory.Client.NoObf/ChunkRenderer.cs-172-
+Vintagestory.Client.NoObf/ChunkRenderer.cs-173-	public void OnBeforeRenderOpaque(float dt)
+Vintagestory.Client.NoObf/ChunkRenderer.cs-174-	{
+Vintagestory.Client.NoObf/ChunkRenderer.cs-175-		masterPool.OnFrame(dt, game.CurrentModelViewMatrix, game.shadowMvpMatrix);
+Vintagestory.Client.NoObf/ChunkRenderer.cs-176-		RuntimeStats.renderedTriangles = 0;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-177-		RuntimeStats.availableTriangles = 0;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-178-		accum += dt;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-179-		if (accum > 5f)
+Vintagestory.Client.NoObf/ChunkRenderer.cs-180-		{
+Vintagestory.Client.NoObf/ChunkRenderer.cs-181-			accum = 0f;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-182-			ClimateCondition climateAt = game.BlockAccessor.GetClimateAt(game.EntityPlayer.Pos.AsBlockPos);
+Vintagestory.Client.NoObf/ChunkRenderer.cs-183-			float num = GameMath.Clamp((climateAt.Temperature + 1f) / 4f, 0f, 1f);
+Vintagestory.Client.NoObf/ChunkRenderer.cs-184-			curRainFall = climateAt.Rainfall * num;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-185-		}
+Vintagestory.Client.NoObf/ChunkRenderer.cs-186-	}
+Vintagestory.Client.NoObf/ChunkRenderer.cs-187-
+Vintagestory.Client.NoObf/ChunkRenderer.cs-188-	public void RenderShadow(float dt)
+Vintagestory.Client.NoObf/ChunkRenderer.cs-189-	{
+Vintagestory.Client.NoObf/ChunkRenderer.cs-190-		ShaderProgramChunkshadowmap chunkshadowmap = ShaderPrograms.Chunkshadowmap;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-191-		chunkshadowmap.Uniform("subpixelPaddingX", subPixelPaddingX);
+Vintagestory.Client.NoObf/ChunkRenderer.cs-192-		chunkshadowmap.Uniform("subpixelPaddingY", subPixelPaddingY);
+Vintagestory.Client.NoObf/ChunkRenderer.cs-193-		Vec3d cameraPos = game.EntityPlayer.CameraPos;
+Vintagestory.Client.NoObf/ChunkRenderer.cs:194:		ScreenManager.FrameProfiler.Mark("rend3D-rets-begin");
+Vintagestory.Client.NoObf/ChunkRenderer.cs-195-		platform.GlDepthMask(flag: true);
+Vintagestory.Client.NoObf/ChunkRenderer.cs-196-		platform.GlToggleBlend(on: false);
+Vintagestory.Client.NoObf/ChunkRenderer.cs-197-		platform.GlEnableDepthTest();
+Vintagestory.Client.NoObf/ChunkRenderer.cs-198-		platform.GlDisableCullFace();
+Vintagestory.Client.NoObf/ChunkRenderer.cs-199-		EnumFrustumCullMode frustumCullMode = ((game.currentRenderStage == EnumRenderStage.ShadowFar) ? EnumFrustumCullMode.CullInstantShadowPassFar : EnumFrustumCullMode.CullInstantShadowPassNear);
+Vintagestory.Client.NoObf/ChunkRenderer.cs-200-		for (int i = 0; i < textureIds.Length; i++)
+Vintagestory.Client.NoObf/ChunkRenderer.cs-201-		{
+Vintagestory.Client.NoObf/ChunkRenderer.cs-202-			chunkshadowmap.Tex2d2D = textureIds[i];
+Vintagestory.Client.NoObf/ChunkRenderer.cs-203-			poolsByRenderPass[0][i].Render(cameraPos, "origin", frustumCullMode);
+Vintagestory.Client.NoObf/ChunkRenderer.cs-204-		}
+Vintagestory.Client.NoObf/ChunkRenderer.cs:205:		ScreenManager.FrameProfiler.Mark("rend3D-rets-op");
+Vintagestory.Client.NoObf/ChunkRenderer.cs-206-		for (int j = 0; j < textureIds.Length; j++)
+Vintagestory.Client.NoObf/ChunkRenderer.cs-207-		{
+Vintagestory.Client.NoObf/ChunkRenderer.cs-208-			chunkshadowmap.Tex2d2D = textureIds[j];
+Vintagestory.Client.NoObf/ChunkRenderer.cs-209-			poolsByRenderPass[5][j].Render(cameraPos, "origin", frustumCullMode);
+Vintagestory.Client.NoObf/ChunkRenderer.cs-210-		}
+Vintagestory.Client.NoObf/ChunkRenderer.cs:211:		ScreenManager.FrameProfiler.Mark("rend3D-rets-tpp");
+Vintagestory.Client.NoObf/ChunkRenderer.cs-212-		platform.GlDisableCullFace();
+Vintagestory.Client.NoObf/ChunkRenderer.cs-213-		for (int k = 0; k < textureIds.Length; k++)
+Vintagestory.Client.NoObf/ChunkRenderer.cs-214-		{
+Vintagestory.Client.NoObf/ChunkRenderer.cs-215-			chunkshadowmap.Tex2d2D = textureIds[k];
+Vintagestory.Client.NoObf/ChunkRenderer.cs-216-			poolsByRenderPass[2][k].Render(cameraPos, "origin", frustumCullMode);
+Vintagestory.Client.NoObf/ChunkRenderer.cs-217-		}
+Vintagestory.Client.NoObf/ChunkRenderer.cs-218-		for (int l = 0; l < textureIds.Length; l++)
+Vintagestory.Client.NoObf/ChunkRenderer.cs-219-		{
+Vintagestory.Client.NoObf/ChunkRenderer.cs-220-			chunkshadowmap.Tex2d2D = textureIds[l];
+Vintagestory.Client.NoObf/ChunkRenderer.cs-221-			poolsByRenderPass[1][l].Render(cameraPos, "origin", frustumCullMode);
+Vintagestory.Client.NoObf/ChunkRenderer.cs-222-		}
+Vintagestory.Client.NoObf/ChunkRenderer.cs-223-		platform.GlToggleBlend(on: true);
+Vintagestory.Client.NoObf/ChunkRenderer.cs-224-	}
+Vintagestory.Client.NoObf/ChunkRenderer.cs-225-
+Vintagestory.Client.NoObf/ChunkRenderer.cs-226-	public void RenderOpaque(float dt)
+Vintagestory.Client.NoObf/ChunkRenderer.cs-227-	{
+Vintagestory.Client.NoObf/ChunkRenderer.cs-228-		Vec3d cameraPos = game.EntityPlayer.CameraPos;
+Vintagestory.Client.NoObf/ChunkRenderer.cs:229:		ScreenManager.FrameProfiler.Mark("rend3D-ret-begin");
+Vintagestory.Client.NoObf/ChunkRenderer.cs-230-		platform.GlDepthMask(flag: true);
+Vintagestory.Client.NoObf/ChunkRenderer.cs-231-		platform.GlEnableDepthTest();
+Vintagestory.Client.NoObf/ChunkRenderer.cs-232-		platform.GlToggleBlend(on: true);
+Vintagestory.Client.NoObf/ChunkRenderer.cs-233-		platform.GlEnableCullFace();
+Vintagestory.Client.NoObf/ChunkRenderer.cs-234-		game.GlMatrixModeModelView();
+Vintagestory.Client.NoObf/ChunkRenderer.cs-235-		game.GlPushMatrix();
+Vintagestory.Client.NoObf/ChunkRenderer.cs-236-		game.GlLoadMatrix(game.MainCamera.CameraMatrixOrigin);
+Vintagestory.Client.NoObf/ChunkRenderer.cs-237-		ShaderProgramChunkopaque chunkopaque = ShaderPrograms.Chunkopaque;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-238-		chunkopaque.Use();
+Vintagestory.Client.NoObf/ChunkRenderer.cs-239-		chunkopaque.CameraUnderwater = game.shUniforms.CameraUnderwater;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-240-		chunkopaque.RgbaFogIn = game.AmbientManager.BlendedFogColor;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-241-		chunkopaque.RgbaAmbientIn = game.AmbientManager.BlendedAmbientColor;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-242-		chunkopaque.FogDensityIn = game.AmbientManager.BlendedFogDensity;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-243-		chunkopaque.FogMinIn = game.AmbientManager.BlendedFogMin;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-244-		chunkopaque.ProjectionMatrix = game.CurrentProjectionMatrix;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-245-		chunkopaque.AlphaTest = 0.001f;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-246-		chunkopaque.HaxyFade = 0;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-247-		chunkopaque.LiquidDepth2D = game.Platform.FrameBuffers[5].DepthTextureId;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-248-		chunkopaque.ModelViewMatrix = game.CurrentModelViewMatrix;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-249-		chunkopaque.Uniform("subpixelPaddingX", subPixelPaddingX);
+Vintagestory.Client.NoObf/ChunkRenderer.cs-250-		chunkopaque.Uniform("subpixelPaddingY", subPixelPaddingY);
+Vintagestory.Client.NoObf/ChunkRenderer.cs-251-		chunkopaque.SunPosition = game.GameWorldCalendar.SunPositionNormalized;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-252-		chunkopaque.DayLight = game.shUniforms.SkyDaylight;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-253-		chunkopaque.HorizonFog = game.AmbientManager.BlendedCloudDensity;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-254-		for (int i = 0; i < textureIds.Length; i++)
+Vintagestory.Client.NoObf/ChunkRenderer.cs-255-		{
+Vintagestory.Client.NoObf/ChunkRenderer.cs-256-			chunkopaque.TerrainTex2D = textureIds[i];
+Vintagestory.Client.NoObf/ChunkRenderer.cs-257-			chunkopaque.TerrainTexLinear2D = textureIds[i];
+Vintagestory.Client.NoObf/ChunkRenderer.cs-258-			poolsByRenderPass[0][i].Render(cameraPos, "origin");
+Vintagestory.Client.NoObf/ChunkRenderer.cs-259-		}
+Vintagestory.Client.NoObf/ChunkRenderer.cs:260:		ScreenManager.FrameProfiler.Mark("rend3D-ret-op");
+Vintagestory.Client.NoObf/ChunkRenderer.cs-261-		chunkopaque.Stop();
+Vintagestory.Client.NoObf/ChunkRenderer.cs-262-		ShaderProgramChunktopsoil chunktopsoil = ShaderPrograms.Chunktopsoil;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-263-		chunktopsoil.Use();
+Vintagestory.Client.NoObf/ChunkRenderer.cs-264-		chunktopsoil.RgbaFogIn = game.AmbientManager.BlendedFogColor;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-265-		chunktopsoil.RgbaAmbientIn = game.AmbientManager.BlendedAmbientColor;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-266-		chunktopsoil.FogDensityIn = game.AmbientManager.BlendedFogDensity;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-267-		chunktopsoil.FogMinIn = game.AmbientManager.BlendedFogMin;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-268-		chunktopsoil.ProjectionMatrix = game.CurrentProjectionMatrix;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-269-		chunktopsoil.ModelViewMatrix = game.CurrentModelViewMatrix;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-270-		chunktopsoil.BlockTextureSize = blockTextureSize;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-271-		chunktopsoil.Uniform("subpixelPaddingX", subPixelPaddingX);
+Vintagestory.Client.NoObf/ChunkRenderer.cs-272-		chunktopsoil.Uniform("subpixelPaddingY", subPixelPaddingY);
+Vintagestory.Client.NoObf/ChunkRenderer.cs-273-		for (int j = 0; j < textureIds.Length; j++)
+Vintagestory.Client.NoObf/ChunkRenderer.cs-274-		{
+Vintagestory.Client.NoObf/ChunkRenderer.cs-275-			chunktopsoil.TerrainTex2D = textureIds[j];
+Vintagestory.Client.NoObf/ChunkRenderer.cs-276-			chunktopsoil.TerrainTexLinear2D = textureIds[j];
+Vintagestory.Client.NoObf/ChunkRenderer.cs-277-			poolsByRenderPass[5][j].Render(cameraPos, "origin");
+Vintagestory.Client.NoObf/ChunkRenderer.cs-278-		}
+Vintagestory.Client.NoObf/ChunkRenderer.cs:279:		ScreenManager.FrameProfiler.Mark("rend3D-ret-tpp");
+Vintagestory.Client.NoObf/ChunkRenderer.cs-280-		chunktopsoil.Stop();
+Vintagestory.Client.NoObf/ChunkRenderer.cs-281-		platform.GlDisableCullFace();
+Vintagestory.Client.NoObf/ChunkRenderer.cs-282-		chunkopaque.Use();
+Vintagestory.Client.NoObf/ChunkRenderer.cs-283-		chunkopaque.RgbaFogIn = game.AmbientManager.BlendedFogColor;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-284-		chunkopaque.RgbaAmbientIn = game.AmbientManager.BlendedAmbientColor;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-285-		chunkopaque.FogDensityIn = game.AmbientManager.BlendedFogDensity;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-286-		chunkopaque.FogMinIn = game.AmbientManager.BlendedFogMin;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-287-		chunkopaque.ProjectionMatrix = game.CurrentProjectionMatrix;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-288-		chunkopaque.ModelViewMatrix = game.CurrentModelViewMatrix;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-289-		chunkopaque.AlphaTest = 0.25f;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-290-		chunkopaque.HaxyFade = 0;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-291-		platform.GlToggleBlend(on: true);
+Vintagestory.Client.NoObf/ChunkRenderer.cs-292-		for (int k = 0; k < textureIds.Length; k++)
+Vintagestory.Client.NoObf/ChunkRenderer.cs-293-		{
+Vintagestory.Client.NoObf/ChunkRenderer.cs-294-			chunkopaque.TerrainTex2D = textureIds[k];
+Vintagestory.Client.NoObf/ChunkRenderer.cs-295-			chunkopaque.TerrainTexLinear2D = textureIds[k];
+Vintagestory.Client.NoObf/ChunkRenderer.cs-296-			poolsByRenderPass[2][k].Render(cameraPos, "origin");
+Vintagestory.Client.NoObf/ChunkRenderer.cs-297-		}
+Vintagestory.Client.NoObf/ChunkRenderer.cs-298-		platform.GlToggleBlend(on: false);
+Vintagestory.Client.NoObf/ChunkRenderer.cs-299-		chunkopaque.AlphaTest = 0.42f;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-300-		chunkopaque.HaxyFade = 1;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-301-		for (int l = 0; l < textureIds.Length; l++)
+Vintagestory.Client.NoObf/ChunkRenderer.cs-302-		{
+Vintagestory.Client.NoObf/ChunkRenderer.cs-303-			chunkopaque.TerrainTex2D = textureIds[l];
+Vintagestory.Client.NoObf/ChunkRenderer.cs-304-			chunkopaque.TerrainTexLinear2D = textureIds[l];
+--
+Vintagestory.Client.NoObf/ChunkRenderer.cs-307-		platform.GlEnableCullFace();
+Vintagestory.Client.NoObf/ChunkRenderer.cs-308-		platform.GlToggleBlend(on: true);
+Vintagestory.Client.NoObf/ChunkRenderer.cs-309-		chunkopaque.AlphaTest = 0.2f;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-310-		chunkopaque.HaxyFade = 0;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-311-		for (int m = 0; m < textureIds.Length; m++)
+Vintagestory.Client.NoObf/ChunkRenderer.cs-312-		{
+Vintagestory.Client.NoObf/ChunkRenderer.cs-313-			chunkopaque.TerrainTex2D = textureIds[m];
+Vintagestory.Client.NoObf/ChunkRenderer.cs-314-			chunkopaque.TerrainTexLinear2D = textureIds[m];
+Vintagestory.Client.NoObf/ChunkRenderer.cs-315-			poolsByRenderPass[8][m].Render(cameraPos, "origin");
+Vintagestory.Client.NoObf/ChunkRenderer.cs-316-		}
+Vintagestory.Client.NoObf/ChunkRenderer.cs-317-		platform.GlToggleBlend(on: false);
+Vintagestory.Client.NoObf/ChunkRenderer.cs-318-		chunkopaque.Stop();
+Vintagestory.Client.NoObf/ChunkRenderer.cs:319:		ScreenManager.FrameProfiler.Mark("rend3D-ret-opnc");
+Vintagestory.Client.NoObf/ChunkRenderer.cs-320-		game.GlPopMatrix();
+Vintagestory.Client.NoObf/ChunkRenderer.cs-321-		if (game.unbindSamplers)
+Vintagestory.Client.NoObf/ChunkRenderer.cs-322-		{
+Vintagestory.Client.NoObf/ChunkRenderer.cs-323-			GL.BindSampler(0, 0);
+Vintagestory.Client.NoObf/ChunkRenderer.cs-324-			GL.BindSampler(1, 0);
+Vintagestory.Client.NoObf/ChunkRenderer.cs-325-			GL.BindSampler(2, 0);
+Vintagestory.Client.NoObf/ChunkRenderer.cs-326-			GL.BindSampler(3, 0);
+Vintagestory.Client.NoObf/ChunkRenderer.cs-327-			GL.BindSampler(4, 0);
+Vintagestory.Client.NoObf/ChunkRenderer.cs-328-			GL.BindSampler(5, 0);
+Vintagestory.Client.NoObf/ChunkRenderer.cs-329-			GL.BindSampler(6, 0);
+Vintagestory.Client.NoObf/ChunkRenderer.cs-330-			GL.BindSampler(7, 0);
+Vintagestory.Client.NoObf/ChunkRenderer.cs-331-			GL.BindSampler(8, 0);
+Vintagestory.Client.NoObf/ChunkRenderer.cs-332-		}
+Vintagestory.Client.NoObf/ChunkRenderer.cs-333-	}
+Vintagestory.Client.NoObf/ChunkRenderer.cs-334-
+Vintagestory.Client.NoObf/ChunkRenderer.cs-335-	internal void RenderOIT(float deltaTime)
+Vintagestory.Client.NoObf/ChunkRenderer.cs-336-	{
+Vintagestory.Client.NoObf/ChunkRenderer.cs-337-		Vec3d cameraPos = game.EntityPlayer.CameraPos;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-338-		game.GlPushMatrix();
+Vintagestory.Client.NoObf/ChunkRenderer.cs-339-		game.GlLoadMatrix(game.MainCamera.CameraMatrixOrigin);
+Vintagestory.Client.NoObf/ChunkRenderer.cs-340-		game.GlPushMatrix();
+Vintagestory.Client.NoObf/ChunkRenderer.cs-341-		ShaderProgramChunkliquid chunkliquid = ShaderPrograms.Chunkliquid;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-342-		chunkliquid.Use();
+Vintagestory.Client.NoObf/ChunkRenderer.cs-343-		chunkliquid.WaterStillCounter = game.shUniforms.WaterStillCounter;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-344-		chunkliquid.WaterFlowCounter = game.shUniforms.WaterFlowCounter;
+--
+Vintagestory.Client.NoObf/ChunkRenderer.cs-369-		chunkliquid.DepthTex2D = frameBufferRef.DepthTextureId;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-370-		chunkliquid.Uniform("frameSize", frameBufferRef.Width, frameBufferRef.Height);
+Vintagestory.Client.NoObf/ChunkRenderer.cs-371-		chunkliquid.SunSpecularIntensity = game.shUniforms.SunSpecularIntensity;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-372-		bool useSSBOs = game.api.renderapi.useSSBOs;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-373-		game.api.renderapi.useSSBOs = false;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-374-		for (int i = 0; i < textureIds.Length; i++)
+Vintagestory.Client.NoObf/ChunkRenderer.cs-375-		{
+Vintagestory.Client.NoObf/ChunkRenderer.cs-376-			chunkliquid.TerrainTex2D = textureIds[i];
+Vintagestory.Client.NoObf/ChunkRenderer.cs-377-			poolsByRenderPass[4][i].Render(cameraPos, "origin");
+Vintagestory.Client.NoObf/ChunkRenderer.cs-378-		}
+Vintagestory.Client.NoObf/ChunkRenderer.cs-379-		game.api.renderapi.useSSBOs = useSSBOs;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-380-		chunkliquid.Stop();
+Vintagestory.Client.NoObf/ChunkRenderer.cs:381:		ScreenManager.FrameProfiler.Mark("rend3D-ret-lp");
+Vintagestory.Client.NoObf/ChunkRenderer.cs-382-		game.GlPopMatrix();
+Vintagestory.Client.NoObf/ChunkRenderer.cs-383-		ShaderProgramChunktransparent chunktransparent = ShaderPrograms.Chunktransparent;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-384-		chunktransparent.Use();
+Vintagestory.Client.NoObf/ChunkRenderer.cs-385-		chunktransparent.RgbaFogIn = game.AmbientManager.BlendedFogColor;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-386-		chunktransparent.RgbaAmbientIn = game.AmbientManager.BlendedAmbientColor;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-387-		chunktransparent.FogDensityIn = game.AmbientManager.BlendedFogDensity;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-388-		chunktransparent.FogMinIn = game.AmbientManager.BlendedFogMin;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-389-		chunktransparent.ProjectionMatrix = game.CurrentProjectionMatrix;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-390-		chunktransparent.ModelViewMatrix = game.CurrentModelViewMatrix;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-391-		chunktransparent.Uniform("subpixelPaddingX", subPixelPaddingX);
+Vintagestory.Client.NoObf/ChunkRenderer.cs-392-		chunktransparent.Uniform("subpixelPaddingY", subPixelPaddingY);
+Vintagestory.Client.NoObf/ChunkRenderer.cs-393-		for (int j = 0; j < textureIds.Length; j++)
+Vintagestory.Client.NoObf/ChunkRenderer.cs-394-		{
+Vintagestory.Client.NoObf/ChunkRenderer.cs-395-			chunktransparent.TerrainTex2D = textureIds[j];
+Vintagestory.Client.NoObf/ChunkRenderer.cs-396-			poolsByRenderPass[3][j].Render(cameraPos, "origin");
+Vintagestory.Client.NoObf/ChunkRenderer.cs-397-			if (ClientSettings.RenderMetaBlocks)
+Vintagestory.Client.NoObf/ChunkRenderer.cs-398-			{
+Vintagestory.Client.NoObf/ChunkRenderer.cs-399-				poolsByRenderPass[6][j].Render(cameraPos, "origin");
+Vintagestory.Client.NoObf/ChunkRenderer.cs-400-			}
+Vintagestory.Client.NoObf/ChunkRenderer.cs-401-		}
+Vintagestory.Client.NoObf/ChunkRenderer.cs-402-		chunktransparent.Stop();
+Vintagestory.Client.NoObf/ChunkRenderer.cs-403-		game.GlPopMatrix();
+Vintagestory.Client.NoObf/ChunkRenderer.cs:404:		ScreenManager.FrameProfiler.Mark("rend3D-ret-tp");
+Vintagestory.Client.NoObf/ChunkRenderer.cs-405-	}
+Vintagestory.Client.NoObf/ChunkRenderer.cs-406-
+Vintagestory.Client.NoObf/ChunkRenderer.cs-407-	internal void RenderAfterOIT(float deltaTime)
+Vintagestory.Client.NoObf/ChunkRenderer.cs-408-	{
+Vintagestory.Client.NoObf/ChunkRenderer.cs-409-		game.GlPushMatrix();
+Vintagestory.Client.NoObf/ChunkRenderer.cs-410-		game.GlLoadMatrix(game.MainCamera.CameraMatrixOrigin);
+Vintagestory.Client.NoObf/ChunkRenderer.cs-411-		Vec3d cameraPos = game.EntityPlayer.CameraPos;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-412-		ShaderProgramChunkopaque chunkopaque = ShaderPrograms.Chunkopaque;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-413-		platform.GlDisableCullFace();
+Vintagestory.Client.NoObf/ChunkRenderer.cs-414-		platform.GlToggleBlend(on: false);
+Vintagestory.Client.NoObf/ChunkRenderer.cs-415-		platform.GlEnableDepthTest();
+Vintagestory.Client.NoObf/ChunkRenderer.cs-416-		chunkopaque.Use();
+Vintagestory.Client.NoObf/ChunkRenderer.cs-417-		chunkopaque.RgbaFogIn = game.AmbientManager.BlendedFogColor;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-418-		chunkopaque.RgbaAmbientIn = game.AmbientManager.BlendedAmbientColor;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-419-		chunkopaque.FogDensityIn = game.AmbientManager.BlendedFogDensity;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-420-		chunkopaque.FogMinIn = game.AmbientManager.BlendedFogMin;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-421-		chunkopaque.ProjectionMatrix = game.CurrentProjectionMatrix;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-422-		chunkopaque.ModelViewMatrix = game.CurrentModelViewMatrix;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-423-		chunkopaque.AlphaTest = 0.42f;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-424-		chunkopaque.SunPosition = game.GameWorldCalendar.SunPositionNormalized;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-425-		chunkopaque.DayLight = game.shUniforms.SkyDaylight;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-426-		chunkopaque.HorizonFog = game.AmbientManager.BlendedCloudDensity;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-427-		chunkopaque.HaxyFade = 1;
+Vintagestory.Client.NoObf/ChunkRenderer.cs-428-		chunkopaque.Uniform("subpixelPaddingX", subPixelPaddingX);
+Vintagestory.Client.NoObf/ChunkRenderer.cs-429-		chunkopaque.Uniform("subpixelPaddingY", subPixelPaddingY);
+--
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-67-		lock (game.EntityLoadQueueLock)
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-68-		{
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-69-			while (game.EntityLoadQueue.Count > 0)
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-70-			{
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-71-				Entity entity = game.EntityLoadQueue.Pop();
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-72-				if (!game.LoadedEntities.ContainsKey(entity.EntityId))
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-73-				{
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-74-					game.LoadedEntities[entity.EntityId] = entity;
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-75-					game.eventManager?.TriggerEntityLoaded(entity);
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-76-				}
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-77-			}
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-78-		}
+Vintagestory.Client.NoObf/ClientSystemEntities.cs:79:		game.api.World.FrameProfiler.Mark("loadedEntityQueue-lockcontention");
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-80-		foreach (Entity item in (IEnumerable<Entity>)game.LoadedEntities.Values)
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-81-		{
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-82-			item.OnGameTick(dt);
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-83-		}
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-84-	}
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-85-
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-86-	private void UpdateEvery1000ms(float dt)
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-87-	{
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-88-		foreach (Entity value in game.LoadedEntities.Values)
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-89-		{
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-90-			value.NearestPlayerDistance = (float)value.Pos.DistanceTo(game.EntityPlayer.Pos);
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-91-			long num = game.WorldMap.ChunkIndex3D(value.Pos);
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-92-			if (value.InChunkIndex3d != num)
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-93-			{
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-94-				game.UpdateEntityChunk(value, num);
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-95-			}
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-96-		}
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-97-	}
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-98-
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-99-	private void OnEntitySpawnOrLoaded(Entity entity, bool loaded)
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-100-	{
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-101-		if (game.EntityRenderers.ContainsKey(entity.EntityId) || string.IsNullOrEmpty(entity.Properties.Client.RendererName))
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-102-		{
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-103-			return;
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-104-		}
+--
+Vintagestory.Client.NoObf/ClientChunk.cs-307-					{
+Vintagestory.Client.NoObf/ClientChunk.cs-308-						game.Logger.Error("Exception thrown when initializing a block entity {0}:", value.GetType());
+Vintagestory.Client.NoObf/ClientChunk.cs-309-					}
+Vintagestory.Client.NoObf/ClientChunk.cs-310-					game.Logger.Error(e);
+Vintagestory.Client.NoObf/ClientChunk.cs-311-				}
+Vintagestory.Client.NoObf/ClientChunk.cs-312-				else
+Vintagestory.Client.NoObf/ClientChunk.cs-313-				{
+Vintagestory.Client.NoObf/ClientChunk.cs-314-					game.Logger.Error("Exception thrown when initializing a block entity, because it's null. Seems to be a corrupt chunk.");
+Vintagestory.Client.NoObf/ClientChunk.cs-315-				}
+Vintagestory.Client.NoObf/ClientChunk.cs-316-			}
+Vintagestory.Client.NoObf/ClientChunk.cs-317-			if (ScreenManager.FrameProfiler.Enabled)
+Vintagestory.Client.NoObf/ClientChunk.cs-318-			{
+Vintagestory.Client.NoObf/ClientChunk.cs:319:				ScreenManager.FrameProfiler.Mark("initbe-", game.ClassRegistryInt.blockEntityTypeToClassnameMapping[value.GetType()]);
+Vintagestory.Client.NoObf/ClientChunk.cs-320-			}
+Vintagestory.Client.NoObf/ClientChunk.cs-321-		}
+Vintagestory.Client.NoObf/ClientChunk.cs-322-	}
+Vintagestory.Client.NoObf/ClientChunk.cs-323-
+Vintagestory.Client.NoObf/ClientChunk.cs-324-	internal void AddOrUpdateBlockEntityFromPacket(Packet_BlockEntity p, ClientMain game)
+Vintagestory.Client.NoObf/ClientChunk.cs-325-	{
+Vintagestory.Client.NoObf/ClientChunk.cs-326-		BlockPos blockPos = new BlockPos(p.PosX, p.PosY, p.PosZ);
+Vintagestory.Client.NoObf/ClientChunk.cs-327-		if (p.Data == null && p.Classname == null)
+Vintagestory.Client.NoObf/ClientChunk.cs-328-		{
+Vintagestory.Client.NoObf/ClientChunk.cs-329-			RemoveBlockEntity(game, blockPos);
+Vintagestory.Client.NoObf/ClientChunk.cs-330-			return;
+Vintagestory.Client.NoObf/ClientChunk.cs-331-		}
+Vintagestory.Client.NoObf/ClientChunk.cs-332-		if (BlockEntities.TryGetValue(blockPos, out var value))
+Vintagestory.Client.NoObf/ClientChunk.cs-333-		{
+Vintagestory.Client.NoObf/ClientChunk.cs-334-			Type blockEntityType = ClientMain.ClassRegistry.GetBlockEntityType(p.Classname);
+Vintagestory.Client.NoObf/ClientChunk.cs-335-			if (value.GetType() == blockEntityType)
+Vintagestory.Client.NoObf/ClientChunk.cs-336-			{
+Vintagestory.Client.NoObf/ClientChunk.cs-337-				BinaryReader stream = new BinaryReader(new MemoryStream(p.Data));
+Vintagestory.Client.NoObf/ClientChunk.cs-338-				ITreeAttribute treeAttribute = new TreeAttribute();
+Vintagestory.Client.NoObf/ClientChunk.cs-339-				treeAttribute.FromBytes(stream);
+Vintagestory.Client.NoObf/ClientChunk.cs-340-				try
+Vintagestory.Client.NoObf/ClientChunk.cs-341-				{
+Vintagestory.Client.NoObf/ClientChunk.cs-342-					value.FromTreeAttributes(treeAttribute, game);
+Vintagestory.Client.NoObf/ClientChunk.cs-343-					return;
+Vintagestory.Client.NoObf/ClientChunk.cs-344-				}
+--
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-32-		this.capi = capi;
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-33-		Composers = composers;
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-34-		composerKeyCode = "worldInteractionHelp" + composerSuffixCode;
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-35-	}
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-36-
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-37-	public void ComposeBlockWorldInteractionHelp(WorldInteraction[] wis)
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-38-	{
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-39-		if (wis == null || wis.Length == 0)
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-40-		{
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-41-			Composers.Remove(composerKeyCode);
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-42-			return;
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-43-		}
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs:44:		capi.World.FrameProfiler.Mark("blockinteractionhelp-recomp-1");
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-45-		ElementBounds elementBounds = ElementStdBounds.AutosizedMainDialog.WithAlignment(EnumDialogArea.CenterMiddle);
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-46-		if (composer == null)
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-47-		{
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-48-			composer = capi.Gui.CreateCompo(composerKeyCode, elementBounds);
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-49-		}
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-50-		else
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-51-		{
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-52-			composer.Clear(elementBounds);
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-53-		}
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-54-		Composers[composerKeyCode] = composer;
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-55-		double lineHeight = GuiElement.scaled(UnscaledLineHeight);
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-56-		int num = 0;
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-57-		foreach (WorldInteraction wi in wis)
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-58-		{
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-59-			ItemStack[] stacks = wi.Itemstacks;
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-60-			if (stacks != null && wi.GetMatchingStacks != null)
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-61-			{
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-62-				stacks = wi.GetMatchingStacks(wi, capi.World.Player.CurrentBlockSelection, capi.World.Player.CurrentEntitySelection);
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-63-				if (stacks == null || stacks.Length == 0)
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-64-				{
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-65-					continue;
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-66-				}
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-67-			}
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-68-			if (stacks != null || wi.ShouldApply == null || wi.ShouldApply(wi, capi.World.Player.CurrentBlockSelection, capi.World.Player.CurrentEntitySelection))
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-69-			{
+--
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-83-					elementBounds3.CalcWorldBounds();
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-84-					capi.Render.PushScissor(elementBounds3);
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-85-					capi.Render.RenderItemstackToGui(new DummySlot(stacks[num2]), bounds.renderX + lineHeight / 2.0, bounds.renderY + lineHeight / 2.0, 100.0, size, ColorUtil.ColorFromRgba(Color));
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-86-					capi.Render.PopScissor();
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-87-				}).EndIf()
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-88-					.AddStaticCustomDraw(elementBounds2, (Context ctx, ImageSurface surface, ElementBounds bounds) =>
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-89-					{
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-90-						drawHelp(ctx, surface, bounds, stacks, lineHeight, wi);
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-91-					});
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-92-				num++;
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-93-			}
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-94-		}
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs:95:		capi.World.FrameProfiler.Mark("blockinteractionhelp-recomp-2");
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-96-		if (num == 0)
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-97-		{
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-98-			Composers.Remove(composerKeyCode);
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-99-			return;
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-100-		}
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-101-		composer.Compose();
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs:102:		capi.World.FrameProfiler.Mark("blockinteractionhelp-recomp-3");
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-103-	}
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-104-
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-105-	public void drawHelp(Context ctx, ImageSurface surface, ElementBounds currentBounds, ItemStack[] stacks, double lineheight, WorldInteraction wi)
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-106-	{
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs:107:		capi.World.FrameProfiler.Mark("blockinteractionhelp-recomp-2.1");
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-108-		double num = 0.0;
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-109-		double drawY = currentBounds.drawY;
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-110-		double[] array = (double[])GuiStyle.DialogDefaultTextColor.Clone();
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-111-		array[0] = (array[0] + 1.0) / 2.0;
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-112-		array[1] = (array[1] + 1.0) / 2.0;
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-113-		array[2] = (array[2] + 1.0) / 2.0;
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-114-		CairoFont cairoFont = CairoFont.WhiteMediumText().WithColor(array).WithFontSize(FontSize)
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-115-			.WithStroke(GuiStyle.DarkBrownColor, 2.0);
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-116-		cairoFont.SetupContext(ctx);
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-117-		double height = cairoFont.GetFontExtents().Height;
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-118-		double num2 = 5.0;
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-119-		double width = cairoFont.GetTextExtents("+").Width;
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-120-		if ((stacks != null && stacks.Length != 0) || wi.RequireFreeHand)
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-121-		{
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-122-			GuiElement.RoundRectangle(ctx, num, drawY + 1.0, lineheight, lineheight, 3.5);
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-123-			ctx.SetSourceRGBA(array);
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-124-			ctx.LineWidth = 1.5;
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-125-			ctx.StrokePreserve();
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-126-			ctx.SetSourceRGBA(new double[4] { 1.0, 1.0, 1.0, 0.5 });
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-127-			ctx.Fill();
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-128-			ctx.SetSourceRGBA(new double[4] { 1.0, 1.0, 1.0, 1.0 });
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-129-			num += lineheight + num2 + 1.0;
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-130-		}
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-131-		List<HotKey> list = new List<HotKey>();
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-132-		if (wi.HotKeyCodes != null)
+--
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-171-			}
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-172-		}
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-173-		if (wi.MouseButton == EnumMouseButton.Left)
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-174-		{
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-175-			HotKey hotKeyByCode3 = capi.Input.GetHotKeyByCode("primarymouse");
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-176-			num = DrawHotkey(hotKeyByCode3, num, drawY, ctx, cairoFont, lineheight, height, width, num2, array);
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-177-		}
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-178-		if (wi.MouseButton == EnumMouseButton.Right)
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-179-		{
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-180-			HotKey hotKeyByCode4 = capi.Input.GetHotKeyByCode("secondarymouse");
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-181-			num = DrawHotkey(hotKeyByCode4, num, drawY, ctx, cairoFont, lineheight, height, width, num2, array);
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-182-		}
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs:183:		capi.World.FrameProfiler.Mark("blockinteractionhelp-recomp-2.2");
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-184-		string text = ": " + Lang.Get(wi.ActionLangCode);
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-185-		capi.Gui.Text.DrawTextLine(ctx, cairoFont, text, num - 4.0, drawY + (lineheight - height) / 2.0 + 2.0);
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-186-		ActualWidth = num + cairoFont.GetTextExtents(text).Width;
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs:187:		capi.World.FrameProfiler.Mark("blockinteractionhelp-recomp-2.3");
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-188-	}
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-189-
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-190-	private double DrawHotkey(HotKey hk, double x, double y, Context ctx, CairoFont font, double lineheight, double textHeight, double pluswdith, double symbolspacing, double[] color)
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-191-	{
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-192-		KeyCombination currentMapping = hk.CurrentMapping;
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-193-		if (currentMapping.IsMouseButton(currentMapping.KeyCode))
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-194-		{
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-195-			return DrawMouseButton(currentMapping.KeyCode - 240, x, y, ctx, font, lineheight, textHeight, pluswdith, symbolspacing, color);
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-196-		}
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-197-		if (currentMapping.Ctrl)
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-198-		{
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-199-			x = HotkeyComponent.DrawHotkey(capi, GlKeyNames.ToString(GlKeys.LControl), x, y, ctx, font, lineheight, textHeight, pluswdith, symbolspacing, 10.0, color);
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-200-		}
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-201-		if (currentMapping.Shift)
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-202-		{
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-203-			x = HotkeyComponent.DrawHotkey(capi, GlKeyNames.ToString(GlKeys.LShift), x, y, ctx, font, lineheight, textHeight, pluswdith, symbolspacing, 10.0, color);
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-204-		}
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-205-		x = HotkeyComponent.DrawHotkey(capi, currentMapping.PrimaryAsString(), x, y, ctx, font, lineheight, textHeight, pluswdith, symbolspacing, 10.0, color);
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-206-		return x;
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-207-	}
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-208-
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-209-	private double DrawMouseButton(int button, double x, double y, Context ctx, CairoFont font, double lineheight, double textHeight, double pluswdith, double symbolspacing, double[] color)
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-210-	{
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-211-		string text;
+Vintagestory.Client.NoObf/DrawWorldInteractionUtil.cs-212-		switch (button)
+--
+Vintagestory.Client/ScreenManager.cs-669-				newestVersion = null;
+Vintagestory.Client/ScreenManager.cs-670-			}
+Vintagestory.Client/ScreenManager.cs-671-		}
+Vintagestory.Client/ScreenManager.cs-672-		int count = MainThreadTasks.Count;
+Vintagestory.Client/ScreenManager.cs-673-		while (count-- > 0)
+Vintagestory.Client/ScreenManager.cs-674-		{
+Vintagestory.Client/ScreenManager.cs-675-			lock (MainThreadTasks)
+Vintagestory.Client/ScreenManager.cs-676-			{
+Vintagestory.Client/ScreenManager.cs-677-				MainThreadTasks.Dequeue()();
+Vintagestory.Client/ScreenManager.cs-678-			}
+Vintagestory.Client/ScreenManager.cs-679-		}
+Vintagestory.Client/ScreenManager.cs-680-		Render(dt);
+Vintagestory.Client/ScreenManager.cs:681:		FrameProfiler.Mark("rendered");
+Vintagestory.Client/ScreenManager.cs-682-		if (debugDrawCallNextFrame)
+Vintagestory.Client/ScreenManager.cs-683-		{
+Vintagestory.Client/ScreenManager.cs-684-			Platform.DebugDrawCalls = false;
+Vintagestory.Client/ScreenManager.cs-685-			debugDrawCallNextFrame = false;
+Vintagestory.Client/ScreenManager.cs-686-		}
+Vintagestory.Client/ScreenManager.cs-687-	}
+Vintagestory.Client/ScreenManager.cs-688-
+Vintagestory.Client/ScreenManager.cs-689-	public static void EnqueueMainThreadTask(Action a)
+Vintagestory.Client/ScreenManager.cs-690-	{
+Vintagestory.Client/ScreenManager.cs-691-		lock (MainThreadTasks)
+Vintagestory.Client/ScreenManager.cs-692-		{
+Vintagestory.Client/ScreenManager.cs-693-			MainThreadTasks.Enqueue(a);
+Vintagestory.Client/ScreenManager.cs-694-		}
+Vintagestory.Client/ScreenManager.cs-695-	}
+Vintagestory.Client/ScreenManager.cs-696-
+Vintagestory.Client/ScreenManager.cs-697-	public static void EnqueueCallBack(Action a, int msdelay, string code)
+Vintagestory.Client/ScreenManager.cs-698-	{
+Vintagestory.Client/ScreenManager.cs-699-		TyronThreadPool.QueueTask(async () =>
+Vintagestory.Client/ScreenManager.cs-700-		{
+Vintagestory.Client/ScreenManager.cs-701-			await Task.Delay(msdelay);
+Vintagestory.Client/ScreenManager.cs-702-			EnqueueMainThreadTask(a);
+Vintagestory.Client/ScreenManager.cs-703-		}, code);
+Vintagestory.Client/ScreenManager.cs-704-	}
+Vintagestory.Client/ScreenManager.cs-705-
+Vintagestory.Client/ScreenManager.cs-706-	internal void Render(float dt)
+Vintagestory.Client/ScreenManager.cs-707-	{
+Vintagestory.Client/ScreenManager.cs-708-		int width = Platform.WindowSize.Width;
+Vintagestory.Client/ScreenManager.cs-709-		int height = Platform.WindowSize.Height;
+Vintagestory.Client/ScreenManager.cs-710-		Platform.GlViewport(0, 0, width, height);
+Vintagestory.Client/ScreenManager.cs-711-		Platform.ClearFrameBuffer(EnumFrameBuffer.Default);
+Vintagestory.Client/ScreenManager.cs-712-		Platform.ClearFrameBuffer(EnumFrameBuffer.Primary);
+Vintagestory.Client/ScreenManager.cs-713-		Platform.GlDisableDepthTest();
+Vintagestory.Client/ScreenManager.cs-714-		Platform.GlDisableCullFace();
+Vintagestory.Client/ScreenManager.cs-715-		Platform.CheckGlError();
+Vintagestory.Client/ScreenManager.cs-716-		Platform.DoPostProcessingEffects = false;
+Vintagestory.Client/ScreenManager.cs-717-		Platform.LoadFrameBuffer(EnumFrameBuffer.Primary);
+Vintagestory.Client/ScreenManager.cs-718-		CurrentScreen.RenderToPrimary(dt);
+Vintagestory.Client/ScreenManager.cs:719:		FrameProfiler.Mark("doneRend");
+Vintagestory.Client/ScreenManager.cs-720-		float[] projectMatrix = null;
+Vintagestory.Client/ScreenManager.cs-721-		if (CurrentScreen is GuiScreenRunningGame guiScreenRunningGame)
+Vintagestory.Client/ScreenManager.cs-722-		{
+Vintagestory.Client/ScreenManager.cs-723-			projectMatrix = guiScreenRunningGame.runningGame.CurrentProjectionMatrix;
+Vintagestory.Client/ScreenManager.cs-724-		}
+Vintagestory.Client/ScreenManager.cs-725-		Platform.RenderPostprocessingEffects(projectMatrix);
+Vintagestory.Client/ScreenManager.cs-726-		CurrentScreen.RenderAfterPostProcessing(dt);
+Vintagestory.Client/ScreenManager.cs-727-		Platform.RenderFinalComposition();
+Vintagestory.Client/ScreenManager.cs-728-		CurrentScreen.RenderAfterFinalComposition(dt);
+Vintagestory.Client/ScreenManager.cs-729-		Platform.BlitPrimaryToDefault();
+Vintagestory.Client/ScreenManager.cs-730-		Platform.CheckGlError();
+Vintagestory.Client/ScreenManager.cs:731:		FrameProfiler.Mark("doneRender2Default");
+Vintagestory.Client/ScreenManager.cs-732-		Mat4f.Identity(api.renderapi.pMatrix);
+Vintagestory.Client/ScreenManager.cs-733-		Mat4f.Ortho(api.renderapi.pMatrix, 0f, Platform.WindowSize.Width, Platform.WindowSize.Height, 0f, 0f, 20001f);
+Vintagestory.Client/ScreenManager.cs-734-		Platform.GlDepthFunc(EnumDepthFunction.Lequal);
+Vintagestory.Client/ScreenManager.cs-735-		float value = 20000f;
+Vintagestory.Client/ScreenManager.cs-736-		GL.ClearBuffer(ClearBuffer.Depth, 0, ref value);
+Vintagestory.Client/ScreenManager.cs-737-		GL.DepthRange(0f, 20000f);
+Vintagestory.Client/ScreenManager.cs-738-		Platform.GlEnableDepthTest();
+Vintagestory.Client/ScreenManager.cs-739-		Platform.GlDisableCullFace();
+Vintagestory.Client/ScreenManager.cs-740-		Platform.GlToggleBlend(on: true);
+Vintagestory.Client/ScreenManager.cs-741-		CurrentScreen.RenderAfterBlit(dt);
+Vintagestory.Client/ScreenManager.cs-742-		if (CurrentScreen.RenderBg && !Platform.IsShuttingDown)
+Vintagestory.Client/ScreenManager.cs-743-		{
+Vintagestory.Client/ScreenManager.cs-744-			guiMainmenuLeft?.RenderBg(dt, withMainMenu);
+Vintagestory.Client/ScreenManager.cs-745-			withMainMenu = false;
+Vintagestory.Client/ScreenManager.cs-746-		}
+Vintagestory.Client/ScreenManager.cs-747-		CurrentScreen.RenderToDefaultFramebuffer(dt);
+Vintagestory.Client/ScreenManager.cs-748-		Platform.GlDepthFunc(EnumDepthFunction.Less);
+Vintagestory.Client/ScreenManager.cs:749:		FrameProfiler.Mark("doneAfterRender");
+Vintagestory.Client/ScreenManager.cs-750-		Platform.CheckGlError();
+Vintagestory.Client/ScreenManager.cs-751-	}
+Vintagestory.Client/ScreenManager.cs-752-
+Vintagestory.Client/ScreenManager.cs-753-	internal void RenderMainMenuParts(float dt, ElementBounds bounds, bool withMainMenu, bool darkenEdges = true)
+Vintagestory.Client/ScreenManager.cs-754-	{
+Vintagestory.Client/ScreenManager.cs-755-		this.withMainMenu = withMainMenu;
+Vintagestory.Client/ScreenManager.cs-756-		if (withMainMenu)
+Vintagestory.Client/ScreenManager.cs-757-		{
+Vintagestory.Client/ScreenManager.cs-758-			Platform.GlToggleBlend(on: true);
+Vintagestory.Client/ScreenManager.cs-759-			mainMenuComposer.Render(dt);
+Vintagestory.Client/ScreenManager.cs-760-			mainMenuComposer.PostRender(dt);
+Vintagestory.Client/ScreenManager.cs-761-		}
+Vintagestory.Client/ScreenManager.cs-762-		float num = Platform.WindowSize.Width;
+Vintagestory.Client/ScreenManager.cs-763-		float num2 = Platform.WindowSize.Height;
+Vintagestory.Client/ScreenManager.cs-764-		api.Render.Render2DTexturePremultipliedAlpha(versionNumberTexture.TextureId, num - (float)versionNumberTexture.Width - 10f, (double)(num2 - (float)versionNumberTexture.Height) - GuiElement.scaled(5.0), versionNumberTexture.Width, versionNumberTexture.Height);
+Vintagestory.Client/ScreenManager.cs-765-	}
+Vintagestory.Client/ScreenManager.cs-766-
+Vintagestory.Client/ScreenManager.cs-767-	public IInventory GetOwnInventory(string className)
+Vintagestory.Client/ScreenManager.cs-768-	{
+Vintagestory.Client/ScreenManager.cs-769-		throw new NotImplementedException();
+Vintagestory.Client/ScreenManager.cs-770-	}
+Vintagestory.Client/ScreenManager.cs-771-
+Vintagestory.Client/ScreenManager.cs-772-	public void SendPacketClient(Packet_Client packetClient)
+Vintagestory.Client/ScreenManager.cs-773-	{
+Vintagestory.Client/ScreenManager.cs-774-		throw new NotImplementedException();
+--
+Vintagestory.Common/EventManager.cs-135-	public virtual void TriggerGameTick(long ellapsedMilliseconds, IWorldAccessor world)
+Vintagestory.Common/EventManager.cs-136-	{
+Vintagestory.Common/EventManager.cs-137-		FrameProfilerUtil frameProfiler = world.FrameProfiler;
+Vintagestory.Common/EventManager.cs-138-		List<GameTickListener> gameTickListenersEntity = GameTickListenersEntity;
+Vintagestory.Common/EventManager.cs-139-		for (int i = 0; i < gameTickListenersEntity.Count; i++)
+Vintagestory.Common/EventManager.cs-140-		{
+Vintagestory.Common/EventManager.cs-141-			GameTickListener gameTickListener = gameTickListenersEntity[i];
+Vintagestory.Common/EventManager.cs-142-			if (gameTickListener != null && ellapsedMilliseconds - gameTickListener.LastUpdateMilliseconds > gameTickListener.Millisecondinterval)
+Vintagestory.Common/EventManager.cs-143-			{
+Vintagestory.Common/EventManager.cs-144-				gameTickListener.OnTriggered(ellapsedMilliseconds);
+Vintagestory.Common/EventManager.cs-145-			}
+Vintagestory.Common/EventManager.cs-146-		}
+Vintagestory.Common/EventManager.cs:147:		frameProfiler.Mark("tick-gtentity");
+Vintagestory.Common/EventManager.cs-148-		List<GameTickListenerBlock> gameTickListenersBlock = GameTickListenersBlock;
+Vintagestory.Common/EventManager.cs-149-		for (int j = 0; j < gameTickListenersBlock.Count; j++)
+Vintagestory.Common/EventManager.cs-150-		{
+Vintagestory.Common/EventManager.cs-151-			GameTickListenerBlock gameTickListenerBlock = gameTickListenersBlock[j];
+Vintagestory.Common/EventManager.cs-152-			if (gameTickListenerBlock != null && ellapsedMilliseconds - gameTickListenerBlock.LastUpdateMilliseconds > gameTickListenerBlock.Millisecondinterval)
+Vintagestory.Common/EventManager.cs-153-			{
+Vintagestory.Common/EventManager.cs-154-				gameTickListenerBlock.OnTriggered(world, gameTickListenerBlock.Pos, ellapsedMilliseconds);
+Vintagestory.Common/EventManager.cs-155-			}
+Vintagestory.Common/EventManager.cs-156-		}
+Vintagestory.Common/EventManager.cs:157:		frameProfiler.Mark("tick-gtblock");
+Vintagestory.Common/EventManager.cs-158-		deletable.Clear();
+Vintagestory.Common/EventManager.cs-159-		foreach (KeyValuePair<long, DelayedCallback> item in DelayedCallbacksEntity)
+Vintagestory.Common/EventManager.cs-160-		{
+Vintagestory.Common/EventManager.cs-161-			if (ellapsedMilliseconds - item.Value.CallAtEllapsedMilliseconds >= 0)
+Vintagestory.Common/EventManager.cs-162-			{
+Vintagestory.Common/EventManager.cs-163-				DelayedCallback value = item.Value;
+Vintagestory.Common/EventManager.cs-164-				value.Handler((float)(ellapsedMilliseconds - value.CallAtEllapsedMilliseconds) / 1000f);
+Vintagestory.Common/EventManager.cs-165-				deletable.Add(value);
+Vintagestory.Common/EventManager.cs-166-			}
+Vintagestory.Common/EventManager.cs-167-		}
+Vintagestory.Common/EventManager.cs:168:		frameProfiler.Mark("tick-dcentity");
+Vintagestory.Common/EventManager.cs-169-		foreach (DelayedCallback item2 in deletable)
+Vintagestory.Common/EventManager.cs-170-		{
+Vintagestory.Common/EventManager.cs-171-			DelayedCallbacksEntity.TryRemove(item2.ListenerId, out var _);
+Vintagestory.Common/EventManager.cs-172-		}
+Vintagestory.Common/EventManager.cs-173-		List<DelayedCallbackBlock> delayedCallbacksBlock = DelayedCallbacksBlock;
+Vintagestory.Common/EventManager.cs-174-		for (int k = 0; k < delayedCallbacksBlock.Count; k++)
+Vintagestory.Common/EventManager.cs-175-		{
+Vintagestory.Common/EventManager.cs-176-			DelayedCallbackBlock delayedCallbackBlock = delayedCallbacksBlock[k];
+Vintagestory.Common/EventManager.cs-177-			if (ellapsedMilliseconds - delayedCallbackBlock.CallAtEllapsedMilliseconds >= 0)
+Vintagestory.Common/EventManager.cs-178-			{
+Vintagestory.Common/EventManager.cs-179-				delayedCallbacksBlock.RemoveAt(k);
+Vintagestory.Common/EventManager.cs-180-				k--;
+Vintagestory.Common/EventManager.cs-181-				delayedCallbackBlock.Handler(world, delayedCallbackBlock.Pos, (float)(ellapsedMilliseconds - delayedCallbackBlock.CallAtEllapsedMilliseconds) / 1000f);
+Vintagestory.Common/EventManager.cs-182-			}
+Vintagestory.Common/EventManager.cs-183-		}
+Vintagestory.Common/EventManager.cs-184-		Dictionary<BlockPos, DelayedCallbackBlock> singleDelayedCallbacksBlock = SingleDelayedCallbacksBlock;
+Vintagestory.Common/EventManager.cs-185-		if (singleDelayedCallbacksBlock.Count > 0)
+Vintagestory.Common/EventManager.cs-186-		{
+Vintagestory.Common/EventManager.cs-187-			foreach (BlockPos item3 in new List<BlockPos>(singleDelayedCallbacksBlock.Keys))
+Vintagestory.Common/EventManager.cs-188-			{
+Vintagestory.Common/EventManager.cs-189-				DelayedCallbackBlock delayedCallbackBlock2 = singleDelayedCallbacksBlock[item3];
+Vintagestory.Common/EventManager.cs-190-				if (ellapsedMilliseconds - delayedCallbackBlock2.CallAtEllapsedMilliseconds >= 0)
+Vintagestory.Common/EventManager.cs-191-				{
+Vintagestory.Common/EventManager.cs-192-					singleDelayedCallbacksBlock.Remove(item3);
+Vintagestory.Common/EventManager.cs-193-					delayedCallbackBlock2.Handler(world, delayedCallbackBlock2.Pos, (float)(ellapsedMilliseconds - delayedCallbackBlock2.CallAtEllapsedMilliseconds) / 1000f);
+Vintagestory.Common/EventManager.cs-194-				}
+Vintagestory.Common/EventManager.cs-195-			}
+Vintagestory.Common/EventManager.cs-196-		}
+Vintagestory.Common/EventManager.cs:197:		frameProfiler.Mark("tick-dcblock");
+Vintagestory.Common/EventManager.cs-198-	}
+Vintagestory.Common/EventManager.cs-199-
+Vintagestory.Common/EventManager.cs-200-	public virtual void TriggerGameTickDebug(long ellapsedMilliseconds, IWorldAccessor world)
+Vintagestory.Common/EventManager.cs-201-	{
+Vintagestory.Common/EventManager.cs-202-		List<GameTickListener> gameTickListenersEntity = GameTickListenersEntity;
+Vintagestory.Common/EventManager.cs-203-		for (int i = 0; i < gameTickListenersEntity.Count; i++)
+Vintagestory.Common/EventManager.cs-204-		{
+Vintagestory.Common/EventManager.cs-205-			GameTickListener gameTickListener = gameTickListenersEntity[i];
+Vintagestory.Common/EventManager.cs-206-			if (gameTickListener != null && ellapsedMilliseconds - gameTickListener.LastUpdateMilliseconds > gameTickListener.Millisecondinterval)
+Vintagestory.Common/EventManager.cs-207-			{
+Vintagestory.Common/EventManager.cs-208-				gameTickListener.OnTriggered(ellapsedMilliseconds);
+Vintagestory.Common/EventManager.cs:209:				world.FrameProfiler.Mark("gmle", gameTickListener.ProfilerName);
+Vintagestory.Common/EventManager.cs-210-			}
+Vintagestory.Common/EventManager.cs-211-		}
+Vintagestory.Common/EventManager.cs-212-		List<GameTickListenerBlock> gameTickListenersBlock = GameTickListenersBlock;
+Vintagestory.Common/EventManager.cs-213-		for (int j = 0; j < gameTickListenersBlock.Count; j++)
+Vintagestory.Common/EventManager.cs-214-		{
+Vintagestory.Common/EventManager.cs-215-			GameTickListenerBlock gameTickListenerBlock = gameTickListenersBlock[j];
+Vintagestory.Common/EventManager.cs-216-			if (gameTickListenerBlock != null && ellapsedMilliseconds - gameTickListenerBlock.LastUpdateMilliseconds > gameTickListenerBlock.Millisecondinterval)
+Vintagestory.Common/EventManager.cs-217-			{
+Vintagestory.Common/EventManager.cs-218-				gameTickListenerBlock.OnTriggered(world, gameTickListenerBlock.Pos, ellapsedMilliseconds);
+Vintagestory.Common/EventManager.cs:219:				world.FrameProfiler.Mark("gmlb", gameTickListenerBlock.ProfilerName);
+Vintagestory.Common/EventManager.cs-220-			}
+Vintagestory.Common/EventManager.cs-221-		}
+Vintagestory.Common/EventManager.cs-222-		deletable.Clear();
+Vintagestory.Common/EventManager.cs-223-		foreach (KeyValuePair<long, DelayedCallback> item in DelayedCallbacksEntity)
+Vintagestory.Common/EventManager.cs-224-		{
+Vintagestory.Common/EventManager.cs-225-			if (ellapsedMilliseconds - item.Value.CallAtEllapsedMilliseconds >= 0)
+Vintagestory.Common/EventManager.cs-226-			{
+Vintagestory.Common/EventManager.cs-227-				DelayedCallback value = item.Value;
+Vintagestory.Common/EventManager.cs-228-				value.Handler((float)(ellapsedMilliseconds - value.CallAtEllapsedMilliseconds) / 1000f);
+Vintagestory.Common/EventManager.cs-229-				deletable.Add(value);
+Vintagestory.Common/EventManager.cs:230:				world.FrameProfiler.Mark("dce", value.ProfileName);
+Vintagestory.Common/EventManager.cs-231-			}
+Vintagestory.Common/EventManager.cs-232-		}
+Vintagestory.Common/EventManager.cs-233-		foreach (DelayedCallback item2 in deletable)
+Vintagestory.Common/EventManager.cs-234-		{
+Vintagestory.Common/EventManager.cs-235-			DelayedCallbacksEntity.TryRemove(item2.ListenerId, out var _);
+Vintagestory.Common/EventManager.cs-236-		}
+Vintagestory.Common/EventManager.cs-237-		List<DelayedCallbackBlock> delayedCallbacksBlock = DelayedCallbacksBlock;
+Vintagestory.Common/EventManager.cs-238-		for (int k = 0; k < delayedCallbacksBlock.Count; k++)
+Vintagestory.Common/EventManager.cs-239-		{
+Vintagestory.Common/EventManager.cs-240-			DelayedCallbackBlock delayedCallbackBlock = delayedCallbacksBlock[k];
+Vintagestory.Common/EventManager.cs-241-			if (ellapsedMilliseconds - delayedCallbackBlock.CallAtEllapsedMilliseconds >= 0)
+Vintagestory.Common/EventManager.cs-242-			{
+Vintagestory.Common/EventManager.cs-243-				delayedCallbacksBlock.RemoveAt(k);
+Vintagestory.Common/EventManager.cs-244-				k--;
+Vintagestory.Common/EventManager.cs-245-				delayedCallbackBlock.Handler(world, delayedCallbackBlock.Pos, (float)(ellapsedMilliseconds - delayedCallbackBlock.CallAtEllapsedMilliseconds) / 1000f);
+Vintagestory.Common/EventManager.cs:246:				world.FrameProfiler.Mark("dcb", delayedCallbackBlock.ProfileName);
+Vintagestory.Common/EventManager.cs-247-			}
+Vintagestory.Common/EventManager.cs-248-		}
+Vintagestory.Common/EventManager.cs-249-		Dictionary<BlockPos, DelayedCallbackBlock> singleDelayedCallbacksBlock = SingleDelayedCallbacksBlock;
+Vintagestory.Common/EventManager.cs-250-		if (singleDelayedCallbacksBlock.Count <= 0)
+Vintagestory.Common/EventManager.cs-251-		{
+Vintagestory.Common/EventManager.cs-252-			return;
+Vintagestory.Common/EventManager.cs-253-		}
+Vintagestory.Common/EventManager.cs-254-		foreach (BlockPos item3 in new List<BlockPos>(singleDelayedCallbacksBlock.Keys))
+Vintagestory.Common/EventManager.cs-255-		{
+Vintagestory.Common/EventManager.cs-256-			DelayedCallbackBlock delayedCallbackBlock2 = singleDelayedCallbacksBlock[item3];
+Vintagestory.Common/EventManager.cs-257-			if (ellapsedMilliseconds - delayedCallbackBlock2.CallAtEllapsedMilliseconds >= 0)
+Vintagestory.Common/EventManager.cs-258-			{
+Vintagestory.Common/EventManager.cs-259-				singleDelayedCallbacksBlock.Remove(item3);
+Vintagestory.Common/EventManager.cs-260-				delayedCallbackBlock2.Handler(world, delayedCallbackBlock2.Pos, (float)(ellapsedMilliseconds - delayedCallbackBlock2.CallAtEllapsedMilliseconds) / 1000f);
+Vintagestory.Common/EventManager.cs:261:				world.FrameProfiler.Mark("sdcb", delayedCallbackBlock2.ProfileName);
+Vintagestory.Common/EventManager.cs-262-			}
+Vintagestory.Common/EventManager.cs-263-		}
+Vintagestory.Common/EventManager.cs-264-	}
+Vintagestory.Common/EventManager.cs-265-
+Vintagestory.Common/EventManager.cs-266-	public virtual long AddGameTickListener(Action<float> handler, int millisecondInterval, int initialDelayOffsetMs = 0)
+Vintagestory.Common/EventManager.cs-267-	{
+Vintagestory.Common/EventManager.cs-268-		return AddGameTickListener(handler, null, millisecondInterval, initialDelayOffsetMs);
+Vintagestory.Common/EventManager.cs-269-	}
+Vintagestory.Common/EventManager.cs-270-
+Vintagestory.Common/EventManager.cs-271-	public virtual long AddGameTickListener(Action<float> handler, Action<Exception> errorHandler, int millisecondInterval, int initialDelayOffsetMs = 0)
+Vintagestory.Common/EventManager.cs-272-	{
+Vintagestory.Common/EventManager.cs-273-		long num = ++listenerId;
+Vintagestory.Common/EventManager.cs-274-		GameTickListener gameTickListener = new GameTickListener(num, millisecondInterval, InWorldEllapsedMs + initialDelayOffsetMs, handler, errorHandler);
+Vintagestory.Common/EventManager.cs-275-		List<GameTickListener> gameTickListenersEntity = GameTickListenersEntity;
+Vintagestory.Common/EventManager.cs-276-		for (int i = 0; i < gameTickListenersEntity.Count; i++)
+Vintagestory.Common/EventManager.cs-277-		{
+Vintagestory.Common/EventManager.cs-278-			if (gameTickListenersEntity[i] == null)
+Vintagestory.Common/EventManager.cs-279-			{
+Vintagestory.Common/EventManager.cs-280-				gameTickListenersEntity[i] = gameTickListener;
+Vintagestory.Common/EventManager.cs-281-				GameTickListenersEntityIndices[num] = i;
+Vintagestory.Common/EventManager.cs-282-				if (gameTickListenersEntity[GameTickListenersEntityIndices[num]] != gameTickListener)
+Vintagestory.Common/EventManager.cs-283-				{
+Vintagestory.Common/EventManager.cs-284-					throw new InvalidOperationException("Failed to add listener properly");
+Vintagestory.Common/EventManager.cs-285-				}
+Vintagestory.Common/EventManager.cs-286-				return num;
+--
+Vintagestory.Server/ServerSystemAutoSaveGame.cs-44-
+Vintagestory.Server/ServerSystemAutoSaveGame.cs-45-	private void doAutoSave()
+Vintagestory.Server/ServerSystemAutoSaveGame.cs-46-	{
+Vintagestory.Server/ServerSystemAutoSaveGame.cs-47-		if (server.chunkThread.BackupInProgress)
+Vintagestory.Server/ServerSystemAutoSaveGame.cs-48-		{
+Vintagestory.Server/ServerSystemAutoSaveGame.cs-49-			return;
+Vintagestory.Server/ServerSystemAutoSaveGame.cs-50-		}
+Vintagestory.Server/ServerSystemAutoSaveGame.cs-51-		if (server.chunkThread.runOffThreadSaveNow)
+Vintagestory.Server/ServerSystemAutoSaveGame.cs-52-		{
+Vintagestory.Server/ServerSystemAutoSaveGame.cs-53-			ServerMain.Logger.Warning("Call to autosave, but server is already saving. May indicate a disk i/o bottleneck. Reduce autosave interval or improve file i/o. Will ignore this autosave call.");
+Vintagestory.Server/ServerSystemAutoSaveGame.cs-54-			return;
+Vintagestory.Server/ServerSystemAutoSaveGame.cs-55-		}
+Vintagestory.Server/ServerSystemAutoSaveGame.cs:56:		ServerMain.FrameProfiler.Mark("autosave - preparing for autosave");
+Vintagestory.Server/ServerSystemAutoSaveGame.cs-57-		if (!Monitor.TryEnter(server.suspendLock, 5000))
+Vintagestory.Server/ServerSystemAutoSaveGame.cs-58-		{
+Vintagestory.Server/ServerSystemAutoSaveGame.cs-59-			return;
+Vintagestory.Server/ServerSystemAutoSaveGame.cs-60-		}
+Vintagestory.Server/ServerSystemAutoSaveGame.cs-61-		try
+Vintagestory.Server/ServerSystemAutoSaveGame.cs-62-		{
+Vintagestory.Server/ServerSystemAutoSaveGame.cs:63:			ServerMain.FrameProfiler.Mark("autosave - obtaining lock");
+Vintagestory.Server/ServerSystemAutoSaveGame.cs-64-			if (!server.Suspend(newSuspendState: true, 3000))
+Vintagestory.Server/ServerSystemAutoSaveGame.cs-65-			{
+Vintagestory.Server/ServerSystemAutoSaveGame.cs-66-				ServerMain.Logger.Notification("Unable to autosave, was not able to pause the server");
+Vintagestory.Server/ServerSystemAutoSaveGame.cs-67-				server.Suspend(newSuspendState: false);
+Vintagestory.Server/ServerSystemAutoSaveGame.cs-68-				return;
+Vintagestory.Server/ServerSystemAutoSaveGame.cs-69-			}
+Vintagestory.Server/ServerSystemAutoSaveGame.cs-70-			if (!server.Saving)
+Vintagestory.Server/ServerSystemAutoSaveGame.cs-71-			{
+Vintagestory.Server/ServerSystemAutoSaveGame.cs-72-				server.Saving = true;
+Vintagestory.Server/ServerSystemAutoSaveGame.cs:73:				ServerMain.FrameProfiler.Mark("autosave - pausing server");
+Vintagestory.Server/ServerSystemAutoSaveGame.cs-74-				ServerMain.Logger.Notification("Autosaving game world. Notifying mods, then systems of save...");
+Vintagestory.Server/ServerSystemAutoSaveGame.cs-75-				server.SendMessageToGroup(GlobalConstants.ServerInfoChatGroup, "Saving game world....", EnumChatType.Notification);
+Vintagestory.Server/ServerSystemAutoSaveGame.cs:76:				ServerMain.FrameProfiler.Mark("autosave - notifying players");
+Vintagestory.Server/ServerSystemAutoSaveGame.cs-77-				server.EventManager.TriggerGameWorldBeingSaved();
+Vintagestory.Server/ServerSystemAutoSaveGame.cs-78-				server.Saving = false;
+Vintagestory.Server/ServerSystemAutoSaveGame.cs-79-				milliSecondsSinceSave = millisecondsSinceStart;
+Vintagestory.Server/ServerSystemAutoSaveGame.cs-80-			}
+Vintagestory.Server/ServerSystemAutoSaveGame.cs-81-			server.Suspend(newSuspendState: false);
+Vintagestory.Server/ServerSystemAutoSaveGame.cs:82:			ServerMain.FrameProfiler.Mark("autosave");
+Vintagestory.Server/ServerSystemAutoSaveGame.cs-83-		}
+Vintagestory.Server/ServerSystemAutoSaveGame.cs-84-		finally
+Vintagestory.Server/ServerSystemAutoSaveGame.cs-85-		{
+Vintagestory.Server/ServerSystemAutoSaveGame.cs-86-			Monitor.Exit(server.suspendLock);
+Vintagestory.Server/ServerSystemAutoSaveGame.cs-87-		}
+Vintagestory.Server/ServerSystemAutoSaveGame.cs-88-	}
+Vintagestory.Server/ServerSystemAutoSaveGame.cs-89-}
+--
+Vintagestory.Server/ServerEventManager.cs-264-			return;
+Vintagestory.Server/ServerEventManager.cs-265-		}
+Vintagestory.Server/ServerEventManager.cs-266-		Delegate[] invocationList = OnGameWorldBeingSaved.GetInvocationList();
+Vintagestory.Server/ServerEventManager.cs-267-		for (int i = 0; i < invocationList.Length; i++)
+Vintagestory.Server/ServerEventManager.cs-268-		{
+Vintagestory.Server/ServerEventManager.cs-269-			Action action = (Action)invocationList[i];
+Vintagestory.Server/ServerEventManager.cs-270-			try
+Vintagestory.Server/ServerEventManager.cs-271-			{
+Vintagestory.Server/ServerEventManager.cs-272-				action();
+Vintagestory.Server/ServerEventManager.cs-273-				FrameProfilerUtil frameProfiler = ServerMain.FrameProfiler;
+Vintagestory.Server/ServerEventManager.cs-274-				if (frameProfiler != null && frameProfiler.Enabled)
+Vintagestory.Server/ServerEventManager.cs-275-				{
+Vintagestory.Server/ServerEventManager.cs:276:					ServerMain.FrameProfiler.Mark("beingsaved-", action.Target.ToString());
+Vintagestory.Server/ServerEventManager.cs-277-				}
+Vintagestory.Server/ServerEventManager.cs-278-			}
+Vintagestory.Server/ServerEventManager.cs-279-			catch (Exception e)
+Vintagestory.Server/ServerEventManager.cs-280-			{
+Vintagestory.Server/ServerEventManager.cs-281-				ServerMain.Logger.Error("Exception thrown during handling event OnGameWorldBeingSaved. Will skip over.");
+Vintagestory.Server/ServerEventManager.cs-282-				ServerMain.Logger.Error(e);
+Vintagestory.Server/ServerEventManager.cs-283-			}
+Vintagestory.Server/ServerEventManager.cs-284-		}
+Vintagestory.Server/ServerEventManager.cs-285-	}
+Vintagestory.Server/ServerEventManager.cs-286-
+Vintagestory.Server/ServerEventManager.cs-287-	public virtual void TriggerDidUseBlock(IServerPlayer player, BlockSelection blockSel)
+Vintagestory.Server/ServerEventManager.cs-288-	{
+Vintagestory.Server/ServerEventManager.cs-289-		Trigger(DidUseBlock?.GetInvocationList(), "DidUseBlock", (BlockUsedDelegate dele) =>
+Vintagestory.Server/ServerEventManager.cs-290-		{
+Vintagestory.Server/ServerEventManager.cs-291-			dele?.Invoke(player, blockSel);
+Vintagestory.Server/ServerEventManager.cs-292-		});
+Vintagestory.Server/ServerEventManager.cs-293-	}
+Vintagestory.Server/ServerEventManager.cs-294-
+Vintagestory.Server/ServerEventManager.cs-295-	public virtual void TriggerDidBreakBlock(IServerPlayer player, int oldBlockId, BlockSelection blockSel)
+Vintagestory.Server/ServerEventManager.cs-296-	{
+Vintagestory.Server/ServerEventManager.cs-297-		Trigger(DidBreakBlock?.GetInvocationList(), "DidBreakBlock", (BlockBrokenDelegate dele) =>
+Vintagestory.Server/ServerEventManager.cs-298-		{
+Vintagestory.Server/ServerEventManager.cs-299-			dele?.Invoke(player, oldBlockId, blockSel);
+Vintagestory.Server/ServerEventManager.cs-300-		});
+Vintagestory.Server/ServerEventManager.cs-301-	}

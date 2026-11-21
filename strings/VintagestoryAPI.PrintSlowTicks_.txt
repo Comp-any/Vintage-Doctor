@@ -1,0 +1,239 @@
+Vintagestory.API.Common/FrameProfilerUtil.cs-2-using System.Collections.Concurrent;
+Vintagestory.API.Common/FrameProfilerUtil.cs-3-using System.Collections.Generic;
+Vintagestory.API.Common/FrameProfilerUtil.cs-4-using System.Diagnostics;
+Vintagestory.API.Common/FrameProfilerUtil.cs-5-using System.Linq;
+Vintagestory.API.Common/FrameProfilerUtil.cs-6-using System.Text;
+Vintagestory.API.Common/FrameProfilerUtil.cs-7-
+Vintagestory.API.Common/FrameProfilerUtil.cs-8-namespace Vintagestory.API.Common;
+Vintagestory.API.Common/FrameProfilerUtil.cs-9-
+Vintagestory.API.Common/FrameProfilerUtil.cs-10-public class FrameProfilerUtil
+Vintagestory.API.Common/FrameProfilerUtil.cs-11-{
+Vintagestory.API.Common/FrameProfilerUtil.cs-12-	public bool Enabled;
+Vintagestory.API.Common/FrameProfilerUtil.cs-13-
+Vintagestory.API.Common/FrameProfilerUtil.cs:14:	public bool PrintSlowTicks;
+Vintagestory.API.Common/FrameProfilerUtil.cs-15-
+Vintagestory.API.Common/FrameProfilerUtil.cs:16:	public int PrintSlowTicksThreshold = 40;
+Vintagestory.API.Common/FrameProfilerUtil.cs-17-
+Vintagestory.API.Common/FrameProfilerUtil.cs-18-	public ProfileEntryRange PrevRootEntry;
+Vintagestory.API.Common/FrameProfilerUtil.cs-19-
+Vintagestory.API.Common/FrameProfilerUtil.cs-20-	public string summary;
+Vintagestory.API.Common/FrameProfilerUtil.cs-21-
+Vintagestory.API.Common/FrameProfilerUtil.cs-22-	public string OutputPrefix = "";
+Vintagestory.API.Common/FrameProfilerUtil.cs-23-
+Vintagestory.API.Common/FrameProfilerUtil.cs-24-	public static ConcurrentQueue<string> offThreadProfiles = new ConcurrentQueue<string>();
+Vintagestory.API.Common/FrameProfilerUtil.cs-25-
+Vintagestory.API.Common/FrameProfilerUtil.cs:26:	public static bool PrintSlowTicks_Offthreads;
+Vintagestory.API.Common/FrameProfilerUtil.cs-27-
+Vintagestory.API.Common/FrameProfilerUtil.cs:28:	public static int PrintSlowTicksThreshold_Offthreads = 40;
+Vintagestory.API.Common/FrameProfilerUtil.cs-29-
+Vintagestory.API.Common/FrameProfilerUtil.cs-30-	private Stopwatch stopwatch = new Stopwatch();
+Vintagestory.API.Common/FrameProfilerUtil.cs-31-
+Vintagestory.API.Common/FrameProfilerUtil.cs-32-	private ProfileEntryRange rootEntry;
+Vintagestory.API.Common/FrameProfilerUtil.cs-33-
+Vintagestory.API.Common/FrameProfilerUtil.cs-34-	private ProfileEntryRange currentEntry;
+Vintagestory.API.Common/FrameProfilerUtil.cs-35-
+Vintagestory.API.Common/FrameProfilerUtil.cs-36-	private string beginText;
+Vintagestory.API.Common/FrameProfilerUtil.cs-37-
+Vintagestory.API.Common/FrameProfilerUtil.cs-38-	private Action<string> onLogoutputHandler;
+Vintagestory.API.Common/FrameProfilerUtil.cs-39-
+Vintagestory.API.Common/FrameProfilerUtil.cs-40-	public FrameProfilerUtil(Action<string> onLogoutputHandler)
+Vintagestory.API.Common/FrameProfilerUtil.cs-41-	{
+Vintagestory.API.Common/FrameProfilerUtil.cs-42-		this.onLogoutputHandler = onLogoutputHandler;
+Vintagestory.API.Common/FrameProfilerUtil.cs-43-		stopwatch.Start();
+Vintagestory.API.Common/FrameProfilerUtil.cs-44-	}
+Vintagestory.API.Common/FrameProfilerUtil.cs-45-
+Vintagestory.API.Common/FrameProfilerUtil.cs-46-	/// <summary>
+Vintagestory.API.Common/FrameProfilerUtil.cs-47-	/// Used to create a FrameProfilerUtil on threads other than the main thread
+Vintagestory.API.Common/FrameProfilerUtil.cs-48-	/// </summary>
+Vintagestory.API.Common/FrameProfilerUtil.cs-49-	/// <param name="outputPrefix"></param>
+Vintagestory.API.Common/FrameProfilerUtil.cs-50-	public FrameProfilerUtil(string outputPrefix)
+Vintagestory.API.Common/FrameProfilerUtil.cs-51-		: this((string text) =>
+Vintagestory.API.Common/FrameProfilerUtil.cs-52-		{
+Vintagestory.API.Common/FrameProfilerUtil.cs-53-			offThreadProfiles.Enqueue(text);
+Vintagestory.API.Common/FrameProfilerUtil.cs-54-		})
+Vintagestory.API.Common/FrameProfilerUtil.cs-55-	{
+Vintagestory.API.Common/FrameProfilerUtil.cs-56-		OutputPrefix = outputPrefix;
+Vintagestory.API.Common/FrameProfilerUtil.cs-57-	}
+Vintagestory.API.Common/FrameProfilerUtil.cs-58-
+Vintagestory.API.Common/FrameProfilerUtil.cs-59-	/// <summary>
+Vintagestory.API.Common/FrameProfilerUtil.cs-60-	/// Called by the game engine for each render frame or server tick
+Vintagestory.API.Common/FrameProfilerUtil.cs-61-	/// </summary>
+Vintagestory.API.Common/FrameProfilerUtil.cs-62-	public void Begin(string beginText = null, params object[] args)
+Vintagestory.API.Common/FrameProfilerUtil.cs-63-	{
+Vintagestory.API.Common/FrameProfilerUtil.cs:64:		if (Enabled || PrintSlowTicks)
+Vintagestory.API.Common/FrameProfilerUtil.cs-65-		{
+Vintagestory.API.Common/FrameProfilerUtil.cs-66-			this.beginText = ((beginText == null) ? null : string.Format(beginText, args));
+Vintagestory.API.Common/FrameProfilerUtil.cs-67-			currentEntry = null;
+Vintagestory.API.Common/FrameProfilerUtil.cs-68-			rootEntry = Enter("all");
+Vintagestory.API.Common/FrameProfilerUtil.cs-69-		}
+Vintagestory.API.Common/FrameProfilerUtil.cs-70-	}
+Vintagestory.API.Common/FrameProfilerUtil.cs-71-
+Vintagestory.API.Common/FrameProfilerUtil.cs-72-	public ProfileEntryRange Enter(string code)
+Vintagestory.API.Common/FrameProfilerUtil.cs-73-	{
+Vintagestory.API.Common/FrameProfilerUtil.cs:74:		if (!Enabled && !PrintSlowTicks)
+Vintagestory.API.Common/FrameProfilerUtil.cs-75-		{
+Vintagestory.API.Common/FrameProfilerUtil.cs-76-			return null;
+Vintagestory.API.Common/FrameProfilerUtil.cs-77-		}
+Vintagestory.API.Common/FrameProfilerUtil.cs-78-		long elapsedTicks = stopwatch.ElapsedTicks;
+Vintagestory.API.Common/FrameProfilerUtil.cs-79-		if (currentEntry == null)
+Vintagestory.API.Common/FrameProfilerUtil.cs-80-		{
+Vintagestory.API.Common/FrameProfilerUtil.cs-81-			ProfileEntryRange profileEntryRange = new ProfileEntryRange
+Vintagestory.API.Common/FrameProfilerUtil.cs-82-			{
+Vintagestory.API.Common/FrameProfilerUtil.cs-83-				Code = code,
+Vintagestory.API.Common/FrameProfilerUtil.cs-84-				Start = elapsedTicks,
+Vintagestory.API.Common/FrameProfilerUtil.cs-85-				LastMark = elapsedTicks,
+Vintagestory.API.Common/FrameProfilerUtil.cs-86-				CallCount = 0
+Vintagestory.API.Common/FrameProfilerUtil.cs-87-			};
+Vintagestory.API.Common/FrameProfilerUtil.cs-88-			ProfileEntryRange result = profileEntryRange;
+Vintagestory.API.Common/FrameProfilerUtil.cs-89-			currentEntry = profileEntryRange;
+Vintagestory.API.Common/FrameProfilerUtil.cs-90-			return result;
+Vintagestory.API.Common/FrameProfilerUtil.cs-91-		}
+Vintagestory.API.Common/FrameProfilerUtil.cs-92-		if (currentEntry.ChildRanges == null)
+Vintagestory.API.Common/FrameProfilerUtil.cs-93-		{
+Vintagestory.API.Common/FrameProfilerUtil.cs-94-			currentEntry.ChildRanges = new Dictionary<string, ProfileEntryRange>();
+Vintagestory.API.Common/FrameProfilerUtil.cs-95-		}
+Vintagestory.API.Common/FrameProfilerUtil.cs-96-		if (!currentEntry.ChildRanges.TryGetValue(code, out var value))
+Vintagestory.API.Common/FrameProfilerUtil.cs-97-		{
+Vintagestory.API.Common/FrameProfilerUtil.cs-98-			Dictionary<string, ProfileEntryRange> childRanges = currentEntry.ChildRanges;
+Vintagestory.API.Common/FrameProfilerUtil.cs-99-			ProfileEntryRange profileEntryRange2 = new ProfileEntryRange
+--
+Vintagestory.API.Common/FrameProfilerUtil.cs-113-			value.LastMark = elapsedTicks;
+Vintagestory.API.Common/FrameProfilerUtil.cs-114-		}
+Vintagestory.API.Common/FrameProfilerUtil.cs-115-		currentEntry = value;
+Vintagestory.API.Common/FrameProfilerUtil.cs-116-		value.CallCount++;
+Vintagestory.API.Common/FrameProfilerUtil.cs-117-		return value;
+Vintagestory.API.Common/FrameProfilerUtil.cs-118-	}
+Vintagestory.API.Common/FrameProfilerUtil.cs-119-
+Vintagestory.API.Common/FrameProfilerUtil.cs-120-	/// <summary>
+Vintagestory.API.Common/FrameProfilerUtil.cs-121-	/// Same as <see cref="M:Vintagestory.API.Common.FrameProfilerUtil.Mark(System.String)" /> when <see cref="M:Vintagestory.API.Common.FrameProfilerUtil.Enter(System.String)" /> was called before.
+Vintagestory.API.Common/FrameProfilerUtil.cs-122-	/// </summary>
+Vintagestory.API.Common/FrameProfilerUtil.cs-123-	public void Leave()
+Vintagestory.API.Common/FrameProfilerUtil.cs-124-	{
+Vintagestory.API.Common/FrameProfilerUtil.cs:125:		if ((Enabled || PrintSlowTicks) && currentEntry != null)
+Vintagestory.API.Common/FrameProfilerUtil.cs-126-		{
+Vintagestory.API.Common/FrameProfilerUtil.cs-127-			long elapsedTicks = stopwatch.ElapsedTicks;
+Vintagestory.API.Common/FrameProfilerUtil.cs-128-			currentEntry.ElapsedTicks += elapsedTicks - currentEntry.Start;
+Vintagestory.API.Common/FrameProfilerUtil.cs-129-			currentEntry.LastMark = elapsedTicks;
+Vintagestory.API.Common/FrameProfilerUtil.cs-130-			currentEntry = currentEntry.ParentRange;
+Vintagestory.API.Common/FrameProfilerUtil.cs-131-			for (ProfileEntryRange parentRange = currentEntry; parentRange != null; parentRange = parentRange.ParentRange)
+Vintagestory.API.Common/FrameProfilerUtil.cs-132-			{
+Vintagestory.API.Common/FrameProfilerUtil.cs-133-				parentRange.LastMark = elapsedTicks;
+Vintagestory.API.Common/FrameProfilerUtil.cs-134-			}
+Vintagestory.API.Common/FrameProfilerUtil.cs-135-		}
+Vintagestory.API.Common/FrameProfilerUtil.cs-136-	}
+Vintagestory.API.Common/FrameProfilerUtil.cs-137-
+Vintagestory.API.Common/FrameProfilerUtil.cs-138-	/// <summary>
+Vintagestory.API.Common/FrameProfilerUtil.cs-139-	/// Use this method like .Mark where the string has a second component
+Vintagestory.API.Common/FrameProfilerUtil.cs-140-	/// (For performance, this avoids concatenating the strings unnecessarily, where the profiler is not enabled)
+Vintagestory.API.Common/FrameProfilerUtil.cs-141-	/// </summary>
+Vintagestory.API.Common/FrameProfilerUtil.cs-142-	/// <param name="code"></param>
+Vintagestory.API.Common/FrameProfilerUtil.cs-143-	/// <param name="param"></param>
+Vintagestory.API.Common/FrameProfilerUtil.cs-144-	public void Mark(string code, object param)
+Vintagestory.API.Common/FrameProfilerUtil.cs-145-	{
+Vintagestory.API.Common/FrameProfilerUtil.cs:146:		if (Enabled || PrintSlowTicks)
+Vintagestory.API.Common/FrameProfilerUtil.cs-147-		{
+Vintagestory.API.Common/FrameProfilerUtil.cs-148-			if (code == null)
+Vintagestory.API.Common/FrameProfilerUtil.cs-149-			{
+Vintagestory.API.Common/FrameProfilerUtil.cs-150-				throw new ArgumentNullException("marker name may not be null!");
+Vintagestory.API.Common/FrameProfilerUtil.cs-151-			}
+Vintagestory.API.Common/FrameProfilerUtil.cs-152-			MarkInternal(code + param);
+Vintagestory.API.Common/FrameProfilerUtil.cs-153-		}
+Vintagestory.API.Common/FrameProfilerUtil.cs-154-	}
+Vintagestory.API.Common/FrameProfilerUtil.cs-155-
+Vintagestory.API.Common/FrameProfilerUtil.cs-156-	/// <summary>
+Vintagestory.API.Common/FrameProfilerUtil.cs-157-	/// Use this method to add a frame profiling marker, will set or add the time ellapsed since the previous mark to the frame profiling reults.
+Vintagestory.API.Common/FrameProfilerUtil.cs-158-	/// </summary>
+Vintagestory.API.Common/FrameProfilerUtil.cs-159-	/// <param name="code"></param>
+Vintagestory.API.Common/FrameProfilerUtil.cs-160-	public void Mark(string code)
+Vintagestory.API.Common/FrameProfilerUtil.cs-161-	{
+Vintagestory.API.Common/FrameProfilerUtil.cs:162:		if (Enabled || PrintSlowTicks)
+Vintagestory.API.Common/FrameProfilerUtil.cs-163-		{
+Vintagestory.API.Common/FrameProfilerUtil.cs-164-			if (code == null)
+Vintagestory.API.Common/FrameProfilerUtil.cs-165-			{
+Vintagestory.API.Common/FrameProfilerUtil.cs-166-				throw new ArgumentNullException("marker name may not be null!");
+Vintagestory.API.Common/FrameProfilerUtil.cs-167-			}
+Vintagestory.API.Common/FrameProfilerUtil.cs-168-			MarkInternal(code);
+Vintagestory.API.Common/FrameProfilerUtil.cs-169-		}
+Vintagestory.API.Common/FrameProfilerUtil.cs-170-	}
+Vintagestory.API.Common/FrameProfilerUtil.cs-171-
+Vintagestory.API.Common/FrameProfilerUtil.cs-172-	private void MarkInternal(string code)
+Vintagestory.API.Common/FrameProfilerUtil.cs-173-	{
+Vintagestory.API.Common/FrameProfilerUtil.cs-174-		try
+Vintagestory.API.Common/FrameProfilerUtil.cs-175-		{
+Vintagestory.API.Common/FrameProfilerUtil.cs-176-			ProfileEntryRange profileEntryRange = currentEntry;
+Vintagestory.API.Common/FrameProfilerUtil.cs-177-			if (profileEntryRange != null)
+Vintagestory.API.Common/FrameProfilerUtil.cs-178-			{
+Vintagestory.API.Common/FrameProfilerUtil.cs-179-				Dictionary<string, ProfileEntry> dictionary = profileEntryRange.Marks;
+Vintagestory.API.Common/FrameProfilerUtil.cs-180-				if (dictionary == null)
+Vintagestory.API.Common/FrameProfilerUtil.cs-181-				{
+Vintagestory.API.Common/FrameProfilerUtil.cs-182-					dictionary = (profileEntryRange.Marks = new Dictionary<string, ProfileEntry>());
+Vintagestory.API.Common/FrameProfilerUtil.cs-183-				}
+Vintagestory.API.Common/FrameProfilerUtil.cs-184-				if (!dictionary.TryGetValue(code, out var value))
+Vintagestory.API.Common/FrameProfilerUtil.cs-185-				{
+Vintagestory.API.Common/FrameProfilerUtil.cs-186-					value = (dictionary[code] = new ProfileEntry());
+Vintagestory.API.Common/FrameProfilerUtil.cs-187-				}
+--
+Vintagestory.API.Common/FrameProfilerUtil.cs-192-			}
+Vintagestory.API.Common/FrameProfilerUtil.cs-193-		}
+Vintagestory.API.Common/FrameProfilerUtil.cs-194-		catch (Exception)
+Vintagestory.API.Common/FrameProfilerUtil.cs-195-		{
+Vintagestory.API.Common/FrameProfilerUtil.cs-196-		}
+Vintagestory.API.Common/FrameProfilerUtil.cs-197-	}
+Vintagestory.API.Common/FrameProfilerUtil.cs-198-
+Vintagestory.API.Common/FrameProfilerUtil.cs-199-	/// <summary>
+Vintagestory.API.Common/FrameProfilerUtil.cs-200-	/// Called by the game engine at the end of the render frame or server tick
+Vintagestory.API.Common/FrameProfilerUtil.cs-201-	/// </summary>
+Vintagestory.API.Common/FrameProfilerUtil.cs-202-	public void End()
+Vintagestory.API.Common/FrameProfilerUtil.cs-203-	{
+Vintagestory.API.Common/FrameProfilerUtil.cs:204:		if (!Enabled && !PrintSlowTicks)
+Vintagestory.API.Common/FrameProfilerUtil.cs-205-		{
+Vintagestory.API.Common/FrameProfilerUtil.cs-206-			return;
+Vintagestory.API.Common/FrameProfilerUtil.cs-207-		}
+Vintagestory.API.Common/FrameProfilerUtil.cs-208-		Mark("end");
+Vintagestory.API.Common/FrameProfilerUtil.cs-209-		Leave();
+Vintagestory.API.Common/FrameProfilerUtil.cs-210-		PrevRootEntry = rootEntry;
+Vintagestory.API.Common/FrameProfilerUtil.cs-211-		double num = (double)rootEntry.ElapsedTicks / (double)Stopwatch.Frequency * 1000.0;
+Vintagestory.API.Common/FrameProfilerUtil.cs:212:		if (PrintSlowTicks && num > (double)PrintSlowTicksThreshold)
+Vintagestory.API.Common/FrameProfilerUtil.cs-213-		{
+Vintagestory.API.Common/FrameProfilerUtil.cs-214-			StringBuilder stringBuilder = new StringBuilder();
+Vintagestory.API.Common/FrameProfilerUtil.cs-215-			if (beginText != null)
+Vintagestory.API.Common/FrameProfilerUtil.cs-216-			{
+Vintagestory.API.Common/FrameProfilerUtil.cs-217-				stringBuilder.Append(beginText).Append(' ');
+Vintagestory.API.Common/FrameProfilerUtil.cs-218-			}
+Vintagestory.API.Common/FrameProfilerUtil.cs-219-			stringBuilder.AppendLine($"{OutputPrefix}A tick took {num:0.##} ms");
+Vintagestory.API.Common/FrameProfilerUtil.cs-220-			slowTicksToString(rootEntry, stringBuilder);
+Vintagestory.API.Common/FrameProfilerUtil.cs-221-			summary = "Stopwatched total= " + num + "ms";
+Vintagestory.API.Common/FrameProfilerUtil.cs-222-			onLogoutputHandler(stringBuilder.ToString());
+Vintagestory.API.Common/FrameProfilerUtil.cs-223-		}
+Vintagestory.API.Common/FrameProfilerUtil.cs-224-	}
+Vintagestory.API.Common/FrameProfilerUtil.cs-225-
+Vintagestory.API.Common/FrameProfilerUtil.cs-226-	public void OffThreadEnd()
+Vintagestory.API.Common/FrameProfilerUtil.cs-227-	{
+Vintagestory.API.Common/FrameProfilerUtil.cs-228-		End();
+Vintagestory.API.Common/FrameProfilerUtil.cs:229:		Enabled = (PrintSlowTicks = PrintSlowTicks_Offthreads);
+Vintagestory.API.Common/FrameProfilerUtil.cs:230:		PrintSlowTicksThreshold = PrintSlowTicksThreshold_Offthreads;
+Vintagestory.API.Common/FrameProfilerUtil.cs-231-	}
+Vintagestory.API.Common/FrameProfilerUtil.cs-232-
+Vintagestory.API.Common/FrameProfilerUtil.cs-233-	private void slowTicksToString(ProfileEntryRange entry, StringBuilder strib, double thresholdMs = 0.35, string indent = "")
+Vintagestory.API.Common/FrameProfilerUtil.cs-234-	{
+Vintagestory.API.Common/FrameProfilerUtil.cs-235-		try
+Vintagestory.API.Common/FrameProfilerUtil.cs-236-		{
+Vintagestory.API.Common/FrameProfilerUtil.cs-237-			double num = (double)entry.ElapsedTicks / (double)Stopwatch.Frequency * 1000.0;
+Vintagestory.API.Common/FrameProfilerUtil.cs-238-			if (num < thresholdMs)
+Vintagestory.API.Common/FrameProfilerUtil.cs-239-			{
+Vintagestory.API.Common/FrameProfilerUtil.cs-240-				return;
+Vintagestory.API.Common/FrameProfilerUtil.cs-241-			}
+Vintagestory.API.Common/FrameProfilerUtil.cs-242-			if (entry.CallCount > 1)
+Vintagestory.API.Common/FrameProfilerUtil.cs-243-			{
+Vintagestory.API.Common/FrameProfilerUtil.cs-244-				_003C_003Ey__InlineArray4<object> buffer = default;
+Vintagestory.API.Common/FrameProfilerUtil.cs-245-				buffer[0] = num;
+Vintagestory.API.Common/FrameProfilerUtil.cs-246-				buffer[1] = entry.CallCount;
+Vintagestory.API.Common/FrameProfilerUtil.cs-247-				buffer[2] = num * 1000.0 / (double)Math.Max(entry.CallCount, 1);
+Vintagestory.API.Common/FrameProfilerUtil.cs-248-				buffer[3] = entry.Code;
+Vintagestory.API.Common/FrameProfilerUtil.cs-249-				strib.AppendLine(indent + string.Format("{0:0.00}ms, {1:####} calls, avg {2:0.00} us/call: {3:0.00}", (ReadOnlySpan<object?>)buffer));
+Vintagestory.API.Common/FrameProfilerUtil.cs-250-			}
+Vintagestory.API.Common/FrameProfilerUtil.cs-251-			else
+Vintagestory.API.Common/FrameProfilerUtil.cs-252-			{
+Vintagestory.API.Common/FrameProfilerUtil.cs-253-				strib.AppendLine(indent + $"{num:0.00}ms, {entry.CallCount:####} call : {entry.Code}");
+Vintagestory.API.Common/FrameProfilerUtil.cs-254-			}
+Vintagestory.API.Common/FrameProfilerUtil.cs-255-			List<ProfileEntryRange> list = new List<ProfileEntryRange>();

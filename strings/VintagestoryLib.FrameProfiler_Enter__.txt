@@ -1,0 +1,349 @@
+Vintagestory.Client.NoObf/ClientMain.cs-1153-		float num2 = (float)Math.Min(640, ClientSettings.ViewDistance) * ClientSettings.LodBiasFar;
+Vintagestory.Client.NoObf/ClientMain.cs-1154-		if (ClientSettings.ViewDistance <= 64)
+Vintagestory.Client.NoObf/ClientMain.cs-1155-		{
+Vintagestory.Client.NoObf/ClientMain.cs-1156-			num2 = ClientSettings.ViewDistance;
+Vintagestory.Client.NoObf/ClientMain.cs-1157-		}
+Vintagestory.Client.NoObf/ClientMain.cs-1158-		frustumCuller.lod0BiasSq = num * num;
+Vintagestory.Client.NoObf/ClientMain.cs-1159-		frustumCuller.lod2BiasSq = num2 * num2;
+Vintagestory.Client.NoObf/ClientMain.cs-1160-		ScreenManager.FrameProfiler.Mark("rendOpaque-4setup");
+Vintagestory.Client.NoObf/ClientMain.cs-1161-		TriggerRenderStage(EnumRenderStage.Opaque, dt);
+Vintagestory.Client.NoObf/ClientMain.cs-1162-		ScreenManager.FrameProfiler.Mark("rendOpaque-4");
+Vintagestory.Client.NoObf/ClientMain.cs-1163-		if (doTransparentRenderPass)
+Vintagestory.Client.NoObf/ClientMain.cs-1164-		{
+Vintagestory.Client.NoObf/ClientMain.cs:1165:			ScreenManager.FrameProfiler.Enter("rendTransparent");
+Vintagestory.Client.NoObf/ClientMain.cs-1166-			Platform.LoadFrameBuffer(EnumFrameBuffer.Transparent);
+Vintagestory.Client.NoObf/ClientMain.cs-1167-			ScreenManager.FrameProfiler.Mark("rendTransp-fbloaded");
+Vintagestory.Client.NoObf/ClientMain.cs-1168-			Platform.ClearFrameBuffer(EnumFrameBuffer.Transparent);
+Vintagestory.Client.NoObf/ClientMain.cs-1169-			ScreenManager.FrameProfiler.Mark("rendTransp-bufscleared");
+Vintagestory.Client.NoObf/ClientMain.cs-1170-			TriggerRenderStage(EnumRenderStage.OIT, dt);
+Vintagestory.Client.NoObf/ClientMain.cs-1171-			Platform.UnloadFrameBuffer(EnumFrameBuffer.Transparent);
+Vintagestory.Client.NoObf/ClientMain.cs-1172-			ScreenManager.FrameProfiler.Mark("rendTranspDone");
+Vintagestory.Client.NoObf/ClientMain.cs-1173-			Platform.MergeTransparentRenderPass();
+Vintagestory.Client.NoObf/ClientMain.cs-1174-			ScreenManager.FrameProfiler.Leave();
+Vintagestory.Client.NoObf/ClientMain.cs-1175-		}
+Vintagestory.Client.NoObf/ClientMain.cs-1176-		Platform.GlDepthMask(flag: true);
+Vintagestory.Client.NoObf/ClientMain.cs-1177-		Platform.GlEnableDepthTest();
+Vintagestory.Client.NoObf/ClientMain.cs-1178-		Platform.GlCullFaceBack();
+Vintagestory.Client.NoObf/ClientMain.cs-1179-		Platform.GlEnableCullFace();
+Vintagestory.Client.NoObf/ClientMain.cs-1180-		TriggerRenderStage(EnumRenderStage.AfterOIT, dt);
+Vintagestory.Client.NoObf/ClientMain.cs-1181-	}
+Vintagestory.Client.NoObf/ClientMain.cs-1182-
+Vintagestory.Client.NoObf/ClientMain.cs-1183-	public void RenderAfterPostProcessing(float dt)
+Vintagestory.Client.NoObf/ClientMain.cs-1184-	{
+Vintagestory.Client.NoObf/ClientMain.cs-1185-		if (DeltaTimeLimiter > 0f)
+Vintagestory.Client.NoObf/ClientMain.cs-1186-		{
+Vintagestory.Client.NoObf/ClientMain.cs-1187-			dt = DeltaTimeLimiter;
+Vintagestory.Client.NoObf/ClientMain.cs-1188-		}
+Vintagestory.Client.NoObf/ClientMain.cs-1189-		TriggerRenderStage(EnumRenderStage.AfterPostProcessing, dt);
+Vintagestory.Client.NoObf/ClientMain.cs-1190-	}
+--
+Vintagestory.Server/ServerSystemEntitySimulation.cs-134-		TickEntities(dt);
+Vintagestory.Server/ServerSystemEntitySimulation.cs-135-		SendPlayerEntityDeaths();
+Vintagestory.Server/ServerSystemEntitySimulation.cs-136-	}
+Vintagestory.Server/ServerSystemEntitySimulation.cs-137-
+Vintagestory.Server/ServerSystemEntitySimulation.cs-138-	private void UpdateEvery100ms(float t1)
+Vintagestory.Server/ServerSystemEntitySimulation.cs-139-	{
+Vintagestory.Server/ServerSystemEntitySimulation.cs-140-		SendEntityDespawns();
+Vintagestory.Server/ServerSystemEntitySimulation.cs-141-		int count = server.DelayedSpawnQueue.Count;
+Vintagestory.Server/ServerSystemEntitySimulation.cs-142-		if (count <= 0)
+Vintagestory.Server/ServerSystemEntitySimulation.cs-143-		{
+Vintagestory.Server/ServerSystemEntitySimulation.cs-144-			return;
+Vintagestory.Server/ServerSystemEntitySimulation.cs-145-		}
+Vintagestory.Server/ServerSystemEntitySimulation.cs:146:		ServerMain.FrameProfiler.Enter("spawningentities");
+Vintagestory.Server/ServerSystemEntitySimulation.cs-147-		int num = MagicNum.MaxEntitySpawnsPerTick;
+Vintagestory.Server/ServerSystemEntitySimulation.cs-148-		if (count > num * 3)
+Vintagestory.Server/ServerSystemEntitySimulation.cs-149-		{
+Vintagestory.Server/ServerSystemEntitySimulation.cs-150-			num = count / 2;
+Vintagestory.Server/ServerSystemEntitySimulation.cs-151-		}
+Vintagestory.Server/ServerSystemEntitySimulation.cs-152-		count = Math.Min(count, num);
+Vintagestory.Server/ServerSystemEntitySimulation.cs-153-		Entity result;
+Vintagestory.Server/ServerSystemEntitySimulation.cs-154-		while (count-- > 0 && server.DelayedSpawnQueue.TryDequeue(out result))
+Vintagestory.Server/ServerSystemEntitySimulation.cs-155-		{
+Vintagestory.Server/ServerSystemEntitySimulation.cs-156-			try
+Vintagestory.Server/ServerSystemEntitySimulation.cs-157-			{
+Vintagestory.Server/ServerSystemEntitySimulation.cs-158-				server.SpawnEntity(result);
+Vintagestory.Server/ServerSystemEntitySimulation.cs-159-				ServerMain.FrameProfiler.Mark("spawning:", result.Code);
+Vintagestory.Server/ServerSystemEntitySimulation.cs-160-			}
+Vintagestory.Server/ServerSystemEntitySimulation.cs-161-			catch (Exception e)
+Vintagestory.Server/ServerSystemEntitySimulation.cs-162-			{
+Vintagestory.Server/ServerSystemEntitySimulation.cs-163-				ServerMain.Logger.Error(e);
+Vintagestory.Server/ServerSystemEntitySimulation.cs-164-			}
+Vintagestory.Server/ServerSystemEntitySimulation.cs-165-		}
+Vintagestory.Server/ServerSystemEntitySimulation.cs-166-		ServerMain.FrameProfiler.Leave();
+Vintagestory.Server/ServerSystemEntitySimulation.cs-167-	}
+Vintagestory.Server/ServerSystemEntitySimulation.cs-168-
+Vintagestory.Server/ServerSystemEntitySimulation.cs-169-	private void UpdateEvery1000ms(float dt)
+Vintagestory.Server/ServerSystemEntitySimulation.cs-170-	{
+Vintagestory.Server/ServerSystemEntitySimulation.cs-171-		foreach (Entity value in server.LoadedEntities.Values)
+--
+Vintagestory.Server/ServerSystemEntitySimulation.cs-179-				{
+Vintagestory.Server/ServerSystemEntitySimulation.cs-180-					serverChunk?.RemoveEntity(value.EntityId);
+Vintagestory.Server/ServerSystemEntitySimulation.cs-181-					serverChunk2.AddEntity(value);
+Vintagestory.Server/ServerSystemEntitySimulation.cs-182-					value.InChunkIndex3d = num;
+Vintagestory.Server/ServerSystemEntitySimulation.cs-183-				}
+Vintagestory.Server/ServerSystemEntitySimulation.cs-184-			}
+Vintagestory.Server/ServerSystemEntitySimulation.cs-185-		}
+Vintagestory.Server/ServerSystemEntitySimulation.cs-186-	}
+Vintagestory.Server/ServerSystemEntitySimulation.cs-187-
+Vintagestory.Server/ServerSystemEntitySimulation.cs-188-	private void TickEntities(float dt)
+Vintagestory.Server/ServerSystemEntitySimulation.cs-189-	{
+Vintagestory.Server/ServerSystemEntitySimulation.cs-190-		List<KeyValuePair<Entity, EntityDespawnData>> list = new List<KeyValuePair<Entity, EntityDespawnData>>();
+Vintagestory.Server/ServerSystemEntitySimulation.cs:191:		ServerMain.FrameProfiler.Enter("tickentities");
+Vintagestory.Server/ServerSystemEntitySimulation.cs-192-		foreach (Entity value in server.LoadedEntities.Values)
+Vintagestory.Server/ServerSystemEntitySimulation.cs-193-		{
+Vintagestory.Server/ServerSystemEntitySimulation.cs-194-			if (!Dimensions.ShouldNotTick(value.Pos, value.Api))
+Vintagestory.Server/ServerSystemEntitySimulation.cs-195-			{
+Vintagestory.Server/ServerSystemEntitySimulation.cs-196-				try
+Vintagestory.Server/ServerSystemEntitySimulation.cs-197-				{
+Vintagestory.Server/ServerSystemEntitySimulation.cs-198-					value.OnGameTick(dt);
+Vintagestory.Server/ServerSystemEntitySimulation.cs-199-				}
+Vintagestory.Server/ServerSystemEntitySimulation.cs-200-				catch (Exception e)
+Vintagestory.Server/ServerSystemEntitySimulation.cs-201-				{
+Vintagestory.Server/ServerSystemEntitySimulation.cs-202-					if (value is EntityPlayer entityPlayer)
+Vintagestory.Server/ServerSystemEntitySimulation.cs-203-					{
+Vintagestory.Server/ServerSystemEntitySimulation.cs-204-						ServerMain.Logger.Warning("Exception while ticking player {0} ({1}) at {2}: ", entityPlayer.GetName(), entityPlayer.PlayerUID, entityPlayer.Pos);
+Vintagestory.Server/ServerSystemEntitySimulation.cs-205-						ServerMain.Logger.Error(e);
+Vintagestory.Server/ServerSystemEntitySimulation.cs-206-					}
+Vintagestory.Server/ServerSystemEntitySimulation.cs-207-					else
+Vintagestory.Server/ServerSystemEntitySimulation.cs-208-					{
+Vintagestory.Server/ServerSystemEntitySimulation.cs-209-						ServerMain.Logger.Warning("Exception while ticking entity {0} ({1}) at {2}: ", value.GetName(), value.Properties?.Class, value.Pos);
+Vintagestory.Server/ServerSystemEntitySimulation.cs-210-						ServerMain.Logger.Error(e);
+Vintagestory.Server/ServerSystemEntitySimulation.cs-211-					}
+Vintagestory.Server/ServerSystemEntitySimulation.cs-212-				}
+Vintagestory.Server/ServerSystemEntitySimulation.cs-213-			}
+Vintagestory.Server/ServerSystemEntitySimulation.cs-214-			if (value.ShouldDespawn)
+Vintagestory.Server/ServerSystemEntitySimulation.cs-215-			{
+Vintagestory.Server/ServerSystemEntitySimulation.cs-216-				list.Add(new KeyValuePair<Entity, EntityDespawnData>(value, value.DespawnReason));
+Vintagestory.Server/ServerSystemEntitySimulation.cs-217-			}
+Vintagestory.Server/ServerSystemEntitySimulation.cs-218-		}
+Vintagestory.Server/ServerSystemEntitySimulation.cs:219:		ServerMain.FrameProfiler.Enter("despawning");
+Vintagestory.Server/ServerSystemEntitySimulation.cs-220-		foreach (KeyValuePair<Entity, EntityDespawnData> item in list)
+Vintagestory.Server/ServerSystemEntitySimulation.cs-221-		{
+Vintagestory.Server/ServerSystemEntitySimulation.cs-222-			server.DespawnEntity(item.Key, item.Value);
+Vintagestory.Server/ServerSystemEntitySimulation.cs-223-			ServerMain.FrameProfiler.Mark("despawned-", item.Key.Code.Path);
+Vintagestory.Server/ServerSystemEntitySimulation.cs-224-		}
+Vintagestory.Server/ServerSystemEntitySimulation.cs-225-		ServerMain.FrameProfiler.Leave();
+Vintagestory.Server/ServerSystemEntitySimulation.cs-226-		ServerMain.FrameProfiler.Leave();
+Vintagestory.Server/ServerSystemEntitySimulation.cs-227-	}
+Vintagestory.Server/ServerSystemEntitySimulation.cs-228-
+Vintagestory.Server/ServerSystemEntitySimulation.cs-229-	private void HandleEntityInteraction(Packet_Client packet, ConnectedClient client)
+Vintagestory.Server/ServerSystemEntitySimulation.cs-230-	{
+Vintagestory.Server/ServerSystemEntitySimulation.cs-231-		ServerPlayer player = client.Player;
+Vintagestory.Server/ServerSystemEntitySimulation.cs-232-		if (player.WorldData.CurrentGameMode == EnumGameMode.Spectator)
+Vintagestory.Server/ServerSystemEntitySimulation.cs-233-		{
+Vintagestory.Server/ServerSystemEntitySimulation.cs-234-			return;
+Vintagestory.Server/ServerSystemEntitySimulation.cs-235-		}
+Vintagestory.Server/ServerSystemEntitySimulation.cs-236-		Packet_EntityInteraction p = packet.EntityInteraction;
+Vintagestory.Server/ServerSystemEntitySimulation.cs-237-		Entity[] entitiesAround = server.GetEntitiesAround(player.Entity.Pos.XYZ, player.WorldData.PickingRange + 10f, player.WorldData.PickingRange + 10f, (Entity e) => e.EntityId == p.EntityId);
+Vintagestory.Server/ServerSystemEntitySimulation.cs-238-		if (entitiesAround == null || entitiesAround.Length == 0)
+Vintagestory.Server/ServerSystemEntitySimulation.cs-239-		{
+Vintagestory.Server/ServerSystemEntitySimulation.cs-240-			ServerMain.Logger.Debug("HandleEntityInteraction received from client " + client.PlayerName + " but no such entity found in his range!");
+Vintagestory.Server/ServerSystemEntitySimulation.cs-241-			return;
+Vintagestory.Server/ServerSystemEntitySimulation.cs-242-		}
+Vintagestory.Server/ServerSystemEntitySimulation.cs-243-		Entity entity = entitiesAround[0];
+Vintagestory.Server/ServerSystemEntitySimulation.cs-244-		Cuboidd cuboidd = entity.SelectionBox.ToDouble().Translate(entity.Pos.X, entity.Pos.Y, entity.Pos.Z);
+--
+Vintagestory.Server/PhysicsManager.cs-244-	{
+Vintagestory.Server/PhysicsManager.cs-245-		es = server.Systems.First((ServerSystem s) => s is ServerSystemEntitySimulation) as ServerSystemEntitySimulation;
+Vintagestory.Server/PhysicsManager.cs-246-		es.physicsManager = this;
+Vintagestory.Server/PhysicsManager.cs-247-	}
+Vintagestory.Server/PhysicsManager.cs-248-
+Vintagestory.Server/PhysicsManager.cs-249-	public void ForceClientUpdateTick(ConnectedClient client)
+Vintagestory.Server/PhysicsManager.cs-250-	{
+Vintagestory.Server/PhysicsManager.cs-251-		attrUpdateAccum = 0.2f;
+Vintagestory.Server/PhysicsManager.cs-252-	}
+Vintagestory.Server/PhysicsManager.cs-253-
+Vintagestory.Server/PhysicsManager.cs-254-	public void ServerTick(float dt)
+Vintagestory.Server/PhysicsManager.cs-255-	{
+Vintagestory.Server/PhysicsManager.cs:256:		ServerMain.FrameProfiler.Enter("physicsmanager-servertick");
+Vintagestory.Server/PhysicsManager.cs-257-		IPhysicsTickable result;
+Vintagestory.Server/PhysicsManager.cs-258-		while (!toAdd.IsEmpty && toAdd.TryDequeue(out result))
+Vintagestory.Server/PhysicsManager.cs-259-		{
+Vintagestory.Server/PhysicsManager.cs-260-			if (result != null && result.Entity != null)
+Vintagestory.Server/PhysicsManager.cs-261-			{
+Vintagestory.Server/PhysicsManager.cs-262-				if (result.Entity.ServerBehaviorsThreadsafe == null)
+Vintagestory.Server/PhysicsManager.cs-263-				{
+Vintagestory.Server/PhysicsManager.cs-264-					ServerMain.Logger.Warning("An entity " + result.Entity.Code.ToShortString() + " failed to complete initialisation, will not be physics ticked.");
+Vintagestory.Server/PhysicsManager.cs-265-				}
+Vintagestory.Server/PhysicsManager.cs-266-				else
+Vintagestory.Server/PhysicsManager.cs-267-				{
+Vintagestory.Server/PhysicsManager.cs-268-					tickables.Add(result);
+Vintagestory.Server/PhysicsManager.cs-269-				}
+Vintagestory.Server/PhysicsManager.cs-270-			}
+Vintagestory.Server/PhysicsManager.cs-271-		}
+Vintagestory.Server/PhysicsManager.cs-272-		IPhysicsTickable result2;
+Vintagestory.Server/PhysicsManager.cs-273-		while (!toRemove.IsEmpty && toRemove.TryDequeue(out result2))
+Vintagestory.Server/PhysicsManager.cs-274-		{
+Vintagestory.Server/PhysicsManager.cs-275-			if (result2 != null)
+Vintagestory.Server/PhysicsManager.cs-276-			{
+Vintagestory.Server/PhysicsManager.cs-277-				tickables.Remove(result2);
+Vintagestory.Server/PhysicsManager.cs-278-			}
+Vintagestory.Server/PhysicsManager.cs-279-		}
+Vintagestory.Server/PhysicsManager.cs-280-		physicsTickAccum += dt;
+Vintagestory.Server/PhysicsManager.cs-281-		deltaT = dt;
+--
+Vintagestory.Server/ServerSystemSupplyChunks.cs-476-		{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-477-			return false;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-478-		}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-479-		return true;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-480-	}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-481-
+Vintagestory.Server/ServerSystemSupplyChunks.cs-482-	internal void mainThreadLoadChunkColumn(ChunkColumnLoadRequest chunkRequest)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-483-	{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-484-		if (server.RunPhase == EnumServerRunPhase.Shutdown)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-485-		{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-486-			return;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-487-		}
+Vintagestory.Server/ServerSystemSupplyChunks.cs:488:		ServerMain.FrameProfiler.Enter("MTT-ChunkLoaded-Begin");
+Vintagestory.Server/ServerSystemSupplyChunks.cs-489-		ServerEventAPI eventapi = server.api.eventapi;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-490-		Vec2i chunkCoord = new Vec2i(chunkRequest.chunkX, chunkRequest.chunkZ);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-491-		IWorldChunk[] chunks = chunkRequest.Chunks;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-492-		eventapi.TriggerChunkColumnLoaded(chunkCoord, chunks);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-493-		ServerMain.FrameProfiler.Mark("MTT-ChunkLoaded-LoadedEvent");
+Vintagestory.Server/ServerSystemSupplyChunks.cs-494-		for (int i = 0; i < chunkRequest.Chunks.Length; i++)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-495-		{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-496-			ServerMain.FrameProfiler.Mark("MTT-ChunkLoaded-LoadedEvent");
+Vintagestory.Server/ServerSystemSupplyChunks.cs-497-			ServerChunk serverChunk = chunkRequest.Chunks[i];
+Vintagestory.Server/ServerSystemSupplyChunks.cs-498-			int num = i + chunkRequest.dimension * 1024;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-499-			long num2 = server.WorldMap.ChunkIndex3D(chunkRequest.chunkX, num, chunkRequest.chunkZ);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-500-			server.loadedChunksLock.AcquireWriteLock();
+Vintagestory.Server/ServerSystemSupplyChunks.cs-501-			try
+Vintagestory.Server/ServerSystemSupplyChunks.cs-502-			{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-503-				if (server.loadedChunks.ContainsKey(num2))
+Vintagestory.Server/ServerSystemSupplyChunks.cs-504-				{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-505-					continue;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-506-				}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-507-				server.loadedChunks[num2] = serverChunk;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-508-				serverChunk.MarkToPack();
+Vintagestory.Server/ServerSystemSupplyChunks.cs-509-				goto IL_00ff;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-510-			}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-511-			finally
+Vintagestory.Server/ServerSystemSupplyChunks.cs-512-			{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-513-				server.loadedChunksLock.ReleaseWriteLock();
+--
+Vintagestory.Server/ServerSystemSupplyChunks.cs-561-							catch (Exception)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-562-							{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-563-							}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-564-							ServerMain.Logger.Log(EnumLogType.Worldgen, "In " + server.WorldName + ", villager " + text + " removed at " + entity.Pos.AsBlockPos?.ToString() + " due to an exception on loading");
+Vintagestory.Server/ServerSystemSupplyChunks.cs-565-						}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-566-					}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-567-				}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-568-			}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-569-			foreach (long item in entitiesToRemove)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-570-			{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-571-				serverChunk.RemoveEntity(item);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-572-			}
+Vintagestory.Server/ServerSystemSupplyChunks.cs:573:			ServerMain.FrameProfiler.Enter("MTT-ChunkLoaded-LoadBlockEntities");
+Vintagestory.Server/ServerSystemSupplyChunks.cs-574-			foreach (KeyValuePair<BlockPos, BlockEntity> blockEntity in serverChunk.BlockEntities)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-575-			{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-576-				BlockEntity value = blockEntity.Value;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-577-				if (value == null)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-578-				{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-579-					continue;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-580-				}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-581-				try
+Vintagestory.Server/ServerSystemSupplyChunks.cs-582-				{
+Vintagestory.Server/ServerSystemSupplyChunks.cs:583:					ServerMain.FrameProfiler.Enter(value.Block.Code.Path);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-584-					value.Initialize(server.api);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-585-					if (serverChunk.serverMapChunk.NewBlockEntities.Contains(value.Pos))
+Vintagestory.Server/ServerSystemSupplyChunks.cs-586-					{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-587-						serverChunk.serverMapChunk.NewBlockEntities.Remove(value.Pos);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-588-						value.OnBlockPlaced();
+Vintagestory.Server/ServerSystemSupplyChunks.cs-589-					}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-590-					ServerMain.FrameProfiler.Leave();
+Vintagestory.Server/ServerSystemSupplyChunks.cs-591-				}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-592-				catch (Exception ex3)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-593-				{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-594-					ServerMain.Logger.Notification("Exception thrown when trying to initialize a block entity @{0}: {1}", value.Pos, ex3);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-595-					value.UnregisterAllTickListeners();
+Vintagestory.Server/ServerSystemSupplyChunks.cs-596-				}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-597-			}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-598-			ServerMain.FrameProfiler.Leave();
+Vintagestory.Server/ServerSystemSupplyChunks.cs-599-			server.api.eventapi.TriggerChunkDirty(new Vec3i(chunkRequest.chunkX, num, chunkRequest.chunkZ), serverChunk, EnumChunkDirtyReason.NewlyLoaded);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-600-		}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-601-		ServerMain.FrameProfiler.Mark("MTT-ChunkLoaded-MarkDirtyEvent");
+Vintagestory.Server/ServerSystemSupplyChunks.cs-602-		updateNeighboursLoadedFlags(chunkRequest.MapChunk, chunkRequest.chunkX, chunkRequest.chunkZ);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-603-		ServerMain.FrameProfiler.Mark("MTT-ChunkLoaded-UpdateNeighboursFlags");
+Vintagestory.Server/ServerSystemSupplyChunks.cs-604-		for (int k = 0; k < chunkRequest.Chunks.Length; k++)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-605-		{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-606-			chunkRequest.Chunks[k].TryPackAndCommit();
+Vintagestory.Server/ServerSystemSupplyChunks.cs-607-		}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-608-		ServerMain.FrameProfiler.Mark("MTT-ChunkLoaded-Pack");
+--
+Vintagestory.Server/ServerSystemUnloadChunks.cs-99-
+Vintagestory.Server/ServerSystemUnloadChunks.cs-100-	public override int GetUpdateInterval()
+Vintagestory.Server/ServerSystemUnloadChunks.cs-101-	{
+Vintagestory.Server/ServerSystemUnloadChunks.cs-102-		return 200;
+Vintagestory.Server/ServerSystemUnloadChunks.cs-103-	}
+Vintagestory.Server/ServerSystemUnloadChunks.cs-104-
+Vintagestory.Server/ServerSystemUnloadChunks.cs-105-	public override void OnServerTick(float dt)
+Vintagestory.Server/ServerSystemUnloadChunks.cs-106-	{
+Vintagestory.Server/ServerSystemUnloadChunks.cs-107-		if (unloadingPaused)
+Vintagestory.Server/ServerSystemUnloadChunks.cs-108-		{
+Vintagestory.Server/ServerSystemUnloadChunks.cs-109-			return;
+Vintagestory.Server/ServerSystemUnloadChunks.cs-110-		}
+Vintagestory.Server/ServerSystemUnloadChunks.cs:111:		ServerMain.FrameProfiler.Enter("unloadchunks-all");
+Vintagestory.Server/ServerSystemUnloadChunks.cs-112-		int count = server.unloadedChunks.Count;
+Vintagestory.Server/ServerSystemUnloadChunks.cs-113-		SendUnloadedChunkUnloads();
+Vintagestory.Server/ServerSystemUnloadChunks.cs-114-		ServerMain.FrameProfiler.Mark("notified-clients:", count);
+Vintagestory.Server/ServerSystemUnloadChunks.cs-115-		accum3s += dt;
+Vintagestory.Server/ServerSystemUnloadChunks.cs-116-		if (accum3s >= 3f)
+Vintagestory.Server/ServerSystemUnloadChunks.cs-117-		{
+Vintagestory.Server/ServerSystemUnloadChunks.cs-118-			accum3s = 0f;
+Vintagestory.Server/ServerSystemUnloadChunks.cs-119-			FindUnloadableChunkColumnCandidates();
+Vintagestory.Server/ServerSystemUnloadChunks.cs-120-			ServerMain.FrameProfiler.Mark("find-chunkcolumns");
+Vintagestory.Server/ServerSystemUnloadChunks.cs-121-			if (mapChunkUnloadCandidates.Count > 0)
+Vintagestory.Server/ServerSystemUnloadChunks.cs-122-			{
+Vintagestory.Server/ServerSystemUnloadChunks.cs-123-				UnloadChunkColumns();
+Vintagestory.Server/ServerSystemUnloadChunks.cs-124-				if (server.Clients.IsEmpty)
+Vintagestory.Server/ServerSystemUnloadChunks.cs-125-				{
+Vintagestory.Server/ServerSystemUnloadChunks.cs-126-					server.serverChunkDataPool.FreeAll();
+Vintagestory.Server/ServerSystemUnloadChunks.cs-127-					GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+Vintagestory.Server/ServerSystemUnloadChunks.cs-128-					GC.Collect();
+Vintagestory.Server/ServerSystemUnloadChunks.cs-129-					ServerMain.FrameProfiler.Mark("garbagecollector (no clients online)");
+Vintagestory.Server/ServerSystemUnloadChunks.cs-130-				}
+Vintagestory.Server/ServerSystemUnloadChunks.cs-131-			}
+Vintagestory.Server/ServerSystemUnloadChunks.cs-132-		}
+Vintagestory.Server/ServerSystemUnloadChunks.cs-133-		accum120s += dt;
+Vintagestory.Server/ServerSystemUnloadChunks.cs-134-		if (accum120s > 120f)
+Vintagestory.Server/ServerSystemUnloadChunks.cs-135-		{
+Vintagestory.Server/ServerSystemUnloadChunks.cs-136-			accum120s = 0f;
+--
+Vintagestory.Server/ServerMain.cs-3333-			throw new ArgumentNullException();
+Vintagestory.Server/ServerMain.cs-3334-		}
+Vintagestory.Server/ServerMain.cs-3335-		lock (mainThreadTasksLock)
+Vintagestory.Server/ServerMain.cs-3336-		{
+Vintagestory.Server/ServerMain.cs-3337-			mainThreadTasks.Enqueue(task);
+Vintagestory.Server/ServerMain.cs-3338-		}
+Vintagestory.Server/ServerMain.cs-3339-	}
+Vintagestory.Server/ServerMain.cs-3340-
+Vintagestory.Server/ServerMain.cs-3341-	public void ProcessMainThreadTasks()
+Vintagestory.Server/ServerMain.cs-3342-	{
+Vintagestory.Server/ServerMain.cs-3343-		if (FrameProfiler != null && FrameProfiler.Enabled)
+Vintagestory.Server/ServerMain.cs-3344-		{
+Vintagestory.Server/ServerMain.cs:3345:			FrameProfiler.Enter("mainthreadtasks");
+Vintagestory.Server/ServerMain.cs-3346-			while (mainThreadTasks.Count > 0)
+Vintagestory.Server/ServerMain.cs-3347-			{
+Vintagestory.Server/ServerMain.cs-3348-				Action action;
+Vintagestory.Server/ServerMain.cs-3349-				lock (mainThreadTasksLock)
+Vintagestory.Server/ServerMain.cs-3350-				{
+Vintagestory.Server/ServerMain.cs-3351-					action = mainThreadTasks.Dequeue();
+Vintagestory.Server/ServerMain.cs-3352-				}
+Vintagestory.Server/ServerMain.cs-3353-				action();
+Vintagestory.Server/ServerMain.cs-3354-				if (action.Target != null)
+Vintagestory.Server/ServerMain.cs-3355-				{
+Vintagestory.Server/ServerMain.cs-3356-					string code = action.Target.GetType().ToString();
+Vintagestory.Server/ServerMain.cs-3357-					FrameProfiler.Mark(code);
+Vintagestory.Server/ServerMain.cs-3358-				}
+Vintagestory.Server/ServerMain.cs-3359-			}
+Vintagestory.Server/ServerMain.cs-3360-			FrameProfiler.Leave();
+Vintagestory.Server/ServerMain.cs-3361-			return;
+Vintagestory.Server/ServerMain.cs-3362-		}
+Vintagestory.Server/ServerMain.cs-3363-		while (mainThreadTasks.Count > 0)
+Vintagestory.Server/ServerMain.cs-3364-		{
+Vintagestory.Server/ServerMain.cs-3365-			Action action2;
+Vintagestory.Server/ServerMain.cs-3366-			lock (mainThreadTasksLock)
+Vintagestory.Server/ServerMain.cs-3367-			{
+Vintagestory.Server/ServerMain.cs-3368-				action2 = mainThreadTasks.Dequeue();
+Vintagestory.Server/ServerMain.cs-3369-			}
+Vintagestory.Server/ServerMain.cs-3370-			action2();

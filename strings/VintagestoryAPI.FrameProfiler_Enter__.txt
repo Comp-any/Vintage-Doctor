@@ -1,0 +1,38 @@
+Vintagestory.API.Common.Entities/Entity.cs-1068-		}
+Vintagestory.API.Common.Entities/Entity.cs-1069-		if (Api is ICoreClientAPI)
+Vintagestory.API.Common.Entities/Entity.cs-1070-		{
+Vintagestory.API.Common.Entities/Entity.cs-1071-			int num = RemainingActivityTime("invulnerable");
+Vintagestory.API.Common.Entities/Entity.cs-1072-			if (prevInvulnerableTime != num)
+Vintagestory.API.Common.Entities/Entity.cs-1073-			{
+Vintagestory.API.Common.Entities/Entity.cs-1074-				RenderColor = ColorUtil.ColorOverlay(HurtColor, -1, 1f - (float)num / 500f);
+Vintagestory.API.Common.Entities/Entity.cs-1075-				prevInvulnerableTime = num;
+Vintagestory.API.Common.Entities/Entity.cs-1076-			}
+Vintagestory.API.Common.Entities/Entity.cs-1077-			alive = WatchedAttributes.GetInt("entityDead") == 0;
+Vintagestory.API.Common.Entities/Entity.cs-1078-			if (world.FrameProfiler.Enabled)
+Vintagestory.API.Common.Entities/Entity.cs-1079-			{
+Vintagestory.API.Common.Entities/Entity.cs:1080:				world.FrameProfiler.Enter("behaviors");
+Vintagestory.API.Common.Entities/Entity.cs-1081-				foreach (EntityBehavior behavior in Properties.Client.Behaviors)
+Vintagestory.API.Common.Entities/Entity.cs-1082-				{
+Vintagestory.API.Common.Entities/Entity.cs-1083-					behavior.OnGameTick(dt);
+Vintagestory.API.Common.Entities/Entity.cs-1084-					world.FrameProfiler.Mark(behavior.ProfilerName);
+Vintagestory.API.Common.Entities/Entity.cs-1085-				}
+Vintagestory.API.Common.Entities/Entity.cs-1086-				world.FrameProfiler.Leave();
+Vintagestory.API.Common.Entities/Entity.cs-1087-			}
+Vintagestory.API.Common.Entities/Entity.cs-1088-			else
+Vintagestory.API.Common.Entities/Entity.cs-1089-			{
+Vintagestory.API.Common.Entities/Entity.cs-1090-				foreach (EntityBehavior behavior2 in Properties.Client.Behaviors)
+Vintagestory.API.Common.Entities/Entity.cs-1091-				{
+Vintagestory.API.Common.Entities/Entity.cs-1092-					behavior2.OnGameTick(dt);
+Vintagestory.API.Common.Entities/Entity.cs-1093-				}
+Vintagestory.API.Common.Entities/Entity.cs-1094-			}
+Vintagestory.API.Common.Entities/Entity.cs-1095-			if (world.Rand.NextDouble() < (double)(IdleSoundChanceModifier * Properties.IdleSoundChance) / 100.0 && Alive)
+Vintagestory.API.Common.Entities/Entity.cs-1096-			{
+Vintagestory.API.Common.Entities/Entity.cs-1097-				PlayEntitySound("idle");
+Vintagestory.API.Common.Entities/Entity.cs-1098-			}
+Vintagestory.API.Common.Entities/Entity.cs-1099-		}
+Vintagestory.API.Common.Entities/Entity.cs-1100-		else
+Vintagestory.API.Common.Entities/Entity.cs-1101-		{
+Vintagestory.API.Common.Entities/Entity.cs-1102-			if (requirePosesOnServer && !shapeFresh)
+Vintagestory.API.Common.Entities/Entity.cs-1103-			{
+Vintagestory.API.Common.Entities/Entity.cs-1104-				CompositeShape shape = Properties.Client.Shape;
+Vintagestory.API.Common.Entities/Entity.cs-1105-				Shape entityShape = Properties.Client.LoadedShapeForEntity;

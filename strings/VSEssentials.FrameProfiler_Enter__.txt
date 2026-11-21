@@ -1,0 +1,145 @@
+Vintagestory.GameContent/EntityBlockFalling.cs-170-			particleSys.Register(this);
+Vintagestory.GameContent/EntityBlockFalling.cs-171-			api.ModLoader.GetModSystem<ModSystemRenderFallingBlocksFast>().fallingBlocks[EntityId] = this;
+Vintagestory.GameContent/EntityBlockFalling.cs-172-		}
+Vintagestory.GameContent/EntityBlockFalling.cs-173-		RandomizeFallingDirectionsOrder();
+Vintagestory.GameContent/EntityBlockFalling.cs-174-		if (DoRemoveBlock)
+Vintagestory.GameContent/EntityBlockFalling.cs-175-		{
+Vintagestory.GameContent/EntityBlockFalling.cs-176-			World.BlockAccessor.SetBlock(0, initialPos);
+Vintagestory.GameContent/EntityBlockFalling.cs-177-		}
+Vintagestory.GameContent/EntityBlockFalling.cs-178-	}
+Vintagestory.GameContent/EntityBlockFalling.cs-179-
+Vintagestory.GameContent/EntityBlockFalling.cs-180-	public override void OnGameTick(float dt)
+Vintagestory.GameContent/EntityBlockFalling.cs-181-	{
+Vintagestory.GameContent/EntityBlockFalling.cs:182:		World.FrameProfiler.Enter("entity-tick-unsstablefalling");
+Vintagestory.GameContent/EntityBlockFalling.cs-183-		if (soundStartDelay > 0f)
+Vintagestory.GameContent/EntityBlockFalling.cs-184-		{
+Vintagestory.GameContent/EntityBlockFalling.cs-185-			soundStartDelay -= dt;
+Vintagestory.GameContent/EntityBlockFalling.cs-186-			if (soundStartDelay <= 0f)
+Vintagestory.GameContent/EntityBlockFalling.cs-187-			{
+Vintagestory.GameContent/EntityBlockFalling.cs-188-				sound.Start();
+Vintagestory.GameContent/EntityBlockFalling.cs-189-			}
+Vintagestory.GameContent/EntityBlockFalling.cs-190-		}
+Vintagestory.GameContent/EntityBlockFalling.cs-191-		if (sound != null)
+Vintagestory.GameContent/EntityBlockFalling.cs-192-		{
+Vintagestory.GameContent/EntityBlockFalling.cs-193-			sound.SetPosition((float)Pos.X, (float)Pos.Y, (float)Pos.Z);
+Vintagestory.GameContent/EntityBlockFalling.cs-194-		}
+Vintagestory.GameContent/EntityBlockFalling.cs-195-		if (lingerTicks > 0)
+Vintagestory.GameContent/EntityBlockFalling.cs-196-		{
+Vintagestory.GameContent/EntityBlockFalling.cs-197-			lingerTicks--;
+Vintagestory.GameContent/EntityBlockFalling.cs-198-			if (lingerTicks != 0)
+Vintagestory.GameContent/EntityBlockFalling.cs-199-			{
+Vintagestory.GameContent/EntityBlockFalling.cs-200-				return;
+Vintagestory.GameContent/EntityBlockFalling.cs-201-			}
+Vintagestory.GameContent/EntityBlockFalling.cs-202-			if (Api.Side == EnumAppSide.Client && sound != null)
+Vintagestory.GameContent/EntityBlockFalling.cs-203-			{
+Vintagestory.GameContent/EntityBlockFalling.cs-204-				sound.FadeOut(3f, (ILoadedSound s) =>
+Vintagestory.GameContent/EntityBlockFalling.cs-205-				{
+Vintagestory.GameContent/EntityBlockFalling.cs-206-					s.Dispose();
+Vintagestory.GameContent/EntityBlockFalling.cs-207-				});
+--
+Vintagestory.GameContent/WeatherSystemServer.cs-193-				list.Add(player as IServerPlayer);
+Vintagestory.GameContent/WeatherSystemServer.cs-194-			}
+Vintagestory.GameContent/WeatherSystemServer.cs-195-		}
+Vintagestory.GameContent/WeatherSystemServer.cs-196-		if (list.Count > 0)
+Vintagestory.GameContent/WeatherSystemServer.cs-197-		{
+Vintagestory.GameContent/WeatherSystemServer.cs-198-			serverChannel.SendPacket(state, data, list.ToArray());
+Vintagestory.GameContent/WeatherSystemServer.cs-199-		}
+Vintagestory.GameContent/WeatherSystemServer.cs-200-		sapi.WorldManager.GetMapRegion(state.RegionX, state.RegionZ)?.SetModdata("weatherState", data);
+Vintagestory.GameContent/WeatherSystemServer.cs-201-	}
+Vintagestory.GameContent/WeatherSystemServer.cs-202-
+Vintagestory.GameContent/WeatherSystemServer.cs-203-	private void OnServerGameTick(float dt)
+Vintagestory.GameContent/WeatherSystemServer.cs-204-	{
+Vintagestory.GameContent/WeatherSystemServer.cs:205:		sapi.World.FrameProfiler.Enter("weathersimulation");
+Vintagestory.GameContent/WeatherSystemServer.cs-206-		foreach (KeyValuePair<long, IMapRegion> allLoadedMapRegion in sapi.WorldManager.AllLoadedMapRegions)
+Vintagestory.GameContent/WeatherSystemServer.cs-207-		{
+Vintagestory.GameContent/WeatherSystemServer.cs-208-			WeatherSimulationRegion orCreateWeatherSimForRegion = getOrCreateWeatherSimForRegion(allLoadedMapRegion.Key, allLoadedMapRegion.Value);
+Vintagestory.GameContent/WeatherSystemServer.cs-209-			orCreateWeatherSimForRegion.TickEvery25ms(dt);
+Vintagestory.GameContent/WeatherSystemServer.cs-210-			sapi.World.FrameProfiler.Mark("finishedtick");
+Vintagestory.GameContent/WeatherSystemServer.cs-211-			orCreateWeatherSimForRegion.UpdateWeatherData();
+Vintagestory.GameContent/WeatherSystemServer.cs-212-			sapi.World.FrameProfiler.Mark("updatedata");
+Vintagestory.GameContent/WeatherSystemServer.cs-213-		}
+Vintagestory.GameContent/WeatherSystemServer.cs-214-		rainOverlaySnap.SetAmbient(rainOverlayPattern);
+Vintagestory.GameContent/WeatherSystemServer.cs-215-		sapi.World.FrameProfiler.Leave();
+Vintagestory.GameContent/WeatherSystemServer.cs-216-	}
+Vintagestory.GameContent/WeatherSystemServer.cs-217-
+Vintagestory.GameContent/WeatherSystemServer.cs-218-	private void OnSaveGameSaving()
+Vintagestory.GameContent/WeatherSystemServer.cs-219-	{
+Vintagestory.GameContent/WeatherSystemServer.cs-220-		HashSet<long> hashSet = new HashSet<long>();
+Vintagestory.GameContent/WeatherSystemServer.cs-221-		using FastMemoryStream ms = new FastMemoryStream();
+Vintagestory.GameContent/WeatherSystemServer.cs-222-		foreach (KeyValuePair<long, WeatherSimulationRegion> item in weatherSimByMapRegion)
+Vintagestory.GameContent/WeatherSystemServer.cs-223-		{
+Vintagestory.GameContent/WeatherSystemServer.cs-224-			IMapRegion mapRegion = sapi.WorldManager.GetMapRegion(item.Key);
+Vintagestory.GameContent/WeatherSystemServer.cs-225-			if (mapRegion != null)
+Vintagestory.GameContent/WeatherSystemServer.cs-226-			{
+Vintagestory.GameContent/WeatherSystemServer.cs-227-				mapRegion.SetModdata("weatherState", item.Value.ToBytes(ms));
+Vintagestory.GameContent/WeatherSystemServer.cs-228-			}
+Vintagestory.GameContent/WeatherSystemServer.cs-229-			else
+Vintagestory.GameContent/WeatherSystemServer.cs-230-			{
+--
+Vintagestory.GameContent/EntityBehaviorTaskAI.cs-103-	public override void AfterInitialized(bool onFirstSpawn)
+Vintagestory.GameContent/EntityBehaviorTaskAI.cs-104-	{
+Vintagestory.GameContent/EntityBehaviorTaskAI.cs-105-		TaskManager.AfterInitialize();
+Vintagestory.GameContent/EntityBehaviorTaskAI.cs-106-	}
+Vintagestory.GameContent/EntityBehaviorTaskAI.cs-107-
+Vintagestory.GameContent/EntityBehaviorTaskAI.cs-108-	public override void OnGameTick(float deltaTime)
+Vintagestory.GameContent/EntityBehaviorTaskAI.cs-109-	{
+Vintagestory.GameContent/EntityBehaviorTaskAI.cs-110-		if (entity.State == EnumEntityState.Active && entity.Alive)
+Vintagestory.GameContent/EntityBehaviorTaskAI.cs-111-		{
+Vintagestory.GameContent/EntityBehaviorTaskAI.cs-112-			entity.World.FrameProfiler.Mark("ai-init");
+Vintagestory.GameContent/EntityBehaviorTaskAI.cs-113-			PathTraverser?.OnGameTick(deltaTime);
+Vintagestory.GameContent/EntityBehaviorTaskAI.cs-114-			entity.World.FrameProfiler.Mark("ai-pathfinding");
+Vintagestory.GameContent/EntityBehaviorTaskAI.cs:115:			entity.World.FrameProfiler.Enter("ai-tasks");
+Vintagestory.GameContent/EntityBehaviorTaskAI.cs-116-			TaskManager.OnGameTick(deltaTime);
+Vintagestory.GameContent/EntityBehaviorTaskAI.cs-117-			entity.World.FrameProfiler.Leave();
+Vintagestory.GameContent/EntityBehaviorTaskAI.cs-118-		}
+Vintagestory.GameContent/EntityBehaviorTaskAI.cs-119-	}
+Vintagestory.GameContent/EntityBehaviorTaskAI.cs-120-
+Vintagestory.GameContent/EntityBehaviorTaskAI.cs-121-	public override void OnStateChanged(EnumEntityState beforeState, ref EnumHandling handling)
+Vintagestory.GameContent/EntityBehaviorTaskAI.cs-122-	{
+Vintagestory.GameContent/EntityBehaviorTaskAI.cs-123-		TaskManager.OnStateChanged(beforeState);
+Vintagestory.GameContent/EntityBehaviorTaskAI.cs-124-	}
+Vintagestory.GameContent/EntityBehaviorTaskAI.cs-125-
+Vintagestory.GameContent/EntityBehaviorTaskAI.cs-126-	public override void Notify(string key, object data)
+Vintagestory.GameContent/EntityBehaviorTaskAI.cs-127-	{
+Vintagestory.GameContent/EntityBehaviorTaskAI.cs-128-		TaskManager.Notify(key, data);
+Vintagestory.GameContent/EntityBehaviorTaskAI.cs-129-	}
+Vintagestory.GameContent/EntityBehaviorTaskAI.cs-130-}
+--
+Vintagestory.Essentials/PathfindingAsync.cs-44-	public int OffThreadInterval()
+Vintagestory.Essentials/PathfindingAsync.cs-45-	{
+Vintagestory.Essentials/PathfindingAsync.cs-46-		return 5;
+Vintagestory.Essentials/PathfindingAsync.cs-47-	}
+Vintagestory.Essentials/PathfindingAsync.cs-48-
+Vintagestory.Essentials/PathfindingAsync.cs-49-	protected void OnMainThreadTick(float dt)
+Vintagestory.Essentials/PathfindingAsync.cs-50-	{
+Vintagestory.Essentials/PathfindingAsync.cs-51-		int count = PathfinderTasks.Count;
+Vintagestory.Essentials/PathfindingAsync.cs-52-		if (count <= 1)
+Vintagestory.Essentials/PathfindingAsync.cs-53-		{
+Vintagestory.Essentials/PathfindingAsync.cs-54-			return;
+Vintagestory.Essentials/PathfindingAsync.cs-55-		}
+Vintagestory.Essentials/PathfindingAsync.cs:56:		api.World.FrameProfiler.Enter("ai-pathfinding-overflow " + count);
+Vintagestory.Essentials/PathfindingAsync.cs-57-		int num = 1000;
+Vintagestory.Essentials/PathfindingAsync.cs-58-		PathfinderTask pathfinderTask;
+Vintagestory.Essentials/PathfindingAsync.cs-59-		while ((pathfinderTask = Next()) != null && num-- > 0)
+Vintagestory.Essentials/PathfindingAsync.cs-60-		{
+Vintagestory.Essentials/PathfindingAsync.cs-61-			pathfinderTask.waypoints = astar_mainthread.FindPathAsWaypoints(pathfinderTask.startBlockPos, pathfinderTask.targetBlockPos, pathfinderTask.modeMinFleeDistance, pathfinderTask.maxFallHeight, pathfinderTask.stepHeight, pathfinderTask.collisionBox, pathfinderTask.searchDepth, pathfinderTask.mhdistanceTolerance);
+Vintagestory.Essentials/PathfindingAsync.cs-62-			pathfinderTask.Finished = true;
+Vintagestory.Essentials/PathfindingAsync.cs-63-			if (isShuttingDown)
+Vintagestory.Essentials/PathfindingAsync.cs-64-			{
+Vintagestory.Essentials/PathfindingAsync.cs-65-				break;
+Vintagestory.Essentials/PathfindingAsync.cs-66-			}
+Vintagestory.Essentials/PathfindingAsync.cs-67-			if (api.World.FrameProfiler.Enabled)
+Vintagestory.Essentials/PathfindingAsync.cs-68-			{
+Vintagestory.Essentials/PathfindingAsync.cs-69-				api.World.FrameProfiler.Mark("path d:" + pathfinderTask.searchDepth + " r:" + ((pathfinderTask.waypoints == null) ? "fail" : pathfinderTask.waypoints.Count.ToString()) + " s:" + pathfinderTask.startBlockPos?.ToString() + " e:" + pathfinderTask.targetBlockPos?.ToString() + " w:" + pathfinderTask.collisionBox.Width);
+Vintagestory.Essentials/PathfindingAsync.cs-70-			}
+Vintagestory.Essentials/PathfindingAsync.cs-71-		}
+Vintagestory.Essentials/PathfindingAsync.cs-72-		api.World.FrameProfiler.Leave();
+Vintagestory.Essentials/PathfindingAsync.cs-73-	}
+Vintagestory.Essentials/PathfindingAsync.cs-74-
+Vintagestory.Essentials/PathfindingAsync.cs-75-	public void OnSeparateThreadTick()
+Vintagestory.Essentials/PathfindingAsync.cs-76-	{
+Vintagestory.Essentials/PathfindingAsync.cs-77-		ProcessQueue(astar_offthread, 100);
+Vintagestory.Essentials/PathfindingAsync.cs-78-	}
+Vintagestory.Essentials/PathfindingAsync.cs-79-
+Vintagestory.Essentials/PathfindingAsync.cs-80-	public void ProcessQueue(AStar astar, int maxCount)
+Vintagestory.Essentials/PathfindingAsync.cs-81-	{

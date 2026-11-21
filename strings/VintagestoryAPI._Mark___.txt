@@ -1,0 +1,194 @@
+Vintagestory.API.Common.Entities/Entity.cs-1177-		}
+Vintagestory.API.Common.Entities/Entity.cs-1178-		if (State == EnumEntityState.Active && world.Side == EnumAppSide.Server)
+Vintagestory.API.Common.Entities/Entity.cs-1179-		{
+Vintagestory.API.Common.Entities/Entity.cs-1180-			try
+Vintagestory.API.Common.Entities/Entity.cs-1181-			{
+Vintagestory.API.Common.Entities/Entity.cs-1182-				AnimManager.OnServerTick(dt);
+Vintagestory.API.Common.Entities/Entity.cs-1183-			}
+Vintagestory.API.Common.Entities/Entity.cs-1184-			catch (Exception)
+Vintagestory.API.Common.Entities/Entity.cs-1185-			{
+Vintagestory.API.Common.Entities/Entity.cs-1186-				world.Logger.Error("Error ticking animations for entity " + Code.ToShortString() + " at " + Pos.AsBlockPos);
+Vintagestory.API.Common.Entities/Entity.cs-1187-				throw;
+Vintagestory.API.Common.Entities/Entity.cs-1188-			}
+Vintagestory.API.Common.Entities/Entity.cs:1189:			world.FrameProfiler.Mark("entity-animation-ticking");
+Vintagestory.API.Common.Entities/Entity.cs-1190-		}
+Vintagestory.API.Common.Entities/Entity.cs-1191-	}
+Vintagestory.API.Common.Entities/Entity.cs-1192-
+Vintagestory.API.Common.Entities/Entity.cs-1193-	protected void ApplyFireDamage(float dt)
+Vintagestory.API.Common.Entities/Entity.cs-1194-	{
+Vintagestory.API.Common.Entities/Entity.cs-1195-		fireDamageAccum += dt;
+Vintagestory.API.Common.Entities/Entity.cs-1196-		if (fireDamageAccum > 1f)
+Vintagestory.API.Common.Entities/Entity.cs-1197-		{
+Vintagestory.API.Common.Entities/Entity.cs-1198-			ReceiveDamage(new DamageSource
+Vintagestory.API.Common.Entities/Entity.cs-1199-			{
+Vintagestory.API.Common.Entities/Entity.cs-1200-				Source = EnumDamageSource.Internal,
+Vintagestory.API.Common.Entities/Entity.cs-1201-				Type = EnumDamageType.Fire
+Vintagestory.API.Common.Entities/Entity.cs-1202-			}, 0.5f);
+Vintagestory.API.Common.Entities/Entity.cs-1203-			fireDamageAccum = 0f;
+Vintagestory.API.Common.Entities/Entity.cs-1204-		}
+Vintagestory.API.Common.Entities/Entity.cs-1205-	}
+Vintagestory.API.Common.Entities/Entity.cs-1206-
+Vintagestory.API.Common.Entities/Entity.cs-1207-	protected void DieInLava()
+Vintagestory.API.Common.Entities/Entity.cs-1208-	{
+Vintagestory.API.Common.Entities/Entity.cs-1209-		float quantity = GameMath.Clamp(SelectionBox.XSize * SelectionBox.YSize * SelectionBox.ZSize * 150f, 10f, 150f);
+Vintagestory.API.Common.Entities/Entity.cs-1210-		Api.World.SpawnParticles(quantity, ColorUtil.ColorFromRgba(20, 20, 20, 255), new Vec3d(Pos.X + (double)SelectionBox.X1, Pos.InternalY + (double)SelectionBox.Y1, Pos.Z + (double)SelectionBox.Z1), new Vec3d(Pos.X + (double)SelectionBox.X2, Pos.InternalY + (double)SelectionBox.Y2, Pos.Z + (double)SelectionBox.Z2), new Vec3f(-1f, -1f, -1f), new Vec3f(2
+Vintagestory.API.Common.Entities/Entity.cs-1211-		Die(EnumDespawnReason.Combusted);
+Vintagestory.API.Common.Entities/Entity.cs-1212-	}
+Vintagestory.API.Common.Entities/Entity.cs-1213-
+Vintagestory.API.Common.Entities/Entity.cs-1214-	public virtual void OnAsyncParticleTick(float dt, IAsyncParticleManager manager)
+--
+Vintagestory.API.Common/EntityItem.cs-217-					coolingMedium.CoolNow(Slot, Pos.XYZ, 0.02f);
+Vintagestory.API.Common/EntityItem.cs-218-					if (Slot.StackSize == 0)
+Vintagestory.API.Common/EntityItem.cs-219-					{
+Vintagestory.API.Common/EntityItem.cs-220-						Die();
+Vintagestory.API.Common/EntityItem.cs-221-					}
+Vintagestory.API.Common/EntityItem.cs-222-				}
+Vintagestory.API.Common/EntityItem.cs-223-			}
+Vintagestory.API.Common/EntityItem.cs-224-		}
+Vintagestory.API.Common/EntityItem.cs-225-		else
+Vintagestory.API.Common/EntityItem.cs-226-		{
+Vintagestory.API.Common/EntityItem.cs-227-			Die();
+Vintagestory.API.Common/EntityItem.cs-228-		}
+Vintagestory.API.Common/EntityItem.cs:229:		World.FrameProfiler.Mark("entity-tick-droppeditems");
+Vintagestory.API.Common/EntityItem.cs-230-	}
+Vintagestory.API.Common/EntityItem.cs-231-
+Vintagestory.API.Common/EntityItem.cs-232-	public override void Ignite()
+Vintagestory.API.Common/EntityItem.cs-233-	{
+Vintagestory.API.Common/EntityItem.cs-234-		ItemStack itemstack = Itemstack;
+Vintagestory.API.Common/EntityItem.cs-235-		CombustibleProperties combustibleProperties = itemstack?.Collectible?.GetCombustibleProperties(Api.World, itemstack, null);
+Vintagestory.API.Common/EntityItem.cs-236-		if (InLava || (itemstack != null && combustibleProperties != null && (combustibleProperties.MeltingPoint < 700 || combustibleProperties.BurnTemperature > 0)))
+Vintagestory.API.Common/EntityItem.cs-237-		{
+Vintagestory.API.Common/EntityItem.cs-238-			base.Ignite();
+Vintagestory.API.Common/EntityItem.cs-239-		}
+Vintagestory.API.Common/EntityItem.cs-240-	}
+Vintagestory.API.Common/EntityItem.cs-241-
+Vintagestory.API.Common/EntityItem.cs-242-	public override void OnEntityDespawn(EntityDespawnData despawn)
+Vintagestory.API.Common/EntityItem.cs-243-	{
+Vintagestory.API.Common/EntityItem.cs-244-		if (SidedProperties == null)
+Vintagestory.API.Common/EntityItem.cs-245-		{
+Vintagestory.API.Common/EntityItem.cs-246-			return;
+Vintagestory.API.Common/EntityItem.cs-247-		}
+Vintagestory.API.Common/EntityItem.cs-248-		foreach (EntityBehavior behavior in SidedProperties.Behaviors)
+Vintagestory.API.Common/EntityItem.cs-249-		{
+Vintagestory.API.Common/EntityItem.cs-250-			behavior.OnEntityDespawn(despawn);
+Vintagestory.API.Common/EntityItem.cs-251-		}
+Vintagestory.API.Common/EntityItem.cs-252-		WatchedAttributes.OnModified.Clear();
+Vintagestory.API.Common/EntityItem.cs-253-	}
+Vintagestory.API.Common/EntityItem.cs-254-
+--
+Vintagestory.API.Common/BlockEntity.cs-129-	/// You should still call the base method to sets the this.api field
+Vintagestory.API.Common/BlockEntity.cs-130-	/// </summary>
+Vintagestory.API.Common/BlockEntity.cs-131-	/// <param name="api"></param>
+Vintagestory.API.Common/BlockEntity.cs-132-	public virtual void Initialize(ICoreAPI api)
+Vintagestory.API.Common/BlockEntity.cs-133-	{
+Vintagestory.API.Common/BlockEntity.cs-134-		Api = api;
+Vintagestory.API.Common/BlockEntity.cs-135-		FrameProfilerUtil frameProfiler = api.World.FrameProfiler;
+Vintagestory.API.Common/BlockEntity.cs-136-		if (frameProfiler != null && frameProfiler.Enabled)
+Vintagestory.API.Common/BlockEntity.cs-137-		{
+Vintagestory.API.Common/BlockEntity.cs-138-			foreach (BlockEntityBehavior behavior in Behaviors)
+Vintagestory.API.Common/BlockEntity.cs-139-			{
+Vintagestory.API.Common/BlockEntity.cs-140-				behavior.Initialize(api, behavior.properties);
+Vintagestory.API.Common/BlockEntity.cs:141:				api.World.FrameProfiler.Mark("initbebehavior-", behavior.GetType());
+Vintagestory.API.Common/BlockEntity.cs-142-			}
+Vintagestory.API.Common/BlockEntity.cs-143-		}
+Vintagestory.API.Common/BlockEntity.cs-144-		else
+Vintagestory.API.Common/BlockEntity.cs-145-		{
+Vintagestory.API.Common/BlockEntity.cs-146-			foreach (BlockEntityBehavior behavior2 in Behaviors)
+Vintagestory.API.Common/BlockEntity.cs-147-			{
+Vintagestory.API.Common/BlockEntity.cs-148-				behavior2.Initialize(api, behavior2.properties);
+Vintagestory.API.Common/BlockEntity.cs-149-			}
+Vintagestory.API.Common/BlockEntity.cs-150-		}
+Vintagestory.API.Common/BlockEntity.cs-151-		if (stackForWorldgen != null)
+Vintagestory.API.Common/BlockEntity.cs-152-		{
+Vintagestory.API.Common/BlockEntity.cs-153-			try
+Vintagestory.API.Common/BlockEntity.cs-154-			{
+Vintagestory.API.Common/BlockEntity.cs-155-				OnBlockPlaced(stackForWorldgen);
+Vintagestory.API.Common/BlockEntity.cs-156-			}
+Vintagestory.API.Common/BlockEntity.cs-157-			catch (Exception e)
+Vintagestory.API.Common/BlockEntity.cs-158-			{
+Vintagestory.API.Common/BlockEntity.cs-159-				api.Logger.Error(e);
+Vintagestory.API.Common/BlockEntity.cs-160-			}
+Vintagestory.API.Common/BlockEntity.cs-161-			stackForWorldgen = null;
+Vintagestory.API.Common/BlockEntity.cs-162-		}
+Vintagestory.API.Common/BlockEntity.cs-163-	}
+Vintagestory.API.Common/BlockEntity.cs-164-
+Vintagestory.API.Common/BlockEntity.cs-165-	public virtual void CreateBehaviors(Block block, IWorldAccessor worldForResolve)
+Vintagestory.API.Common/BlockEntity.cs-166-	{
+--
+Vintagestory.API.Common/EntityAgent.cs-663-			if (RotateModelOnClimb)
+Vintagestory.API.Common/EntityAgent.cs-664-			{
+Vintagestory.API.Common/EntityAgent.cs-665-				if (!OnGround && Alive && Controls.IsClimbing && ClimbingOnFace != null && (double)ClimbingOnCollBox.Y2 > 0.2)
+Vintagestory.API.Common/EntityAgent.cs-666-				{
+Vintagestory.API.Common/EntityAgent.cs-667-					Pos.Pitch = (float)ClimbingOnFace.HorizontalAngleIndex * ((float)Math.PI / 2f);
+Vintagestory.API.Common/EntityAgent.cs-668-				}
+Vintagestory.API.Common/EntityAgent.cs-669-				else
+Vintagestory.API.Common/EntityAgent.cs-670-				{
+Vintagestory.API.Common/EntityAgent.cs-671-					Pos.Pitch = 0f;
+Vintagestory.API.Common/EntityAgent.cs-672-				}
+Vintagestory.API.Common/EntityAgent.cs-673-			}
+Vintagestory.API.Common/EntityAgent.cs-674-		}
+Vintagestory.API.Common/EntityAgent.cs:675:		World.FrameProfiler.Mark("entityAgent-ticking");
+Vintagestory.API.Common/EntityAgent.cs-676-		base.OnGameTick(dt);
+Vintagestory.API.Common/EntityAgent.cs-677-	}
+Vintagestory.API.Common/EntityAgent.cs-678-
+Vintagestory.API.Common/EntityAgent.cs-679-	protected virtual void SpawnSnowStepParticles()
+Vintagestory.API.Common/EntityAgent.cs-680-	{
+Vintagestory.API.Common/EntityAgent.cs-681-		ICoreClientAPI coreClientAPI = Api as ICoreClientAPI;
+Vintagestory.API.Common/EntityAgent.cs-682-		EntityPos pos = Pos;
+Vintagestory.API.Common/EntityAgent.cs-683-		float num = (float)Math.Sqrt(Pos.Motion.X * Pos.Motion.X + Pos.Motion.Z * Pos.Motion.Z);
+Vintagestory.API.Common/EntityAgent.cs-684-		if (Api.World.Rand.NextDouble() < (double)(10f * num))
+Vintagestory.API.Common/EntityAgent.cs-685-		{
+Vintagestory.API.Common/EntityAgent.cs-686-			Random rand = coreClientAPI.World.Rand;
+Vintagestory.API.Common/EntityAgent.cs-687-			Vec3f velocity = new Vec3f(1f - 2f * (float)rand.NextDouble() + GameMath.Clamp((float)Pos.Motion.X * 15f, -5f, 5f), 0.5f + 3.5f * (float)rand.NextDouble(), 1f - 2f * (float)rand.NextDouble() + GameMath.Clamp((float)Pos.Motion.Z * 15f, -5f, 5f));
+Vintagestory.API.Common/EntityAgent.cs-688-			float radius = Math.Min(SelectionBox.XSize, SelectionBox.ZSize) * 0.9f;
+Vintagestory.API.Common/EntityAgent.cs-689-			World.SpawnCubeParticles(pos.AsBlockPos, pos.XYZ.Add(0.0, 0.0, 0.0), radius, 2 + (int)(rand.NextDouble() * (double)num * 5.0), 0.5f + (float)rand.NextDouble() * 0.5f, null, velocity);
+Vintagestory.API.Common/EntityAgent.cs-690-		}
+Vintagestory.API.Common/EntityAgent.cs-691-	}
+Vintagestory.API.Common/EntityAgent.cs-692-
+Vintagestory.API.Common/EntityAgent.cs-693-	protected virtual void SpawnFloatingSediment(IAsyncParticleManager manager)
+Vintagestory.API.Common/EntityAgent.cs-694-	{
+Vintagestory.API.Common/EntityAgent.cs-695-		ICoreClientAPI capi = Api as ICoreClientAPI;
+Vintagestory.API.Common/EntityAgent.cs-696-		EntityPos pos = Pos;
+Vintagestory.API.Common/EntityAgent.cs-697-		double num = SelectionBox.XSize * 0.75f;
+Vintagestory.API.Common/EntityAgent.cs-698-		Entity.SplashParticleProps.BasePos.Set(pos.X - num / 2.0, pos.InternalY + 0.0, pos.Z - num / 2.0);
+Vintagestory.API.Common/EntityAgent.cs-699-		Entity.SplashParticleProps.AddPos.Set(num, 0.5, num);
+Vintagestory.API.Common/EntityAgent.cs-700-		float num2 = (float)pos.Motion.Length();
+--
+Vintagestory.API.Common/EntityPlayer.cs-684-			updateEyeHeight(dt);
+Vintagestory.API.Common/EntityPlayer.cs-685-		}
+Vintagestory.API.Common/EntityPlayer.cs-686-		if (flag)
+Vintagestory.API.Common/EntityPlayer.cs-687-		{
+Vintagestory.API.Common/EntityPlayer.cs-688-			alwaysRunIdle = (Api as ICoreClientAPI).Render.CameraType == EnumCameraMode.FirstPerson && !selfNowShadowPass && MountedOn == null;
+Vintagestory.API.Common/EntityPlayer.cs-689-		}
+Vintagestory.API.Common/EntityPlayer.cs-690-		climateCondAccum += dt;
+Vintagestory.API.Common/EntityPlayer.cs-691-		if (flag && World.Side == EnumAppSide.Client && climateCondAccum > 0.5f)
+Vintagestory.API.Common/EntityPlayer.cs-692-		{
+Vintagestory.API.Common/EntityPlayer.cs-693-			climateCondAccum = 0f;
+Vintagestory.API.Common/EntityPlayer.cs-694-			selfClimateCond = Api.World.BlockAccessor.GetClimateAt(Pos.XYZ.AsBlockPos);
+Vintagestory.API.Common/EntityPlayer.cs-695-		}
+Vintagestory.API.Common/EntityPlayer.cs:696:		World.FrameProfiler.Mark("entityPlayer-ticking");
+Vintagestory.API.Common/EntityPlayer.cs-697-		if (!PrevFrameCanStandUp && !servercontrols.Sneak)
+Vintagestory.API.Common/EntityPlayer.cs-698-		{
+Vintagestory.API.Common/EntityPlayer.cs-699-			servercontrols.Sneak = true;
+Vintagestory.API.Common/EntityPlayer.cs-700-			base.OnGameTick(dt);
+Vintagestory.API.Common/EntityPlayer.cs-701-			servercontrols.Sneak = false;
+Vintagestory.API.Common/EntityPlayer.cs-702-		}
+Vintagestory.API.Common/EntityPlayer.cs-703-		else
+Vintagestory.API.Common/EntityPlayer.cs-704-		{
+Vintagestory.API.Common/EntityPlayer.cs-705-			base.OnGameTick(dt);
+Vintagestory.API.Common/EntityPlayer.cs-706-		}
+Vintagestory.API.Common/EntityPlayer.cs-707-	}
+Vintagestory.API.Common/EntityPlayer.cs-708-
+Vintagestory.API.Common/EntityPlayer.cs-709-	public override void OnAsyncParticleTick(float dt, IAsyncParticleManager manager)
+Vintagestory.API.Common/EntityPlayer.cs-710-	{
+Vintagestory.API.Common/EntityPlayer.cs-711-		base.OnAsyncParticleTick(dt, manager);
+Vintagestory.API.Common/EntityPlayer.cs-712-		_ = (Api as ICoreClientAPI).World.Player.Entity.EntityId;
+Vintagestory.API.Common/EntityPlayer.cs-713-		_ = EntityId;
+Vintagestory.API.Common/EntityPlayer.cs-714-		bool flag = Pos.Motion.LengthSq() > 1E-05 && !servercontrols.NoClip;
+Vintagestory.API.Common/EntityPlayer.cs-715-		if (((FeetInLiquid || Swimming) & flag) && Properties.Habitat != EnumHabitat.Underwater)
+Vintagestory.API.Common/EntityPlayer.cs-716-		{
+Vintagestory.API.Common/EntityPlayer.cs-717-			SpawnFloatingSediment(manager);
+Vintagestory.API.Common/EntityPlayer.cs-718-		}
+Vintagestory.API.Common/EntityPlayer.cs-719-	}
+Vintagestory.API.Common/EntityPlayer.cs-720-
+Vintagestory.API.Common/EntityPlayer.cs-721-	private void updateLocalEyePosImmersiveFpMode(float dt)

@@ -1,0 +1,575 @@
+Vintagestory.GameContent/BlockEntityClayForm.cs-139-			SendUseOverPacket(byPlayer, voxelPos, facing, mouseBreakMode);
+Vintagestory.GameContent/BlockEntityClayForm.cs-140-		}
+Vintagestory.GameContent/BlockEntityClayForm.cs-141-		ItemSlot activeHotbarSlot = byPlayer.InventoryManager.ActiveHotbarSlot;
+Vintagestory.GameContent/BlockEntityClayForm.cs-142-		if (activeHotbarSlot.Itemstack == null || !CanWorkCurrent)
+Vintagestory.GameContent/BlockEntityClayForm.cs-143-		{
+Vintagestory.GameContent/BlockEntityClayForm.cs-144-			return;
+Vintagestory.GameContent/BlockEntityClayForm.cs-145-		}
+Vintagestory.GameContent/BlockEntityClayForm.cs-146-		int num = activeHotbarSlot.Itemstack.Collectible.GetToolMode(activeHotbarSlot, byPlayer, new BlockSelection
+Vintagestory.GameContent/BlockEntityClayForm.cs-147-		{
+Vintagestory.GameContent/BlockEntityClayForm.cs-148-			Position = Pos
+Vintagestory.GameContent/BlockEntityClayForm.cs-149-		});
+Vintagestory.GameContent/BlockEntityClayForm.cs-150-		bool flag = false;
+Vintagestory.GameContent/BlockEntityClayForm.cs:151:		Api.World.FrameProfiler.Mark("clayform-modified1");
+Vintagestory.GameContent/BlockEntityClayForm.cs-152-		int num2 = NextNotMatchingRecipeLayer();
+Vintagestory.GameContent/BlockEntityClayForm.cs:153:		Api.World.FrameProfiler.Mark("clayform-modified2");
+Vintagestory.GameContent/BlockEntityClayForm.cs-154-		if (num == 3)
+Vintagestory.GameContent/BlockEntityClayForm.cs-155-		{
+Vintagestory.GameContent/BlockEntityClayForm.cs-156-			if (!mouseBreakMode)
+Vintagestory.GameContent/BlockEntityClayForm.cs-157-			{
+Vintagestory.GameContent/BlockEntityClayForm.cs-158-				flag = OnCopyLayer(num2);
+Vintagestory.GameContent/BlockEntityClayForm.cs-159-			}
+Vintagestory.GameContent/BlockEntityClayForm.cs-160-			else
+Vintagestory.GameContent/BlockEntityClayForm.cs-161-			{
+Vintagestory.GameContent/BlockEntityClayForm.cs-162-				num = 1;
+Vintagestory.GameContent/BlockEntityClayForm.cs-163-			}
+Vintagestory.GameContent/BlockEntityClayForm.cs-164-		}
+Vintagestory.GameContent/BlockEntityClayForm.cs-165-		if (num != 3)
+Vintagestory.GameContent/BlockEntityClayForm.cs-166-		{
+Vintagestory.GameContent/BlockEntityClayForm.cs-167-			flag = (mouseBreakMode ? OnRemove(num2, voxelPos, facing, num) : OnAdd(num2, voxelPos, facing, num));
+Vintagestory.GameContent/BlockEntityClayForm.cs-168-		}
+Vintagestory.GameContent/BlockEntityClayForm.cs:169:		Api.World.FrameProfiler.Mark("clayform-modified3");
+Vintagestory.GameContent/BlockEntityClayForm.cs-170-		if (flag)
+Vintagestory.GameContent/BlockEntityClayForm.cs-171-		{
+Vintagestory.GameContent/BlockEntityClayForm.cs-172-			Api.World.PlaySoundAt(new AssetLocation("sounds/player/clayform.ogg"), byPlayer, byPlayer, randomizePitch: true, 8f);
+Vintagestory.GameContent/BlockEntityClayForm.cs:173:			Api.World.FrameProfiler.Mark("clayform-playsound");
+Vintagestory.GameContent/BlockEntityClayForm.cs-174-		}
+Vintagestory.GameContent/BlockEntityClayForm.cs-175-		num2 = NextNotMatchingRecipeLayer(num2);
+Vintagestory.GameContent/BlockEntityClayForm.cs-176-		RegenMeshAndSelectionBoxes(num2);
+Vintagestory.GameContent/BlockEntityClayForm.cs:177:		Api.World.FrameProfiler.Mark("clayform-regenmesh");
+Vintagestory.GameContent/BlockEntityClayForm.cs-178-		Api.World.BlockAccessor.MarkBlockDirty(Pos);
+Vintagestory.GameContent/BlockEntityClayForm.cs-179-		Api.World.BlockAccessor.MarkBlockEntityDirty(Pos);
+Vintagestory.GameContent/BlockEntityClayForm.cs-180-		if (!HasAnyVoxel())
+Vintagestory.GameContent/BlockEntityClayForm.cs-181-		{
+Vintagestory.GameContent/BlockEntityClayForm.cs-182-			AvailableVoxels = 0;
+Vintagestory.GameContent/BlockEntityClayForm.cs-183-			workItemStack = null;
+Vintagestory.GameContent/BlockEntityClayForm.cs-184-			Api.World.BlockAccessor.SetBlock(0, Pos);
+Vintagestory.GameContent/BlockEntityClayForm.cs-185-		}
+Vintagestory.GameContent/BlockEntityClayForm.cs-186-		else
+Vintagestory.GameContent/BlockEntityClayForm.cs-187-		{
+Vintagestory.GameContent/BlockEntityClayForm.cs-188-			CheckIfFinished(byPlayer, num2);
+Vintagestory.GameContent/BlockEntityClayForm.cs:189:			Api.World.FrameProfiler.Mark("clayform-checkfinished");
+Vintagestory.GameContent/BlockEntityClayForm.cs-190-			MarkDirty();
+Vintagestory.GameContent/BlockEntityClayForm.cs-191-		}
+Vintagestory.GameContent/BlockEntityClayForm.cs-192-	}
+Vintagestory.GameContent/BlockEntityClayForm.cs-193-
+Vintagestory.GameContent/BlockEntityClayForm.cs-194-	public void CheckIfFinished(IPlayer byPlayer, int layer)
+Vintagestory.GameContent/BlockEntityClayForm.cs-195-	{
+Vintagestory.GameContent/BlockEntityClayForm.cs-196-		if (!MatchesRecipe(layer) || !(Api.World is IServerWorldAccessor))
+Vintagestory.GameContent/BlockEntityClayForm.cs-197-		{
+Vintagestory.GameContent/BlockEntityClayForm.cs-198-			return;
+Vintagestory.GameContent/BlockEntityClayForm.cs-199-		}
+Vintagestory.GameContent/BlockEntityClayForm.cs-200-		workItemStack = null;
+Vintagestory.GameContent/BlockEntityClayForm.cs-201-		Voxels = new bool[16, 16, 16];
+Vintagestory.GameContent/BlockEntityClayForm.cs-202-		AvailableVoxels = 0;
+Vintagestory.GameContent/BlockEntityClayForm.cs-203-		ItemStack itemStack = SelectedRecipe.Output.ResolvedItemstack.Clone();
+Vintagestory.GameContent/BlockEntityClayForm.cs-204-		selectedRecipeId = -1;
+Vintagestory.GameContent/BlockEntityClayForm.cs-205-		selectedRecipe = null;
+Vintagestory.GameContent/BlockEntityClayForm.cs-206-		GroundStorageProperties groundStorageProperties = itemStack.Collectible.GetBehavior<CollectibleBehaviorGroundStorable>()?.StorageProps;
+Vintagestory.GameContent/BlockEntityClayForm.cs-207-		if (groundStorageProperties != null)
+Vintagestory.GameContent/BlockEntityClayForm.cs-208-		{
+Vintagestory.GameContent/BlockEntityClayForm.cs-209-			Api.World.BlockAccessor.SetBlock(Api.World.GetBlock("groundstorage").BlockId, Pos);
+Vintagestory.GameContent/BlockEntityClayForm.cs-210-			int stackSize = itemStack.StackSize;
+Vintagestory.GameContent/BlockEntityClayForm.cs-211-			bool flag = stackSize == 1;
+Vintagestory.GameContent/BlockEntityClayForm.cs-212-			if (flag)
+Vintagestory.GameContent/BlockEntityClayForm.cs-213-			{
+Vintagestory.GameContent/BlockEntityClayForm.cs-214-				EnumGroundStorageLayout layout = groundStorageProperties.Layout;
+--
+Vintagestory.GameContent/EntityActivitySystem.cs-146-			{
+Vintagestory.GameContent/EntityActivitySystem.cs-147-				entityActivity.Finish();
+Vintagestory.GameContent/EntityActivitySystem.cs-148-				Entity.Attributes.SetString("lastActivity", entityActivity.Code);
+Vintagestory.GameContent/EntityActivitySystem.cs-149-				if (Debug)
+Vintagestory.GameContent/EntityActivitySystem.cs-150-				{
+Vintagestory.GameContent/EntityActivitySystem.cs-151-					Entity.World.Logger.Debug("ActivitySystem entity {0} activity {1} has finished", Entity.EntityId, entityActivity.Name);
+Vintagestory.GameContent/EntityActivitySystem.cs-152-				}
+Vintagestory.GameContent/EntityActivitySystem.cs-153-				ActiveActivitiesBySlot.Remove(key);
+Vintagestory.GameContent/EntityActivitySystem.cs-154-			}
+Vintagestory.GameContent/EntityActivitySystem.cs-155-			else
+Vintagestory.GameContent/EntityActivitySystem.cs-156-			{
+Vintagestory.GameContent/EntityActivitySystem.cs-157-				entityActivity.OnTick(accum);
+Vintagestory.GameContent/EntityActivitySystem.cs:158:				Entity.World.FrameProfiler.Mark("behavior-activitydriven-tick-", entityActivity.Code);
+Vintagestory.GameContent/EntityActivitySystem.cs-159-			}
+Vintagestory.GameContent/EntityActivitySystem.cs-160-		}
+Vintagestory.GameContent/EntityActivitySystem.cs-161-		accum = 0f;
+Vintagestory.GameContent/EntityActivitySystem.cs-162-		if (!pauseAutoSelection)
+Vintagestory.GameContent/EntityActivitySystem.cs-163-		{
+Vintagestory.GameContent/EntityActivitySystem.cs-164-			foreach (IEntityActivity availableActivity in AvailableActivities)
+Vintagestory.GameContent/EntityActivitySystem.cs-165-			{
+Vintagestory.GameContent/EntityActivitySystem.cs-166-				int slot = availableActivity.Slot;
+Vintagestory.GameContent/EntityActivitySystem.cs-167-				if (ActiveActivitiesBySlot.TryGetValue(slot, out var value) && value != null && value.Priority >= availableActivity.Priority)
+Vintagestory.GameContent/EntityActivitySystem.cs-168-				{
+Vintagestory.GameContent/EntityActivitySystem.cs-169-					continue;
+Vintagestory.GameContent/EntityActivitySystem.cs-170-				}
+Vintagestory.GameContent/EntityActivitySystem.cs-171-				bool flag = availableActivity.ConditionsOp == EnumConditionLogicOp.AND;
+Vintagestory.GameContent/EntityActivitySystem.cs-172-				for (int i = 0; i < availableActivity.Conditions.Length; i++)
+Vintagestory.GameContent/EntityActivitySystem.cs-173-				{
+Vintagestory.GameContent/EntityActivitySystem.cs-174-					if (!flag && availableActivity.ConditionsOp != EnumConditionLogicOp.OR)
+Vintagestory.GameContent/EntityActivitySystem.cs-175-					{
+Vintagestory.GameContent/EntityActivitySystem.cs-176-						break;
+Vintagestory.GameContent/EntityActivitySystem.cs-177-					}
+Vintagestory.GameContent/EntityActivitySystem.cs-178-					IActionCondition obj = availableActivity.Conditions[i];
+Vintagestory.GameContent/EntityActivitySystem.cs-179-					bool flag2 = obj.ConditionSatisfied(Entity);
+Vintagestory.GameContent/EntityActivitySystem.cs-180-					if (obj.Invert)
+Vintagestory.GameContent/EntityActivitySystem.cs-181-					{
+Vintagestory.GameContent/EntityActivitySystem.cs-182-						flag2 = !flag2;
+Vintagestory.GameContent/EntityActivitySystem.cs-183-					}
+--
+Vintagestory.GameContent/EntityAnimalBot.cs-88-					}
+Vintagestory.GameContent/EntityAnimalBot.cs-89-				}
+Vintagestory.GameContent/EntityAnimalBot.cs-90-			}
+Vintagestory.GameContent/EntityAnimalBot.cs-91-			else if (LoopCommands)
+Vintagestory.GameContent/EntityAnimalBot.cs-92-			{
+Vintagestory.GameContent/EntityAnimalBot.cs-93-				StartExecuteCommands();
+Vintagestory.GameContent/EntityAnimalBot.cs-94-			}
+Vintagestory.GameContent/EntityAnimalBot.cs-95-			else
+Vintagestory.GameContent/EntityAnimalBot.cs-96-			{
+Vintagestory.GameContent/EntityAnimalBot.cs-97-				commandQueueActive = false;
+Vintagestory.GameContent/EntityAnimalBot.cs-98-			}
+Vintagestory.GameContent/EntityAnimalBot.cs-99-		}
+Vintagestory.GameContent/EntityAnimalBot.cs:100:		World.FrameProfiler.Mark("entityAnimalBot-pathfinder-and-commands");
+Vintagestory.GameContent/EntityAnimalBot.cs-101-	}
+Vintagestory.GameContent/EntityAnimalBot.cs-102-
+Vintagestory.GameContent/EntityAnimalBot.cs-103-	public override void ToBytes(BinaryWriter writer, bool forClient)
+Vintagestory.GameContent/EntityAnimalBot.cs-104-	{
+Vintagestory.GameContent/EntityAnimalBot.cs-105-		if (!forClient)
+Vintagestory.GameContent/EntityAnimalBot.cs-106-		{
+Vintagestory.GameContent/EntityAnimalBot.cs-107-			ITreeAttribute treeAttribute = new TreeAttribute();
+Vintagestory.GameContent/EntityAnimalBot.cs-108-			WatchedAttributes["commandQueue"] = treeAttribute;
+Vintagestory.GameContent/EntityAnimalBot.cs-109-			ITreeAttribute treeAttribute2 = (ITreeAttribute)(treeAttribute["commands"] = new TreeAttribute());
+Vintagestory.GameContent/EntityAnimalBot.cs-110-			int num = 0;
+Vintagestory.GameContent/EntityAnimalBot.cs-111-			foreach (INpcCommand command in Commands)
+Vintagestory.GameContent/EntityAnimalBot.cs-112-			{
+Vintagestory.GameContent/EntityAnimalBot.cs-113-				ITreeAttribute treeAttribute3 = new TreeAttribute();
+Vintagestory.GameContent/EntityAnimalBot.cs-114-				command.ToAttribute(treeAttribute3);
+Vintagestory.GameContent/EntityAnimalBot.cs-115-				treeAttribute3.SetString("type", command.Type);
+Vintagestory.GameContent/EntityAnimalBot.cs-116-				treeAttribute2["cmd" + num] = treeAttribute3;
+Vintagestory.GameContent/EntityAnimalBot.cs-117-				num++;
+Vintagestory.GameContent/EntityAnimalBot.cs-118-			}
+Vintagestory.GameContent/EntityAnimalBot.cs-119-			WatchedAttributes.SetBool("loop", LoopCommands);
+Vintagestory.GameContent/EntityAnimalBot.cs-120-		}
+Vintagestory.GameContent/EntityAnimalBot.cs-121-		base.ToBytes(writer, forClient);
+Vintagestory.GameContent/EntityAnimalBot.cs-122-	}
+Vintagestory.GameContent/EntityAnimalBot.cs-123-
+Vintagestory.GameContent/EntityAnimalBot.cs-124-	public override void FromBytes(BinaryReader reader, bool forClient)
+Vintagestory.GameContent/EntityAnimalBot.cs-125-	{
+--
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-53-		JsonObject jsonObject = collObj.Attributes?["handbook"]?["extraSections"];
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-54-		if (jsonObject != null && jsonObject.Exists)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-55-		{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-56-			ExtraHandBookSections = jsonObject?.AsObject<ExtraHandbookSection[]>();
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-57-		}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-58-	}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-59-
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-60-	public virtual RichTextComponentBase[] GetHandbookInfo(ItemSlot inSlot, ICoreClientAPI capi, ItemStack[] allStacks, ActionConsumable<string> openDetailPageFor)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-61-	{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-62-		ItemStack itemstack = inSlot.Itemstack;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-63-		List<RichTextComponentBase> list = new List<RichTextComponentBase>();
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-64-		addGeneralInfo(inSlot, capi, itemstack, list, out var marginTop, out var marginBottom);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs:65:		capi.World.FrameProfiler.Mark("handbook-CollectibleGetHandbookInfo-1");
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-66-		List<ItemStack> list2 = new List<ItemStack>();
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-67-		List<ItemStack> list3 = new List<ItemStack>();
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-68-		List<ItemStack> list4 = new List<ItemStack>();
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-69-		List<ItemStack> list5 = new List<ItemStack>();
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-70-		List<ItemStack> list6 = new List<ItemStack>();
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-71-		foreach (ItemStack itemStack in allStacks)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-72-		{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-73-			JsonObject itemAttributes = itemStack.ItemAttributes;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-74-			if (itemAttributes != null && itemAttributes.KeyExists("cookingContainerSlots"))
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-75-			{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-76-				list2.Add(itemStack);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-77-			}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-78-			CombustibleProperties combustibleProperties = itemStack.Collectible?.GetCombustibleProperties(Api.World, itemStack, null);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-79-			if (combustibleProperties != null)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-80-			{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-81-				_ = combustibleProperties.BurnDuration;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-82-			}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-83-			else
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-84-			{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-85-				if (combustibleProperties == null)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-86-				{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-87-					goto IL_00ce;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-88-				}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-89-				_ = combustibleProperties.BurnTemperature;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-90-			}
+--
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-108-					if (array[i].ResolvedItemstack.Equals(capi.World, itemstack, GlobalConstants.IgnoredStackAttributes))
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-109-					{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-110-						list6.Add(itemStack);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-111-					}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-112-				}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-113-			}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-114-		}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-115-		addDropsInfo(capi, openDetailPageFor, itemstack, list, marginTop, list6);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-116-		bool haveText = addObtainedThroughInfo(capi, allStacks, openDetailPageFor, itemstack, list, marginTop, list6);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-117-		haveText = addFoundInInfo(capi, openDetailPageFor, itemstack, list, marginTop, haveText);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-118-		haveText = addAlloyForInfo(capi, openDetailPageFor, itemstack, list, marginTop, list2, list3, haveText);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-119-		haveText = addAlloyedFromInfo(capi, allStacks, openDetailPageFor, itemstack, list, marginTop, list2, list3, haveText);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs:120:		capi.World.FrameProfiler.Mark("handbook-CollectibleGetHandbookInfo-2");
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-121-		haveText = addProcessesIntoInfo(capi, openDetailPageFor, itemstack, list, marginTop, marginBottom, list2, list3, haveText);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-122-		haveText = addProcessorForInfo(capi, allStacks, openDetailPageFor, itemstack, list, marginTop, marginBottom, list2, list3, list4, list5, haveText);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs:123:		capi.World.FrameProfiler.Mark("handbook-CollectibleGetHandbookInfo-3a");
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-124-		haveText = addIngredientForInfo(capi, allStacks, openDetailPageFor, itemstack, list, marginTop, list2, list3, list4, haveText);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs:125:		capi.World.FrameProfiler.Mark("handbook-CollectibleGetHandbookInfo-3b");
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-126-		haveText = addCreatedByInfo(capi, allStacks, openDetailPageFor, itemstack, list, marginTop, list2, list3, list4, list5, haveText);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs:127:		capi.World.FrameProfiler.Mark("handbook-CollectibleGetHandbookInfo-3-CreatedBy");
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-128-		addExtraSections(capi, itemstack, list, marginTop);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-129-		addEatenByInfo(capi, itemstack, list, marginTop);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs:130:		capi.World.FrameProfiler.Mark("handbook-CollectibleGetHandbookInfo-3d");
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-131-		addStorableInfo(capi, allStacks, openDetailPageFor, itemstack, list, marginTop);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-132-		addStoredInInfo(capi, allStacks, openDetailPageFor, itemstack, list, marginTop);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-133-		collObj.GetCollectibleInterface<ICustomHandbookPageContent>()?.OnHandbookPageComposed(list, inSlot, capi, allStacks, openDetailPageFor);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs:134:		capi.World.FrameProfiler.Mark("handbook-CollectibleGetHandbookInfo-4");
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-135-		return list.ToArray();
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-136-	}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-137-
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-138-	protected void addGeneralInfo(ItemSlot inSlot, ICoreClientAPI capi, ItemStack stack, List<RichTextComponentBase> components, out float marginTop, out float marginBottom)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-139-	{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-140-		components.Add(new ItemstackTextComponent(capi, stack, 100.0, 10.0));
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-141-		components.AddRange(VtmlUtil.Richtextify(capi, stack.GetName() + "\n", CairoFont.WhiteSmallishText()));
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-142-		if (capi.Settings.Bool["extendedDebugInfo"])
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-143-		{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-144-			CairoFont cairoFont = CairoFont.WhiteDetailText();
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-145-			cairoFont.Color[3] = 0.5;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-146-			components.AddRange(VtmlUtil.Richtextify(capi, "Page code:" + GuiHandbookItemStackPage.PageCodeForStack(stack) + "\n", cairoFont));
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-147-		}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-148-		components.AddRange(VtmlUtil.Richtextify(capi, stack.GetDescription(capi.World, inSlot), CairoFont.WhiteSmallText()));
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-149-		marginTop = 7f;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-150-		marginBottom = 3f;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-151-	}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-152-
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-153-	protected void addDropsInfo(ICoreClientAPI capi, ActionConsumable<string> openDetailPageFor, ItemStack stack, List<RichTextComponentBase> components, float marginTop, List<ItemStack> breakBlocks)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-154-	{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-155-		if (stack.Class != EnumItemClass.Block)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-156-		{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-157-			return;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-158-		}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-159-		Dictionary<int, List<ItemStack>> dictionary = new Dictionary<int, List<ItemStack>>();
+--
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1213-					}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1214-					ItemSlot[] inputSlots = array;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1215-					gridRecipe.GenerateOutputStack(inputSlots, dummySlot);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1216-					addToListUniquely(capi, list, dummySlot.Itemstack);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1217-					ItemStack extraReturnedStack = recipeIngredient.ReturnedStack?.ResolvedItemStack;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1218-					if (extraReturnedStack != null && !gridRecipe.ResolvedIngredients.Any((CraftingRecipeIngredient ingred) => ingred?.SatisfiesAsIngredient(extraReturnedStack, checkStackSize: false) ?? false))
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1219-					{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1220-						addToListUniquely(capi, list, extraReturnedStack);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1221-					}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1222-				}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1223-			}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1224-		}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs:1225:		capi.World.FrameProfiler.Mark("handbook-recipematch-gridrecipes");
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1226-		foreach (SmithingRecipe smithingRecipe in capi.GetSmithingRecipes())
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1227-		{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1228-			if (smithingRecipe.Ingredient.SatisfiesAsIngredient(stack, checkStackSize: false) && getIsAnvilWorkable(stack, fuels))
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1229-			{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1230-				addToListUniquely(capi, list, smithingRecipe.Output.ResolvedItemStack);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1231-			}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1232-		}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1233-		foreach (ClayFormingRecipe clayformingRecipe in capi.GetClayformingRecipes())
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1234-		{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1235-			if (clayformingRecipe.Ingredient.SatisfiesAsIngredient(stack, checkStackSize: false))
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1236-			{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1237-				addToListUniquely(capi, list, clayformingRecipe.Output.ResolvedItemStack);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1238-			}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1239-		}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1240-		foreach (KnappingRecipe knappingRecipe in capi.GetKnappingRecipes())
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1241-		{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1242-			if (knappingRecipe.Ingredient.SatisfiesAsIngredient(stack, checkStackSize: false))
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1243-			{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1244-				addToListUniquely(capi, list, knappingRecipe.Output.ResolvedItemStack);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1245-			}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1246-		}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs:1247:		capi.World.FrameProfiler.Mark("handbook-recipematch-smithing/clayforming/knapping");
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1248-		foreach (BarrelRecipe barrelRecipe in capi.GetBarrelRecipes())
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1249-		{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1250-			BarrelRecipeIngredient[] ingredients = barrelRecipe.Ingredients;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1251-			for (int num = 0; num < ingredients.Length; num++)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1252-			{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1253-				if (ingredients[num].SatisfiesAsIngredient(stack, checkStackSize: false))
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1254-				{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1255-					addToListUniquely(capi, list, barrelRecipe.RecipeOutput.ResolvedItemStack);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1256-				}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1257-			}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1258-		}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs:1259:		capi.World.FrameProfiler.Mark("handbook-recipematch-barrelrecipes");
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1260-		if (stack.Collectible is BlockAnvilPart)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1261-		{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1262-			list.Add(new ItemStack(Api.World.GetBlock("anvil-" + stack.Collectible.Variant["metal"])));
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1263-		}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1264-		JsonObject itemAttributes = stack.ItemAttributes;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1265-		if ((itemAttributes != null && itemAttributes.IsTrue("isFlux")) || (stack != null && stack.Collectible?.GetTags(stack).Overlaps(in fluxTag) == true))
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1266-		{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1267-			foreach (Block block in capi.World.Blocks)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1268-			{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1269-				if (block is BlockAnvilPart)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1270-				{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1271-					ItemStack entry = new ItemStack(Api.World.GetBlock("anvil-" + block.Variant["metal"]));
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1272-					addToListUniquely(capi, list, entry);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1273-				}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1274-			}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1275-		}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs:1276:		capi.World.FrameProfiler.Mark("handbook-recipematch-anvils");
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1277-		CombustibleProperties combustibleProperties = stack.Collectible.GetCombustibleProperties(Api.World, stack, null);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1278-		if (combustibleProperties?.SmeltedStack?.ResolvedItemStack.Collectible is ItemIngot itemIngot)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1279-		{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1280-			foreach (ItemStack mold in molds)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1281-			{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1282-				if (!getCanContainerSmelt(capi, containers, fuels, stack))
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1283-				{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1284-					break;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1285-				}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1286-				ItemStack itemStack = combustibleProperties?.SmeltedStack?.ResolvedItemStack;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1287-				if (itemStack != null && mold.Collectible is BlockIngotMold)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1288-				{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1289-					addToListUniquely(capi, list, itemStack);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1290-					continue;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1291-				}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1292-				string newValue = itemIngot.LastCodePart();
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1293-				JsonItemStack jsonItemStack = mold.ItemAttributes?["drop"]?.AsObject<JsonItemStack>(null, mold.Collectible.Code.Domain);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1294-				if (jsonItemStack != null)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1295-				{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1296-					jsonItemStack.Code.Path = jsonItemStack.Code.Path.Replace("{metal}", newValue);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1297-					jsonItemStack.Resolve(capi.World, "handbookmolds", printWarningOnError: false);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1298-					if (jsonItemStack.ResolvedItemStack != null)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1299-					{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1300-						addToListUniquely(capi, list, jsonItemStack.ResolvedItemStack);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1301-					}
+--
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1309-				JsonItemStack[] array3 = array2;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1310-				foreach (JsonItemStack jsonItemStack2 in array3)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1311-				{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1312-					jsonItemStack2.Code.Path = jsonItemStack2.Code.Path.Replace("{metal}", newValue);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1313-					jsonItemStack2.Resolve(capi.World, "handbookmolds", printWarningOnError: false);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1314-					if (jsonItemStack2.ResolvedItemStack != null)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1315-					{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1316-						addToListUniquely(capi, list, jsonItemStack2.ResolvedItemStack);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1317-					}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1318-				}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1319-			}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1320-		}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs:1321:		capi.World.FrameProfiler.Mark("handbook-recipematch-smeltables");
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1322-		JuiceableProperties juiceableProperties = getjuiceableProps(stack);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1323-		if (juiceableProperties != null)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1324-		{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1325-			ItemStack itemStack2 = juiceableProperties.PressedStack.ResolvedItemStack.Clone();
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1326-			itemStack2.Attributes.SetDouble("juiceableLitresLeft", 1.0);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1327-			if (juiceableProperties.ReturnStack != null && !stack.Equals(capi.World, itemStack2, GlobalConstants.IgnoredStackAttributes))
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1328-			{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1329-				addToListUniquely(capi, list, itemStack2);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1330-			}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1331-		}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs:1332:		capi.World.FrameProfiler.Mark("handbook-recipematch-juicables");
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1333-		List<CookingRecipe> list2 = new List<CookingRecipe>();
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1334-		foreach (CookingRecipe cookingRecipe2 in capi.GetCookingRecipes())
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1335-		{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1336-			bool flag = false;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1337-			CookingRecipeIngredient[] ingredients2 = cookingRecipe2.Ingredients;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1338-			for (int num = 0; num < ingredients2.Length; num++)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1339-			{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1340-				if (ingredients2[num].GetMatchingStack(stack) != null)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1341-				{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1342-					flag = true;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1343-					break;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1344-				}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1345-			}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1346-			if (flag)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1347-			{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1348-				ItemStack itemStack3 = cookingRecipe2.CooksInto?.ResolvedItemStack;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1349-				if (itemStack3 != null)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1350-				{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1351-					addToListUniquely(capi, list, itemStack3);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1352-				}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1353-				else
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1354-				{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1355-					list2.Add(cookingRecipe2);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1356-				}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1357-			}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1358-		}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs:1359:		capi.World.FrameProfiler.Mark("handbook-recipematch-cookingrecipes");
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1360-		List<CookingRecipe> list3 = new List<CookingRecipe>();
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1361-		CookingRecipe[] array4 = ObjectCacheUtil.TryGet<CookingRecipe[]>(capi, "handbookpierecipes");
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1362-		foreach (CookingRecipe cookingRecipe in array4)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1363-		{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1364-			if (cookingRecipe.CooksInto?.ResolvedItemStack != null || list3.Contains(cookingRecipe))
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1365-			{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1366-				continue;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1367-			}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1368-			bool flag2 = false;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1369-			CookingRecipeIngredient[] ingredients2 = cookingRecipe.Ingredients;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1370-			for (int num2 = 0; num2 < ingredients2.Length; num2++)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1371-			{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1372-				if (ingredients2[num2].GetMatchingStack(stack) != null)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1373-				{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1374-					flag2 = true;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1375-					break;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1376-				}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1377-			}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1378-			if (flag2)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1379-			{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1380-				list3.Add(cookingRecipe);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1381-			}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1382-		}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs:1383:		capi.World.FrameProfiler.Mark("handbook-recipematch-pierecipes");
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1384-		if (list.Count <= 0 && list2.Count <= 0 && list3.Count <= 0)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1385-		{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1386-			return haveText;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1387-		}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1388-		AddHeading(components, capi, "Ingredient for", ref haveText);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1389-		components.Add(new ClearFloatTextComponent(capi, 2f));
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1390-		while (list.Count > 0)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1391-		{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1392-			ItemStack itemStack4 = list[0];
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1393-			list.RemoveAt(0);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1394-			if (itemStack4 != null)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1395-			{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1396-				SlideshowItemstackTextComponent item = new SlideshowItemstackTextComponent(capi, itemStack4, list, 40.0, EnumFloat.Inline, (ItemStack cs) =>
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1397-				{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1398-					openDetailPageFor(getPageCodeForStack(capi, cs));
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1399-				});
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1400-				components.Add(item);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1401-			}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1402-		}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1403-		while (list2.Count > 0)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1404-		{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1405-			CookingRecipe recipe = list2[0];
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1406-			list2.RemoveAt(0);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1407-			if (recipe != null)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1408-			{
+--
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1421-			{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1422-				ItemStack itemStack5 = new ItemStack(capi.World.BlockAccessor.GetBlock("pie-perfect"));
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1423-				itemStack5.Attributes.SetInt("pieSize", 4);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1424-				itemStack5.Attributes.SetString("topCrustType", BlockPie.TopCrustTypes[capi.World.Rand.Next(BlockPie.TopCrustTypes.Length)].Code);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1425-				itemStack5.Attributes.SetInt("bakeLevel", 2);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1426-				MealstackTextComponent item3 = new MealstackTextComponent(capi, itemStack5, recipe2, 40.0, EnumFloat.Inline, (CookingRecipe cs) =>
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1427-				{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1428-					openDetailPageFor("handbook-mealrecipe-" + recipe2.Code + "-pie");
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1429-				}, 6, isPie: true, stack);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1430-				components.Add(item3);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1431-			}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1432-		}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs:1433:		capi.World.FrameProfiler.Mark("handbook-recipematch-addcomponents");
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1434-		components.Add(new ClearFloatTextComponent(capi, 3f));
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1435-		return haveText;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1436-	}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1437-
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1438-	protected bool addCreatedByInfo(ICoreClientAPI capi, ItemStack[] allStacks, ActionConsumable<string> openDetailPageFor, ItemStack stack, List<RichTextComponentBase> components, float marginTop, List<ItemStack> containers, List<ItemStack> fuels, List<ItemStack> molds, List<ItemStack> anvils, bool haveText)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1439-	{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1440-		bool flag = false;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1441-		List<KnappingRecipe> list = new List<KnappingRecipe>();
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1442-		foreach (KnappingRecipe knappingRecipe in capi.GetKnappingRecipes())
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1443-		{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1444-			if (knappingRecipe.Output.ResolvedItemStack.Equals(capi.World, stack, GlobalConstants.IgnoredStackAttributes))
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1445-			{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1446-				list.Add(knappingRecipe);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1447-			}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1448-		}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1449-		List<ClayFormingRecipe> list2 = new List<ClayFormingRecipe>();
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1450-		foreach (ClayFormingRecipe clayformingRecipe in capi.GetClayformingRecipes())
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1451-		{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1452-			if (clayformingRecipe.Output.ResolvedItemStack.Equals(capi.World, stack, GlobalConstants.IgnoredStackAttributes))
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1453-			{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1454-				list2.Add(clayformingRecipe);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1455-			}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1456-		}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1457-		list2 = list2.OrderBy((ClayFormingRecipe clayFormingRecipe2) => clayFormingRecipe2.Output.ResolvedItemStack?.StackSize).ToList();
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1458-		if (stack.Collectible is BlockAnvil && capi.World.GetBlock("anvilpart-base-" + stack.Collectible.Variant["metal"]) != null)
+--
+Vintagestory.GameContent/GuiDialogHandbook.cs-174-		ElementBounds elementBounds6 = ElementBounds.FixedSize(0.0, 0.0).FixedUnder(elementBounds2, 15.0).WithAlignment(EnumDialogArea.LeftFixed)
+Vintagestory.GameContent/GuiDialogHandbook.cs-175-			.WithFixedPadding(20.0, 4.0)
+Vintagestory.GameContent/GuiDialogHandbook.cs-176-			.WithFixedAlignmentOffset(4.0, 1.0);
+Vintagestory.GameContent/GuiDialogHandbook.cs-177-		ElementBounds bounds = ElementBounds.FixedSize(0.0, 0.0).FixedUnder(elementBounds2, 15.0).WithAlignment(EnumDialogArea.CenterFixed)
+Vintagestory.GameContent/GuiDialogHandbook.cs-178-			.WithFixedPadding(20.0, 4.0)
+Vintagestory.GameContent/GuiDialogHandbook.cs-179-			.WithFixedAlignmentOffset(0.0, 1.0);
+Vintagestory.GameContent/GuiDialogHandbook.cs-180-		ElementBounds elementBounds7 = elementBounds3.ForkBoundingParent(5.0, 40.0, 36.0, 52.0).WithFixedPadding(GuiStyle.ElementToDialogPadding / 2.0);
+Vintagestory.GameContent/GuiDialogHandbook.cs-181-		elementBounds7.WithChildren(elementBounds3, elementBounds, elementBounds4, elementBounds6, elementBounds5);
+Vintagestory.GameContent/GuiDialogHandbook.cs-182-		ElementBounds bounds2 = elementBounds7.ForkBoundingParent().WithAlignment(EnumDialogArea.None).WithAlignment(EnumDialogArea.CenterFixed)
+Vintagestory.GameContent/GuiDialogHandbook.cs-183-			.WithFixedPosition(0.0, 70.0);
+Vintagestory.GameContent/GuiDialogHandbook.cs-184-		ElementBounds bounds3 = ElementBounds.Fixed(-200.0, 35.0, 200.0, 545.0);
+Vintagestory.GameContent/GuiDialogHandbook.cs-185-		BrowseHistoryElement browseHistoryElement = browseHistory.Peek();
+Vintagestory.GameContent/GuiDialogHandbook.cs:186:		capi.World.FrameProfiler.Mark("handbook-opendetailpage-1");
+Vintagestory.GameContent/GuiDialogHandbook.cs-187-		detailViewGui?.Dispose();
+Vintagestory.GameContent/GuiDialogHandbook.cs-188-		detailViewGui = capi.Gui.CreateCompo("handbook-detail", bounds2).AddShadedDialogBG(elementBounds7).AddDialogTitleBar(DialogTitle, OnTitleBarClose)
+Vintagestory.GameContent/GuiDialogHandbook.cs-189-			.AddVerticalTabs(genTabs(out var curTab), bounds3, OnDetailViewTabClicked, "verticalTabs")
+Vintagestory.GameContent/GuiDialogHandbook.cs-190-			.BeginChildElements(elementBounds7)
+Vintagestory.GameContent/GuiDialogHandbook.cs-191-			.BeginClip(elementBounds2)
+Vintagestory.GameContent/GuiDialogHandbook.cs-192-			.AddInset(elementBounds3, 3);
+Vintagestory.GameContent/GuiDialogHandbook.cs:193:		capi.World.FrameProfiler.Mark("handbook-opendetailpage-2");
+Vintagestory.GameContent/GuiDialogHandbook.cs-194-		composePageHandler(browseHistoryElement.Page, detailViewGui, elementBounds, OpenDetailPageFor);
+Vintagestory.GameContent/GuiDialogHandbook.cs-195-		GuiElement lastAddedElement = detailViewGui.LastAddedElement;
+Vintagestory.GameContent/GuiDialogHandbook.cs:196:		capi.World.FrameProfiler.Mark("handbook-opendetailpage-3");
+Vintagestory.GameContent/GuiDialogHandbook.cs-197-		detailViewGui.EndClip().AddVerticalScrollbar(OnNewScrollbarvalueDetailPage, elementBounds4, "scrollbar").AddIf(capi.IsSinglePlayer && !capi.OpenedToLan)
+Vintagestory.GameContent/GuiDialogHandbook.cs-198-			.AddToggleButton(Lang.Get("Pause game"), CairoFont.WhiteDetailText(), onTogglePause, ElementBounds.Fixed(370.0, -5.0, 100.0, 22.0), "pausegame")
+Vintagestory.GameContent/GuiDialogHandbook.cs-199-			.EndIf()
+Vintagestory.GameContent/GuiDialogHandbook.cs-200-			.AddSmallButton(Lang.Get("general-back"), OnButtonBack, elementBounds6)
+Vintagestory.GameContent/GuiDialogHandbook.cs-201-			.AddSmallButton(Lang.Get("handbook-overview"), OnButtonOverview, bounds)
+Vintagestory.GameContent/GuiDialogHandbook.cs-202-			.AddSmallButton(Lang.Get("general-close"), OnButtonClose, elementBounds5)
+Vintagestory.GameContent/GuiDialogHandbook.cs-203-			.EndChildElements();
+Vintagestory.GameContent/GuiDialogHandbook.cs-204-		detailViewGui.Compose();
+Vintagestory.GameContent/GuiDialogHandbook.cs:205:		capi.World.FrameProfiler.Mark("handbook-opendetailpage-compose");
+Vintagestory.GameContent/GuiDialogHandbook.cs-206-		float num = browseHistoryElement.PosY;
+Vintagestory.GameContent/GuiDialogHandbook.cs-207-		if (num == 0f)
+Vintagestory.GameContent/GuiDialogHandbook.cs-208-		{
+Vintagestory.GameContent/GuiDialogHandbook.cs-209-			float num2 = (float)lastAddedElement.Bounds.fixedHeight;
+Vintagestory.GameContent/GuiDialogHandbook.cs-210-			if (num2 > (float)listHeight)
+Vintagestory.GameContent/GuiDialogHandbook.cs-211-			{
+Vintagestory.GameContent/GuiDialogHandbook.cs-212-				float searchTextPosRel = browseHistoryElement.Page.GetSearchTextPosRel(currentSearchText);
+Vintagestory.GameContent/GuiDialogHandbook.cs-213-				num = Math.Max(0f, searchTextPosRel * 0.98f * num2);
+Vintagestory.GameContent/GuiDialogHandbook.cs-214-			}
+Vintagestory.GameContent/GuiDialogHandbook.cs-215-		}
+Vintagestory.GameContent/GuiDialogHandbook.cs-216-		detailViewGui.GetScrollbar("scrollbar").SetHeights((float)listHeight, (float)lastAddedElement.Bounds.fixedHeight);
+Vintagestory.GameContent/GuiDialogHandbook.cs-217-		detailViewGui.GetScrollbar("scrollbar").CurrentYPosition = num;
+Vintagestory.GameContent/GuiDialogHandbook.cs-218-		OnNewScrollbarvalueDetailPage(num);
+Vintagestory.GameContent/GuiDialogHandbook.cs-219-		detailViewGui.GetVerticalTab("verticalTabs").SetValue(curTab, triggerHandler: false);
+Vintagestory.GameContent/GuiDialogHandbook.cs-220-		detailViewGui.GetToggleButton("pausegame")?.SetValue(!capi.Settings.Bool["noHandbookPause"]);
+Vintagestory.GameContent/GuiDialogHandbook.cs:221:		capi.World.FrameProfiler.Mark("handbook-opendetailpage-scrollbars");
+Vintagestory.GameContent/GuiDialogHandbook.cs-222-	}
+Vintagestory.GameContent/GuiDialogHandbook.cs-223-
+Vintagestory.GameContent/GuiDialogHandbook.cs-224-	protected virtual void OnDetailViewTabClicked(int index, GuiTab tab)
+Vintagestory.GameContent/GuiDialogHandbook.cs-225-	{
+Vintagestory.GameContent/GuiDialogHandbook.cs-226-		browseHistory.Clear();
+Vintagestory.GameContent/GuiDialogHandbook.cs-227-		OnTabClicked(index, tab);
+Vintagestory.GameContent/GuiDialogHandbook.cs-228-	}
+Vintagestory.GameContent/GuiDialogHandbook.cs-229-
+Vintagestory.GameContent/GuiDialogHandbook.cs-230-	protected bool OnButtonOverview()
+Vintagestory.GameContent/GuiDialogHandbook.cs-231-	{
+Vintagestory.GameContent/GuiDialogHandbook.cs-232-		browseHistory.Clear();
+Vintagestory.GameContent/GuiDialogHandbook.cs-233-		return true;
+Vintagestory.GameContent/GuiDialogHandbook.cs-234-	}
+Vintagestory.GameContent/GuiDialogHandbook.cs-235-
+Vintagestory.GameContent/GuiDialogHandbook.cs-236-	public virtual bool OpenDetailPageFor(string pageCode)
+Vintagestory.GameContent/GuiDialogHandbook.cs-237-	{
+Vintagestory.GameContent/GuiDialogHandbook.cs-238-		capi.Gui.PlaySound("menubutton_press");
+Vintagestory.GameContent/GuiDialogHandbook.cs-239-		if (pageNumberByPageCode.TryGetValue(pageCode, out var value))
+Vintagestory.GameContent/GuiDialogHandbook.cs-240-		{
+Vintagestory.GameContent/GuiDialogHandbook.cs-241-			GuiHandbookPage guiHandbookPage = allHandbookPages[value];
+Vintagestory.GameContent/GuiDialogHandbook.cs-242-			if (browseHistory.Count > 0 && guiHandbookPage == browseHistory.Peek().Page)
+Vintagestory.GameContent/GuiDialogHandbook.cs-243-			{
+Vintagestory.GameContent/GuiDialogHandbook.cs-244-				return true;
+Vintagestory.GameContent/GuiDialogHandbook.cs-245-			}
+Vintagestory.GameContent/GuiDialogHandbook.cs-246-			browseHistory.Push(new BrowseHistoryElement
+--
+Vintagestory.GameContent/EntityBehaviorActivityDriven.cs-123-				}
+Vintagestory.GameContent/EntityBehaviorActivityDriven.cs-124-			}
+Vintagestory.GameContent/EntityBehaviorActivityDriven.cs-125-			active = enumInteruptionType == EnumInteruptionType.None;
+Vintagestory.GameContent/EntityBehaviorActivityDriven.cs-126-			if (flag && !active)
+Vintagestory.GameContent/EntityBehaviorActivityDriven.cs-127-			{
+Vintagestory.GameContent/EntityBehaviorActivityDriven.cs-128-				ActivitySystem.Pause(enumInteruptionType);
+Vintagestory.GameContent/EntityBehaviorActivityDriven.cs-129-			}
+Vintagestory.GameContent/EntityBehaviorActivityDriven.cs-130-			if (!flag && active)
+Vintagestory.GameContent/EntityBehaviorActivityDriven.cs-131-			{
+Vintagestory.GameContent/EntityBehaviorActivityDriven.cs-132-				ActivitySystem.Resume();
+Vintagestory.GameContent/EntityBehaviorActivityDriven.cs-133-			}
+Vintagestory.GameContent/EntityBehaviorActivityDriven.cs-134-		}
+Vintagestory.GameContent/EntityBehaviorActivityDriven.cs:135:		Api.World.FrameProfiler.Mark("behavior-activitydriven-checks");
+Vintagestory.GameContent/EntityBehaviorActivityDriven.cs-136-		if (active)
+Vintagestory.GameContent/EntityBehaviorActivityDriven.cs-137-		{
+Vintagestory.GameContent/EntityBehaviorActivityDriven.cs-138-			ActivitySystem.OnTick(deltaTime);
+Vintagestory.GameContent/EntityBehaviorActivityDriven.cs-139-		}
+Vintagestory.GameContent/EntityBehaviorActivityDriven.cs-140-	}
+Vintagestory.GameContent/EntityBehaviorActivityDriven.cs-141-
+Vintagestory.GameContent/EntityBehaviorActivityDriven.cs-142-	public override string PropertyName()
+Vintagestory.GameContent/EntityBehaviorActivityDriven.cs-143-	{
+Vintagestory.GameContent/EntityBehaviorActivityDriven.cs-144-		return "activitydriven";
+Vintagestory.GameContent/EntityBehaviorActivityDriven.cs-145-	}
+Vintagestory.GameContent/EntityBehaviorActivityDriven.cs-146-}
