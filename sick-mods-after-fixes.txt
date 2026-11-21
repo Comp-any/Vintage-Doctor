@@ -1,0 +1,10 @@
+total 200
+drwxr-xr-x  4 runner runner   4096 Nov 21 06:10 .
+drwxr-xr-x 13 runner runner   4096 Nov 21 06:10 ..
+-rw-r--r--  1 runner runner    385 Nov 21 06:10 doctor-sick-backslash.zip
+-rw-r--r--  1 runner runner    387 Nov 21 06:10 doctor-sick-nested.zip
+drwxr-xr-x  2 runner runner   4096 Nov 21 06:10 doctorcrashy
+-rw-r--r--  1 runner runner    228 Nov 21 06:10 doctordup_1.1.0.zip
+drwxr-xr-x  3 runner runner   4096 Nov 21 06:10 doctorsick
+-rw-r--r--  1 runner runner    231 Nov 21 06:10 doctorwrapped_1.0.0.zip
+-rw-r--r--  1 runner runner 168188 Nov 21 06:10 vintagedoctor_1.0.0.zip

@@ -1,0 +1,5 @@
+== Errors and warnings in the log ==
+1 kind(s) of errors (3 line(s)) and 0 kind(s) of warnings (0 line(s)) in server-main.log, most frequent first. The same message counts once however often it was written.
+⚠ Doctor Crashy: 1 kind(s) of errors, 0 kind(s) of warnings
+  ×3 [Error] [doctorcrashy] a made-up error from the broken test mod
+  Doctor Crashy's page (/doctor mod doctorcrashy)

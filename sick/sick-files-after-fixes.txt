@@ -1,0 +1,7 @@
+== The Mods folder ==
+✓ 7 mod file(s) in 2 folder(s), nothing wrong with them.
+  ~/work/Vintage-Doctor/Vintage-Doctor/data-sick/Mods
+  ~/work/Vintage-Doctor/Vintage-Doctor/vs/Mods
+
+== Config files ==
+✓ 3 config file(s) read without a problem.

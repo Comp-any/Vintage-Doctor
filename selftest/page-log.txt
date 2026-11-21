@@ -1,0 +1,12 @@
+== Errors and warnings in the log ==
+⚠ Doctor Example: An example pump jammed
+  [doctorexample] pump 3 jammed (a made-up warning from the example mod)
+  This line in the log comes from the example mod; the JSON example mod knows what it means.
+  → Nothing to do: it is only an example.
+  Start the example's config afresh (/doctor fix doctorexamplejson:pump-jammed/fix)
+0 kind(s) of errors (0 line(s)) and 1 kind(s) of warnings (2 line(s)) in server-main.log, most frequent first. The same message counts once however often it was written.
+• doctorselftest: 0 kind(s) of errors, 1 kind(s) of warnings
+  ×2 [Warning] [doctorselftest] Its check 'doctorselftest:throws' for Vintage Doctor failed: System.InvalidOperationException: the check's own bug
+    at VintageDoctor.SelfTest.<>c.<Api>b__14_1(IDoctorContext ctx)
+    at VintageDoctor.Checks.ModChecks(DoctorContext x, Boolean deep, String onlyMod, Boolean heading)
+  doctorselftest's page (/doctor mod doctorselftest)

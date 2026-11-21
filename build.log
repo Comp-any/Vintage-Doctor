@@ -1,0 +1,12 @@
+  Determining projects to restore...
+  Restored /home/runner/work/Vintage-Doctor/Vintage-Doctor/VintageDoctor.csproj (in 81 ms).
+/home/runner/work/Vintage-Doctor/Vintage-Doctor/src/Gui/GuiDialogDoctor.cs(117,14): warning CS0414: The field 'GuiDialogDoctor.composing' is assigned but its value is never used [/home/runner/work/Vintage-Doctor/Vintage-Doctor/VintageDoctor.csproj]
+  VintageDoctor -> /home/runner/work/Vintage-Doctor/Vintage-Doctor/bin/Release/Mods/vintagedoctor/VintageDoctor.dll
+
+Build succeeded.
+
+/home/runner/work/Vintage-Doctor/Vintage-Doctor/src/Gui/GuiDialogDoctor.cs(117,14): warning CS0414: The field 'GuiDialogDoctor.composing' is assigned but its value is never used [/home/runner/work/Vintage-Doctor/Vintage-Doctor/VintageDoctor.csproj]
+    1 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:12.59
