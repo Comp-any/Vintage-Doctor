@@ -16,13 +16,18 @@ You get a check-up: one card per check.
 - **Green**: passed. **Grey**: something to know. **Yellow**: may affect play. **Red**: something isn't running
   properly, or could crash.
 - Click a card to see what was found, why it happens and what to do.
-- Green **⚒** buttons do a fix there and then, and run the checks again.
+- A button with green words does a fix there and then, and runs the checks again. The other buttons open a page.
 - The four counters at the top hide and show each colour.
-- Under the cards are questions: *The game crashed*, *The game is slow or stutters*, *A mod isn't working*,
+- The check-up runs every check each time, and is laid out **by mod**: first a section for the game itself (crashes,
+  lag, the Mods folder, the world), then one for each mod with something against it or something to offer, worst
+  first, then one card for the mods nothing was found against.
+- The list next to *Run checks again* shows one mod's section alone.
+- A mod's section holds the buttons that mod added (Vintage-E's *Something is wrong with EMC values*, say). The
+  doctor's own are in the game's section: *The game crashed*, *The game is slow or stutters*, *A mod isn't working*,
   *Something broke after I added or updated mods*... Each opens a page that looks into just that.
 
-In single player you see two halves, **Your game** and **The world**. On a multiplayer server, the server's half
-is shown to its admins only.
+What your own game found and what the server found are put together under each mod. On a multiplayer server, the
+server's findings are shown to its admins only, under "On the server:".
 
 ## What it looks at
 
@@ -62,7 +67,7 @@ you can put them back.
 `/doctor` opens the check-up. Every page is a command too, which is how it works from a server's console:
 
 `/doctor crash`, `perf`, `mods`, `mod <mod id>`, `log [mod id]`, `startup`, `files`, `patches`, `clashes`, `changes`, `world`,
-`item [code]`, `block`, `craft [code]`, `hotkeys`, `deep`, `bugreport [mod id]`, `api`
+`item [code]`, `block`, `craft [code]`, `hotkeys`, `bugreport [mod id]`, `api`
 
 `/doctor fix <id> [argument]` does a fix; each fix's command is shown next to it in the console's output.
 `.doctor ...` is the same for your own game only.

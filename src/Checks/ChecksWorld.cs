@@ -65,7 +65,7 @@ namespace VintageDoctor
                     x.Explain(x.T("world-missing-why"));
                     x.Advice(x.T("world-missing-advice"));
                 }
-                else if (full) x.Ok(x.T("world-missing-none"));
+                else if (Listed(x, full)) x.Ok(x.T("world-missing-none"));
             }
             catch (Exception e) { if (full) x.Line("missing blocks: " + e.Message, DoctorLineStyle.Note); }
 
@@ -78,7 +78,7 @@ namespace VintageDoctor
                     x.Info(x.T("world-time", N(speed / 60.0, "0.##")));
                     x.Explain(x.T("world-time-why"));
                 }
-                else if (full) x.Ok(x.T("world-time-ok"));
+                else if (Listed(x, full)) x.Ok(x.T("world-time-ok"));
             }
             catch { }
         }

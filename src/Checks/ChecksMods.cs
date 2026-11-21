@@ -17,11 +17,11 @@ namespace VintageDoctor
         // ---------------------------------------------------------------- what other mods hand the doctor
 
         /// <summary>Runs the checks other mods registered (code, event bus) and shows what they reported while playing.</summary>
-        public static void ModChecks(DoctorContext x, bool deep, string onlyMod = null, bool heading = true)
+        public static void ModChecks(DoctorContext x, string onlyMod = null, bool heading = true)
         {
             // A check that names its pages only runs on those; one that doesn't is for the check-up and its mod's page.
             string page = onlyMod != null ? "mod" : "overview";
-            var checks = x.Doctor.ChecksFor(onlyMod).Where(c => (deep || !c.Deep) && (c.Pages == null || c.Pages.Contains(page))).ToList();
+            var checks = x.Doctor.ChecksFor(onlyMod).Where(c => c.Pages == null || c.Pages.Contains(page)).ToList();
             var incidents = x.Doctor.IncidentsFor(onlyMod);
             var bus = x.Doctor.CollectFromEventBus(x, onlyMod);
             if (checks.Count == 0 && incidents.Count == 0 && bus.Count == 0) return;
@@ -64,6 +64,7 @@ namespace VintageDoctor
                 {
                     x.Owner = null;
                     x.Warn(x.T("modcheck-failed", x.ModName(check.ModId), check.Id, e.GetType().Name + ": " + e.Message));
+                    x.About(check.ModId);
                     x.Detail(x.T("modcheck-failed-why"));
                     // Under the mod's own tag, so the log's page counts it against that mod and not against the doctor.
                     try { x.Api.Logger.Warning("[{0}] Its check '{1}' for Vintage Doctor failed: {2}", check.ModId, check.Id, e); } catch { }
@@ -119,7 +120,7 @@ namespace VintageDoctor
             SessionRecord prev = x.Doctor.PreviousSession;
             if (prev == null)
             {
-                if (full) { x.Info(x.T("changes-first")); x.Explain(x.T("changes-first-why")); }
+                if (Listed(x, full)) { x.Info(x.T("changes-first")); x.Explain(x.T("changes-first-why")); }
                 return;
             }
             var now = x.Ev.Mods.UserMods.ToDictionary(m => m.Id, m => m.Version, StringComparer.Ordinal);
@@ -129,7 +130,7 @@ namespace VintageDoctor
             bool game = !string.IsNullOrEmpty(prev.GameVersion) && prev.GameVersion != GameVersion.ShortGameVersion;
             if (added.Count + removed.Count + updated.Count == 0 && !game)
             {
-                if (full) x.Ok(x.T("changes-none", prev.Time));
+                if (Listed(x, full)) x.Ok(x.T("changes-none", prev.Time));
                 return;
             }
             x.Info(x.T("changes-title", prev.Time, added.Count, updated.Count, removed.Count) + (game ? " " + x.T("changes-game", prev.GameVersion, GameVersion.ShortGameVersion) : ""));
@@ -347,7 +348,7 @@ namespace VintageDoctor
                 if (ms > 0.005) x.Info(x.T("mod-profile", N(ms, "0.00"), N(p.PerTick().work, "0.00")));
             }
             // Its own checks.
-            ModChecks(x, true, m.Id, heading: true);
+            ModChecks(x, m.Id, heading: true);
             // Its lines in the log.
             if (log != null && log.For(m.Id).Any()) Log(x, true, m.Id);
             else if (log != null && log.Found) { x.Section(x.T("sec-log-mod", m.Name)); x.Ok(x.T("log-clean-mod", m.Name)); }
@@ -431,14 +432,14 @@ namespace VintageDoctor
             if (rewritten.Count > 0)
             {
                 x.Warn(x.T("patches-rewritten", rewritten.Count));
-                foreach (PatchedMethod m in rewritten.Take(full ? 30 : 5)) x.Detail(m.Name + " ← " + string.Join(", ", m.Transpilers.Select(x.ModName)));
+                foreach (PatchedMethod m in rewritten.Take(full ? 30 : 5)) x.Detail(m.Name + ": " + string.Join(", ", m.Transpilers.Select(x.ModName)));
                 x.Explain(x.T("patches-rewritten-why"));
             }
             x.Info(x.T("patches-title", owners.Count, methods.Count, shared.Count));
             x.Detail(string.Join(", ", owners.Take(full ? 60 : 8).Select(g => x.ModName(g.Key) + " (" + g.Count() + ")")));
             if (full)
             {
-                foreach (PatchedMethod m in shared.Take(40)) x.Detail(m.Name + " ← " + string.Join(", ", m.Owners.Select(x.ModName)), 2);
+                foreach (PatchedMethod m in shared.Take(40)) x.Detail(m.Name + ": " + string.Join(", ", m.Owners.Select(x.ModName)), 2);
             }
             x.Explain(x.T("patches-why"));
             if (!full) x.LinkButton(TopicPatches, "", x.T("btn-patches"));
@@ -452,7 +453,7 @@ namespace VintageDoctor
                 if (mine.Count == 0) return;
                 var shared = mine.Where(pm => pm.Owners.Count >= 2).ToList();
                 x.Info(x.T("mod-harmony", mine.Count, shared.Count));
-                foreach (PatchedMethod pm in mine.Take(12)) x.Detail(pm.Name + (pm.Owners.Count >= 2 ? " ← " + string.Join(", ", pm.Owners.Where(o => o != m.Id).Select(x.ModName)) : ""));
+                foreach (PatchedMethod pm in mine.Take(12)) x.Detail(pm.Name + (pm.Owners.Count >= 2 ? ": " + string.Join(", ", pm.Owners.Where(o => o != m.Id).Select(x.ModName)) : ""));
                 if (mine.Count > 12) x.Detail(x.T("more-lines", mine.Count - 12));
                 x.Explain(x.T("patches-why"));
             }
@@ -460,13 +461,21 @@ namespace VintageDoctor
         }
 
         /// <summary>JSON patches from different mods that change the same place in the same file: the last one wins.</summary>
+        // What the mods' patch files change, read once: they don't change while the game runs, and the check-up
+        // looks every time it is opened.
+        static Dictionary<string, HashSet<string>> patchTargets;
+        static int patchTotal, patchFiles;
+        static readonly object patchGate = new object();
+
         public static void JsonPatchOverlaps(DoctorContext x)
         {
-            x.Section(x.T("sec-jsonpatches"));
-            var targets = new Dictionary<string, HashSet<string>>(StringComparer.Ordinal);
+            if (!x.ListAll) x.Section(x.T("sec-jsonpatches"));
+            Dictionary<string, HashSet<string>> targets;
             int total = 0, files = 0;
-            try
+            lock (patchGate) { targets = patchTargets; total = patchTotal; files = patchFiles; }
+            if (targets == null) try
             {
+                targets = new Dictionary<string, HashSet<string>>(StringComparer.Ordinal);
                 foreach (IAsset asset in x.Api.Assets.GetMany("patches/", null, true))
                 {
                     string domain = asset.Location.Domain;
@@ -485,12 +494,13 @@ namespace VintageDoctor
                         set.Add(domain);
                     }
                 }
+                lock (patchGate) { patchTargets = targets; patchTotal = total; patchFiles = files; }
             }
             catch (Exception e) { x.Info(x.T("patches-error", e.Message)); return; }
             var clashes = targets.Where(kv => kv.Value.Count >= 2).OrderByDescending(kv => kv.Value.Count).ToList();
             if (clashes.Count == 0) { x.Ok(x.T("jsonpatches-none", total, files)); return; }
             x.Warn(x.T("jsonpatches-clash", clashes.Count));
-            foreach (var kv in clashes.Take(40)) x.Detail(kv.Key + " ← " + string.Join(", ", kv.Value.Select(x.ModName)));
+            foreach (var kv in clashes.Take(40)) x.Detail(kv.Key + ": " + string.Join(", ", kv.Value.Select(x.ModName)));
             x.Explain(x.T("jsonpatches-why"));
         }
     }

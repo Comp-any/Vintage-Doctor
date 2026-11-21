@@ -91,6 +91,12 @@ namespace VintageDoctor
             x.Buttons(tokens.ToArray());
         }
 
+        /// <summary>
+        /// Whether a check says so when it found nothing: on its own page (<paramref name="full"/>) and on the
+        /// check-up, which lists every check with its result. A mod's page only says what it found.
+        /// </summary>
+        static bool Listed(DoctorContext x, bool full) => full || x.ListAll;
+
         /// <summary>Runs one of the doctor's own checks; if it throws, the page says so and carries on.</summary>
         public static void Guarded(DoctorContext x, string name, Action check)
         {
@@ -345,7 +351,7 @@ namespace VintageDoctor
         {
             LogScan log = x.Ev.Log;
             if (full) x.Section(onlyMod == null ? x.T("sec-log") : x.T("sec-log-mod", x.ModName(onlyMod)));
-            if (log == null || !log.Found) { if (full) x.Info(x.T("log-nofile", System.IO.Path.GetFileName(log?.File ?? "?"))); return; }
+            if (log == null || !log.Found) { if (Listed(x, full)) x.Info(x.T("log-nofile", System.IO.Path.GetFileName(log?.File ?? "?"))); return; }
 
             List<LogIssue> issues = log.Issues.Where(i => onlyMod == null || string.Equals(i.Mod, onlyMod, StringComparison.OrdinalIgnoreCase)).ToList();
 
@@ -377,6 +383,22 @@ namespace VintageDoctor
             if (!full)
             {
                 if (errorKinds == 0) { x.Ok(warnKinds == 0 ? x.T("log-clean") : x.T("log-clean-warnings", warnKinds, warnLines)); }
+                else if (x.ListAll)
+                {
+                    // The check-up is by mod: each mod with errors gets a card of its own, in its own section. What no
+                    // mod could be named for is the game's.
+                    foreach (var g in unknown.Where(i => i.Bad).GroupBy(i => i.Mod ?? "").OrderByDescending(g => g.Sum(i => i.Count)).Take(40))
+                    {
+                        bool named = g.Key.Length > 0;
+                        int kinds = g.Count(), lines = g.Sum(i => i.Count);
+                        x.Warn(named ? x.T("log-errors-mod", x.ModName(g.Key), kinds, lines) : x.T("log-errors-nomod", kinds, lines));
+                        x.About(named ? g.Key : DoctorReport.GameSection);
+                        foreach (LogIssue i in g.OrderByDescending(i => i.Count).Take(3)) x.Detail((i.Count > 1 ? "×" + i.Count + " " : "") + LogScan.Shorten(Anonymise.Line(i.Message), 200));
+                        if (kinds > 3) x.Detail(x.T("more-lines", kinds - 3));
+                        x.Explain(x.T("log-errors-why"));
+                        x.LinkButton(TopicLog, named ? g.Key : "", named ? x.T("btn-log-mod", x.ModName(g.Key)) : x.T("btn-log"));
+                    }
+                }
                 else
                 {
                     x.Warn(x.T("log-errors", errorKinds, errorLines, warnKinds));
@@ -389,7 +411,7 @@ namespace VintageDoctor
                     }
                     x.Explain(x.T("log-errors-why"));
                 }
-                if (errorKinds + warnKinds > 0) x.LinkButton(TopicLog, "", x.T("btn-log"));
+                if (errorKinds + warnKinds > 0 && !(x.ListAll && errorKinds > 0)) x.LinkButton(TopicLog, "", x.T("btn-log"));
                 if (log.Truncated) x.Detail(x.T("log-truncated", Size(log.Bytes)));
                 return;
             }

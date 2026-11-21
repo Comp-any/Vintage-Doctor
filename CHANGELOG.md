@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.3.0
+
+The check-up is one page by mod, and nothing on it needs a character the game can't draw.
+
+- **Symbols that showed as empty boxes are gone.** The game draws text with your computer's own default font, and on many computers that font has no arrows, ticks, warning signs or small triangles. The window now draws its own arrow before a line that says what to do and its own triangle on a card that opens, a fix button has green words instead of a hammer, and in chat a page's marks are written `[ok]`, `[!]`, `[x]` and `->`. Whatever a mod hands the doctor gets the same treatment before the game draws it.
+- **The check-up lists every check, each time.** There is no second round of "deeper checks" any more, and no button for it. What it used to hold is on the check-up: every mod zip read to its end (off the game's main thread, and each file only once until it changes), patches of two mods on the same thing, things that show a code instead of a name, recipes with the same ingredients, and every mod's own slower checks. A check that found nothing says so, so you can see what was looked at. `/doctor deep` opens the check-up.
+- **Laid out by mod.** A section for the game itself (crashes, lag, the Mods folder, the world), then a section for each mod with something against it or something to offer, the ones with problems first, then one card naming the mods nothing was found against. What your game found and what the server found about a mod are together under its heading.
+- **Show one mod alone.** Where the deeper checks button was, a list of the mods on the page: pick one and only its section is shown (and counted, and copied).
+- **Each mod's errors in the log get a card of their own,** in that mod's section, with a button to all of them.
+- **A mod's buttons are in the mod's own section,** not in one list at the bottom: its pages, and one for everything the doctor knows about it. The doctor's own pages are buttons in the game's section.
+- For mod authors: `DoctorCheck.Deep` no longer does anything (the field stays, so older mods load); a check runs every time the check-up is opened, so a slow one should remember its answer. Nothing else changes: your findings and your pages move under your mod's heading by themselves. See [docs/api.md](docs/api.md).
+- Not seen in a real game by the session that made it: the window's new drawing, the list of mods and the green fix buttons. The tests run a server, where the pages are checked as text.
+
 ## 1.2.0
 
 For mods that already have a doctor of their own: they can now hand the whole thing over, so there is one window instead of two. Vintage-E is the first to do it (from its version 1.26.0): with Vintage Doctor installed, its EMC check-up, its pages and its fixes show up here, under "Something is wrong with EMC values". Nothing changes for players who don't have such a mod.

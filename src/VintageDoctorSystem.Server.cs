@@ -50,7 +50,7 @@ namespace VintageDoctor
                     DoctorReport r = BuildPage(ev, null, "en", Pages.Overview, "");
                     StartupProblems = r.Problems;
                     StartupWarnings = r.Warnings;
-                    SaveText("startup-checkup.txt", r.PlainText(sapi.World));
+                    SaveText("startup-checkup.txt", CheckUp(r, ev, null, "en").PlainText(sapi.World));
                     if (Config.ScanAtStartup)
                     {
                         if (StartupProblems + StartupWarnings == 0) sapi.Logger.Notification("[vintagedoctor] Check-up after start-up: nothing wrong ({0} ms to read the logs and folders).", ev.ReadMilliseconds);
@@ -127,12 +127,23 @@ namespace VintageDoctor
                     {
                         if (player.ConnectionState != EnumClientState.Playing) return;
                         r.File = SaveText("last-report-server.txt", r.PlainText(sapi.World));
+                        var topics = AllTopics();
+                        // The player's game may not have a mod that has a page here: it gets the mod's name for the section's heading.
+                        if (r.SectionTitles.Count > 0)
+                        {
+                            foreach (var t in topics)
+                            {
+                                ModEntry owner = ev.Mods.Get(t.ModId);
+                                if (owner != null && !r.SectionTitles.ContainsKey(owner.Id)) r.SectionTitles[owner.Id] = string.IsNullOrEmpty(owner.Version) ? owner.Name : owner.Name + " " + owner.Version;
+                            }
+                        }
                         DoctorReportPacket packet = r.ToPacket(p.Id);
                         packet.Outcome = outcome ?? "";
                         packet.ServerVersion = DoctorVersion;
                         packet.ServerMods = ev.Mods.UserMods.Select(m => m.Key).ToArray();
                         // In the asker's language: their game may not have the mod whose lang key the question is.
-                        packet.ServerTopics = AllTopics().Select(t => t.Id + "|" + WordsIn(lang, t.Question ?? t.Id)).ToArray();
+                        packet.ServerTopics = topics.Select(t => t.Id + "|" + WordsIn(lang, t.Question ?? t.Id)).ToArray();
+                        packet.ServerTopicMods = topics.Select(t => t.ModId ?? "").ToArray();
                         serverChannel.SendPacket(packet, player);
                     }, Working);
                 }
@@ -239,8 +250,8 @@ namespace VintageDoctor
                 string page = null;
                 BuildPageThen(ev, player, lang, topic, arg, player?.InventoryManager?.ActiveHotbarSlot?.Itemstack, null, false, null, null, false, r =>
                 {
-                    var x = new DoctorContext { Doctor = this, Api = sapi, Side = EnumAppSide.Server, Player = player, LanguageCode = lang, Topic = topic, Argument = arg, Ev = ev, R = r };
-                    if (r.Key.StartsWith(Pages.Overview + "|", StringComparison.Ordinal)) Pages.Questions(x, null, true, false);
+                    // The check-up is put in order here, by mod, as the window does for a player.
+                    if (r.Key.StartsWith(Pages.Overview + "|", StringComparison.Ordinal)) r = CheckUp(r, ev, player, lang);
                     string text = r.PlainText(sapi.World);
                     string file = SaveText("last-report-server.txt", text);
                     if (file != null) text += "\n" + Lang.GetL(lang, "vintagedoctor:cmd-saved", Anonymise.Short(file));
@@ -257,7 +268,11 @@ namespace VintageDoctor
             }
         }
 
-        /// <summary>Chat reads &lt; and &gt; as markup: they are written out so a stack trace doesn't break the message.</summary>
-        static string ChatSafe(string text) => (text ?? "").Replace("<", "&lt;").Replace(">", "&gt;");
+        /// <summary>
+        /// Text for chat: the report's marks and anything else the game's font may lack written in ordinary characters
+        /// (chat is drawn by the game; the console isn't), then &lt; and &gt; written out, because chat reads them as
+        /// markup and a stack trace would break the message.
+        /// </summary>
+        internal static string ChatSafe(string text) => GameFont.Drawable(text ?? "").Replace("<", "&lt;").Replace(">", "&gt;");
     }
 }

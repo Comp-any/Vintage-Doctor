@@ -21,7 +21,7 @@ namespace VintageDoctor
         public bool ServerAnswers { get; private set; }
         /// <summary>The server's mods ("id@version") as its last answer gave them; null before the first.</summary>
         public string[] ServerMods { get; private set; }
-        string[] serverTopics;
+        string[] serverTopics, serverTopicMods;
 
         /// <summary>One press of a button in the window: the page being put together from the game's half and the server's.</summary>
         sealed class PendingPage
@@ -228,7 +228,7 @@ namespace VintageDoctor
             p.Server = packet;
             p.ServerDone = true;
             if (packet.ServerMods != null) ServerMods = packet.ServerMods;
-            if (packet.ServerTopics != null) serverTopics = packet.ServerTopics;
+            if (packet.ServerTopics != null) { serverTopics = packet.ServerTopics; serverTopicMods = packet.ServerTopicMods; }
             Finish(p);
         }
 
@@ -266,16 +266,28 @@ namespace VintageDoctor
                     if (string.IsNullOrEmpty(outcome)) continue;
                     final.Add(outcome, outcome.StartsWith(DoctorReport.WarnMark, StringComparison.Ordinal) ? DoctorLineStyle.Warn : DoctorLineStyle.Total);
                 }
-                final.Lines.AddRange(local.Lines);
-                if (two) final.Lines.AddRange(DoctorReport.FromPacket(p.Server).Lines);
-                else if (p.Server != null && p.Server.Denied) final.Add(Lang.Get("vintagedoctor:server-denied"), DoctorLineStyle.Note);
-                else if (p.TimedOut) final.Add(Lang.Get("vintagedoctor:server-timeout"), DoctorLineStyle.Note);
-                else if (p.ServerMissing && !capi.IsSinglePlayer) final.Add(Lang.Get("vintagedoctor:server-missing"), DoctorLineStyle.Note);
-
-                var x = new DoctorContext { Doctor = this, Api = capi, Side = EnumAppSide.Client, Player = player, LanguageCode = ClientLang, Topic = p.Topic, Argument = p.Arg, HeldItem = held, Ev = p.Ev, R = final };
                 string topic = local.Key.Split('|')[0];
-                if (topic == Pages.Overview) Pages.Questions(x, two ? serverTopics : null, two, true);
-                else Pages.Back(x);
+                bool checkUp = topic == Pages.Overview;
+                DoctorReport server = two ? DoctorReport.FromPacket(p.Server) : null;
+                // Why the server's half isn't there, if it isn't.
+                string without = two ? null : p.Server != null && p.Server.Denied ? Lang.Get("vintagedoctor:server-denied") : p.TimedOut ? Lang.Get("vintagedoctor:server-timeout")
+                    : p.ServerMissing && !capi.IsSinglePlayer ? Lang.Get("vintagedoctor:server-missing") : null;
+                var x = new DoctorContext { Doctor = this, Api = capi, Side = EnumAppSide.Client, Player = player, LanguageCode = ClientLang, Topic = p.Topic, Argument = p.Arg, HeldItem = held, Ev = p.Ev, R = final };
+                if (checkUp)
+                {
+                    // The check-up is one list by mod: each mod's cards from this game, then from the server.
+                    if (without != null) final.Add(without, DoctorLineStyle.Note);
+                    var halves = new List<(DoctorReport half, string note)> { (local, null) };
+                    if (server != null) halves.Add((server, capi.IsSinglePlayer ? null : Lang.Get("vintagedoctor:note-server")));
+                    Pages.Arrange(x, halves, two ? Pages.OtherTopics(serverTopics, serverTopicMods) : null, two, true);
+                }
+                else
+                {
+                    final.Lines.AddRange(local.Lines);
+                    if (server != null) final.Lines.AddRange(server.Lines);
+                    if (without != null) final.Add(without, DoctorLineStyle.Note);
+                    Pages.Back(x);
+                }
                 SaveText("last-report-client.txt", final.PlainText(capi.World));
                 Show(final.ToPacket(p.Seq));
             }

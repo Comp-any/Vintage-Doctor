@@ -19,6 +19,16 @@ namespace VintageDoctor
         public int Indent;
         public DoctorLineStyle Style;
         public string Text;
+        /// <summary>On a card: the mods it is about beyond the ones its words name (ids, comma-separated). Not sent.</summary>
+        public string About;
+        /// <summary>
+        /// On the check-up: the section the line is in, which is a mod's id or <see cref="DoctorReport.GameSection"/>
+        /// for what isn't about one mod. A half of the check-up (one side's cards, before the two are put together)
+        /// may name several, comma-separated: the card is shown in each. Null on other pages.
+        /// </summary>
+        public string Section;
+
+        public DoctorLine Copy(string section) => new DoctorLine { Indent = Indent, Style = Style, Text = Text, About = About, Section = section };
     }
 
     /// <summary>
@@ -28,7 +38,11 @@ namespace VintageDoctor
     /// </summary>
     public sealed class DoctorReport
     {
-        public const string OkMark = "✓", WarnMark = "⚠", ProblemMark = "✖", InfoMark = "•", AdviceMark = "→";
+        // The marks are how a line says what it is, to the window, to the other side and to other mods. They are never
+        // drawn as they are: the game's font can't be counted on for them (see GameFont).
+        public const string OkMark = "✓", WarnMark = "⚠", ProblemMark = "✖", InfoMark = "•", AdviceMark = "→";   // font-ok: never drawn as text
+        /// <summary>The check-up's section for what isn't about one mod, and the one for the mods nothing was found against.</summary>
+        public const string GameSection = "game", RestSection = "-";
 
         public string Title = "";
         /// <summary>"topic|argument": what Run checks again asks for.</summary>
@@ -36,6 +50,8 @@ namespace VintageDoctor
         /// <summary>Where the text was saved (null if it couldn't be).</summary>
         public string File;
         public readonly List<DoctorLine> Lines = new List<DoctorLine>();
+        /// <summary>On the check-up: the heading of each section (a mod's name and version), by its key.</summary>
+        public readonly Dictionary<string, string> SectionTitles = new Dictionary<string, string>(StringComparer.Ordinal);
 
         public void Section(string heading) => Add(heading, DoctorLineStyle.Heading);
 
@@ -44,7 +60,8 @@ namespace VintageDoctor
             Lines.Add(new DoctorLine { Text = text ?? "", Style = style, Indent = Math.Max(0, indent) });
         }
 
-        public int Count(string mark) => Lines.Count(l => l.Style == DoctorLineStyle.Check && l.Indent == 0 && l.Text.StartsWith(mark, StringComparison.Ordinal));
+        /// <summary>How many cards have this mark. A card shown under several mods on the check-up counts once.</summary>
+        public int Count(string mark) => Lines.Where(l => l.Style == DoctorLineStyle.Check && l.Indent == 0 && l.Text.StartsWith(mark, StringComparison.Ordinal)).Select(l => l.Text).Distinct(StringComparer.Ordinal).Count();
         public int Problems => Count(ProblemMark);
         public int Warnings => Count(WarnMark);
 
@@ -145,7 +162,9 @@ namespace VintageDoctor
             File = File,
             Texts = Lines.Select(l => l.Text).ToArray(),
             Indents = Lines.Select(l => (byte)Math.Min(l.Indent, 20)).ToArray(),
-            Styles = Lines.Select(l => (byte)l.Style).ToArray()
+            Styles = Lines.Select(l => (byte)l.Style).ToArray(),
+            Sections = Lines.Any(l => l.Section != null) ? Lines.Select(l => l.Section ?? "").ToArray() : null,
+            SectionTitles = SectionTitles.Count > 0 ? SectionTitles.Select(kv => kv.Key + "|" + kv.Value).ToArray() : null
         };
 
         public static DoctorReport FromPacket(DoctorReportPacket p)
@@ -158,8 +177,14 @@ namespace VintageDoctor
                 {
                     Text = texts[i] ?? "",
                     Style = p.Styles != null && i < p.Styles.Length ? (DoctorLineStyle)p.Styles[i] : DoctorLineStyle.Text,
-                    Indent = p.Indents != null && i < p.Indents.Length ? p.Indents[i] : 0
+                    Indent = p.Indents != null && i < p.Indents.Length ? p.Indents[i] : 0,
+                    Section = p.Sections != null && i < p.Sections.Length ? p.Sections[i] : null
                 });
+            }
+            foreach (string s in p?.SectionTitles ?? Array.Empty<string>())
+            {
+                int bar = s?.IndexOf('|') ?? -1;
+                if (bar > 0) r.SectionTitles[s.Substring(0, bar)] = s.Substring(bar + 1);
             }
             return r;
         }

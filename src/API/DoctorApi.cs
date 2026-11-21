@@ -82,7 +82,12 @@ namespace VintageDoctor.API
         public string Id;
         /// <summary>Your mod id. The doctor shows the mod's name before your findings and lists them on the mod's page.</summary>
         public string ModId;
-        /// <summary>Only run when the player asks for the deeper checks (for anything that takes more than a few milliseconds).</summary>
+        /// <summary>
+        /// No longer used. Up to Vintage Doctor 1.2.0 a check with this set only ran in a second, slower round of
+        /// "deeper checks"; since 1.3.0 the check-up runs every check each time it is opened. It is kept so mods built
+        /// against the earlier API still load. A check that takes more than a few milliseconds should work its
+        /// answer out once and remember it.
+        /// </summary>
         public bool Deep;
         /// <summary>
         /// (API 2) Which pages the check runs on. Null (the default): the check-up and your mod's own page. Otherwise any of

@@ -11,16 +11,21 @@ namespace VintageDoctor
         public const string TopicFiles = "files";
 
         /// <summary>The Mods folders: files the game can't load, mods installed twice, mods made for a newer game.</summary>
-        public static void Folder(DoctorContext x, bool full, bool deep = false)
+        public static void Folder(DoctorContext x, bool full)
         {
             FolderScan scan = x.Ev.Folder;
             if (full) x.Section(x.T("sec-folder"));
-            if (scan == null) { if (full) x.Info(x.T("folder-notscanned")); return; }
+            if (scan == null) { if (Listed(x, full)) x.Info(x.T("folder-notscanned")); return; }
             int before = x.Problems + x.Warnings;
             bool windows = Path.DirectorySeparatorChar == '\\';
+            int cards = x.R.Lines.Count;
+            ModFile last = null;
 
             foreach (ModFile f in scan.Files)
             {
+                // A card about a file is about the mod in it, whatever the file is called.
+                if (x.R.Lines.Count > cards) { x.About(last?.ModId); cards = x.R.Lines.Count; }
+                last = f;
                 string name = f.Name;
                 string arg = FileArg(scan, f);
                 if (f.ReadError != null)
@@ -83,13 +88,14 @@ namespace VintageDoctor
                     x.Explain(x.T("folder-backslash-why"));
                     x.FixButton("doctor:repack", arg, x.T("btn-repack", name));
                 }
-                else if (f.Backslashes && full)
+                else if (f.Backslashes && Listed(x, full))
                 {
                     x.Info(x.T("folder-backslash-windows", name));
                     x.Explain(x.T("folder-backslash-why"));
                     x.FixButton("doctor:repack", arg, x.T("btn-repack", name));
                 }
             }
+            if (x.R.Lines.Count > cards) x.About(last?.ModId);
 
             foreach (var (id, copies) in scan.Duplicates())
             {
@@ -109,7 +115,7 @@ namespace VintageDoctor
                 x.Explain(x.T("folder-toonew-why"));
             }
 
-            if (full)
+            if (Listed(x, full))
             {
                 string install = SafeFull(System.IO.Path.Combine(GamePaths.Binaries, "Mods"));
                 var inInstall = scan.Files.Where(f => string.Equals(SafeFull(f.Folder), install, StringComparison.OrdinalIgnoreCase)).ToList();
@@ -121,25 +127,23 @@ namespace VintageDoctor
                 }
             }
 
-            if (deep)
+            // A zip that opens but can't be read to its end: a download that was cut short. Each one is read once,
+            // off the main thread, and remembered (ZipHealth).
+            foreach (ModFile f in scan.Files.Where(f => f.Damage != null))
             {
-                int tested = 0;
-                foreach (ModFile f in scan.Files.Where(f => f.Kind == "zip" && f.ReadError == null))
-                {
-                    tested++;
-                    string error = FolderScan.TestZip(f.Path);
-                    if (error == null) continue;
-                    x.Problem(x.T("folder-damaged", f.Name));
-                    x.Detail(Anonymise.Line(error));
-                    x.Advice(x.T("folder-unreadable-advice"));
-                }
-                x.Line(x.T("folder-tested", tested));
+                x.Problem(x.T("folder-damaged", f.Name));
+                x.Detail(Anonymise.Line(f.Damage));
+                x.Advice(x.T("folder-unreadable-advice"));
+                x.About(f.ModId);
             }
 
             foreach (string e in scan.Errors) x.Line(Anonymise.Line(e));
             if (x.Problems + x.Warnings == before)
             {
                 x.Ok(x.T("folder-clean", scan.Files.Count, scan.Folders.Count));
+                int zips = scan.Files.Count(f => f.Kind == "zip" && f.ReadError == null), tested = scan.Files.Count(f => f.Tested);
+                if (tested > 0) x.Detail(x.T("folder-tested", tested));
+                if (tested < zips) x.Detail(x.T("folder-testing", zips - tested));
                 if (full) foreach (string folder in scan.Folders) x.Detail(Anonymise.Path(folder));
             }
             else if (!full) x.LinkButton(TopicFiles, "", x.T("btn-files"));
@@ -170,7 +174,7 @@ namespace VintageDoctor
         {
             ConfigScan scan = x.Ev.Configs;
             if (full) x.Section(x.T("sec-configs"));
-            if (scan == null) { if (full) x.Info(x.T("folder-notscanned")); return; }
+            if (scan == null) { if (Listed(x, full)) x.Info(x.T("folder-notscanned")); return; }
             if (scan.Error != null) { x.Info(x.T("configs-error", Anonymise.Line(scan.Error))); return; }
             var bad = scan.Files.Where(f => f.Bad).ToList();
             foreach (ConfigFile f in bad)

@@ -322,7 +322,7 @@ namespace VintageDoctor
                 if (text.StartsWith("Possible cyclic dependencies between mods: ", StringComparison.Ordinal)) CyclicDependencies = text.Substring(43).Trim();
                 if (text.StartsWith("One or more source code mods failed to compile", StringComparison.Ordinal)) CompileFailed = true;
                 Match dup = DuplicateId.Match(text);
-                if (dup.Success) { DuplicateIds.Add(dup.Groups[1].Value + ": " + dup.Groups[2].Value + " → v" + dup.Groups[3].Value); continue; }
+                if (dup.Success) { DuplicateIds.Add(dup.Groups[1].Value + ": " + dup.Groups[2].Value + ", loaded: v" + dup.Groups[3].Value); continue; }
 
                 Match pf = PatchFail.Match(text);
                 if (pf.Success)

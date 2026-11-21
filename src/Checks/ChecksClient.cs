@@ -29,7 +29,7 @@ namespace VintageDoctor
                     x.Explain(x.T("gfx-software-why"));
                     x.Advice(x.T("gfx-software-advice"));
                 }
-                else if (full) x.Ok(x.T("gfx-card", gpu));
+                else if (Listed(x, full)) x.Ok(x.T("gfx-card", gpu));
                 if (full && log.GpuVersion != null) x.Detail(x.T("gfx-version", log.GpuVendor ?? "?", log.GpuVersion));
             }
 
@@ -55,7 +55,7 @@ namespace VintageDoctor
                 x.Detail(x.T("gfx-fps-detail", N(avg), N(p95), N(max, "0")));
                 ProfileButtons(x);
             }
-            else if (full) x.Info(x.T("gfx-fps-early"));
+            else if (Listed(x, full)) x.Info(x.T("gfx-fps-early"));
 
             if (s.Bool("glDebugMode") == true)
             {

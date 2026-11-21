@@ -47,7 +47,7 @@ namespace VintageDoctor
                 Guarded(x, "replaced files", () => ReplacedFiles(x, full));
                 Guarded(x, "old mods", () => OldCodeMods(x, full));
             }
-            if (full && worldParts) Guarded(x, "recipes", () => RecipeShadows(x, null, true));
+            if (Listed(x, full) && worldParts) Guarded(x, "recipes", () => RecipeShadows(x, null, full));
             if (!full && x.Problems + x.Warnings > before) x.LinkButton(TopicClashes, "", x.T("btn-clashes"));
         }
 
@@ -149,7 +149,7 @@ namespace VintageDoctor
                 x.Advice(x.T("missing-advice"));
                 if (onlyMod == null && x.Ev.Mods.Has(kv.Key)) ModButtons(x, kv.Key, false);
             }
-            if (byMod.Count == 0 && full && onlyMod == null) x.Ok(x.T("missing-none"));
+            if (byMod.Count == 0 && Listed(x, full) && onlyMod == null) x.Ok(x.T("missing-none"));
         }
 
         // ---------------------------------------------------------------- blocks and items the game refused to add
@@ -217,14 +217,14 @@ namespace VintageDoctor
                     x.Explain(x.T("targets-missing-why"));
                     if (onlyMod == null && x.Ev.Mods.Has(kv.Key)) ModButtons(x, kv.Key, false);
                 }
-                if (optional.Count > 0 && full)
+                if (optional.Count > 0 && Listed(x, full))
                 {
                     found++;
                     x.Info(x.T("targets-optional", x.ModName(kv.Key), optional.Count, string.Join(", ", optional.Select(DomainOf).Distinct().Take(10))));
                     x.Explain(x.T("targets-optional-why"));
                 }
             }
-            if (found == 0 && full && onlyMod == null) x.Ok(x.T("targets-none"));
+            if (found == 0 && Listed(x, full) && onlyMod == null) x.Ok(x.T("targets-none"));
         }
 
         // ---------------------------------------------------------------- code the game leaves out
@@ -266,7 +266,7 @@ namespace VintageDoctor
                 if (slashes && x.Ev.Folder != null) x.FixButton("doctor:repack", FileArg(x.Ev.Folder, f), x.T("btn-repack", f.Name));
                 ModButtons(x, f.ModId, false);
             }
-            if (found == 0 && full) x.Ok(x.T("notloaded-none"));
+            if (found == 0 && Listed(x, full)) x.Ok(x.T("notloaded-none"));
         }
 
         // ---------------------------------------------------------------- libraries brought along
@@ -302,7 +302,7 @@ namespace VintageDoctor
                 var own = f.Dlls.Where(d => game.Contains(d)).ToList();
                 if (own.Count == 0) continue;
                 bool errors = HasErrors(x, f.ModId);
-                if (!errors && !full) continue;
+                if (!errors && !Listed(x, full)) continue;
                 found++;
                 string title = x.T("bundled-title", x.ModName(f.ModId), string.Join(", ", own));
                 if (errors) x.Warn(title + " " + x.T("and-has-errors")); else x.Info(title);
@@ -317,13 +317,13 @@ namespace VintageDoctor
             {
                 var mods = g.Select(t => t.mod).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
                 bool errors = mods.Any(m => HasErrors(x, m));
-                if (!errors && !full) continue;
+                if (!errors && !Listed(x, full)) continue;
                 found++;
                 string title = x.T("shared-dll-title", g.Key, string.Join(", ", mods.Select(x.ModName)));
                 if (errors) x.Warn(title + " " + x.T("and-has-errors")); else x.Info(title);
                 x.Explain(x.T("shared-dll-why"));
             }
-            if (found == 0 && full) x.Ok(x.T("bundled-none"));
+            if (found == 0 && Listed(x, full)) x.Ok(x.T("bundled-none"));
         }
 
         // ---------------------------------------------------------------- files replaced outright
@@ -384,17 +384,17 @@ namespace VintageDoctor
             {
                 found++;
                 x.Warn(x.T("replaced-clash", dataClashes.Count));
-                foreach (var kv in dataClashes.Take(shown)) x.Detail(kv.Key + " ← " + string.Join(", ", kv.Value.Select(x.ModName)));
+                foreach (var kv in dataClashes.Take(shown)) x.Detail(kv.Key + ": " + string.Join(", ", kv.Value.Select(x.ModName)));
                 if (dataClashes.Count > shown) x.Detail(x.T("more-lines", dataClashes.Count - shown));
                 x.Explain(x.T("replaced-clash-why"));
                 x.Advice(x.T("replaced-clash-advice"));
             }
             var lookClashes = clashes.Where(kv => !Matters(kv.Key)).ToList();
-            if (lookClashes.Count > 0 && full)
+            if (lookClashes.Count > 0 && Listed(x, full))
             {
                 found++;
                 x.Info(x.T("replaced-look", lookClashes.Count));
-                foreach (var kv in lookClashes.Take(20)) x.Detail(kv.Key + " ← " + string.Join(", ", kv.Value.Select(x.ModName)));
+                foreach (var kv in lookClashes.Take(20)) x.Detail(kv.Key + ": " + string.Join(", ", kv.Value.Select(x.ModName)));
                 if (lookClashes.Count > 20) x.Detail(x.T("more-lines", lookClashes.Count - 20));
                 x.Explain(x.T("replaced-look-why"));
             }
@@ -409,7 +409,7 @@ namespace VintageDoctor
                 if (replaced.Count == 0) continue;
                 bool isOld = Versions.MajorMinor(f.GameDep, out int major, out int minor) && (major < gameMajor || (major == gameMajor && minor < gameMinor));
                 if (isOld) { old.Add((f, replaced)); continue; }
-                if (!full) continue;
+                if (!Listed(x, full)) continue;
                 found++;
                 x.Info(x.T("replaced-game", x.ModName(f.ModId), replaced.Count));
                 foreach (string a in replaced.Take(25)) x.Detail(a);
@@ -431,7 +431,7 @@ namespace VintageDoctor
                 x.Advice(x.T("replaced-game-old-advice"));
                 x.Buttons(old.Take(4).Select(o => DoctorReport.Open(TopicMod, o.f.ModId, x.T("btn-modpage", x.ModName(o.f.ModId)))).ToArray());
             }
-            if (found == 0 && full) x.Ok(x.T("replaced-none"));
+            if (found == 0 && Listed(x, full)) x.Ok(x.T("replaced-none"));
         }
 
         // ---------------------------------------------------------------- code mods made for an older game, with errors now
@@ -460,7 +460,7 @@ namespace VintageDoctor
                 x.Buttons(broken.Take(4).Select(o => DoctorReport.Open(TopicMod, o.mod.Id, x.T("btn-modpage", o.mod.Name))).ToArray());
             }
             var fine = old.Where(o => !o.errors).ToList();
-            if (full && fine.Count > 0)
+            if (Listed(x, full) && fine.Count > 0)
             {
                 x.Info(x.T("oldmods-fine", fine.Count, game));
                 x.Detail(string.Join(", ", fine.Take(40).Select(o => o.mod.Name + " (" + o.made + ")")));
@@ -502,7 +502,7 @@ namespace VintageDoctor
         {
             List<GridRecipe> recipes;
             try { recipes = x.Api.World.GridRecipes.Where(r => r != null && r.Enabled && r.Output != null && r.ResolvedIngredients != null).ToList(); }
-            catch (Exception e) { if (full && about == null) x.Info(x.T("craft-error", e.Message)); return 0; }
+            catch (Exception e) { if (Listed(x, full) && about == null) x.Info(x.T("craft-error", e.Message)); return 0; }
             var groups = new Dictionary<string, List<GridRecipe>>(StringComparer.Ordinal);
             foreach (GridRecipe r in recipes)
             {
@@ -523,14 +523,14 @@ namespace VintageDoctor
             }
             if (shadows.Count == 0)
             {
-                if (full && about == null) x.Ok(x.T("shadow-none", recipes.Count));
+                if (Listed(x, full) && about == null) x.Ok(x.T("shadow-none", recipes.Count));
                 return 0;
             }
             int shown = full ? 30 : 5;
             x.Warn(about == null ? x.T("shadow-title", shadows.Count) : x.T("shadow-title-item"));
             foreach (List<GridRecipe> g in shadows.Take(shown))
             {
-                x.Detail(Ingredients(g[0]) + " →");
+                x.Detail(Ingredients(g[0]) + ":");
                 foreach (GridRecipe r in g.Take(6))
                     x.Detail(OutputOf(r) + (r.Output.Quantity > 1 ? " ×" + r.Output.Quantity : "") + "  (" + (r.Name == null ? "?" : OwnerName(x, r.Name.Domain) + ", " + r.Name.Path) + ")", 2);
             }
@@ -549,24 +549,10 @@ namespace VintageDoctor
         /// </summary>
         public static void MissingNames(DoctorContext x)
         {
-            x.Section(x.T("sec-names"));
-            var total = new Dictionary<string, int>(StringComparer.Ordinal);
-            var missing = new Dictionary<string, int>(StringComparer.Ordinal);
-            var example = new Dictionary<string, string>(StringComparer.Ordinal);
-            foreach (CollectibleObject c in x.Api.World.Collectibles)
-            {
-                if (c?.Code == null || c.IsMissing || ModSnapshot.IsGameMod(c.Code.Domain)) continue;
-                if (c.CreativeInventoryTabs == null || c.CreativeInventoryTabs.Length == 0) continue;
-                string domain = c.Code.Domain;
-                total[domain] = total.TryGetValue(domain, out int n) ? n + 1 : 1;
-                string name;
-                try { name = c.GetHeldItemName(new ItemStack(c)); } catch { continue; }
-                // Without a text the game shows the key it looked for.
-                string key = (c is Block ? "block-" : "item-") + c.Code.Path;
-                if (name == null || !name.EndsWith(key, StringComparison.Ordinal)) continue;
-                missing[domain] = missing.TryGetValue(domain, out int m) ? m + 1 : 1;
-                if (!example.ContainsKey(domain)) example[domain] = name;
-            }
+            if (!x.ListAll) x.Section(x.T("sec-names"));
+            NameCount counted = CountNames(x);
+            Dictionary<string, int> total = counted.Total, missing = counted.Missing;
+            Dictionary<string, string> example = counted.Example;
             int found = 0;
             foreach (var kv in missing.OrderByDescending(kv => kv.Value))
             {
@@ -578,6 +564,43 @@ namespace VintageDoctor
                 if (x.Ev.Mods.Has(kv.Key)) ModButtons(x, kv.Key, false);
             }
             if (found == 0) x.Ok(x.T("names-none"));
+        }
+
+        sealed class NameCount
+        {
+            public readonly Dictionary<string, int> Total = new Dictionary<string, int>(StringComparer.Ordinal), Missing = new Dictionary<string, int>(StringComparer.Ordinal);
+            public readonly Dictionary<string, string> Example = new Dictionary<string, string>(StringComparer.Ordinal);
+        }
+
+        static readonly Dictionary<EnumAppSide, NameCount> nameCounts = new Dictionary<EnumAppSide, NameCount>();
+
+        /// <summary>
+        /// Asks every block and item of every mod for its name, once for each side of the game: the blocks, the items
+        /// and the language don't change while the game runs, and the check-up asks every time it is opened.
+        /// </summary>
+        static NameCount CountNames(DoctorContext x)
+        {
+            lock (nameCounts)
+            {
+                if (nameCounts.TryGetValue(x.Side, out NameCount done)) return done;
+            }
+            var count = new NameCount();
+            foreach (CollectibleObject c in x.Api.World.Collectibles)
+            {
+                if (c?.Code == null || c.IsMissing || ModSnapshot.IsGameMod(c.Code.Domain)) continue;
+                if (c.CreativeInventoryTabs == null || c.CreativeInventoryTabs.Length == 0) continue;
+                string domain = c.Code.Domain;
+                count.Total[domain] = count.Total.TryGetValue(domain, out int n) ? n + 1 : 1;
+                string name;
+                try { name = c.GetHeldItemName(new ItemStack(c)); } catch { continue; }
+                // Without a text the game shows the key it looked for.
+                string key = (c is Block ? "block-" : "item-") + c.Code.Path;
+                if (name == null || !name.EndsWith(key, StringComparison.Ordinal)) continue;
+                count.Missing[domain] = count.Missing.TryGetValue(domain, out int m) ? m + 1 : 1;
+                if (!count.Example.ContainsKey(domain)) count.Example[domain] = name;
+            }
+            lock (nameCounts) nameCounts[x.Side] = count;
+            return count;
         }
 
         /// <summary>

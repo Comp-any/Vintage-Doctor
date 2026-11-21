@@ -32,6 +32,8 @@ namespace VintageDoctor
         public bool OtherSideHasTopic;
         /// <summary>The asker's game runs in the same program as this server (single player).</summary>
         public bool SameProcess;
+        /// <summary>The page is the check-up, which lists every check with its result: one that found nothing says so too.</summary>
+        public bool ListAll;
         public Evidence Ev;
         public DoctorReport R = new DoctorReport();
         /// <summary>While another mod's check runs: that mod's id, so its findings carry the mod's name.</summary>
@@ -70,10 +72,35 @@ namespace VintageDoctor
             return name + ": " + text;
         }
 
-        public void Ok(string text) => R.Add(DoctorReport.OkMark + " " + Titled(text), DoctorLineStyle.Check);
-        public void Info(string text) => R.Add(DoctorReport.InfoMark + " " + Titled(text), DoctorLineStyle.Check);
-        public void Warn(string text) => R.Add(DoctorReport.WarnMark + " " + Titled(text), DoctorLineStyle.Check);
-        public void Problem(string text) => R.Add(DoctorReport.ProblemMark + " " + Titled(text), DoctorLineStyle.Check);
+        public void Ok(string text) => Card(DoctorReport.OkMark, text);
+        public void Info(string text) => Card(DoctorReport.InfoMark, text);
+        public void Warn(string text) => Card(DoctorReport.WarnMark, text);
+        public void Problem(string text) => Card(DoctorReport.ProblemMark, text);
+
+        void Card(string mark, string text)
+        {
+            R.Add(mark + " " + Titled(text), DoctorLineStyle.Check);
+            if (Owner != null) R.Lines[R.Lines.Count - 1].About = Owner;
+        }
+
+        /// <summary>
+        /// Says which mods the card just written is about, where its words and buttons don't name them (a file's
+        /// name, say): the check-up shows the card under those mods.
+        /// </summary>
+        public void About(params string[] modIds)
+        {
+            for (int i = R.Lines.Count - 1; i >= 0; i--)
+            {
+                DoctorLine l = R.Lines[i];
+                if (l.Style == DoctorLineStyle.Heading) return;
+                if (l.Style != DoctorLineStyle.Check || l.Indent != 0) continue;
+                foreach (string id in modIds ?? Array.Empty<string>())
+                {
+                    if (!string.IsNullOrEmpty(id)) l.About = string.IsNullOrEmpty(l.About) ? id : l.About + "," + id;
+                }
+                return;
+            }
+        }
 
         public void Result(DoctorLevel level, string text)
         {

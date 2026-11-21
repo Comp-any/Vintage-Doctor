@@ -358,12 +358,28 @@ namespace VintageDoctor
             });
         }
 
+        /// <summary>
+        /// The check-up from this side alone, put in order by mod (<see cref="Pages.Arrange"/>): for the console, where
+        /// there is no window to put two halves together.
+        /// </summary>
+        public DoctorReport CheckUp(DoctorReport half, Evidence ev, IPlayer player, string lang)
+        {
+            var final = new DoctorReport { Title = half.Title, Key = half.Key, File = half.File };
+            var x = new DoctorContext
+            {
+                Doctor = this, Api = api, Side = api.Side, Player = player, LanguageCode = lang ?? "en", Topic = Pages.Overview, Argument = "", Ev = ev, R = final,
+                HeldItem = player?.InventoryManager?.ActiveHotbarSlot?.Itemstack
+            };
+            Pages.Arrange(x, new[] { (half, (string)null) }, null, api.Side == EnumAppSide.Server, api.Side == EnumAppSide.Client);
+            return final;
+        }
+
         /// <summary>The same, here and now (for the console and the self-test, where waiting is fine).</summary>
         public Evidence EvidenceNow(bool fresh = true)
         {
             Evidence ev = cached;
             if (!fresh && ev != null && (DateTime.Now - ev.TakenAt).TotalSeconds < 20) return ev;
-            lock (evidenceGate) ev = Evidence.Gather(api.Side, Snapshot(), Known, Config, true);
+            lock (evidenceGate) ev = Evidence.Gather(api.Side, Snapshot(), Known, Config, true, 1500);
             cached = ev;
             return ev;
         }

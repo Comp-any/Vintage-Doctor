@@ -18,12 +18,12 @@ namespace VintageDoctor
     /// </summary>
     public static class Pages
     {
-        public const string Overview = "overview", Deep = "deep", BugReportTopic = "bugreport", Api = "api";
+        public const string Overview = "overview", BugReportTopic = "bugreport", Api = "api";
 
         /// <summary>Every page the doctor has on its own (mods add theirs through the API).</summary>
         public static readonly string[] Topics =
         {
-            Overview, Deep, Checks.TopicCrash, Checks.TopicStartup, Checks.TopicLog, Checks.TopicMods, Checks.TopicMod, Checks.TopicPerf, Checks.TopicFiles,
+            Overview, Checks.TopicCrash, Checks.TopicStartup, Checks.TopicLog, Checks.TopicMods, Checks.TopicMod, Checks.TopicPerf, Checks.TopicFiles,
             Checks.TopicPatches, Checks.TopicClashes, Checks.TopicChanges, Checks.TopicWorld, Checks.TopicItem, Checks.TopicBlock, Checks.TopicCraft, Checks.TopicHotkeys, BugReportTopic, Api
         };
 
@@ -32,7 +32,8 @@ namespace VintageDoctor
             topic = (topic ?? "").Trim().ToLowerInvariant();
             switch (topic)
             {
-                case "": case "checkup": case "check": case "home": return Overview;
+                // "deep" was a second, slower round of checks up to 1.2.0: the check-up runs everything now.
+                case "": case "checkup": case "check": case "home": case "deep": case "deeper": case "full": return Overview;
                 case "crashes": case "crashed": return Checks.TopicCrash;
                 case "start": case "starting": return Checks.TopicStartup;
                 case "logs": case "errors": return Checks.TopicLog;
@@ -45,7 +46,6 @@ namespace VintageDoctor
                 case "recipe": case "crafting": return Checks.TopicCraft;
                 case "keys": case "hotkey": return Checks.TopicHotkeys;
                 case "report": case "bug": return BugReportTopic;
-                case "deeper": case "full": return Deep;
                 default: return topic;
             }
         }
@@ -86,8 +86,12 @@ namespace VintageDoctor
 
             switch (topic)
             {
-                case Overview: if (server) ServerOverview(x); else ClientOverview(x); break;
-                case Deep: DeepChecks(x); break;
+                case Overview:
+                    // Every check, each with its result, then filed under the mods the results are about.
+                    x.ListAll = true;
+                    if (server) ServerOverview(x); else ClientOverview(x);
+                    BySection(x);
+                    break;
                 case Checks.TopicCrash: Checks.Guarded(x, "crash", () => Checks.Crash(x, true)); if (!(server && x.SameProcess)) Checks.Guarded(x, "shutdown", () => Checks.Shutdown(x)); break;
                 case Checks.TopicStartup: Checks.Guarded(x, "startup", () => Checks.Startup(x, true)); break;
                 case Checks.TopicLog: Checks.Guarded(x, "log", () => Checks.Log(x, true, arg.Length > 0 && arg != "all" ? arg : null)); break;
@@ -155,12 +159,14 @@ namespace VintageDoctor
             Checks.Guarded(x, "world", () => Checks.WorldChecks(x, false));
             Checks.Guarded(x, "clashes", () => Checks.Clashes(x, false));
             Checks.Guarded(x, "conflicts", () => Checks.Conflicts(x));
+            Checks.Guarded(x, "jsonpatches", () => Checks.JsonPatchOverlaps(x));
+            Checks.Guarded(x, "names", () => Checks.MissingNames(x));
             if (!x.SameProcess)
             {
                 Checks.Guarded(x, "patches", () => Checks.CodePatches(x, false));
                 Checks.Guarded(x, "changes", () => Checks.Changes(x, false));
             }
-            Checks.Guarded(x, "modchecks", () => Checks.ModChecks(x, false));
+            Checks.Guarded(x, "modchecks", () => Checks.ModChecks(x));
         }
 
         static void ClientOverview(DoctorContext x)
@@ -176,68 +182,307 @@ namespace VintageDoctor
             Checks.Guarded(x, "hotkeys", () => Checks.Hotkeys(x, false));
             Checks.Guarded(x, "versus", () => Checks.ModsVersusServer(x, false));
             Checks.Guarded(x, "clashes", () => Checks.Clashes(x, false));
-            if (!x.Doctor.ServerAnswers) Checks.Guarded(x, "conflicts", () => Checks.Conflicts(x));
+            if (!x.Doctor.ServerAnswers)
+            {
+                Checks.Guarded(x, "conflicts", () => Checks.Conflicts(x));
+                Checks.Guarded(x, "names", () => Checks.MissingNames(x));
+            }
             Checks.Guarded(x, "patches", () => Checks.CodePatches(x, false));
             Checks.Guarded(x, "changes", () => Checks.Changes(x, false));
-            Checks.Guarded(x, "modchecks", () => Checks.ModChecks(x, false));
+            Checks.Guarded(x, "modchecks", () => Checks.ModChecks(x));
         }
 
-        /// <summary>The checks that take longer: every zip read to the end, JSON patches compared, and mods' own deeper checks.</summary>
-        static void DeepChecks(DoctorContext x)
-        {
-            bool server = x.Side == EnumAppSide.Server;
-            x.R.Section(server ? x.T("sec-deep-server") : x.T("sec-deep-client"));
-            if (!(server && x.SameProcess))
-            {
-                Checks.Guarded(x, "folder", () => Checks.Folder(x, true, deep: true));
-                Checks.Guarded(x, "configs", () => Checks.Configs(x, true));
-                Checks.Guarded(x, "patches", () => Checks.CodePatches(x, true));
-            }
-            Checks.Guarded(x, "clashes", () => Checks.Clashes(x, true));
-            if (server)
-            {
-                Checks.Guarded(x, "jsonpatches", () => Checks.JsonPatchOverlaps(x));
-                Checks.Guarded(x, "world", () => Checks.WorldChecks(x, true));
-            }
-            if (server || !x.Doctor.ServerAnswers) Checks.Guarded(x, "names", () => Checks.MissingNames(x));
-            Checks.Guarded(x, "modchecks", () => Checks.ModChecks(x, true));
-        }
+        // ---------------------------------------------------------------- the check-up, by mod
 
-        // ---------------------------------------------------------------- questions
+        /// <summary>A card about more mods than this is about the game as a whole (a list of every mod that changed, say).</summary>
+        const int MostModsOnACard = 6;
+
+        /// <summary>A line that belongs to the card above it: indented, or a note.</summary>
+        static bool IsDetail(DoctorLine l) => l.Style != DoctorLineStyle.Heading && (l.Indent > 0 || l.Style == DoctorLineStyle.Note);
 
         /// <summary>
-        /// What the player can look into next, as buttons. <paramref name="serverTopics"/> are pages other mods added
-        /// on the server ("id|question"); the player's own game adds its own from its registry.
+        /// Files one side's half of the check-up by mod: every card gets the sections it belongs in
+        /// (<see cref="DoctorLine.Section"/>), which are the mods it is about, or the game's when it isn't about one.
+        /// The checks' own headings go; the half's first one stays for a game with a Vintage Doctor from before 1.3.0,
+        /// which shows the half as it comes.
         /// </summary>
-        public static void Questions(DoctorContext x, IEnumerable<string> serverTopics, bool hasServer, bool hasClient)
+        static void BySection(DoctorContext x)
         {
-            x.R.Section(x.T("sec-questions"));
-            x.Line(x.T("questions-help"), DoctorLineStyle.Note);
-            x.Line(DoctorReport.Open(Checks.TopicCrash, "", x.T("q-crash")));
-            x.Line(DoctorReport.Open(Checks.TopicPerf, "", x.T("q-perf")));
-            x.Line(DoctorReport.Open(Checks.TopicMods, "", x.T("q-mods")));
-            x.Line(DoctorReport.Open(Checks.TopicChanges, "", x.T("q-changes")));
-            x.Line(DoctorReport.Open(Checks.TopicItem, "hand", x.HeldItem?.Collectible != null ? x.T("q-item-held", DoctorReport.NameOf(x.HeldItem.Collectible)) : x.T("q-item")));
-            if (hasServer) x.Line(DoctorReport.Open(Checks.TopicBlock, "", x.T("q-block")));
-            x.Line(DoctorReport.Open(Checks.TopicCraft, "hand", x.T("q-craft")));
-            if (hasClient) x.Line(DoctorReport.Open(Checks.TopicHotkeys, "", x.T("q-hotkeys")));
-            x.Line(DoctorReport.Open(Checks.TopicStartup, "", x.T("q-startup")));
-            x.Line(DoctorReport.Open(Checks.TopicLog, "", x.T("q-log")));
-            x.Line(DoctorReport.Open(Checks.TopicFiles, "", x.T("q-files")));
-            x.Line(DoctorReport.Open(Checks.TopicClashes, "", x.T("q-clashes")));
-            x.Line(DoctorReport.Open(Checks.TopicPatches, "", x.T("q-patches")));
-            if (hasServer) x.Line(DoctorReport.Open(Checks.TopicWorld, "", x.T("q-world")));
-            foreach (DoctorTopic t in x.Doctor.AllTopics()) x.Line(DoctorReport.Open(t.Id, "", x.Words(t.Question ?? t.Id)));
-            foreach (string s in serverTopics ?? Enumerable.Empty<string>())
+            List<ModEntry> mods = (x.Ev?.Mods?.UserMods ?? Enumerable.Empty<ModEntry>()).ToList();
+            List<DoctorLine> lines = x.R.Lines.ToList();
+            var kept = new List<DoctorLine>();
+            bool sideHeading = false;
+            for (int i = 0; i < lines.Count;)
             {
-                int bar = s.IndexOf('|');
-                if (bar <= 0 || x.Doctor.TopicFor(s.Substring(0, bar)) != null) continue;
-                x.Line(DoctorReport.Open(s.Substring(0, bar), "", x.Words(s.Substring(bar + 1))));
+                DoctorLine l = lines[i];
+                if (l.Style == DoctorLineStyle.Heading)
+                {
+                    if (!sideHeading) { l.Section = ""; kept.Add(l); sideHeading = true; }
+                    i++;
+                    continue;
+                }
+                bool card = l.Style == DoctorLineStyle.Check && l.Indent == 0;
+                int end = i + 1;
+                if (card) { while (end < lines.Count && IsDetail(lines[end])) end++; }
+                // A line on its own in a failure's or a result's colour is about the page (an unknown page was asked for); the rest is the game's.
+                string section = card ? string.Join(",", SectionsOf(x, lines, i, end, mods))
+                    : l.Style == DoctorLineStyle.Warn || l.Style == DoctorLineStyle.Total ? "" : DoctorReport.GameSection;
+                for (int k = i; k < end; k++) { lines[k].Section = section; kept.Add(lines[k]); }
+                i = end;
             }
-            x.Line(DoctorReport.Open(Deep, "", x.T("q-deep")));
-            x.Line(DoctorReport.Open(BugReportTopic, "", x.T("q-bugreport")));
-            x.Line(DoctorReport.Open(Api, "", x.T("q-api")));
-            x.Line(hasClient ? x.T("questions-commands") : x.T("questions-console"), DoctorLineStyle.Note);
+            x.R.Lines.Clear();
+            x.R.Lines.AddRange(kept);
+            foreach (string key in kept.SelectMany(l => (l.Section ?? "").Split(',')).Where(k => k.Length > 0).Distinct())
+                x.R.SectionTitles[key] = SectionTitle(x, key);
+        }
+
+        /// <summary>The mods a card is about: the ones it was tagged with, the ones its buttons lead to, and the ones its words name.</summary>
+        static List<string> SectionsOf(DoctorContext x, List<DoctorLine> lines, int from, int to, List<ModEntry> mods)
+        {
+            var found = new List<string>();
+            void Add(string id)
+            {
+                id = (id ?? "").Trim();
+                if (id.Length == 0) return;
+                string key = x.Ev?.Mods?.Get(id)?.Id ?? id.ToLowerInvariant();
+                if (ModSnapshot.IsGameMod(key) || key.IndexOf(',') >= 0 || key.IndexOf('|') >= 0) return;
+                if (!found.Contains(key)) found.Add(key);
+            }
+            // A card that says it is the game's is, whichever mods its words happen to name.
+            string[] about = (lines[from].About ?? "").Split(',');
+            if (about.Contains(DoctorReport.GameSection)) return new List<string> { DoctorReport.GameSection };
+            foreach (string id in about) Add(id);
+            var words = new StringBuilder();
+            for (int i = from; i < to; i++)
+            {
+                string text = lines[i].Text ?? "";
+                words.Append(text).Append('\n');
+                if (text.IndexOf("{{", StringComparison.Ordinal) < 0) continue;
+                foreach (System.Text.RegularExpressions.Match m in DoctorReport.ActionToken.Matches(text))
+                {
+                    string kind = m.Groups[1].Value, target = m.Groups[2].Value, arg = m.Groups[3].Value;
+                    if (kind == "open" && target == Checks.TopicMod) Add(arg);
+                    else if (kind == "open" && target == Checks.TopicLog && arg.Length > 0 && arg != "all") Add(arg);
+                    else if (kind == "fix" && target.EndsWith("doctor:disable-mod", StringComparison.Ordinal)) Add(arg);
+                }
+            }
+            string all = words.ToString();
+            foreach (ModEntry m in mods)
+            {
+                if (!found.Contains(m.Id) && Names(all, m)) Add(m.Id);
+            }
+            if (found.Count == 0 || found.Count > MostModsOnACard) return new List<string> { DoctorReport.GameSection };
+            return found;
+        }
+
+        /// <summary>
+        /// Whether a text names a mod: its name as whole words, its tag in a log line ("[modid]"), or one of its files
+        /// ("modid:path"). A name of three letters or fewer is too easily a word of its own, so only the id counts then.
+        /// </summary>
+        public static bool Names(string text, ModEntry m)
+        {
+            if (string.IsNullOrEmpty(text) || m == null) return false;
+            if (!string.IsNullOrEmpty(m.Name) && m.Name.Length >= 4 && WholeWord(text, m.Name, 0, false)) return true;
+            if (string.IsNullOrEmpty(m.Id)) return false;
+            if (text.IndexOf("[" + m.Id + "]", StringComparison.OrdinalIgnoreCase) >= 0) return true;
+            return WholeWord(text, m.Id + ":", 0, true);
+        }
+
+        /// <summary>Finds <paramref name="word"/> where no letter or digit touches it (only its start is looked at when <paramref name="startOnly"/>).</summary>
+        static bool WholeWord(string text, string word, int from, bool startOnly)
+        {
+            for (int at = text.IndexOf(word, from, StringComparison.Ordinal); at >= 0; at = text.IndexOf(word, at + 1, StringComparison.Ordinal))
+            {
+                bool before = at == 0 || !char.IsLetterOrDigit(text[at - 1]);
+                int after = at + word.Length;
+                bool behind = startOnly ? after < text.Length && char.IsLetter(text[after]) : after >= text.Length || !char.IsLetterOrDigit(text[after]);
+                if (before && behind) return true;
+            }
+            return false;
+        }
+
+        /// <summary>A section's heading: the mod's name and version, or what the Mods folder knows of a mod the game didn't load.</summary>
+        static string SectionTitle(DoctorContext x, string key)
+        {
+            if (key == DoctorReport.GameSection) return x.T("sec-game", GameVersion.ShortGameVersion);
+            if (key == DoctorReport.RestSection) return x.T("sec-othermods");
+            ModEntry m = x.Ev?.Mods?.Get(key);
+            if (m != null) return string.IsNullOrEmpty(m.Version) ? m.Name : m.Name + " " + m.Version;
+            // A mod only the server has: this game knows its id and version.
+            string onServer = (x.Doctor?.ServerMods ?? new string[0]).FirstOrDefault(s => s != null && s.StartsWith(key + "@", StringComparison.OrdinalIgnoreCase));
+            if (onServer != null) return onServer.Replace('@', ' ');
+            ModFile f = x.Ev?.Folder?.Files.FirstOrDefault(file => string.Equals(file.ModId, key, StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(file.ModName));
+            return x.T("sec-mod-notloaded", f != null ? f.ModName : key);
+        }
+
+        /// <summary>How bad the worst card of a section is: 0 a problem, 1 a warning, 2 something to know, 3 passed, 4 no cards.</summary>
+        static int Worst(IEnumerable<DoctorLine> lines)
+        {
+            int worst = 4;
+            foreach (DoctorLine l in lines)
+            {
+                if (l.Style != DoctorLineStyle.Check || l.Indent != 0) continue;
+                string t = l.Text ?? "";
+                int rank = t.StartsWith(DoctorReport.ProblemMark, StringComparison.Ordinal) ? 0 : t.StartsWith(DoctorReport.WarnMark, StringComparison.Ordinal) ? 1
+                    : t.StartsWith(DoctorReport.OkMark, StringComparison.Ordinal) ? 3 : 2;
+                if (rank < worst) worst = rank;
+            }
+            return worst;
+        }
+
+        /// <summary>A page a mod on the other side of the game added: its id, its question, and the mod's id when the other side said.</summary>
+        public struct OtherTopic
+        {
+            public string Id, Question, Mod;
+        }
+
+        /// <summary>"id|question" lines and the mods beside them, as the server sends its pages (the mods only since 1.3.0).</summary>
+        public static List<OtherTopic> OtherTopics(string[] topics, string[] mods)
+        {
+            var list = new List<OtherTopic>();
+            for (int i = 0; i < (topics?.Length ?? 0); i++)
+            {
+                string s = topics[i] ?? "";
+                int bar = s.IndexOf('|');
+                if (bar <= 0) continue;
+                list.Add(new OtherTopic { Id = s.Substring(0, bar), Question = s.Substring(bar + 1), Mod = mods != null && i < mods.Length ? mods[i] : null });
+            }
+            return list;
+        }
+
+        /// <summary>
+        /// The check-up as it is shown, written into <paramref name="x"/>'s report: a section for the game, then one
+        /// for each mod with something against it or something to offer, worst first, then the mods nothing was found
+        /// against. A section holds the cards about that mod from each half (this game's, the server's) and the
+        /// buttons the mod itself added; the doctor's own buttons are the game's.
+        /// </summary>
+        /// <param name="halves">Each side's half, as <see cref="Build"/> made it, with the note that goes above its cards in a section (null for none).</param>
+        /// <param name="otherTopics">Pages of mods on the other side that this side doesn't have.</param>
+        public static void Arrange(DoctorContext x, IList<(DoctorReport half, string note)> halves, IEnumerable<OtherTopic> otherTopics, bool hasServer, bool hasClient)
+        {
+            DoctorReport r = x.R;
+            var order = new List<string>();
+            var cards = new Dictionary<string, List<DoctorLine>[]>(StringComparer.Ordinal);
+            var titles = new Dictionary<string, string>(StringComparer.Ordinal);
+            var asIs = new List<DoctorLine>();
+            List<DoctorLine>[] Lists(string key)
+            {
+                if (!cards.TryGetValue(key, out List<DoctorLine>[] lists))
+                {
+                    cards[key] = lists = new List<DoctorLine>[halves.Count];
+                    order.Add(key);
+                }
+                return lists;
+            }
+            Lists(DoctorReport.GameSection);
+
+            for (int h = 0; h < halves.Count; h++)
+            {
+                DoctorReport half = halves[h].half;
+                if (half == null) continue;
+                foreach (var kv in half.SectionTitles) { if (!titles.ContainsKey(kv.Key)) titles[kv.Key] = kv.Value; }
+                // A half from a Vintage Doctor before 1.3.0 has no sections: it is shown whole, under the rest.
+                if (!half.Lines.Any(l => !string.IsNullOrEmpty(l.Section))) { asIs.AddRange(half.Lines.Select(l => l.Copy(null))); continue; }
+                foreach (DoctorLine l in half.Lines)
+                {
+                    if (l.Style == DoctorLineStyle.Heading) continue;
+                    if (string.IsNullOrEmpty(l.Section)) { r.Lines.Add(l.Copy(null)); continue; }
+                    foreach (string key in l.Section.Split(','))
+                    {
+                        if (key.Length == 0) continue;
+                        List<DoctorLine>[] lists = Lists(key);
+                        (lists[h] ?? (lists[h] = new List<DoctorLine>())).Add(l.Copy(key));
+                    }
+                }
+            }
+
+            // The buttons: each mod's pages in its own section, the ones nobody is named for with the game's.
+            var buttons = new Dictionary<string, List<string>>(StringComparer.Ordinal);
+            var seen = new HashSet<string>(StringComparer.Ordinal);
+            void Button(string mod, string topic, string question)
+            {
+                if (!seen.Add(topic)) return;
+                string key = string.IsNullOrEmpty(mod) ? DoctorReport.GameSection : x.Ev?.Mods?.Get(mod)?.Id ?? mod.ToLowerInvariant();
+                if (ModSnapshot.IsGameMod(key)) key = DoctorReport.GameSection;
+                Lists(key);
+                if (!buttons.TryGetValue(key, out List<string> list)) buttons[key] = list = new List<string>();
+                list.Add(DoctorReport.Open(topic, "", question));
+            }
+            foreach (DoctorTopic t in x.Doctor.AllTopics()) Button(t.ModId, t.Id, x.Words(t.Question ?? t.Id));
+            foreach (OtherTopic t in otherTopics ?? Enumerable.Empty<OtherTopic>()) Button(t.Mod, t.Id, x.Words(t.Question ?? t.Id));
+
+            // The game first, then the mods: the ones with problems, then warnings, then the rest, each lot by name.
+            string Title(string key) => titles.TryGetValue(key, out string t) ? t : SectionTitle(x, key);
+            int Rank(string key) => Worst(cards[key].Where(l => l != null).SelectMany(l => l));
+            var sorted = order.Where(k => k != DoctorReport.GameSection).OrderBy(Rank).ThenBy(Title, StringComparer.OrdinalIgnoreCase).ToList();
+            sorted.Insert(0, DoctorReport.GameSection);
+
+            foreach (string key in sorted)
+            {
+                string title = Title(key);
+                r.Lines.Add(new DoctorLine { Text = title, Style = DoctorLineStyle.Heading, Section = key });
+                ModEntry mod = key == DoctorReport.GameSection ? null : x.Ev?.Mods?.Get(key);
+                for (int h = 0; h < halves.Count; h++)
+                {
+                    List<DoctorLine> list = cards[key][h];
+                    if (list == null || list.Count == 0) continue;
+                    if (!string.IsNullOrEmpty(halves[h].note)) r.Lines.Add(new DoctorLine { Text = halves[h].note, Style = DoctorLineStyle.Note, Section = key });
+                    foreach (DoctorLine l in list)
+                    {
+                        // Under the mod's own heading a card needn't start with the mod's name.
+                        if (mod != null && l.Style == DoctorLineStyle.Check && l.Indent == 0 && l.Text.Length > 2 && l.Text.IndexOf(mod.Name + ": ", 2, StringComparison.Ordinal) == 2)
+                            l.Text = l.Text.Substring(0, 2) + l.Text.Substring(2 + mod.Name.Length + 2);
+                        r.Lines.Add(l);
+                    }
+                }
+                if (key == DoctorReport.GameSection) GameButtons(x, key, hasServer, hasClient);
+                if (buttons.TryGetValue(key, out List<string> own))
+                {
+                    foreach (string b in own) r.Lines.Add(new DoctorLine { Text = b, Style = DoctorLineStyle.Text, Section = key });
+                }
+                if (mod != null && !x.Compact) r.Lines.Add(new DoctorLine { Text = DoctorReport.Open(Checks.TopicMod, mod.Id, x.T("btn-modpage-all", mod.Name)), Style = DoctorLineStyle.Text, Section = key });
+            }
+
+            // Everything else that is installed, in one card.
+            var rest = (x.Ev?.Mods?.UserMods ?? Enumerable.Empty<ModEntry>()).Where(m => !cards.ContainsKey(m.Id)).Select(m => m.Name).ToList();
+            foreach (string other in x.Doctor.ServerMods ?? new string[0])
+            {
+                string id = (other ?? "").Split('@')[0];
+                if (id.Length == 0 || cards.ContainsKey(id) || x.Ev?.Mods?.Get(id) != null || rest.Contains(id)) continue;
+                rest.Add(id);
+            }
+            if (rest.Count > 0)
+            {
+                r.Lines.Add(new DoctorLine { Text = SectionTitle(x, DoctorReport.RestSection), Style = DoctorLineStyle.Heading, Section = DoctorReport.RestSection });
+                r.Lines.Add(new DoctorLine { Text = DoctorReport.OkMark + " " + x.T("mods-fine", rest.Count), Style = DoctorLineStyle.Check, Section = DoctorReport.RestSection });
+                r.Lines.Add(new DoctorLine { Text = string.Join(", ", rest.OrderBy(n => n, StringComparer.OrdinalIgnoreCase)), Style = DoctorLineStyle.Note, Indent = 1, Section = DoctorReport.RestSection });
+                if (!x.Compact) r.Lines.Add(new DoctorLine { Text = DoctorReport.Open(Checks.TopicMods, "", x.T("btn-mods-all")), Style = DoctorLineStyle.Text, Indent = 1, Section = DoctorReport.RestSection });
+            }
+            r.Lines.AddRange(asIs);
+            r.Lines.Add(new DoctorLine { Text = hasClient ? x.T("questions-commands") : x.T("questions-console"), Style = DoctorLineStyle.Note });
+        }
+
+        /// <summary>The doctor's own pages, as buttons in the game's section: what the player may be seeing, and where to look into it.</summary>
+        static void GameButtons(DoctorContext x, string key, bool hasServer, bool hasClient)
+        {
+            void Line(string text, DoctorLineStyle style = DoctorLineStyle.Text) => x.R.Lines.Add(new DoctorLine { Text = text, Style = style, Section = key });
+            Line(x.T("questions-help"), DoctorLineStyle.Note);
+            Line(DoctorReport.Open(Checks.TopicCrash, "", x.T("q-crash")));
+            Line(DoctorReport.Open(Checks.TopicPerf, "", x.T("q-perf")));
+            Line(DoctorReport.Open(Checks.TopicMods, "", x.T("q-mods")));
+            Line(DoctorReport.Open(Checks.TopicChanges, "", x.T("q-changes")));
+            Line(DoctorReport.Open(Checks.TopicItem, "hand", x.HeldItem?.Collectible != null ? x.T("q-item-held", DoctorReport.NameOf(x.HeldItem.Collectible)) : x.T("q-item")));
+            if (hasServer) Line(DoctorReport.Open(Checks.TopicBlock, "", x.T("q-block")));
+            Line(DoctorReport.Open(Checks.TopicCraft, "hand", x.T("q-craft")));
+            if (hasClient) Line(DoctorReport.Open(Checks.TopicHotkeys, "", x.T("q-hotkeys")));
+            Line(DoctorReport.Open(Checks.TopicStartup, "", x.T("q-startup")));
+            Line(DoctorReport.Open(Checks.TopicLog, "", x.T("q-log")));
+            Line(DoctorReport.Open(Checks.TopicFiles, "", x.T("q-files")));
+            Line(DoctorReport.Open(Checks.TopicClashes, "", x.T("q-clashes")));
+            Line(DoctorReport.Open(Checks.TopicPatches, "", x.T("q-patches")));
+            if (hasServer) Line(DoctorReport.Open(Checks.TopicWorld, "", x.T("q-world")));
+            Line(DoctorReport.Open(BugReportTopic, "", x.T("q-bugreport")));
+            Line(DoctorReport.Open(Api, "", x.T("q-api")));
         }
 
         /// <summary>Under any page but the check-up: the way back.</summary>
@@ -258,7 +503,7 @@ namespace VintageDoctor
             var fixes = x.Doctor.AllFixes().Where(f => f.ModId != DoctorApi.ModId).ToList();
             KnownProblems known = x.Doctor.Known;
             x.Info(x.T("api-counts", checks.Count, fixes.Count, topics.Count, known.Count));
-            foreach (var g in checks.GroupBy(c => c.ModId ?? "?")) x.Detail(x.ModName(g.Key) + ": " + string.Join(", ", g.Select(c => c.Id + (c.Deep ? " (deep)" : ""))));
+            foreach (var g in checks.GroupBy(c => c.ModId ?? "?")) x.Detail(x.ModName(g.Key) + ": " + string.Join(", ", g.Select(c => c.Id)));
             foreach (DoctorFix f in fixes) x.Detail(x.T("api-fix", x.ModName(f.ModId), f.Id), 2);
             foreach (DoctorTopic t in topics) x.Detail(x.T("api-topic", x.ModName(t.ModId), t.Id), 2);
             if (known.Sources.Count > 0)

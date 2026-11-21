@@ -82,7 +82,7 @@ namespace VintageDoctor
                 using (var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete))
                 using (var reader = new StreamReader(fs))
                     text = reader.ReadToEnd();
-                if (text.Trim('\0', ' ', '\t', '\r', '\n', '﻿').Length == 0) { f.Empty = true; return f; }
+                if (text.Trim('\0', ' ', '\t', '\r', '\n', '\uFEFF').Length == 0) { f.Empty = true; return f; }   // font-ok: a byte order mark, trimmed away
                 // The whole document, as the game reads it: a file cut short fails here too (a bare reader stops quietly at the end).
                 JToken.Parse(text);
             }
@@ -212,8 +212,12 @@ namespace VintageDoctor
             return list;
         }
 
-        /// <summary>Reads it all. Safe to call from a worker thread; never throws.</summary>
-        public static Evidence Gather(EnumAppSide side, ModSnapshot mods, KnownProblems known, DoctorConfig config, bool files)
+        /// <summary>
+        /// Reads it all. Safe to call from a worker thread; never throws. <paramref name="zipBudgetMs"/> is how long
+        /// reading the mods' zips to their ends may take here (no limit when negative): on the main thread it is kept
+        /// short, and what is left is read in the background.
+        /// </summary>
+        public static Evidence Gather(EnumAppSide side, ModSnapshot mods, KnownProblems known, DoctorConfig config, bool files, int zipBudgetMs = -1)
         {
             var watch = System.Diagnostics.Stopwatch.StartNew();
             var ev = new Evidence { Side = side, Mods = mods };
@@ -223,6 +227,7 @@ namespace VintageDoctor
             if (files)
             {
                 try { ev.Folder = FolderScan.Read(ModFolders(mods), mods); } catch (Exception e) { ev.Folder = new FolderScan(); ev.Folder.Errors.Add(e.Message); }
+                try { ZipHealth.Test(ev.Folder.Files, zipBudgetMs); } catch { }
                 ev.Configs = ConfigScan.Read(GamePaths.ModConfig, GamePaths.DataPath, mods, known?.ConfigOwners);
             }
             ev.Apply(known, config);

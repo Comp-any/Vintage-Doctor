@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Vintagestory.API.Common;
 
@@ -32,6 +34,10 @@ namespace VintageDoctor
         /// <summary>The zip holds nothing but another zip.</summary>
         public string InnerZip;
         public int Entries;
+        /// <summary>Every file in the zip was read to its end (see <see cref="ZipHealth"/>); false while that is still to come.</summary>
+        public bool Tested;
+        /// <summary>What went wrong reading the zip to its end: a download that was cut short or damaged. Null when it is whole.</summary>
+        public string Damage;
         /// <summary>The game loaded this one.</summary>
         public bool Loaded;
         /// <summary>Code libraries at the top of the mod ("MyMod.dll", and whatever else it brings along).</summary>
@@ -388,6 +394,61 @@ namespace VintageDoctor
                 return null;
             }
             catch (Exception e) { return e.Message; }
+        }
+    }
+
+    /// <summary>
+    /// Whether each zip in the Mods folders can be read to its end, which is what finds a download that was cut short
+    /// or damaged inside. Reading them all takes a while with many mods, so a file is read once and remembered until
+    /// it changes, and never on the game's main thread for longer than it is given.
+    /// </summary>
+    public static class ZipHealth
+    {
+        static readonly System.Collections.Concurrent.ConcurrentDictionary<string, string> known = new System.Collections.Concurrent.ConcurrentDictionary<string, string>(StringComparer.Ordinal);
+        static int warming;
+
+        static string Key(ModFile f) => f.Path + "|" + f.Bytes + "|" + f.Modified.Ticks;
+
+        /// <summary>
+        /// Marks each zip as whole or damaged (<see cref="ModFile.Tested"/>, <see cref="ModFile.Damage"/>). Files not
+        /// read yet are read now, until <paramref name="budgetMs"/> is used up (no limit when negative); the ones
+        /// left over are read in the background, so the next look has them.
+        /// </summary>
+        public static void Test(List<ModFile> files, int budgetMs)
+        {
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+            List<(string key, string path)> later = null;
+            foreach (ModFile f in files)
+            {
+                if (f.Kind != "zip" || f.ReadError != null) continue;
+                string key = Key(f);
+                if (!known.TryGetValue(key, out string result))
+                {
+                    if (budgetMs >= 0 && watch.ElapsedMilliseconds >= budgetMs)
+                    {
+                        if (later == null) later = new List<(string, string)>();
+                        later.Add((key, f.Path));
+                        continue;
+                    }
+                    result = FolderScan.TestZip(f.Path) ?? "";
+                    known[key] = result;
+                }
+                f.Tested = true;
+                f.Damage = result.Length > 0 ? result : null;
+            }
+            if (later == null || Interlocked.CompareExchange(ref warming, 1, 0) != 0) return;
+            Task.Run(() =>
+            {
+                try
+                {
+                    foreach (var (key, path) in later)
+                    {
+                        if (!known.ContainsKey(key)) known[key] = FolderScan.TestZip(path) ?? "";
+                    }
+                }
+                catch { }
+                finally { Interlocked.Exchange(ref warming, 0); }
+            });
         }
     }
 

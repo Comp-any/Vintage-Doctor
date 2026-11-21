@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using Newtonsoft.Json.Linq;
 using Vintagestory.API.Common;
+using Vintagestory.API.Config;
 using Vintagestory.API.Datastructures;
 using Vintagestory.API.Server;
 using VintageDoctor.API;
@@ -220,7 +221,50 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             t.Check("a page as text names the commands behind its buttons", plain.Contains("/doctor fix doctor:x a/b(c)") && plain.Contains("/doctor mod carryon"), plain.Replace("\n", " / "));
             t.Check("a page counts its problems", r.Problems == 1 && r.Warnings == 0);
             DoctorReport back = DoctorReport.FromPacket(r.ToPacket(7));
-            t.Check("a page survives being sent", back.Lines.Count == r.Lines.Count && back.Lines[2].Indent == 1 && back.Lines[0].Style == DoctorLineStyle.Check);
+            t.Check("a page survives being sent", back.Lines.Count == r.Lines.Count && back.Lines[2].Indent == 1 && back.Lines[0].Style == DoctorLineStyle.Check && back.Lines[0].Section == null);
+            r.Lines[0].Section = "carryon";
+            r.Lines[1].Section = "carryon,game";
+            r.SectionTitles["carryon"] = "Carry On 1.14.3";
+            back = DoctorReport.FromPacket(r.ToPacket(8));
+            t.Check("so do the check-up's sections and their headings", back.Lines[0].Section == "carryon" && back.Lines[1].Section == "carryon,game" && back.Lines[2].Section == "" && back.SectionTitles["carryon"] == "Carry On 1.14.3");
+            r.Add(DoctorReport.ProblemMark + " bad " + DoctorReport.Fix('s', "doctor:x", "a|b{c}", "Do it"), DoctorLineStyle.Check);
+            t.Check("a card that is under two mods counts once", r.Problems == 1);
+
+            // The game's font can't be counted on for symbols: what is handed to it to draw has them written out.
+            string marks = DoctorReport.OkMark + " fine\n" + DoctorReport.WarnMark + "\uFE0F careful\n" + DoctorReport.ProblemMark + " broken\n" + DoctorReport.InfoMark + " to know\n  " + DoctorReport.AdviceMark + " do this";
+            string drawn = GameFont.Drawable(marks);
+            t.Check("font: a page's marks are written in ordinary characters where the game draws them", drawn == "[ok] fine\n[!] careful\n[x] broken\n\u2022 to know\n  -> do this", drawn.Replace("\n", " / "));
+            string symbols = GameFont.Drawable("Esc \u2192 Settings \u2190 back \u25B8 open \u25BE shut, a \u2264 b \u2260 c, \u2692 Fix it, 5\u202F000, done \uD83D\uDD27 here \u2B50");
+            t.Check("font: arrows, triangles, signs and pictures too", symbols == "Esc -> Settings <- back > open v shut, a <= b != c, Fix it, 5 000, done here *", symbols);
+            string plainWords = "Pr\u00FCfung \u00D7 3 \u00B7 \u2018quoted\u2019 \u2026 \u2013 \u2014 \u041F\u0440\u0438\u0432\u0435\u0442 \u65E5\u672C\u8A9E 50 \u00B0C";
+            t.Check("font: letters of any language and ordinary punctuation are left alone", GameFont.Drawable(plainWords) == plainWords && GameFont.Drawable("") == "" && GameFont.Drawable(null) == "");
+            string chat = VintageDoctorSystem.ChatSafe(DoctorReport.WarnMark + " <b>1 < 2</b> " + DoctorReport.AdviceMark + " go");
+            t.Check("font: chat gets the same, with its own markup signs written out", chat == "[!] &lt;b&gt;1 &lt; 2&lt;/b&gt; -&gt; go", chat);
+        }
+
+        /// <summary>The part of a page under the heading that has <paramref name="heading"/> in it, up to the next heading.</summary>
+        static string Under(string page, string heading)
+        {
+            var sb = new StringBuilder();
+            bool inside = false;
+            foreach (string line in page.Split('\n'))
+            {
+                if (line.StartsWith("== ", StringComparison.Ordinal)) { inside = line.IndexOf(heading, StringComparison.Ordinal) >= 0; continue; }
+                if (inside) sb.Append(line).Append('\n');
+            }
+            return sb.ToString();
+        }
+
+        /// <summary>The symbols the game's font may lack that are still in a text (none, after GameFont.Drawable).</summary>
+        static string Undrawable(string text)
+        {
+            var found = new StringBuilder();
+            foreach (char c in text ?? "")
+            {
+                bool symbol = (c >= '\u2190' && c <= '\u21FF') || (c >= '\u2300' && c <= '\u27BF') || (c >= '\u2B00' && c <= '\u2BFF') || (c >= '\uFE00' && c <= '\uFE0F') || char.IsSurrogate(c);
+                if (symbol && found.ToString().IndexOf(c) < 0) found.Append(c);
+            }
+            return found.ToString();
         }
 
         static void LogReader(Run_ t, VintageDoctorSystem doctor)
@@ -375,6 +419,9 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             var dups = scan.Duplicates();
             t.Check("folder: a mod installed twice, newest first", dups.Count == 1 && dups[0].id == "twice" && dups[0].copies[0].Version == "1.10.0", dups.Count + " duplicates");
             t.Check("folder: reading a damaged zip to the end fails, a good one doesn't", FolderScan.TestZip(Path.Combine(mods, "good_1.0.0.zip")) == null && FolderScan.TestZip(Path.Combine(mods, "corrupt.zip")) != null);
+            ZipHealth.Test(scan.Files, -1);
+            t.Check("folder: every zip that opens is read to its end as part of the look, and the whole ones pass", F("good_1.0.0.zip") is ModFile whole && whole.Tested && whole.Damage == null
+                && scan.Files.Where(f => f.Kind == "zip" && f.ReadError == null).All(f => f.Tested) && !(F("corrupt.zip")?.Tested ?? true));
 
             int changed = FolderScan.Repack(Path.Combine(mods, "backslash.zip"), backups, out string backup1);
             ModFile fixedSlash = FolderScan.Look(Path.Combine(mods, "backslash.zip"));
@@ -487,12 +534,10 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             string overview = doctor.BuildPage(ev, null, "en", Pages.Overview, "").PlainText(sapi.World);
             t.Check("api: a registered check shows in the check-up with its details and fix", overview.Contains("3 pipes aren't connected") && overview.Contains("at 10 5 10") && overview.Contains("/doctor fix " + me + ":reconnect all")
                 && overview.Contains("pumps are fine"), null);
-            t.Check("api: a deep check stays out of the check-up", !overview.Contains("a deeper look"));
+            t.Check("api: a check marked Deep runs in the check-up like any other (there is no second, slower round since 1.3.0)", overview.Contains("a deeper look") && Pages.Canonical("deep") == Pages.Overview);
             t.Check("api: a check that throws is reported, and the rest still runs", overview.Contains("the check's own bug") && overview.Contains("A pump jammed"));
             t.Check("api: an incident reported twice is shown once with a count", overview.Contains("A pump jammed (×2)"));
             t.Check("api: findings handed over on the event bus show too", overview.Contains("2 tanks are leaking") && overview.Contains("tank at 2 2 2") && overview.Contains("/doctor fix bus:busmod:seal"));
-            string deep = doctor.BuildPage(ev, null, "en", Pages.Deep, "").PlainText(sapi.World);
-            t.Check("api: the deeper checks run the deep check", deep.Contains("a deeper look"));
             string outcome = doctor.RunFix(me + ":reconnect", "all", null, "en", ev);
             t.Check("api: a registered fix runs and reports", fixRan && outcome == "Reconnected 3 pipes", outcome);
             t.Check("api: a fix can say it failed", doctor.RunFix(me + ":reconnect", "", null, "en", ev).StartsWith(DoctorReport.WarnMark));
@@ -504,9 +549,28 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             bool refused = false;
             try { api.RegisterTopic(new DoctorTopic(me, "crash", "x", ctx => { })); } catch (ArgumentException) { refused = true; }
             t.Check("api: a page can't take one of the doctor's own names", refused);
-            var x = new DoctorContext { Doctor = doctor, Api = sapi, Side = EnumAppSide.Server, LanguageCode = "en", Ev = ev };
-            Pages.Questions(x, null, true, false);
-            t.Check("api: a registered page is among the questions", x.R.PlainText(sapi.World).Contains("My pipes aren't moving anything (/doctor selftest-pipes)"));
+            // The check-up as it is shown: the game's section first, then one for each mod, with that mod's cards and the buttons it added.
+            DoctorReport half = doctor.BuildPage(ev, null, "en", Pages.Overview, "");
+            DoctorReport whole = doctor.CheckUp(half, ev, null, "en");
+            string shown = whole.PlainText(sapi.World);
+            File.WriteAllText(Path.Combine(doctor.DataFolder, "selftest", "checkup-by-mod.txt"), shown);
+            string mine = Under(shown, me), game = Under(shown, "The game (Vintage Story");
+            t.Check("check-up: every card has a section, and the page begins with the game's", half.Lines.All(l => l.Section != null) && shown.TrimStart().StartsWith("== The game (Vintage Story " + GameVersion.ShortGameVersion + ") =="),
+                First(shown, "=="));
+            t.Check("check-up: a mod's cards are under that mod's heading, not the game's", mine.Contains("3 pipes aren't connected") && mine.Contains("pumps are fine") && mine.Contains("A pump jammed") && !game.Contains("3 pipes aren't connected"),
+                mine.Replace("\n", " / "));
+            t.Check("check-up: findings handed over on the event bus are under their mod too", whole.Lines.Any(l => l.Section == me && l.Style == DoctorLineStyle.Check) && Under(shown, "busmod").Contains("2 tanks are leaking"),
+                Under(shown, "busmod").Replace("\n", " / "));
+            t.Check("check-up: a page a mod added is a button in that mod's section", mine.Contains("My pipes aren't moving anything (/doctor selftest-pipes)") && !game.Contains("selftest-pipes"));
+            t.Check("check-up: the doctor's own pages are buttons in the game's section", game.Contains("/doctor crash") && game.Contains("/doctor bugreport") && !mine.Contains("/doctor crash"));
+            t.Check("check-up: every line that is shown is in one section, so the window can show one mod alone",
+                whole.Lines.Where(l => l.Style == DoctorLineStyle.Check || l.Style == DoctorLineStyle.Heading).All(l => !string.IsNullOrEmpty(l.Section) && l.Section.IndexOf(',') < 0),
+                string.Join(" | ", whole.Lines.Where(l => (l.Style == DoctorLineStyle.Check || l.Style == DoctorLineStyle.Heading) && (string.IsNullOrEmpty(l.Section) || l.Section.IndexOf(',') >= 0)).Select(l => l.Text).Take(3)));
+            int gameAt = shown.IndexOf("== The game (", StringComparison.Ordinal), mineAt = shown.IndexOf(me, StringComparison.Ordinal), restAt = shown.IndexOf("== The other mods ==", StringComparison.Ordinal);
+            t.Check("check-up: the game first, then the mods with something to say, then the rest in one card", gameAt == 0 && mineAt > gameAt && (restAt < 0 || restAt > mineAt), gameAt + ", " + mineAt + ", " + restAt);
+            t.Check("check-up: nothing in it needs a character the game's font may lack once it is made drawable", Undrawable(GameFont.Drawable(shown)).Length == 0, Undrawable(GameFont.Drawable(shown)));
+            t.Check("check-up: a check that found nothing says so too", (shown.Contains("no two mods replacing the same thing") || shown.Contains("replaced or removed by more than one mod"))
+                && (shown.Contains("have names") || shown.Contains("instead of a name")), First(shown, "names") + " / " + First(shown, "replac"));
             LogIssue issue = new LogIssue { Level = "Error", Message = "pipe network overflow in sector 7" };
             t.Check("api: a registered known problem matches", doctor.Known.Match(issue, EnumAppSide.Server)?.Id == me + ":known");
             api.Unregister(me);
@@ -604,9 +668,8 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             t.Check("guests: a page offered on the event bus is known, one with a name the doctor uses isn't", doctor.TopicFor("guest-notes")?.ModId == me && !doctor.AllTopics().Any(tp => tp.Id == "crash"),
                 string.Join(",", doctor.AllTopics().Select(tp => tp.Id)));
             var ask = new DoctorContext { Doctor = doctor, Api = sapi, Side = EnumAppSide.Server, LanguageCode = "en", Ev = ev };
-            Pages.Questions(ask, null, true, false);
-            string asked = ask.R.PlainText(sapi.World);
-            t.Check("guests: it is among the questions", asked.Contains("My guest notes are missing (/doctor guest-notes)"));
+            string asked = doctor.CheckUp(doctor.BuildPage(ev, null, "en", Pages.Overview, ""), ev, null, "en").PlainText(sapi.World);
+            t.Check("guests: it is a button on the check-up, in its mod's section", Under(asked, me).Contains("My guest notes are missing (/doctor guest-notes)"), First(asked, "guest-notes"));
             string crashWords = ask.T("q-crash");
             t.Check("guests: a question given as a lang key is shown in words, here and for a player's game", asked.Contains(crashWords + " (/doctor guest-keyed)") && !asked.Contains("vintagedoctor:q-crash")
                 && VintageDoctorSystem.WordsIn("en", "vintagedoctor:q-crash") == crashWords && VintageDoctorSystem.WordsIn("en", "Plain words: kept") == "Plain words: kept", First(asked, "guest-keyed"));
@@ -741,7 +804,8 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             SickPage(doctor, sapi, ev, folder, Pages.BugReportTopic, "", "sick-bugreport");
             string clashes = SickPage(doctor, sapi, ev, folder, Checks.TopicClashes, "", "sick-clashes");
             string flint = SickPage(doctor, sapi, ev, folder, Checks.TopicCraft, "game:flint", "sick-craft-flint");
-            SickPage(doctor, sapi, ev, folder, Pages.Deep, "", "sick-deep");
+            string checkup = doctor.CheckUp(doctor.BuildPage(ev, null, "en", Pages.Overview, ""), ev, null, "en").PlainText(sapi.World);
+            File.WriteAllText(Path.Combine(folder, "sick-checkup.txt"), checkup);
             string sickMod = SickPage(doctor, sapi, ev, folder, Checks.TopicMod, "doctorsick", "sick-mod-doctorsick");
 
             t.Check("sick: a mod that failed to start is named, with its error", startup.Contains("Doctor Crashy threw an error while starting: Method not found"), First(startup, "threw an error"));
@@ -796,8 +860,8 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
                 First(clashes, "brings its own") + " / " + First(clashes, "more than one mod"));
             if (replacedFile.Length > 0)
             {
-                t.Check("sick: two mods replacing the same files", clashes.Contains("2 file(s) are replaced by more than one mod") && LineHas(clashes, "game:" + replacedFile + " ←", "Doctor Sick", "doctorsickold")
-                    && LineHas(clashes, "doctorsick:config/note.json ←", "Doctor Sick", "doctorsickold"), First(clashes, "replaced by more") + " / " + First(clashes, replacedFile));
+                t.Check("sick: two mods replacing the same files", clashes.Contains("2 file(s) are replaced by more than one mod") && LineHas(clashes, "game:" + replacedFile + ":", "Doctor Sick", "doctorsickold")
+                    && LineHas(clashes, "doctorsick:config/note.json:", "Doctor Sick", "doctorsickold"), First(clashes, "replaced by more") + " / " + First(clashes, replacedFile));
                 t.Check("sick: a mod made for an older game that replaces the game's own files", clashes.Contains("1 mod(s) made for an older game replace 1 of the game's own files")
                     && clashes.Contains("doctorsickold (made for 1.19.0): 1 file(s)") && clashes.Contains("Doctor Sick replaces 1 of the game's own files outright"),
                     First(clashes, "older game replace") + " / " + First(clashes, "outright"));
@@ -809,8 +873,14 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             t.Check("sick: the same on the item's own crafting page", flint.Contains("Another recipe has exactly the same ingredients"), First(flint, "same ingredients"));
             t.Check("sick: a mod's own page has what is wrong with its files", sickMod.Contains("2 block(s) or item(s) need code that isn't in the game") && sickMod.Contains("1 of its files couldn't be read")
                 && sickMod.Contains("tries to change 1 file(s) that aren't there") && sickMod.Contains("It replaces 1 of the game's own files"), First(sickMod, "need code") + " / " + First(sickMod, "replaces"));
-            t.Check("sick: the check-up shows the clashes that matter and leads to the rest", overview.Contains("need code that isn't in the game") && overview.Contains("/doctor clashes")
-                && !overview.Contains("brings its own copy"), First(overview, "/doctor clashes"));
+            t.Check("sick: the check-up lists every clash check, the harmless findings too, and leads to the page", overview.Contains("need code that isn't in the game") && overview.Contains("/doctor clashes")
+                && overview.Contains("brings its own copy"), First(overview, "/doctor clashes"));
+            string crashyPart = Under(checkup, "Doctor Crashy"), sickPart = Under(checkup, "Doctor Sick ");
+            t.Check("sick: on the check-up a mod that failed to start has its own section, with the failure and its errors in the log", crashyPart.Contains("threw an error while starting") && crashyPart.Contains("kind(s) of errors in the log")
+                && crashyPart.Contains("/doctor mod doctorcrashy"), crashyPart.Length + " chars: " + First(crashyPart, "error"));
+            t.Check("sick: and a mod with broken files has them under its own heading", sickPart.Contains("need code that isn't in the game") && sickPart.Contains("kind(s) of errors in the log"), First(sickPart, "need code"));
+            t.Check("sick: what isn't about one mod is the game's (the crash, files that aren't mods)", Under(checkup, "The game (").Contains("The game crashed") && Under(checkup, "The game (").Contains("aren't mods the game can load"),
+                First(Under(checkup, "The game ("), "crashed"));
 
             var counted = new DoctorReport();
             foreach (string line in overview.Split('\n')) if (line.StartsWith(DoctorReport.ProblemMark) || line.StartsWith(DoctorReport.WarnMark)) counted.Add(line, DoctorLineStyle.Check);
@@ -879,7 +949,7 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             string firstMod = ev.Mods.UserMods.FirstOrDefault(m => m.Id != DoctorApi.ModId)?.Id ?? DoctorApi.ModId;
             var pages = new List<(string topic, string arg)>
             {
-                (Pages.Overview, ""), (Pages.Deep, ""), (Checks.TopicCrash, ""), (Checks.TopicStartup, ""), (Checks.TopicLog, ""), (Checks.TopicLog, firstMod), (Checks.TopicMods, ""),
+                (Pages.Overview, ""), ("deep", ""), (Checks.TopicCrash, ""), (Checks.TopicStartup, ""), (Checks.TopicLog, ""), (Checks.TopicLog, firstMod), (Checks.TopicMods, ""),
                 (Checks.TopicMod, DoctorApi.ModId), (Checks.TopicMod, firstMod), (Checks.TopicMod, "nosuchmod"), (Checks.TopicPerf, ""), (Checks.TopicFiles, ""), (Checks.TopicPatches, ""), (Checks.TopicClashes, ""),
                 (Checks.TopicChanges, ""), (Checks.TopicWorld, ""), (Checks.TopicItem, "game:ingot-copper"), (Checks.TopicItem, "game:nosuchitem"), (Checks.TopicItem, ""), (Checks.TopicBlock, ""),
                 (Checks.TopicCraft, "game:axe-copper"), (Checks.TopicCraft, "game:ingot-copper"), (Pages.BugReportTopic, ""), (Pages.BugReportTopic, firstMod), (Pages.Api, ""),
@@ -892,8 +962,7 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
                 {
                     var x = new DoctorContext { Doctor = doctor, Api = sapi, Side = EnumAppSide.Server, LanguageCode = "en", Topic = topic, Argument = arg, Ev = ev };
                     Pages.Build(x);
-                    if (x.Topic == Pages.Overview) Pages.Questions(x, null, true, false);
-                    string text = x.R.PlainText(sapi.World);
+                    string text = (x.Topic == Pages.Overview ? doctor.CheckUp(x.R, ev, null, "en") : x.R).PlainText(sapi.World);
                     File.WriteAllText(Path.Combine(folder, name + ".txt"), text);
                     // A text missing from the lang file comes back as its key.
                     bool keys = System.Text.RegularExpressions.Regex.IsMatch(text, @"vintagedoctor:[a-z]+-[a-z0-9-]+");
@@ -903,7 +972,11 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
                 catch (Exception e) { t.Check("real: " + name, false, e.GetType().Name + ": " + e.Message); }
             }
             string overview = File.ReadAllText(Path.Combine(folder, "page-overview.txt"));
-            t.Check("real: the check-up has cards and questions", overview.Contains(DoctorReport.OkMark) && overview.Contains("/doctor crash") && overview.Contains("/doctor bugreport"));
+            t.Check("real: the check-up has cards and buttons", overview.Contains(DoctorReport.OkMark) && overview.Contains("/doctor crash") && overview.Contains("/doctor bugreport"));
+            t.Check("real: what used to be the deeper checks is in it (patches of two mods on one thing, things without a name, every zip read to its end)",
+                (overview.Contains("no two mods replacing the same thing") || overview.Contains("replaced or removed by more than one mod")) && (overview.Contains("have names") || overview.Contains("instead of a name"))
+                && ev.Folder.Files.Any(f => f.Tested) && ev.Folder.Files.Where(f => f.Kind == "zip" && f.ReadError == null).All(f => f.Tested),
+                First(overview, "names") + " / " + First(overview, "replac") + " / " + ev.Folder.Files.Count(f => f.Tested) + " zips read to the end");
             string bug = File.ReadAllText(Path.Combine(folder, "page-bugreport.txt"));
             t.Check("real: the bug report has the mod list and no addresses", bug.Contains("Mods (") && bug.Contains("Findings") && !System.Text.RegularExpressions.Regex.IsMatch(bug, @"\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d+"));
             t.Check("real: the bug report was saved", File.Exists(Path.Combine(doctor.DataFolder, "bug-report-server.txt")));
@@ -914,7 +987,13 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
         {
             Evidence ev = doctor.EvidenceNow(false);
             if (!ev.Mods.Has("doctorexample") || !ev.Mods.Has("doctorexamplejson")) { t.Skip("the example mods", "not loaded in this run"); return; }
-            string overview = doctor.BuildPage(ev, null, "en", Pages.Overview, "").PlainText(sapi.World);
+            DoctorReport exampleHalf = doctor.BuildPage(ev, null, "en", Pages.Overview, "");
+            string overview = exampleHalf.PlainText(sapi.World);
+            string byMod = doctor.CheckUp(exampleHalf, ev, null, "en").PlainText(sapi.World);
+            string own = Under(byMod, "Doctor Example 1");
+            t.Check("example: on the check-up the mod has a section of its own: its cards without its name in front, the buttons for its two pages, and one for everything about it",
+                own.Split('\n').Any(l => l.Length > 2 && l.Substring(2).StartsWith("3 example pumps are jammed", StringComparison.Ordinal)) && own.Contains("(/doctor example-tanks)") && own.Contains("(/doctor example-pipes)")
+                && own.Contains("Everything about Doctor Example (/doctor mod doctorexample)") && !Under(byMod, "The game (").Contains("example-tanks"), First(own, "pumps") + " / " + First(own, "example-tanks"));
             t.Check("example: a mod's check, registered without the doctor being a requirement", overview.Contains("3 example pumps are jammed") && overview.Contains("/doctor fix doctorexample:unjam all"));
             t.Check("example: the check can read the log through the doctor", overview.Contains("message(s) from this mod in the log"));
             t.Check("example: a finding over the event bus, and an incident", overview.Contains("2 example tanks are half empty") && overview.Contains("The example mod started"));

@@ -69,13 +69,16 @@ namespace DoctorExample
         {
             // Styles: 0 text, 1 heading, 2 a result line, 3 a quiet note, 4 a warning line, 5 a card. A card starts
             // with ✓ (passed), • (to know), ⚠ (may affect play) or ✖ (a problem); indented lines after it are its details.
+            // A detail starting with → says what to do. The marks say what a line is: the doctor never hands them to
+            // the game to draw (its font may not have them), and it writes out any other symbol in your words too
+            // (an arrow as ->), so keep to letters, digits and ordinary punctuation in what players read.
             // Buttons are written into a line: {{fix|<fix id>|<argument>|<label>}} and {{open|<page>|<argument>|<label>}}.
             var lines = new (string text, byte style, byte indent)[]
             {
                 ("The example tanks", 1, 0),
-                ("⚠ 2 example tanks are half empty", 5, 0),
+                ("⚠ 2 example tanks are half empty", 5, 0),   // font-ok: one of the doctor's marks; it draws them itself
                 ("tank at 10 3 10", 3, 1),
-                ("→ Fill them from a pump.", 0, 1),
+                ("→ Fill them from a pump.", 0, 1),            // font-ok: the mark for "what to do"
                 ("{{fix|doctorexample:fill||Fill the example tanks}} {{fix|doctorexample:slowfill||Fill them slowly}} {{open|example-tanks|slow|The same page, slowly}}", 0, 1),
                 (last, 3, 0)
             };

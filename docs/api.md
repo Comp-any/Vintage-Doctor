@@ -31,6 +31,17 @@ Open **/doctor api** in game to see what the doctor has taken from your mod, and
 
 Say what you checked even when it's fine: an `ok` card tells the player your mod was looked at.
 
+**Where it shows.** The check-up is laid out by mod: a section for the game, then one for each mod with something
+to say. Your findings sit under your mod's own heading, with the doctor's findings about your mod (its errors in the
+log, a failed start, its broken files) and a button for each page you added. The list at the top of the window shows
+one mod's section alone.
+
+**Which characters to use.** The game draws text with the computer's own default font and has no second font to
+fall back on, so a character that font lacks is an empty box. Arrows, ticks, warning signs and other symbols can't be
+counted on; letters, digits and ordinary punctuation can. The doctor writes symbols out in what you hand it before the
+game draws it (an arrow becomes `->`, a tick `[ok]`), so nothing shows as a box, but your text reads best when you
+don't use them.
+
 ## 1. A JSON file (no code)
 
 Put `vintagedoctor.json` in your mod's `assets/<modid>/config/` folder:
@@ -142,7 +153,7 @@ What the doctor puts in the tree it sends:
 | Key | |
 |---|---|
 | `side` | `"server"` or `"client"`. Each side of the game asks separately; answer on the side that knows. |
-| `topic` | `"overview"` for the check-up, `"mod"` for a mod's page, `"deep"` for the deeper checks. |
+| `topic` | `"overview"` for the check-up, `"mod"` for a mod's page. (Up to 1.2.0 there was also `"deep"`, a second, slower round; the check-up runs everything now.) |
 | `argument` | What followed the topic (a mod id on a mod's page). |
 | `mod` | Set when only one mod's findings are wanted. |
 | `language` | The asking player's language code. |
@@ -221,9 +232,9 @@ Don't list `vintagedoctor` under `dependencies` in your modinfo.json unless you 
 
 | | |
 |---|---|
-| `RegisterCheck(DoctorCheck)` | A check for the check-up and for your mod's page. Set `Deep = true` for anything slow: it then only runs when the player asks for the deeper checks. |
+| `RegisterCheck(DoctorCheck)` | A check for the check-up and for your mod's page. It runs every time the check-up is opened, so a slow one should remember its answer. |
 | `RegisterFix(DoctorFix)` | What a fix button does. Return one line saying what happened, or `ctx.Failed("why")`. |
-| `RegisterTopic(DoctorTopic)` | A page of your own, opened with `/doctor <id>` and listed under "What are you seeing?" with your question. |
+| `RegisterTopic(DoctorTopic)` | A page of your own, opened with `/doctor <id>` and shown as a button, with your question on it, in your mod's section of the check-up. |
 | `RegisterKnownProblem(KnownProblem)` | The same as a JSON known problem, from code. |
 | `ReportIncident(modId, level, title, details)` | Something that went wrong just now (a machine jammed, a save failed). Kept for the session and shown under your mod's name; the same title again raises a count. Safe from any thread. |
 | `Unregister(modId)` | Takes everything of your mod away again. |
@@ -235,7 +246,8 @@ Everything marked "API 2" needs Vintage Doctor 1.2.0. If your mod should also wo
 `ApiVersion >= 2` and keep the code that uses those members in a class of its own, as the example mod does
 (`WithDoctor2`).
 
-**`DoctorCheck`** has `Deep`, and since API 2 `Pages`: the pages the check runs on. Left empty it runs on the
+**`DoctorCheck`** has, since API 2, `Pages`: the pages the check runs on. (`Deep` is still there so older mods load, but
+does nothing since 1.3.0: there is no second round of checks any more.) Left empty it runs on the
 check-up and your mod's page; set to any of `"overview"`, `"mod"`, `"item"`, `"block"`, `"craft"` it runs only there.
 On the last three it is about one thing, found in `ctx.Subject`.
 
@@ -260,8 +272,9 @@ question above it as one.
 | `ClientFacts(modId)` | (API 2) What your mod on the asker's own game sent along (`RegisterClientFacts`); null when nothing came. |
 | `Write(text, indent)`, `LinkText(...)`, `FixText(...)` | (API 2) A plain line outside any card, and buttons as text to put into it, several on one line. |
 
-A check runs on the game's main thread, so it may read the world. Keep it quick (a few milliseconds); set `Deep`
-for the rest. If a check throws, the doctor shows a card saying so with your check's name, and carries on.
+A check runs on the game's main thread, so it may read the world, and it runs every time the check-up is opened.
+Keep it quick (a few milliseconds); work anything slower out once and remember it. If a check throws, the doctor
+shows a card saying so with your check's name, and carries on.
 
 ## 4. A whole doctor of your own
 
@@ -307,7 +320,7 @@ A page is lines of text, each with a style and an indent:
 | 2 | A result line (what a fix did). |
 | 3 | A quiet note. |
 | 4 | A warning line. |
-| 5 | A card. It starts with `✓` (passed), `•` (to know), `⚠` (may affect play) or `✖` (a problem); the indented lines after it are its details, shown when the card is opened. A line starting with `→` is advice. |
+| 5 | A card. It starts with `✓` (passed), `•` (to know), `⚠` (may affect play) or `✖` (a problem); the indented lines after it are its details, shown when the card is opened. A line starting with `→` is advice. These five marks say what a line is: the doctor never hands them to the game as text (it colours the card and draws the arrow itself), so they are safe to use although the game's font may not have them. |
 
 Inside a line:
 

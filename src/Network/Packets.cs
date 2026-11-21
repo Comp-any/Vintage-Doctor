@@ -58,6 +58,12 @@ namespace VintageDoctor
         /// <summary>Not the page yet: a mod on the server is still working on it, for up to <see cref="WaitSeconds"/> more.</summary>
         [ProtoMember(13)] public bool Working;
         [ProtoMember(14)] public int WaitSeconds;
+        /// <summary>(1.3.0) On the check-up: the section each line is in (see <see cref="DoctorLine.Section"/>). Null on other pages.</summary>
+        [ProtoMember(15)] public string[] Sections;
+        /// <summary>(1.3.0) The sections' headings: "key|Name version".</summary>
+        [ProtoMember(16)] public string[] SectionTitles;
+        /// <summary>(1.3.0) The mod each of <see cref="ServerTopics"/> belongs to, in the same order.</summary>
+        [ProtoMember(17)] public string[] ServerTopicMods;
     }
 
     /// <summary>Server → client: open the doctor's window on this page (the player typed /doctor).</summary>
