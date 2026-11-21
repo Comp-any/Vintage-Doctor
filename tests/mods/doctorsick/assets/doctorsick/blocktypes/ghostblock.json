@@ -1,0 +1,5 @@
+{
+  "code": "ghostblock",
+  "class": "DoctorGhostBlock",
+  "entityClass": "DoctorGhostEntity"
+}

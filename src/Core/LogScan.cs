@@ -76,6 +76,14 @@ namespace VintageDoctor
         public readonly Dictionary<string, string> FailedPatchExample = new Dictionary<string, string>(StringComparer.Ordinal);
         public readonly Dictionary<string, int> Unresolved = new Dictionary<string, int>(StringComparer.Ordinal);
         public readonly Dictionary<string, string> UnresolvedExample = new Dictionary<string, string>(StringComparer.Ordinal);
+        /// <summary>Blocks and items that name code the game doesn't have ("has defined a block class X, no such class registered").</summary>
+        public readonly List<(string kind, string code, string className)> MissingClasses = new List<(string, string, string)>();
+        /// <summary>Block, item and creature files the game could not read, by the mod (asset domain) they are in.</summary>
+        public readonly Dictionary<string, List<string>> BrokenTypes = new Dictionary<string, List<string>>(StringComparer.Ordinal);
+        /// <summary>JSON patches for files that aren't there, by the mod that has the patch: the files it wanted to change.</summary>
+        public readonly Dictionary<string, List<string>> MissingTargets = new Dictionary<string, List<string>>(StringComparer.Ordinal);
+        /// <summary>Mods marked as content mods that have code in them, which the game leaves out ("Is a Content mod, but .cs or .dll files were found").</summary>
+        public readonly List<string> IgnoredCode = new List<string>();
         public readonly List<string> Phases = new List<string>();
         public readonly List<string> ModPaths = new List<string>();
         public int ModsFound = -1, ModsDisabled;
@@ -93,6 +101,9 @@ namespace VintageDoctor
         static readonly Regex Prefix = new Regex(@"^\[([^\]\s]{2,80})\]\s+(.*)$", RegexOptions.Compiled | RegexOptions.Singleline);
         static readonly Regex DepLine = new Regex(@"^(\S+) - (.+)$", RegexOptions.Compiled);
         static readonly Regex PatchFail = new Regex(@"^Patch \d+ \(target: ([^)]*)\) in ([a-z0-9_.-]+):(\S*)", RegexOptions.Compiled);
+        static readonly Regex PatchNoFile = new Regex(@"^Patch \d+ in ([a-z0-9_.-]+):(\S+?): File (\S+?) not found", RegexOptions.Compiled);
+        static readonly Regex NoClass = new Regex(@"^(Block|Item) with code (\S+) has defined an? (block entity|block|item) class (\S+?),", RegexOptions.Compiled);
+        static readonly Regex TypeNotLoaded = new Regex(@"^(Item|Block|Entity) type ([a-z0-9_.-]+):(\S+?) could not be loaded", RegexOptions.Compiled);
         static readonly Regex Unresolvable = new Regex(@"^Failed resolving .* with code ([a-z0-9_.-]+):(\S+)", RegexOptions.Compiled);
         static readonly Regex DuplicateId = new Regex(@"^Multiple mods share the mod ID '([^']+)' \((.*)\)\. Will only load the highest version one - v(.+)\.$", RegexOptions.Compiled);
         static readonly Regex Overload = new Regex(@"^Server overloaded\. A tick took (\d+)ms", RegexOptions.Compiled);
@@ -311,6 +322,44 @@ namespace VintageDoctor
                     string domain = pf.Groups[2].Value;
                     Bump(FailedPatches, domain);
                     if (!FailedPatchExample.ContainsKey(domain)) FailedPatchExample[domain] = Shorten(text, 260);
+                    continue;
+                }
+                Match nf = PatchNoFile.Match(text);
+                if (nf.Success)
+                {
+                    string domain = nf.Groups[1].Value;
+                    if (!MissingTargets.TryGetValue(domain, out List<string> targets)) MissingTargets[domain] = targets = new List<string>();
+                    string target = nf.Groups[3].Value.TrimEnd('.', ',');
+                    if (!targets.Contains(target) && targets.Count < 200) targets.Add(target);
+                    // A patch for a mod that isn't installed is how mods support each other, and harmless; one for a
+                    // file of the game or of an installed mod that isn't there has stopped working.
+                    int colon = target.IndexOf(':');
+                    string targetDomain = colon > 0 ? target.Substring(0, colon) : "game";
+                    if (ModSnapshot.IsGameMod(targetDomain) || (mods != null && mods.Has(targetDomain)))
+                    {
+                        Bump(FailedPatches, domain);
+                        if (!FailedPatchExample.ContainsKey(domain)) FailedPatchExample[domain] = Shorten(text, 260);
+                    }
+                    continue;
+                }
+                Match nc = NoClass.Match(text);
+                if (nc.Success)
+                {
+                    string kind = nc.Groups[3].Value == "block entity" ? "entity" : nc.Groups[3].Value;
+                    if (MissingClasses.Count < 2000 && !MissingClasses.Contains((kind, nc.Groups[2].Value, nc.Groups[4].Value))) MissingClasses.Add((kind, nc.Groups[2].Value, nc.Groups[4].Value));
+                    // No "continue": it counts as one of the mod's errors too.
+                }
+                Match tn = TypeNotLoaded.Match(text);
+                if (tn.Success)
+                {
+                    string domain = tn.Groups[2].Value, file = tn.Groups[3].Value.TrimEnd('.', ',');
+                    if (!BrokenTypes.TryGetValue(domain, out List<string> broken)) BrokenTypes[domain] = broken = new List<string>();
+                    if (!broken.Contains(file) && broken.Count < 200) broken.Add(file);
+                    // No "continue": the error itself, with what was wrong in the file, belongs in the log's list too.
+                }
+                if (tag != null && text.StartsWith("Is a ", StringComparison.Ordinal) && text.Contains(" mod, but .cs or .dll files were found"))
+                {
+                    if (!IgnoredCode.Contains(tag)) IgnoredCode.Add(tag);
                     continue;
                 }
                 Match un = Unresolvable.Match(text);

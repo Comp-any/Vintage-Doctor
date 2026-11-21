@@ -90,6 +90,9 @@ namespace VintageDoctor
             x.Detail(x.T("perf-chunks", chunks, players));
         }
 
+        /// <summary>Whether memory that went from one amount to another over so many minutes is growing in earnest: by a third and by 400 MB, over at least 20 minutes.</summary>
+        public static bool Leaking(double minutes, long was, long now) => minutes >= 20 && now - was > 400L * 1024 * 1024 && now > was * 1.35;
+
         /// <summary>The program's memory: how much it holds, and how much the computer has.</summary>
         public static void Memory(DoctorContext x, bool full)
         {
@@ -107,6 +110,14 @@ namespace VintageDoctor
                 }
                 else x.Ok(x.T("perf-memory-ok", Size(working), Size(available)));
                 x.Detail(x.T("perf-memory-detail", Size(managed), GC.CollectionCount(2), Environment.ProcessorCount));
+                // Holding a lot is one thing; holding more every minute is a leak, and ends in a crash.
+                var trend = x.Doctor.MemoryTrend.Trend();
+                if (trend != null && Leaking(trend.Value.minutes, trend.Value.was, trend.Value.now))
+                {
+                    x.Warn(x.T("perf-memory-growing", Size(trend.Value.now - trend.Value.was), N(trend.Value.minutes, "0"), Size(trend.Value.was), Size(trend.Value.now)));
+                    x.Explain(x.T("perf-memory-growing-why"));
+                    x.Advice(x.Side == EnumAppSide.Client ? x.T("perf-memory-advice-client") : x.T("perf-memory-advice-server"));
+                }
             }
             catch (Exception e) { x.Info(x.T("perf-memory-error", e.Message)); }
         }

@@ -61,6 +61,13 @@ namespace VintageDoctor
 21.11.2026 10:00:02 [Error] Failed to start system Crashy.CrashySystem
 21.11.2026 10:00:03 [Error] Patch 0 (target: game:blocktypes/plant/crop/pineapple.json) in patchy:patches/crops.json failed because supplied path /dropsByType/*-16/1/x is invalid
 21.11.2026 10:00:03 [Error] Patch 3 (target: game:itemtypes/x.json) in patchy:patches/items.json failed because supplied path /a/b is invalid
+21.11.2026 10:00:03 [Error] Patch 1 in patchy:patches/compat.json: File selftestabsentmod:itemtypes/thing.json not found
+21.11.2026 10:00:03 [Error] Patch 2 in oldpatchy:patches/old.json: File game:itemtypes/removed.json not found
+21.11.2026 10:00:03 [Error] Block with code ghosty:machine-north has defined a block class GhostMachine, no such class registered. Will ignore.
+21.11.2026 10:00:03 [Error] Block with code ghosty:machine-north has defined a block entity class GhostMachineEntity, no such class registered. Will ignore.
+21.11.2026 10:00:03 [Error] Item with code ghosty:wand has defined an item class GhostWand, but no such class registered. Will ignore.
+21.11.2026 10:00:03 [Error] Item type ghosty:itemtypes/broken.json could not be loaded. Will ignore. Exception:
+21.11.2026 10:00:03 [Warning] [ghosty] Is a Content mod, but .cs or .dll files were found. These will be ignored.
 21.11.2026 10:00:04 [Warning] Failed resolving crafting recipe ingredient with code armory:part-hammerhead-steel in Grid recipe
 21.11.2026 10:00:04 [Error] Grid Recipe with output 'armory:part-hammerhead-steel' contains an ingredient that cannot be resolved: Item code armory:part-hammerhead-steel
 21.11.2026 10:00:05 [Notification] Entering runphase RunGame
@@ -194,6 +201,15 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             t.Check("log: a file that isn't a mod", log.StartFailures.Any(f => f.Mod == "broken.zip" && f.IsFile), string.Join(";", log.StartFailures.Select(f => f.Mod)));
             t.Check("log: failed JSON patches by mod", log.FailedPatches.TryGetValue("patchy", out int n) && n == 2, string.Join(";", log.FailedPatches.Select(kv => kv.Key + "=" + kv.Value)));
             t.Check("log: recipes naming things that don't exist, once each", log.Unresolved.TryGetValue("armory", out int u) && u == 1, string.Join(";", log.Unresolved.Select(kv => kv.Key + "=" + kv.Value)));
+            t.Check("log: a patch for a mod that isn't installed is noted, not counted as failed", log.MissingTargets.TryGetValue("patchy", out List<string> compat) && compat.Count == 1
+                && compat[0] == "selftestabsentmod:itemtypes/thing.json", string.Join(";", log.MissingTargets.Select(kv => kv.Key + "=" + string.Join(",", kv.Value))));
+            t.Check("log: a patch for a file the game no longer has counts as failed", log.FailedPatches.TryGetValue("oldpatchy", out int old) && old == 1 && log.MissingTargets.ContainsKey("oldpatchy"));
+            t.Check("log: blocks and items whose code is missing", log.MissingClasses.Count == 3 && log.MissingClasses.Contains(("block", "ghosty:machine-north", "GhostMachine"))
+                && log.MissingClasses.Contains(("entity", "ghosty:machine-north", "GhostMachineEntity")) && log.MissingClasses.Contains(("item", "ghosty:wand", "GhostWand")),
+                string.Join(";", log.MissingClasses.Select(m => m.kind + " " + m.code + " " + m.className)));
+            t.Check("log: a block or item file the game couldn't read", log.BrokenTypes.TryGetValue("ghosty", out List<string> unread) && unread.Count == 1 && unread[0] == "itemtypes/broken.json",
+                string.Join(";", log.BrokenTypes.Select(kv => kv.Key + "=" + string.Join(",", kv.Value))));
+            t.Check("log: code in a mod that calls itself a content mod", log.IgnoredCode.Count == 1 && log.IgnoredCode[0] == "ghosty", string.Join(";", log.IgnoredCode));
             t.Check("log: a slow tick", log.Overloads.Count == 1 && log.Overloads[0].ms == 2377);
             LogIssue drink = log.Issues.FirstOrDefault(i => i.Message.StartsWith("Drink portion"));
             t.Check("log: the same warning twice is one entry with a count", drink != null && drink.Count == 2 && !drink.Startup, drink?.Count.ToString());
@@ -201,6 +217,19 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             t.Check("log: an exception keeps its stack trace and count", nre != null && nre.Count == 2 && nre.Stack.Count == 2, nre == null ? "none" : nre.Count + "x, " + nre.Stack.Count + " frames");
             t.Check("log: start-up lines aren't counted as errors of their own", !log.Issues.Any(i => i.Message.Contains("Could not resolve") || i.Message.Contains("Patch 0")), log.Issues.Count + " issues");
             t.Check("an error is explained in plain words", WhyFor(doctor, "Method not found: 'Void X.Y()'") != null && WhyFor(doctor, "Could not load file or assembly 'A'") != null && WhyFor(doctor, "all is well") == null);
+            t.Check("more errors explained: a name taken twice, a library for another system, a mod packed wrong",
+                WhyFor(doctor, "System.ArgumentException: An item with the same key has already been added. Key: pump") == WhyFor(doctor, "Block class 'Pump' is already registered")
+                && WhyFor(doctor, "System.DllNotFoundException: Unable to load shared library 'thing'") != null && WhyFor(doctor, "System.BadImageFormatException: Bad IL format.") != null
+                && WhyFor(doctor, "Found multiple .dll files with ModSystems and/or ModInfo attributes") != null
+                && WhyFor(doctor, "Please restart the game. The mod's .dll was already loaded and cannot be reloaded.") != null && WhyFor(doctor, "Block class 'Pump' is already registered") != null);
+            var growing = new MemoryWatch();
+            var steady = new MemoryWatch();
+            for (int step = 0; step < 8; step++) { growing.Add(40 - step * 5, (1000L + step * 150) * 1024 * 1024); steady.Add(40 - step * 5, (1000L + step % 2 * 30) * 1024 * 1024); }
+            var up = growing.Trend();
+            var flat = steady.Trend();
+            t.Check("memory that keeps growing is told from memory that is only large", up != null && flat != null && Checks.Leaking(up.Value.minutes, up.Value.was, up.Value.now)
+                && !Checks.Leaking(flat.Value.minutes, flat.Value.was, flat.Value.now) && new MemoryWatch().Trend() == null,
+                up == null ? "no trend" : up.Value.minutes + " min, " + up.Value.was / 1048576 + " to " + up.Value.now / 1048576 + " MB");
 
             // The same through the known-problem list and the ignore list.
             var known = new KnownProblems();
@@ -271,10 +300,16 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             File.WriteAllText(Path.Combine(mods, "notes.txt"), "x");
             Directory.CreateDirectory(Path.Combine(mods, "foldermod"));
             File.WriteAllText(Path.Combine(mods, "foldermod", "modinfo.json"), Info("foldermod", "0.1.0"));
+            Directory.CreateDirectory(Path.Combine(mods, "foldermod", "assets", "game", "recipes", "grid"));
+            File.WriteAllText(Path.Combine(mods, "foldermod", "assets", "game", "recipes", "grid", "x.json"), "[]");
+            WriteZip(Path.Combine(mods, "libs_1.0.0.zip"), ("modinfo.json", Info("libs", "1.0.0")), ("libs.dll", "not really code"), ("0Harmony.dll", "not really code"), ("native/thing.dll", "x"),
+                ("assets/libs/itemtypes/thing.json", "{}"), ("assets/libs/lang/en.json", "{}"), ("assets/game/recipes/grid/x.json", "[]"), ("assets/game/lang/en.json", "{}"),
+                ("assets/game/textures/block/z.png", "x"), ("assets/othermod/itemtypes/y.json", "{}"));
+            WriteZip(Path.Combine(mods, "stray.zip"), ("modinfo.json", Info("stray", "1.0.0")), ("lib/Helper.dll", "not really code"));
 
             FolderScan scan = FolderScan.Read(new[] { mods }, null);
             ModFile F(string name) => scan.Files.FirstOrDefault(f => f.Name == name);
-            t.Check("folder: every mod file found, a text file left alone", scan.Files.Count == 14 && F("notes.txt") == null, scan.Files.Count + ": " + string.Join(",", scan.Files.Select(f => f.Name)));
+            t.Check("folder: every mod file found, a text file left alone", scan.Files.Count == 16 && F("notes.txt") == null, scan.Files.Count + ": " + string.Join(",", scan.Files.Select(f => f.Name)));
             t.Check("folder: a good zip", F("good_1.0.0.zip") is ModFile g && !g.Broken && g.ModId == "good" && g.Version == "1.0.0" && g.GameDep == "1.22.0" && g.Deps.Count == 1);
             t.Check("folder: backslashes in file names", F("backslash.zip")?.Backslashes == true);
             t.Check("folder: modinfo one folder down", F("nested.zip")?.NestedFolder == "Nested-main" && F("nested.zip").ModId == "nested");
@@ -285,6 +320,14 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             t.Check("folder: a damaged zip", F("corrupt.zip")?.ReadError != null);
             t.Check("folder: an archive the game can't read, and a download that didn't finish", F("packed.rar")?.Kind == "archive" && F("half.zip.crdownload")?.Kind == "partial");
             t.Check("folder: a mod in a folder", F("foldermod")?.Kind == "folder" && F("foldermod").ModId == "foldermod");
+            ModFile libs = F("libs_1.0.0.zip");
+            t.Check("folder: what a mod brings: its libraries, its own files, and what it puts into the game's and other mods' folders", libs != null && !libs.Broken
+                && libs.Dlls.Count == 2 && libs.Dlls.Contains("0Harmony.dll") && libs.OwnData.Count == 1 && libs.OwnData.Contains("itemtypes/thing.json")
+                && libs.ForeignAssets.Count == 3 && libs.ForeignAssets.Contains("game:recipes/grid/x.json") && libs.ForeignAssets.Contains("othermod:itemtypes/y.json")
+                && libs.ForeignAssets.Contains("game:textures/block/z.png") && libs.Misplaced.Count == 0,
+                libs == null ? "not found" : string.Join(",", libs.Dlls) + " / " + string.Join(",", libs.OwnData) + " / " + string.Join(",", libs.ForeignAssets) + " / " + string.Join(",", libs.Misplaced));
+            t.Check("folder: the same for a mod kept as a folder", F("foldermod").ForeignAssets.Count == 1 && F("foldermod").ForeignAssets[0] == "game:recipes/grid/x.json", string.Join(",", F("foldermod").ForeignAssets));
+            t.Check("folder: a .dll in a subfolder, which the game refuses to load", F("stray.zip") is ModFile stray && stray.Broken && stray.Misplaced.Count == 1 && stray.Misplaced[0] == "lib/Helper.dll");
             var dups = scan.Duplicates();
             t.Check("folder: a mod installed twice, newest first", dups.Count == 1 && dups[0].id == "twice" && dups[0].copies[0].Version == "1.10.0", dups.Count + " duplicates");
             t.Check("folder: reading a damaged zip to the end fails, a good one doesn't", FolderScan.TestZip(Path.Combine(mods, "good_1.0.0.zip")) == null && FolderScan.TestZip(Path.Combine(mods, "corrupt.zip")) != null);
@@ -295,6 +338,10 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             FolderScan.Repack(Path.Combine(mods, "nested.zip"), backups, out string backup2);
             ModFile fixedNested = FolderScan.Look(Path.Combine(mods, "nested.zip"));
             t.Check("fix: the outer folder taken away, the original kept", fixedNested != null && fixedNested.NestedFolder == null && !fixedNested.NoModInfo && fixedNested.ModId == "nested" && File.Exists(backup2));
+            int dropped = FolderScan.Repack(Path.Combine(mods, "libs_1.0.0.zip"), backups, out string backup3, n => n == "0Harmony.dll");
+            ModFile stripped = FolderScan.Look(Path.Combine(mods, "libs_1.0.0.zip"));
+            t.Check("fix: a library the game already has taken out of a mod, the rest and the original kept", dropped == 1 && stripped != null && !stripped.Broken && stripped.Dlls.Count == 1
+                && stripped.Dlls[0] == "libs.dll" && stripped.ForeignAssets.Count == 3 && stripped.Entries == 9 && File.Exists(backup3), "dropped " + dropped + ", " + stripped?.Entries + " entries");
             bool refused = false;
             try { FolderScan.Repack(Path.Combine(mods, "notamod.zip"), backups, out _); } catch (InvalidOperationException) { refused = true; }
             t.Check("fix: a zip that can't be made right is left as it was", refused && File.Exists(Path.Combine(mods, "notamod.zip")) && !File.Exists(Path.Combine(mods, "notamod.zip.doctor-tmp")));
@@ -451,11 +498,16 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             string mods = SickPage(doctor, sapi, ev, folder, Checks.TopicMods, "", "sick-mods");
             string crashy = SickPage(doctor, sapi, ev, folder, Checks.TopicMod, "doctorcrashy", "sick-mod-doctorcrashy");
             SickPage(doctor, sapi, ev, folder, Pages.BugReportTopic, "", "sick-bugreport");
+            string clashes = SickPage(doctor, sapi, ev, folder, Checks.TopicClashes, "", "sick-clashes");
+            string flint = SickPage(doctor, sapi, ev, folder, Checks.TopicCraft, "game:flint", "sick-craft-flint");
+            SickPage(doctor, sapi, ev, folder, Pages.Deep, "", "sick-deep");
+            SickPage(doctor, sapi, ev, folder, Checks.TopicMod, "doctorsick", "sick-mod-doctorsick");
 
             t.Check("sick: a mod that failed to start is named, with its error", startup.Contains("Doctor Crashy threw an error while starting: Method not found"), First(startup, "threw an error"));
             t.Check("sick: the error is explained", startup.Contains("built for a different version"));
             t.Check("sick: the part of the mod the game gave up on is named", startup.Contains("Not started: ") && startup.Contains("DoctorCrashy"), First(startup, "Not started"));
-            t.Check("sick: files the game couldn't load as mods, each with what it really is", startup.Contains("4 file(s) in the Mods folder aren't mods the game can load")
+            t.Check("sick: files the game couldn't load as mods, each with what it really is", startup.Contains("5 file(s) in the Mods folder aren't mods the game can load")
+                && startup.Contains("doctor-sick-straydll.zip: it has code in the wrong place (lib/Helper.dll)")
                 && startup.Contains("doctor-sick-notamod.zip: it has no modinfo.json") && startup.Contains("doctor-sick-nested.zip: the mod sits one folder down")
                 && startup.Contains("doctor-sick-wrapped.zip: it holds another zip") && startup.Contains("doctor-sick-corrupt.zip: the zip is damaged"), First(startup, "aren't mods"));
             t.Check("sick: the game's own notice of a mod installed twice", startup.Contains("in the Mods folder more than once") && startup.Contains("doctordup"), First(startup, "more than once"));
@@ -475,6 +527,46 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             t.Check("sick: the mods page puts the broken mod first", mods.Contains("Doctor Crashy 1.0.0: 1 error(s) while starting"), First(mods, "Doctor Crashy"));
             t.Check("sick: the broken mod's own page has all of it and offers to switch it off", crashy.Contains("threw an error while starting") && crashy.Contains("doctorcrashy.json can't be read")
                 && crashy.Contains("/doctor fix doctor:disable-mod doctorcrashy") && crashy.Contains("a made-up error"));
+
+            // Mods in each other's way, or their own.
+            bool LineHas(string text, string key, params string[] words)
+            {
+                foreach (string line in text.Split('\n')) if (line.Contains(key)) return words.All(w => line.Contains(w));
+                return false;
+            }
+            string replacedFile = "";
+            try { replacedFile = File.ReadAllText(Path.Combine(Vintagestory.API.Config.GamePaths.ModConfig, "doctor-sick-override.txt")).Trim(); } catch { }
+            t.Check("sick: a .dll in a subfolder of a zip", files.Contains("doctor-sick-straydll.zip has code where the game doesn't accept it (lib/Helper.dll)"), First(files, "straydll"));
+            t.Check("sick: a block and an item whose code is missing, the block's data code too", clashes.Contains("Doctor Sick: 3 block(s) or item(s) need code that isn't in the game")
+                && clashes.Contains("doctorsick:ghost (its code: DoctorGhostItem)") && clashes.Contains("doctorsick:ghostblock (its code: DoctorGhostBlock)")
+                && clashes.Contains("doctorsick:ghostblock (its data code: DoctorGhostEntity)"), First(clashes, "need code") + " / " + First(clashes, "DoctorGhostEntity"));
+            t.Check("sick: an item file the game couldn't read", clashes.Contains("Doctor Sick: 1 block, item or creature file(s) couldn't be read") && clashes.Contains("doctorsick:itemtypes/broken.json"),
+                First(clashes, "couldn't be read"));
+            t.Check("sick: a patch for a file the game doesn't have, and one for a mod that isn't installed", clashes.Contains("Doctor Sick tries to change 1 file(s) that aren't there")
+                && clashes.Contains("game:itemtypes/doctor-no-such-file.json") && clashes.Contains("Doctor Sick has 1 patch(es) for mods that aren't installed (doctornosuchmod)"),
+                First(clashes, "aren't there") + " / " + First(clashes, "aren't installed"));
+            t.Check("sick: code in a mod that calls itself a content mod", LineHas(clashes, "doctorsickbundled has code in it", "0Harmony.dll", "SickShared.dll", "calls itself a content mod"), First(clashes, "has code in it"));
+            t.Check("sick: a mod whose items never arrived, with the reason and the fix", clashes.Contains("doctorsickslash has 1 block and item file(s), but none of its blocks or items are in the game")
+                && clashes.Contains("/doctor fix doctor:repack"), First(clashes, "none of its"));
+            t.Check("sick: a library the game already has, and one that two mods bring", clashes.Contains("doctorsickbundled brings its own copy of 0Harmony.dll")
+                && LineHas(clashes, "SickShared.dll is in more than one mod", "doctorsickbundled", "doctorsickshared") && clashes.Contains("/doctor fix doctor:strip-libraries"),
+                First(clashes, "brings its own") + " / " + First(clashes, "more than one mod"));
+            if (replacedFile.Length > 0)
+            {
+                t.Check("sick: two mods replacing the same files", clashes.Contains("2 file(s) are replaced by more than one mod") && LineHas(clashes, "game:" + replacedFile + " ←", "Doctor Sick", "doctorsickold")
+                    && LineHas(clashes, "doctorsick:config/note.json ←", "Doctor Sick", "doctorsickold"), First(clashes, "replaced by more") + " / " + First(clashes, replacedFile));
+                t.Check("sick: a mod made for an older game that replaces the game's own files", clashes.Contains("1 mod(s) made for an older game replace 1 of the game's own files")
+                    && clashes.Contains("doctorsickold (made for 1.19.0): 1 file(s)") && clashes.Contains("Doctor Sick replaces 1 of the game's own files outright"),
+                    First(clashes, "older game replace") + " / " + First(clashes, "outright"));
+            }
+            else t.Skip("sick: replaced files", "no file of the game's was found to replace");
+            t.Check("sick: a mod with code made for an older game that has errors now", LineHas(clashes, "with code were made for an older game", "1 mod(s)", "have errors now", "Doctor Crashy (1.20.0)"),
+                First(clashes, "with code were made"));
+            t.Check("sick: two recipes with the same ingredients", clashes.Contains("1 recipe(s) have exactly the same ingredients as another recipe"), First(clashes, "same ingredients"));
+            t.Check("sick: the same on the item's own crafting page", flint.Contains("Another recipe has exactly the same ingredients"), First(flint, "same ingredients"));
+            t.Check("sick: the check-up shows the clashes that matter and leads to the rest", overview.Contains("need code that isn't in the game") && overview.Contains("/doctor clashes")
+                && !overview.Contains("brings its own copy"), First(overview, "/doctor clashes"));
+
             var counted = new DoctorReport();
             foreach (string line in overview.Split('\n')) if (line.StartsWith(DoctorReport.ProblemMark) || line.StartsWith(DoctorReport.WarnMark)) counted.Add(line, DoctorLineStyle.Check);
             t.Check("sick: the check-up counts the problems", counted.Problems >= 6 && counted.Warnings >= 5, counted.Problems + " problems, " + counted.Warnings + " warnings");
@@ -500,6 +592,13 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             t.Check("sick fix: the broken config moved aside", Ok(r8) && !File.Exists(Path.Combine(Vintagestory.API.Config.GamePaths.ModConfig, "doctorcrashy.json")), r8);
             string r9 = doctor.RunFix("doctor:move-file", Arg("doctordup_1.1.0.zip"), null, "en", ev);
             t.Check("sick fix: a mod the game has loaded is not moved", !Ok(r9) && File.Exists(Where("doctordup_1.1.0.zip")), r9);
+            string bundled = Where("doctor-sick-bundled.zip");
+            string r11 = doctor.RunFix("doctor:strip-libraries", Arg("doctor-sick-bundled.zip"), null, "en", ev);
+            t.Check("sick fix: the game's library taken out of a mod, the mod's own files kept", Ok(r11) && FolderScan.Look(bundled) is ModFile c && c.Dlls.Count == 1 && c.Dlls[0] == "SickShared.dll" && c.ModId == "doctorsickbundled", r11);
+            string r12 = doctor.RunFix("doctor:strip-libraries", Arg("doctor-sick-shared.zip"), null, "en", ev);
+            t.Check("sick fix: a mod with nothing of the game's in it is left alone", !Ok(r12), r12);
+            string r13 = doctor.RunFix("doctor:move-file", Arg("doctor-sick-straydll.zip"), null, "en", ev);
+            t.Check("sick fix: the zip the game refuses moved aside", Ok(r13) && !File.Exists(Where("doctor-sick-straydll.zip")), r13);
             string r10 = doctor.RunFix("doctor:disable-mod", "doctorcrashy", null, "en", ev);
             t.Check("sick fix: the broken mod switched off for the next start", Ok(r10), r10);
 
@@ -507,7 +606,7 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             string filesAfter = SickPage(doctor, sapi, after, folder, Checks.TopicFiles, "", "sick-files-after-fixes");
             t.Check("sick: after the fixes the Mods folder and the config files are clean", filesAfter.Contains("nothing wrong with them") && filesAfter.Contains("read without a problem"), First(filesAfter, DoctorReport.ProblemMark) + First(filesAfter, DoctorReport.WarnMark));
             int kept = Directory.Exists(Path.Combine(doctor.DataFolder, "backups")) ? Directory.GetFiles(Path.Combine(doctor.DataFolder, "backups"), "*", SearchOption.AllDirectories).Length : 0;
-            t.Check("sick: everything that was moved is in the backups, nothing deleted", kept == 8, kept + " files in the backups");
+            t.Check("sick: everything that was moved is in the backups, nothing deleted", kept == 10, kept + " files in the backups");
         }
 
         /// <summary>The first line of a page that has a word in it, for a failed check's detail.</summary>
@@ -536,7 +635,7 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             var pages = new List<(string topic, string arg)>
             {
                 (Pages.Overview, ""), (Pages.Deep, ""), (Checks.TopicCrash, ""), (Checks.TopicStartup, ""), (Checks.TopicLog, ""), (Checks.TopicLog, firstMod), (Checks.TopicMods, ""),
-                (Checks.TopicMod, DoctorApi.ModId), (Checks.TopicMod, firstMod), (Checks.TopicMod, "nosuchmod"), (Checks.TopicPerf, ""), (Checks.TopicFiles, ""), (Checks.TopicPatches, ""),
+                (Checks.TopicMod, DoctorApi.ModId), (Checks.TopicMod, firstMod), (Checks.TopicMod, "nosuchmod"), (Checks.TopicPerf, ""), (Checks.TopicFiles, ""), (Checks.TopicPatches, ""), (Checks.TopicClashes, ""),
                 (Checks.TopicChanges, ""), (Checks.TopicWorld, ""), (Checks.TopicItem, "game:ingot-copper"), (Checks.TopicItem, "game:nosuchitem"), (Checks.TopicItem, ""), (Checks.TopicBlock, ""),
                 (Checks.TopicCraft, "game:axe-copper"), (Checks.TopicCraft, "game:ingot-copper"), (Pages.BugReportTopic, ""), (Pages.BugReportTopic, firstMod), (Pages.Api, ""),
                 ("nosuchpage", ""), (firstMod, ""), ("game:ingot-copper", "")

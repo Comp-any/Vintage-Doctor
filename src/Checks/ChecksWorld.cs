@@ -233,6 +233,7 @@ namespace VintageDoctor
                 if (r.Name != null) x.Detail(x.T("craft-from", r.Name.ToString()));
             }
             if (recipes.Count > 10) x.Line(x.T("more-lines", recipes.Count - 10));
+            RecipeShadows(x, c, true);
             x.Line(x.T("craft-tips"));
         }
 

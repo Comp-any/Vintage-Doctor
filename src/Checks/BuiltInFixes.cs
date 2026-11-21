@@ -26,6 +26,7 @@ namespace VintageDoctor
             void Add(string id, System.Func<DoctorFixContext, string> apply) => doctor.RegisterFix(new DoctorFix(DoctorApi.ModId, id, ctx => apply((DoctorFixContext)ctx)));
             Add("doctor:reset-config", ResetConfig);
             Add("doctor:repack", Repack);
+            Add("doctor:strip-libraries", StripLibraries);
             Add("doctor:move-file", MoveFile);
             Add("doctor:move-duplicates", MoveDuplicates);
             Add("doctor:unwrap", Unwrap);
@@ -69,6 +70,24 @@ namespace VintageDoctor
             if (f.Kind != "zip") return x.Failed(x.T("fix-notzip", f.Name));
             int changed = FolderScan.Repack(f.Path, Backups(x), out string backup);
             return x.T("fix-repack-done", f.Name, changed, Anonymise.Short(backup));
+        }
+
+        /// <summary>
+        /// Writes a mod zip again without the libraries it brought along that the game already has (its own copy of
+        /// Harmony, Newtonsoft.Json...). The game uses its own copy either way; the mod's copy can only get in the way.
+        /// </summary>
+        static string StripLibraries(DoctorFixContext x)
+        {
+            ModFile f = FileOf(x, out string error);
+            if (f == null) return error;
+            if (f.Kind != "zip") return x.Failed(x.T("fix-notzip", f.Name));
+            HashSet<string> game = Checks.GameLibraries();
+            var drop = f.Dlls.Where(d => game.Contains(d)).ToList();
+            if (drop.Count == 0) return x.Failed(x.T("fix-strip-none", f.Name));
+            // The mod's own code must stay: with nothing but the game's libraries in it there would be no mod left.
+            if (string.Equals(f.Type, "code", StringComparison.OrdinalIgnoreCase) && drop.Count == f.Dlls.Count) return x.Failed(x.T("fix-strip-all", f.Name));
+            FolderScan.Repack(f.Path, Backups(x), out string backup, n => n.IndexOf('/') < 0 && game.Contains(n));
+            return x.T("fix-strip-done", f.Name, string.Join(", ", drop), Anonymise.Short(backup));
         }
 
         static string MoveFile(DoctorFixContext x)

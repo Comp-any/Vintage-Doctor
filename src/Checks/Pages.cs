@@ -24,7 +24,7 @@ namespace VintageDoctor
         public static readonly string[] Topics =
         {
             Overview, Deep, Checks.TopicCrash, Checks.TopicStartup, Checks.TopicLog, Checks.TopicMods, Checks.TopicMod, Checks.TopicPerf, Checks.TopicFiles,
-            Checks.TopicPatches, Checks.TopicChanges, Checks.TopicWorld, Checks.TopicItem, Checks.TopicBlock, Checks.TopicCraft, Checks.TopicHotkeys, BugReportTopic, Api
+            Checks.TopicPatches, Checks.TopicClashes, Checks.TopicChanges, Checks.TopicWorld, Checks.TopicItem, Checks.TopicBlock, Checks.TopicCraft, Checks.TopicHotkeys, BugReportTopic, Api
         };
 
         public static string Canonical(string topic)
@@ -39,6 +39,7 @@ namespace VintageDoctor
                 case "lag": case "performance": case "slow": case "fps": case "tps": return Checks.TopicPerf;
                 case "folder": case "modsfolder": case "config": case "configs": return Checks.TopicFiles;
                 case "harmony": case "code": return Checks.TopicPatches;
+                case "clash": case "conflict": case "conflicts": case "compat": case "compatibility": return Checks.TopicClashes;
                 case "changed": case "whatchanged": return Checks.TopicChanges;
                 case "hand": case "held": return Checks.TopicItem;
                 case "recipe": case "crafting": return Checks.TopicCraft;
@@ -100,6 +101,12 @@ namespace VintageDoctor
                     if (!(server && x.SameProcess)) Checks.Guarded(x, "patches", () => Checks.CodePatches(x, true));
                     if (server) Checks.Guarded(x, "jsonpatches", () => Checks.JsonPatchOverlaps(x));
                     break;
+                case Checks.TopicClashes:
+                    Checks.Guarded(x, "clashes", () => Checks.Clashes(x, true));
+                    if (server || !x.Doctor.ServerAnswers) Checks.Guarded(x, "conflicts", () => Checks.Conflicts(x));
+                    if (!(server && x.SameProcess)) Checks.Guarded(x, "patches", () => Checks.CodePatches(x, false));
+                    if (server) Checks.Guarded(x, "jsonpatches", () => Checks.JsonPatchOverlaps(x));
+                    break;
                 case Checks.TopicChanges: if (!(server && x.SameProcess)) Checks.Guarded(x, "changes", () => Checks.Changes(x, true)); break;
                 case Checks.TopicWorld: if (server) Checks.Guarded(x, "world", () => Checks.WorldChecks(x, true)); break;
                 case Checks.TopicItem: if (server || !x.Doctor.ServerAnswers) Checks.Guarded(x, "item", () => Checks.ItemPage(x, arg)); break;
@@ -138,6 +145,7 @@ namespace VintageDoctor
             }
             Checks.Guarded(x, "performance", () => Checks.ServerPerformance(x, false));
             Checks.Guarded(x, "world", () => Checks.WorldChecks(x, false));
+            Checks.Guarded(x, "clashes", () => Checks.Clashes(x, false));
             Checks.Guarded(x, "conflicts", () => Checks.Conflicts(x));
             if (!x.SameProcess)
             {
@@ -159,6 +167,7 @@ namespace VintageDoctor
             Checks.Guarded(x, "performance", () => Checks.ClientPerformance(x, false));
             Checks.Guarded(x, "hotkeys", () => Checks.Hotkeys(x, false));
             Checks.Guarded(x, "versus", () => Checks.ModsVersusServer(x, false));
+            Checks.Guarded(x, "clashes", () => Checks.Clashes(x, false));
             if (!x.Doctor.ServerAnswers) Checks.Guarded(x, "conflicts", () => Checks.Conflicts(x));
             Checks.Guarded(x, "patches", () => Checks.CodePatches(x, false));
             Checks.Guarded(x, "changes", () => Checks.Changes(x, false));
@@ -176,11 +185,13 @@ namespace VintageDoctor
                 Checks.Guarded(x, "configs", () => Checks.Configs(x, true));
                 Checks.Guarded(x, "patches", () => Checks.CodePatches(x, true));
             }
+            Checks.Guarded(x, "clashes", () => Checks.Clashes(x, true));
             if (server)
             {
                 Checks.Guarded(x, "jsonpatches", () => Checks.JsonPatchOverlaps(x));
                 Checks.Guarded(x, "world", () => Checks.WorldChecks(x, true));
             }
+            if (server || !x.Doctor.ServerAnswers) Checks.Guarded(x, "names", () => Checks.MissingNames(x));
             Checks.Guarded(x, "modchecks", () => Checks.ModChecks(x, true));
         }
 
@@ -205,6 +216,7 @@ namespace VintageDoctor
             x.Line(DoctorReport.Open(Checks.TopicStartup, "", x.T("q-startup")));
             x.Line(DoctorReport.Open(Checks.TopicLog, "", x.T("q-log")));
             x.Line(DoctorReport.Open(Checks.TopicFiles, "", x.T("q-files")));
+            x.Line(DoctorReport.Open(Checks.TopicClashes, "", x.T("q-clashes")));
             x.Line(DoctorReport.Open(Checks.TopicPatches, "", x.T("q-patches")));
             if (hasServer) x.Line(DoctorReport.Open(Checks.TopicWorld, "", x.T("q-world")));
             foreach (DoctorTopic t in x.Doctor.AllTopics()) x.Line(DoctorReport.Open(t.Id, "", x.Words(t.Question ?? t.Id)));

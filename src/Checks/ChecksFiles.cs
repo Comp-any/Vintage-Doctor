@@ -69,6 +69,14 @@ namespace VintageDoctor
                     x.Detail(Anonymise.Line(f.ModInfoError));
                     x.Explain(x.T("folder-modinfo-why"));
                 }
+                else if (f.Kind == "zip" && f.Misplaced.Count > 0)
+                {
+                    // The game's own rule: a .dll anywhere but the top of the mod (or native/), or a .cs outside src/, and it won't load the zip.
+                    x.Problem(x.T("folder-misplaced", name, string.Join(", ", f.Misplaced.Take(4)) + (f.Misplaced.Count > 4 ? ", ..." : "")));
+                    x.Explain(x.T("folder-misplaced-why"));
+                    x.Advice(x.T("folder-misplaced-advice"));
+                    if (!f.Loaded) x.FixButton("doctor:move-file", arg, x.T("btn-move-aside", name));
+                }
                 else if (f.Backslashes && !windows)
                 {
                     x.Problem(x.T("folder-backslash", name));

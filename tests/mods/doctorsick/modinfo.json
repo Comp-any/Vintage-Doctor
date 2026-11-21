@@ -3,7 +3,7 @@
   "modid": "doctorsick",
   "name": "Doctor Sick",
   "authors": [ "demonic69" ],
-  "description": "Broken on purpose: a patch that doesn't fit and a recipe that names something that doesn't exist.",
+  "description": "Broken on purpose: patches that don't fit or have nothing to change, a recipe that names something that doesn't exist, two recipes with the same ingredients, a block and an item whose code is missing, and an item file that can't be read.",
   "version": "1.0.0",
   "dependencies": { "game": "1.22.0" }
 }

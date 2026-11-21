@@ -45,6 +45,7 @@ namespace VintageDoctor
         public readonly KnownProblems Known = new KnownProblems();
         public readonly TickWatch Ticks = new TickWatch();
         public readonly TickProfile Profile = new TickProfile();
+        public readonly MemoryWatch MemoryTrend = new MemoryWatch();
         public string DataFolder { get; private set; }
         public bool IsDedicated { get; private set; }
 

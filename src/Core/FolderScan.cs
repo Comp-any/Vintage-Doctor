@@ -34,9 +34,54 @@ namespace VintageDoctor
         public int Entries;
         /// <summary>The game loaded this one.</summary>
         public bool Loaded;
+        /// <summary>Code libraries at the top of the mod ("MyMod.dll", and whatever else it brings along).</summary>
+        public List<string> Dlls = new List<string>();
+        /// <summary>The asset domains it has files for (assets/&lt;domain&gt;/...).</summary>
+        public HashSet<string> Domains = new HashSet<string>(StringComparer.Ordinal);
+        /// <summary>Files it puts into a domain that isn't its own ("game:recipes/grid/ingot.json"): replacing or adding to the game's or another mod's files. Lang files are left out (those are merged, not replaced).</summary>
+        public List<string> ForeignAssets = new List<string>();
+        /// <summary>The JSON files in its own domain ("recipes/grid/x.json"), so another mod replacing one of them can be told.</summary>
+        public HashSet<string> OwnData = new HashSet<string>(StringComparer.Ordinal);
+        /// <summary>How many block, item and entity definition files it has, by domain.</summary>
+        public Dictionary<string, int> TypeFiles = new Dictionary<string, int>(StringComparer.Ordinal);
+        /// <summary>
+        /// Code in a place the game doesn't accept: a .dll in a subfolder other than native/, or a .cs file outside
+        /// src/. The game refuses to load a zip that has one ("is not in the mod's root folder. Won't load this mod").
+        /// </summary>
+        public List<string> Misplaced = new List<string>();
+        const int MaxListed = 5000;
+
+        /// <summary>Sorts one file of the mod ("assets/game/recipes/x.json", "MyMod.dll") into the lists above. Call once the mod id is known.</summary>
+        public void Note(string name)
+        {
+            int first = name.IndexOf('/');
+            bool dll = name.EndsWith(".dll", StringComparison.OrdinalIgnoreCase), cs = name.EndsWith(".cs", StringComparison.OrdinalIgnoreCase);
+            if (first < 0)
+            {
+                if (dll) Dlls.Add(name);
+                else if (cs && Misplaced.Count < 50) Misplaced.Add(name);
+                return;
+            }
+            string top = name.Substring(0, first);
+            if ((dll && top != "native" || cs && top != "src") && Misplaced.Count < 50) Misplaced.Add(name);
+            if (!name.StartsWith("assets/", StringComparison.OrdinalIgnoreCase)) return;
+            int slash = name.IndexOf('/', 7);
+            if (slash < 0 || slash == name.Length - 1) return;
+            string domain = name.Substring(7, slash - 7).ToLowerInvariant();
+            string path = name.Substring(slash + 1).ToLowerInvariant();
+            if (path.EndsWith("/", StringComparison.Ordinal)) return;
+            Domains.Add(domain);
+            bool json = path.EndsWith(".json", StringComparison.Ordinal);
+            if (json && (path.StartsWith("blocktypes/", StringComparison.Ordinal) || path.StartsWith("itemtypes/", StringComparison.Ordinal) || path.StartsWith("entities/", StringComparison.Ordinal)))
+                TypeFiles[domain] = TypeFiles.TryGetValue(domain, out int n) ? n + 1 : 1;
+            if (path.StartsWith("lang/", StringComparison.Ordinal)) return;
+            bool own = string.Equals(domain, ModId, StringComparison.OrdinalIgnoreCase);
+            if (own) { if (json && OwnData.Count < MaxListed) OwnData.Add(path); }
+            else if (ForeignAssets.Count < MaxListed) ForeignAssets.Add(domain + ":" + path);
+        }
 
         public bool Broken => ReadError != null || ModInfoError != null || NoModInfo || NestedFolder != null || InnerZip != null
-            || Kind == "archive" || Kind == "partial" || (Backslashes && System.IO.Path.DirectorySeparatorChar != '\\');
+            || Kind == "archive" || Kind == "partial" || (Backslashes && System.IO.Path.DirectorySeparatorChar != '\\') || (Kind == "zip" && Misplaced.Count > 0);
     }
 
     /// <summary>What is in the folders the game loads mods from.</summary>
@@ -106,7 +151,11 @@ namespace VintageDoctor
                     f.Kind = "folder";
                     f.Modified = Directory.GetLastWriteTime(path);
                     string info = Directory.GetFiles(path).FirstOrDefault(p => string.Equals(System.IO.Path.GetFileName(p), "modinfo.json", StringComparison.OrdinalIgnoreCase));
-                    if (info != null) ReadModInfo(f, File.ReadAllText(info));
+                    if (info != null)
+                    {
+                        ReadModInfo(f, File.ReadAllText(info));
+                        NoteFolder(f, path);
+                    }
                     else
                     {
                         // A folder the game will try to load as a mod and complain about; an empty or unrelated one is left alone.
@@ -143,6 +192,24 @@ namespace VintageDoctor
             }
         }
 
+        /// <summary>What a mod kept as a folder has in it: its DLLs and its asset files.</summary>
+        static void NoteFolder(ModFile f, string path)
+        {
+            try
+            {
+                foreach (string dll in Directory.GetFiles(path, "*.dll")) f.Note(System.IO.Path.GetFileName(dll));
+                string assets = System.IO.Path.Combine(path, "assets");
+                if (!Directory.Exists(assets)) return;
+                int seen = 0;
+                foreach (string file in Directory.EnumerateFiles(assets, "*", SearchOption.AllDirectories))
+                {
+                    if (++seen > 20000) break;
+                    f.Note("assets/" + System.IO.Path.GetRelativePath(assets, file).Replace('\\', '/'));
+                }
+            }
+            catch { }
+        }
+
         static void ReadZip(ModFile f)
         {
             try
@@ -175,6 +242,13 @@ namespace VintageDoctor
                     }
                     else if (files.Count == 1 && files[0].EndsWith(".zip", StringComparison.OrdinalIgnoreCase)) f.InnerZip = files[0];
                     else f.NoModInfo = true;
+                }
+                // What it brings: counted from where the mod really starts (inside its outer folder, if it has one).
+                string prefix = f.NestedFolder == null ? "" : f.NestedFolder + "/";
+                foreach (string n in names)
+                {
+                    if (prefix.Length > 0 && !n.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)) continue;
+                    f.Note(n.Substring(prefix.Length));
                 }
                 bool project = names.Any(n => n.EndsWith(".csproj", StringComparison.OrdinalIgnoreCase) || n.EndsWith(".sln", StringComparison.OrdinalIgnoreCase));
                 bool built = names.Any(n => n.EndsWith(".dll", StringComparison.OrdinalIgnoreCase));
@@ -216,7 +290,7 @@ namespace VintageDoctor
         /// outer folder taken away so modinfo.json sits at the top. The original is moved to
         /// <paramref name="backupFolder"/> first. Returns the number of entries changed.
         /// </summary>
-        public static int Repack(string zipPath, string backupFolder, out string backupPath)
+        public static int Repack(string zipPath, string backupFolder, out string backupPath, Predicate<string> drop = null)
         {
             ModFile before = Look(zipPath);
             if (before == null || before.Kind != "zip" || before.ReadError != null) throw new InvalidOperationException("not a zip the doctor can read");
@@ -238,6 +312,7 @@ namespace VintageDoctor
                     }
                     if (name != e.FullName) changed++;
                     if (name.Length == 0 || name.EndsWith("/", StringComparison.Ordinal) || !seen.Add(name)) continue;
+                    if (drop != null && drop(name)) { changed++; continue; }
                     ZipArchiveEntry copy = dst.CreateEntry(name, CompressionLevel.Optimal);
                     copy.LastWriteTime = e.LastWriteTime;
                     using Stream from = e.Open();

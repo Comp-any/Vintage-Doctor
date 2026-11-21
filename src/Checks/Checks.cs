@@ -35,12 +35,19 @@ namespace VintageDoctor
         static string WhyKey(string m)
         {
             if (m.Length == 0) return null;
-            if (m.Contains("assembly with same name is already loaded")) return "why-sameassembly";
+            if (m.Contains("assembly with same name is already loaded") || m.Contains("already loaded and cannot be reloaded")) return "why-sameassembly";
             if (m.Contains("could not load file or assembly")) return "why-missingassembly";
             if (m.Contains("method not found") || m.Contains("missingmethodexception") || m.Contains("field not found") || m.Contains("missingfieldexception")
                 || m.Contains("could not load type") || m.Contains("typeloadexception") || m.Contains("does not have an implementation") || m.Contains("missingmemberexception")
                 || m.Contains("entry point was not found") || m.Contains("typeinitializationexception")) return "why-version";
-            if (m.Contains("harmonyexception") || m.Contains("patching exception") || m.Contains("il compile error")) return "why-harmony";
+            if (m.Contains("found multiple .dll files with modsystems") || m.Contains("there are no .dll files that contain at least one modsystem")
+                || m.Contains("found both .cs and .dll files")) return "why-packaging";
+            if (m.Contains("dllnotfoundexception") || m.Contains("unable to load shared library") || m.Contains("unable to load dll")) return "why-native";
+            if (m.Contains("badimageformatexception") || m.Contains("bad il format") || m.Contains("is not a valid") && m.Contains("assembly")) return "why-badimage";
+            if (m.Contains("harmonyexception") || m.Contains("patching exception") || m.Contains("il compile error") || m.Contains("invalidprogramexception")
+                || m.Contains("detected an invalid program")) return "why-harmony";
+            if (m.Contains("already registered") || m.Contains("already been registered") || m.Contains("has already been added")
+                || m.Contains("duplicate key")) return "why-duplicate";
             if (m.Contains("index (zero based) must be greater than or equal to zero and less than the size of the argument list")) return "why-format";
             if (m.Contains("jsonreaderexception") || m.Contains("jsonserializationexception") || m.Contains("unexpected character encountered while parsing")
                 || m.Contains("error converting value") || m.Contains("unterminated string") || m.Contains("after parsing a value an unexpected character")
@@ -307,6 +314,7 @@ namespace VintageDoctor
             if (f.NestedFolder != null) return f.SourceCode ? x.T("reason-source") : x.T("reason-nested", f.NestedFolder);
             if (f.NoModInfo) return f.SourceCode ? x.T("reason-source") : x.T("reason-nomodinfo");
             if (f.ModInfoError != null) return x.T("reason-modinfo");
+            if (f.Kind == "zip" && f.Misplaced.Count > 0) return x.T("reason-misplaced", f.Misplaced[0]);
             return null;
         }
 

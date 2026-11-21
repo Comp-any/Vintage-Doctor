@@ -152,10 +152,11 @@ jobs:
         run: |
           set +e
           data="$PWD/data-sick"
-          python3 tools/ci_sick_server.py "$data"
+          mkdir -p "$data/Mods"
           cp "results/vintagedoctor_${VERSION}.zip" "$data/Mods/"
           cp -r tests/mods/DoctorCrashy/bin/Release/doctorcrashy "$data/Mods/"
           cp -r tests/mods/doctorsick "$data/Mods/"
+          python3 tools/ci_sick_server.py "$data" "$VSDIR"
           ls -la "$data/Mods" | tee results/sick-mods.txt
           cd "$VSDIR"
           dotnet VintagestoryServer.dll --dataPath "$data" > "$GITHUB_WORKSPACE/results/sick-server-console.log" 2>&1 &

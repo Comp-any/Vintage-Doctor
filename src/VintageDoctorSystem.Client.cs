@@ -44,7 +44,7 @@ namespace VintageDoctor
             clientChannel.SetMessageHandler<DoctorReportPacket>(OnServerReport);
             clientChannel.SetMessageHandler<DoctorOpenPacket>(p => OpenDoctor(p?.Topic ?? "", p?.Arg ?? ""));
             BeginSession();
-            api.Event.RegisterGameTickListener(_ => { Ticks.Tick(); if (Profile.Running) Profile.Tick(); }, 1);
+            api.Event.RegisterGameTickListener(_ => { Ticks.Tick(); MemoryTrend.Tick(); if (Profile.Running) Profile.Tick(); }, 1);
             Profile.OnFinished = _ => { if (dialog != null && dialog.IsOpened()) OpenDoctor(Checks.TopicPerf, ""); };
 
             api.Input.RegisterHotKey(Hotkey, Lang.Get("vintagedoctor:hotkey"), GlKeys.D, HotkeyType.GUIOrOtherControls, ctrlPressed: true, shiftPressed: true);

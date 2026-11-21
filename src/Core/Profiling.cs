@@ -64,6 +64,50 @@ namespace VintageDoctor
         public double MinutesRunning => watch.ElapsedMilliseconds / 60000.0;
     }
 
+    /// <summary>How much memory the game holds, noted once a minute, to tell "uses a lot" from "keeps growing".</summary>
+    public sealed class MemoryWatch
+    {
+        readonly Stopwatch watch = Stopwatch.StartNew();
+        readonly List<(long ms, long bytes)> samples = new List<(long, long)>();
+        long next;
+
+        public void Tick()
+        {
+            long now = watch.ElapsedMilliseconds;
+            if (now < next) return;
+            next = now + 60000;
+            try
+            {
+                using Process p = Process.GetCurrentProcess();
+                samples.Add((now, p.WorkingSet64));
+                if (samples.Count > 240) samples.RemoveAt(0);
+            }
+            catch { }
+        }
+
+        /// <summary>For the self-test: a sample as if taken some minutes ago.</summary>
+        public void Add(double minutesAgo, long bytes)
+        {
+            samples.Add((watch.ElapsedMilliseconds - (long)(minutesAgo * 60000), bytes));
+            samples.Sort((a, b) => a.ms.CompareTo(b.ms));
+        }
+
+        public void Clear() => samples.Clear();
+
+        /// <summary>Over the last hour (or as long as is known): how many minutes, and the memory held then and now. Null with too little to go on.</summary>
+        public (double minutes, long was, long now)? Trend()
+        {
+            if (samples.Count < 6) return null;
+            long newest = samples[samples.Count - 1].ms;
+            var recent = samples.Where(s => s.ms >= newest - 60 * 60000L).ToList();
+            if (recent.Count < 6) return null;
+            // The middle of the first three and of the last three, so one odd reading doesn't decide it.
+            long was = recent.Take(3).Select(s => s.bytes).OrderBy(b => b).ElementAt(1);
+            long now = recent.Skip(recent.Count - 3).Select(s => s.bytes).OrderBy(b => b).ElementAt(1);
+            return ((newest - recent[0].ms) / 60000.0, was, now);
+        }
+    }
+
     /// <summary>
     /// Where the game's time goes, measured with the game's own tick profiler (the one behind /debug logticks): the
     /// doctor switches it on for a few seconds, adds up every tick's breakdown, and switches it back. The profiler

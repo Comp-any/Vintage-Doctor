@@ -34,7 +34,8 @@ is shown to its admins only.
 | **The Mods folder** | Zips that can't be opened, mods zipped inside a folder or inside another zip, zips with `\` in their file names (nothing in them loads on Linux and Mac), source code downloaded instead of a release, `.rar` and `.7z` files, downloads that didn't finish, mods made for a newer game. |
 | **Config files** | Files in `ModConfig` that are empty or no longer valid JSON, and whose they are. |
 | **Lag** | The server's tick times, your frame rate, what's loaded, memory. **Measure where the time goes** runs the game's own profiler for 20 seconds and shows the time by part of the game and by mod. |
-| **Mods against each other** | Which mods change the game's code and where two change the same place; JSON patches from different mods on the same thing; mods that say they clash; your mods' versions against the server's. |
+| **Mods against each other** | Which mods change the game's code and where two change the same place; JSON patches from different mods on the same thing; files that two mods both replace (only one copy is used); recipes with the same ingredients that make different things; the same code library in two mods; mods that say they clash; your mods' versions against the server's. |
+| **Mods against themselves** | Blocks and items that name code no loaded mod has (they exist but do nothing); block and item files the game couldn't read; a mod whose blocks and items never arrived; code in a mod that calls itself a content mod (the game leaves it out); a `.dll` in a subfolder (the game refuses the mod); patches for files that are no longer there; mods that ship whole copies of the game's files from an older version; mods with their own copy of a library the game has; mods with code made for an older game that have errors now; things that show a code instead of a name. |
 | **The world** | Free disk space where it is saved; blocks and items left by mods that are gone; time running at another pace. |
 | **One thing** | A page for any mod (`/doctor mod carryon`), for the item you hold or the block you look at, and for why something can't be crafted (a recipe only for another class, say). |
 | **What changed** | Mods added, updated and removed since last time, and which of them have errors now. |
@@ -44,6 +45,7 @@ is shown to its admins only.
 
 - Repack a mod zip the right way (`\` in file names, or the mod one folder down).
 - Take a mod out of a zip-inside-a-zip.
+- Take a library the game already has out of a mod that brought its own copy.
 - Move spare copies of a mod, files that aren't mods and broken downloads out of the Mods folder.
 - Move a broken or outdated config file aside so the mod writes a fresh one.
 - Switch a mod off from the next start.
@@ -58,7 +60,7 @@ you can put them back.
 
 `/doctor` opens the check-up. Every page is a command too, which is how it works from a server's console:
 
-`/doctor crash`, `perf`, `mods`, `mod <mod id>`, `log [mod id]`, `startup`, `files`, `patches`, `changes`, `world`,
+`/doctor crash`, `perf`, `mods`, `mod <mod id>`, `log [mod id]`, `startup`, `files`, `patches`, `clashes`, `changes`, `world`,
 `item [code]`, `block`, `craft [code]`, `hotkeys`, `deep`, `bugreport [mod id]`, `api`
 
 `/doctor fix <id> [argument]` does a fix; each fix's command is shown next to it in the console's output.

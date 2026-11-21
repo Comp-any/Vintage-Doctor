@@ -27,7 +27,7 @@ namespace VintageDoctor
             serverChannel = api.Network.GetChannel(Channel);
             serverChannel.SetMessageHandler<DoctorRequestPacket>(OnRequest);
             BeginSession();
-            api.Event.RegisterGameTickListener(_ => { Ticks.Tick(); if (Profile.Running) Profile.Tick(); }, 1);
+            api.Event.RegisterGameTickListener(_ => { Ticks.Tick(); MemoryTrend.Tick(); if (Profile.Running) Profile.Tick(); }, 1);
             Profile.OnFinished = _ => OnProfileFinished();
             RegisterCommand(api);
             api.Event.PlayerDisconnect += p => { lock (gate) clientsWithDoctor.Remove(p.PlayerUID); };

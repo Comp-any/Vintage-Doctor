@@ -1,0 +1,4 @@
+[
+  { "op": "replace", "path": "/x", "value": 1, "file": "game:itemtypes/doctor-no-such-file.json" },
+  { "op": "replace", "path": "/x", "value": 1, "file": "doctornosuchmod:itemtypes/thing.json" }
+]

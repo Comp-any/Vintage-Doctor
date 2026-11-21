@@ -285,8 +285,9 @@ namespace VintageDoctor
                 }
             }
 
-            // What it adds to the game.
+            // What it adds to the game, and what of the game's and other mods' it replaces.
             Content(x, m);
+            Guarded(x, "mod files", () => ModFiles(x, m));
             // Its config files.
             if (x.Ev.Configs != null)
             {
