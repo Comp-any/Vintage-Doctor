@@ -230,6 +230,11 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             r.Add(DoctorReport.ProblemMark + " bad " + DoctorReport.Fix('s', "doctor:x", "a|b{c}", "Do it"), DoctorLineStyle.Check);
             t.Check("a card that is under two mods counts once", r.Problems == 1);
 
+            t.Check("check-up: a card is filed under the mods its words name: a name as whole words, a log tag, a file of the mod's, and for a mod that wasn't loaded its bare id",
+                Pages.Names("Carry On can't lift this", "carryon", "Carry On", true) && !Pages.Names("Carry Onwards", "carryon", "Carry On", true) && Pages.Names("[Error] [carryon] oops", "carryon", "Carry On", true)
+                && Pages.Names("in carryon:patches/x.json", "carryon", "Carry On", true) && !Pages.Names("a carryon bag", "carryon", "Carry On", true) && Pages.Names("left out: configlib (needs vsimgui)", "configlib", null, false)
+                && !Pages.Names("the Map is fine", "map", "Map", true));
+
             // The game's font can't be counted on for symbols: what is handed to it to draw has them written out.
             string marks = DoctorReport.OkMark + " fine\n" + DoctorReport.WarnMark + "\uFE0F careful\n" + DoctorReport.ProblemMark + " broken\n" + DoctorReport.InfoMark + " to know\n  " + DoctorReport.AdviceMark + " do this";
             string drawn = GameFont.Drawable(marks);

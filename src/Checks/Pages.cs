@@ -208,7 +208,15 @@ namespace VintageDoctor
         /// </summary>
         static void BySection(DoctorContext x)
         {
-            List<ModEntry> mods = (x.Ev?.Mods?.UserMods ?? Enumerable.Empty<ModEntry>()).ToList();
+            // The mods a card's words may name: the loaded ones, and the ones in the Mods folder that the game didn't
+            // load (a mod left out for a missing requirement is exactly one to have a section for).
+            var mods = new List<(string id, string name, bool loaded)>();
+            foreach (ModEntry m in x.Ev?.Mods?.UserMods ?? Enumerable.Empty<ModEntry>()) mods.Add((m.Id, m.Name, true));
+            foreach (ModFile f in x.Ev?.Folder?.Files ?? Enumerable.Empty<ModFile>())
+            {
+                if (string.IsNullOrEmpty(f.ModId) || x.Ev.Mods?.Get(f.ModId) != null || ModSnapshot.IsGameMod(f.ModId)) continue;
+                if (!mods.Any(known => string.Equals(known.id, f.ModId, StringComparison.OrdinalIgnoreCase))) mods.Add((f.ModId.ToLowerInvariant(), f.ModName, false));
+            }
             List<DoctorLine> lines = x.R.Lines.ToList();
             var kept = new List<DoctorLine>();
             bool sideHeading = false;
@@ -237,7 +245,7 @@ namespace VintageDoctor
         }
 
         /// <summary>The mods a card is about: the ones it was tagged with, the ones its buttons lead to, and the ones its words name.</summary>
-        static List<string> SectionsOf(DoctorContext x, List<DoctorLine> lines, int from, int to, List<ModEntry> mods)
+        static List<string> SectionsOf(DoctorContext x, List<DoctorLine> lines, int from, int to, List<(string id, string name, bool loaded)> mods)
         {
             var found = new List<string>();
             void Add(string id)
@@ -267,9 +275,9 @@ namespace VintageDoctor
                 }
             }
             string all = words.ToString();
-            foreach (ModEntry m in mods)
+            foreach (var (id, name, loaded) in mods)
             {
-                if (!found.Contains(m.Id) && Names(all, m)) Add(m.Id);
+                if (!found.Contains(id) && Names(all, id, name, loaded)) Add(id);
             }
             if (found.Count == 0 || found.Count > MostModsOnACard) return new List<string> { DoctorReport.GameSection };
             return found;
@@ -278,14 +286,17 @@ namespace VintageDoctor
         /// <summary>
         /// Whether a text names a mod: its name as whole words, its tag in a log line ("[modid]"), or one of its files
         /// ("modid:path"). A name of three letters or fewer is too easily a word of its own, so only the id counts then.
+        /// A mod the game didn't load is spoken of by its id (the game knows nothing else of it), so the bare id
+        /// counts for those.
         /// </summary>
-        public static bool Names(string text, ModEntry m)
+        public static bool Names(string text, string id, string name, bool loaded)
         {
-            if (string.IsNullOrEmpty(text) || m == null) return false;
-            if (!string.IsNullOrEmpty(m.Name) && m.Name.Length >= 4 && WholeWord(text, m.Name, 0, false)) return true;
-            if (string.IsNullOrEmpty(m.Id)) return false;
-            if (text.IndexOf("[" + m.Id + "]", StringComparison.OrdinalIgnoreCase) >= 0) return true;
-            return WholeWord(text, m.Id + ":", 0, true);
+            if (string.IsNullOrEmpty(text)) return false;
+            if (!string.IsNullOrEmpty(name) && name.Length >= 4 && WholeWord(text, name, 0, false)) return true;
+            if (string.IsNullOrEmpty(id)) return false;
+            if (text.IndexOf("[" + id + "]", StringComparison.OrdinalIgnoreCase) >= 0) return true;
+            if (WholeWord(text, id + ":", 0, true)) return true;
+            return !loaded && id.Length >= 4 && WholeWord(text, id, 0, false);
         }
 
         /// <summary>Finds <paramref name="word"/> where no letter or digit touches it (only its start is looked at when <paramref name="startOnly"/>).</summary>
