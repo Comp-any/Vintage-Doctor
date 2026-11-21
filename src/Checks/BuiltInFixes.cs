@@ -23,7 +23,7 @@ namespace VintageDoctor
     {
         public static void Register(VintageDoctorSystem doctor, ICoreAPI api)
         {
-            void Add(string id, Func<DoctorFixContext, string> apply) => doctor.RegisterFix(new DoctorFix(DoctorApi.ModId, id, ctx => apply((DoctorFixContext)ctx)));
+            void Add(string id, System.Func<DoctorFixContext, string> apply) => doctor.RegisterFix(new DoctorFix(DoctorApi.ModId, id, ctx => apply((DoctorFixContext)ctx)));
             Add("doctor:reset-config", ResetConfig);
             Add("doctor:repack", Repack);
             Add("doctor:move-file", MoveFile);

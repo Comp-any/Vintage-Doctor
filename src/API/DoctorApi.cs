@@ -85,10 +85,10 @@ namespace VintageDoctor.API
         /// <see cref="IDoctorFixContext.Failed"/> when it didn't work. On the server it only runs for players allowed
         /// to see the server's report (admins by default) and for the console.
         /// </summary>
-        public Func<IDoctorFixContext, string> Apply;
+        public System.Func<IDoctorFixContext, string> Apply;
 
         public DoctorFix() { }
-        public DoctorFix(string modId, string id, Func<IDoctorFixContext, string> apply) { ModId = modId; Id = id; Apply = apply; }
+        public DoctorFix(string modId, string id, System.Func<IDoctorFixContext, string> apply) { ModId = modId; Id = id; Apply = apply; }
     }
 
     /// <summary>A page of your own in the doctor.</summary>
