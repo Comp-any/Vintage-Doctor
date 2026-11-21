@@ -1,0 +1,9 @@
+{
+  "type": "content",
+  "modid": "doctorexamplejson",
+  "name": "Doctor Example (JSON)",
+  "authors": [ "demonic69" ],
+  "description": "Shows how a mod without any code tells Vintage Doctor about its known problems. Only for trying the API out.",
+  "version": "1.0.0",
+  "dependencies": { "game": "1.22.0" }
+}

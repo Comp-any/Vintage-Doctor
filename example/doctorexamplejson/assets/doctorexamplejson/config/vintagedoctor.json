@@ -1,0 +1,30 @@
+{
+  "knownProblems": [
+    {
+      "id": "pump-jammed",
+      "mod": "doctorexample",
+      "match": "pump \\d+ jammed",
+      "regex": true,
+      "side": "server",
+      "level": "warning",
+      "title": "An example pump jammed",
+      "explain": "This line in the log comes from the example mod; the JSON example mod knows what it means.",
+      "advice": "Nothing to do: it is only an example.",
+      "fix": { "type": "resetConfig", "file": "doctorexample.json", "label": "Start the example's config afresh" }
+    },
+    {
+      "id": "more-about-it",
+      "match": "this never appears in a log",
+      "level": "problem",
+      "title": "Never shown",
+      "fix": { "type": "url", "url": "https://github.com/Comp-any/Vintage-Doctor/blob/main/docs/api.md", "label": "Read about it" }
+    }
+  ],
+  "conflicts": [
+    { "with": "doctorexample", "level": "info", "why": "Nothing is really wrong: the two example mods say they clash so the doctor has a clash to show." }
+  ],
+  "recommends": [
+    { "mod": "doctorexamplemissing", "why": "A mod that doesn't exist, so the recommendation shows." }
+  ],
+  "configFiles": [ "doctorexample.json" ]
+}

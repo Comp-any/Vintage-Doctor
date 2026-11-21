@@ -1,0 +1,226 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Vintagestory.API.Common;
+using Vintagestory.API.Config;
+using Vintagestory.API.MathTools;
+using Vintagestory.API.Server;
+
+namespace VintageDoctor
+{
+    public partial class VintageDoctorSystem
+    {
+        ICoreServerAPI sapi;
+        IServerNetworkChannel serverChannel;
+        /// <summary>Players whose game has the doctor too (it says hello when it joins), so /doctor can open their window.</summary>
+        readonly HashSet<string> clientsWithDoctor = new HashSet<string>(StringComparer.Ordinal);
+        /// <summary>What the check-up found right after start-up, for the log line and the note to admins.</summary>
+        public int StartupProblems { get; private set; } = -1;
+        public int StartupWarnings { get; private set; }
+        string profileAsker;
+
+        public override void StartServerSide(ICoreServerAPI api)
+        {
+            sapi = api;
+            this.api = api;
+            IsDedicated = api.Server.IsDedicated;
+            serverChannel = api.Network.GetChannel(Channel);
+            serverChannel.SetMessageHandler<DoctorRequestPacket>(OnRequest);
+            BeginSession();
+            api.Event.RegisterGameTickListener(_ => { Ticks.Tick(); if (Profile.Running) Profile.Tick(); }, 1);
+            Profile.OnFinished = _ => OnProfileFinished();
+            RegisterCommand(api);
+            api.Event.PlayerDisconnect += p => { lock (gate) clientsWithDoctor.Remove(p.PlayerUID); };
+            api.Event.PlayerNowPlaying += OnPlayerNowPlaying;
+            api.Event.ServerRunPhase(EnumServerRunPhase.RunGame, () =>
+            {
+                // A few seconds in, so the log holds the whole start-up.
+                api.Event.RegisterCallback(_ => StartupScan(), 4000);
+            });
+        }
+
+        void StartupScan()
+        {
+            if (!Config.ScanAtStartup && !Config.SelfTestOnStart) return;
+            WithEvidence(true, ev =>
+            {
+                try
+                {
+                    DoctorReport r = BuildPage(ev, null, "en", Pages.Overview, "");
+                    StartupProblems = r.Problems;
+                    StartupWarnings = r.Warnings;
+                    SaveText("startup-checkup.txt", r.PlainText(sapi.World));
+                    if (Config.ScanAtStartup)
+                    {
+                        if (StartupProblems + StartupWarnings == 0) sapi.Logger.Notification("[vintagedoctor] Check-up after start-up: nothing wrong ({0} ms to read the logs and folders).", ev.ReadMilliseconds);
+                        else sapi.Logger.Notification("[vintagedoctor] Check-up after start-up: {0} problem(s), {1} warning(s). Type /doctor to see them.", StartupProblems, StartupWarnings);
+                    }
+                }
+                catch (Exception e) { sapi.Logger.Warning("[vintagedoctor] The check-up after start-up failed: {0}", e); }
+                if (Config.SelfTestOnStart)
+                {
+                    try { SelfTest.Run(this, sapi); }
+                    catch (Exception e) { sapi.Logger.Error("[vintagedoctor] The self-test failed to run: {0}", e); }
+                }
+            });
+        }
+
+        bool MaySeeServer(IServerPlayer player) => player != null && player.HasPrivilege(Config.ServerReportPrivilege);
+
+        void OnPlayerNowPlaying(IServerPlayer player)
+        {
+            if (!Config.TellAdminsOnJoin || !MaySeeServer(player)) return;
+            sapi.Event.RegisterCallback(_ =>
+            {
+                try
+                {
+                    if (player.ConnectionState != EnumClientState.Playing) return;
+                    string lang = player.LanguageCode;
+                    var parts = new List<string>();
+                    if (NewCrashThisSession) parts.Add(Lang.GetL(lang, "vintagedoctor:join-crash"));
+                    else if (PreviousUnclean) parts.Add(Lang.GetL(lang, "vintagedoctor:join-unclean"));
+                    if (StartupProblems > 0) parts.Add(Lang.GetL(lang, "vintagedoctor:join-problems", StartupProblems, StartupWarnings));
+                    if (parts.Count == 0) return;
+                    player.SendMessage(GlobalConstants.GeneralChatGroup, Lang.GetL(lang, "vintagedoctor:join-prefix") + " " + string.Join(" ", parts) + " " + Lang.GetL(lang, "vintagedoctor:join-how"), EnumChatType.Notification);
+                }
+                catch (Exception e) { sapi.Logger.Warning("[vintagedoctor] Could not tell {0} about the check-up: {1}", player?.PlayerName, e.Message); }
+            }, 9000);
+        }
+
+        // ---------------------------------------------------------------- requests from players' windows
+
+        void OnRequest(IServerPlayer player, DoctorRequestPacket p)
+        {
+            if (p == null || player == null) return;
+            try
+            {
+                if (p.Topic == "hello") { lock (gate) clientsWithDoctor.Add(player.PlayerUID); return; }
+                lock (gate) clientsWithDoctor.Add(player.PlayerUID);
+                if (!MaySeeServer(player))
+                {
+                    serverChannel.SendPacket(new DoctorReportPacket { Id = p.Id, Denied = true, Key = (p.Topic ?? "") + "|" + (p.Arg ?? ""), ServerVersion = DoctorVersion }, player);
+                    return;
+                }
+                ItemStack held = null;
+                if (p.HeldStack != null && p.HeldStack.Length > 0)
+                {
+                    try { held = new ItemStack(p.HeldStack); if (!held.ResolveBlockOrItem(sapi.World)) held = null; } catch { held = null; }
+                }
+                held ??= player.InventoryManager?.ActiveHotbarSlot?.Itemstack;
+                BlockPos looked = p.HasLookedAt ? new BlockPos(p.LookedAtX, p.LookedAtY, p.LookedAtZ, p.LookedAtDim) : null;
+                string lang = player.LanguageCode;
+                bool hasFix = !string.IsNullOrEmpty(p.FixId);
+
+                void Answer(Evidence ev, string outcome)
+                {
+                    string label = Lang.GetL(lang, p.SameProcess ? "vintagedoctor:side-world" : "vintagedoctor:side-server");
+                    DoctorReport r = BuildPage(ev, player, lang, p.Topic, p.Arg, held, looked, p.SameProcess, label);
+                    r.File = SaveText("last-report-server.txt", r.PlainText(sapi.World));
+                    DoctorReportPacket packet = r.ToPacket(p.Id);
+                    packet.Outcome = outcome ?? "";
+                    packet.ServerVersion = DoctorVersion;
+                    packet.ServerMods = ev.Mods.UserMods.Select(m => m.Key).ToArray();
+                    packet.ServerTopics = AllTopics().Select(t => t.Id + "|" + (t.Question ?? t.Id)).ToArray();
+                    serverChannel.SendPacket(packet, player);
+                }
+
+                if (hasFix)
+                {
+                    WithEvidence(false, ev =>
+                    {
+                        if (p.FixId == "doctor:profile") profileAsker = player.PlayerUID;
+                        string outcome = RunFix(p.FixId, p.FixArg, player, lang, ev);
+                        // What was read may no longer be true after a fix.
+                        WithEvidence(true, fresh => Answer(fresh, outcome));
+                    });
+                    return;
+                }
+                WithEvidence(p.Fresh, ev => Answer(ev, null));
+            }
+            catch (Exception e)
+            {
+                sapi.Logger.Error("[vintagedoctor] A request from {0} failed: {1}", player.PlayerName, e);
+            }
+        }
+
+        void OnProfileFinished()
+        {
+            if (sapi == null) return;
+            string uid = profileAsker;
+            profileAsker = null;
+            if (uid == null) return;
+            try
+            {
+                var player = sapi.World.PlayerByUid(uid) as IServerPlayer;
+                bool has;
+                lock (gate) has = clientsWithDoctor.Contains(uid);
+                if (player != null && has && player.ConnectionState == EnumClientState.Playing) serverChannel.SendPacket(new DoctorOpenPacket { Topic = Checks.TopicPerf, Arg = "" }, player);
+            }
+            catch { }
+        }
+
+        // ---------------------------------------------------------------- /doctor
+
+        void RegisterCommand(ICoreServerAPI api)
+        {
+            var parsers = api.ChatCommands.Parsers;
+            api.ChatCommands.Create("doctor")
+                .WithDescription("Vintage Doctor: find out what's wrong with the game and its mods. /doctor opens the check-up; /doctor crash, perf, mods, mod <id>, log, files, world... open one page; /doctor fix <id> [argument] does a fix.")
+                .RequiresPrivilege(Privilege.chat)
+                .WithArgs(parsers.OptionalWord("page"), parsers.OptionalAll("what"))
+                .HandleWith(OnCommand);
+        }
+
+        TextCommandResult OnCommand(TextCommandCallingArgs args)
+        {
+            string topic = (args[0] as string ?? "").Trim();
+            string arg = (args[1] as string ?? "").Trim();
+            string lang = args.LanguageCode ?? "en";
+            try
+            {
+                var player = args.Caller?.Player as IServerPlayer;
+                if (player != null)
+                {
+                    bool has;
+                    lock (gate) has = clientsWithDoctor.Contains(player.PlayerUID);
+                    if (has && !topic.Equals("fix", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // The player's game asks back with its own half (its log, its settings), and shows the window.
+                        serverChannel.SendPacket(new DoctorOpenPacket { Topic = topic, Arg = arg }, player);
+                        return TextCommandResult.Success(Lang.GetL(lang, "vintagedoctor:cmd-opening"));
+                    }
+                    if (!MaySeeServer(player)) return TextCommandResult.Error(Lang.GetL(lang, "vintagedoctor:cmd-noprivilege", Config.ServerReportPrivilege));
+                }
+                if (topic.Equals("selftest", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (player != null && !MaySeeServer(player)) return TextCommandResult.Error(Lang.GetL(lang, "vintagedoctor:cmd-noprivilege", Config.ServerReportPrivilege));
+                    return TextCommandResult.Success(SelfTest.Run(this, sapi));
+                }
+                Evidence ev = EvidenceNow(true);
+                if (topic.Equals("fix", StringComparison.OrdinalIgnoreCase))
+                {
+                    string[] parts = arg.Split(new[] { ' ' }, 2);
+                    if (parts[0].Length == 0) return TextCommandResult.Error(Lang.GetL(lang, "vintagedoctor:cmd-fix-usage"));
+                    string outcome = RunFix(parts[0], parts.Length > 1 ? parts[1] : "", player, lang, ev);
+                    ForgetEvidence();
+                    return outcome.StartsWith(DoctorReport.WarnMark, StringComparison.Ordinal) ? TextCommandResult.Error(ChatSafe(outcome)) : TextCommandResult.Success(ChatSafe(outcome));
+                }
+                var x = new DoctorContext { Doctor = this, Api = sapi, Side = EnumAppSide.Server, Player = player, LanguageCode = lang, Topic = topic, Argument = arg, Ev = ev, HeldItem = player?.InventoryManager?.ActiveHotbarSlot?.Itemstack };
+                Pages.Build(x);
+                if (x.Topic == Pages.Overview) Pages.Questions(x, null, true, false);
+                string text = x.R.PlainText(sapi.World);
+                string file = SaveText("last-report-server.txt", text);
+                if (file != null) text += "\n" + Lang.GetL(lang, "vintagedoctor:cmd-saved", Anonymise.Short(file));
+                return TextCommandResult.Success(player != null ? ChatSafe(text) : text);
+            }
+            catch (Exception e)
+            {
+                sapi.Logger.Error("[vintagedoctor] /doctor failed: {0}", e);
+                return TextCommandResult.Error("/doctor failed: " + e.Message + " (the server log has the details)");
+            }
+        }
+
+        /// <summary>Chat reads &lt; and &gt; as markup: they are written out so a stack trace doesn't break the message.</summary>
+        static string ChatSafe(string text) => (text ?? "").Replace("<", "&lt;").Replace(">", "&gt;");
+    }
+}

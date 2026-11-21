@@ -1,0 +1,201 @@
+name: Build and test on a real server
+
+# Downloads the real Vintage Story server, compiles the mod against the game's own DLLs, starts a fresh world with
+# the mod, its two example mods and a few real mods, and lets the mod examine itself (its self-test: made-up logs,
+# crash reports, Mods folders and config files with known faults, every page built from the server's own logs, the
+# API used the way another mod would). The results, the pages as text and the zip are pushed to a results branch,
+# because a session can't read job logs. With release=true (on main, after the tests pass) the zip is published
+# as the GitHub release v<version>.
+on:
+  push:
+    branches:
+      - main
+      - "work/**"
+      - "ci/**"
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: Publish the zip as a GitHub release (v<version from modinfo.json>)
+        type: boolean
+        default: false
+      gameVersion:
+        description: Vintage Story version
+        default: "1.22.7"
+      extraMods:
+        description: Other mods to run alongside, as Mod DB mod ids (comma-separated)
+        default: "carryon,configlib,primitivesurvival"
+      resultsBranch:
+        description: Branch the results are pushed to (default ci-results-<branch>)
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      VS_VERSION: ${{ inputs.gameVersion || '1.22.7' }}
+      EXTRA_MODS: ${{ github.event_name == 'workflow_dispatch' && inputs.extraMods || 'carryon,configlib,primitivesurvival' }}
+      RESULTS_BRANCH: ${{ inputs.resultsBranch }}
+      RELEASE: ${{ inputs.release && 'true' || 'false' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Check the texts and the JSON files
+        run: |
+          set -e
+          mkdir -p results
+          python3 tools/check_lang.py | tee results/lang-check.txt
+          for f in modinfo.json assets/vintagedoctor/config/vintagedoctor.json assets/vintagedoctor/lang/en.json example/*/modinfo.json example/doctorexamplejson/assets/doctorexamplejson/config/vintagedoctor.json; do
+            python3 -c "import json,sys;json.load(open(sys.argv[1], encoding='utf-8'))" "$f" || { echo "::error::$f is not valid JSON"; exit 1; }
+          done
+          version=$(python3 -c "import json;print(json.load(open('modinfo.json'))['version'])")
+          grep -q "<Version>${version}</Version>" VintageDoctor.csproj || { echo "::error::modinfo.json says $version but VintageDoctor.csproj doesn't"; exit 1; }
+          grep -q "^## ${version}" CHANGELOG.md || { echo "::error::CHANGELOG.md has no section for $version"; exit 1; }
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+
+      - name: Download the game server
+        run: |
+          set -e
+          for name in "vs_server_linux-x64_${VS_VERSION}.tar.gz" "vs_server_${VS_VERSION}.tar.gz"; do
+            if curl -fsSL -o server.tar.gz "https://cdn.vintagestory.at/gamefiles/stable/$name"; then echo "got $name"; break; fi
+          done
+          mkdir -p vs && tar -xzf server.tar.gz -C vs
+          vsdir=$(dirname "$(find "$PWD/vs" -name VintagestoryServer.dll | head -1)")
+          echo "VSDIR=$vsdir" >> "$GITHUB_ENV"
+
+      - name: Get client libraries if the server lacks them
+        run: |
+          if [ ! -f "$VSDIR/Lib/cairo-sharp.dll" ]; then
+            curl -fsSL -o client.tar.gz "https://cdn.vintagestory.at/gamefiles/stable/vs_client_linux-x64_${VS_VERSION}.tar.gz"
+            mkdir -p vsclient && tar -xzf client.tar.gz -C vsclient
+            find vsclient -name 'cairo-sharp.dll' | head -1 | xargs -I{} cp {} "$VSDIR/Lib/"
+            rm -rf client.tar.gz vsclient
+          fi
+          ls -la "$VSDIR/Lib/cairo-sharp.dll" "$VSDIR/VintagestoryAPI.dll" "$VSDIR/Lib/Newtonsoft.Json.dll" "$VSDIR/Lib/protobuf-net.dll" "$VSDIR/Lib/0Harmony.dll"
+
+      - name: Compile against the real game
+        run: |
+          set -o pipefail
+          export VINTAGE_STORY="$VSDIR"
+          dotnet build VintageDoctor.csproj -c Release 2>&1 | tee results/build.log
+          dotnet build example/DoctorExample/DoctorExample.csproj -c Release 2>&1 | tee results/build-example.log
+          ls -la bin/Release/Mods/vintagedoctor
+
+      - name: Zip the mod
+        run: |
+          set -e
+          files="modinfo.json modicon.png VintageDoctor.dll VintageDoctor.xml assets"
+          [ -f bin/Release/Mods/vintagedoctor/moddb.json ] && files="$files moddb.json"
+          (cd bin/Release/Mods/vintagedoctor && zip -qr "$GITHUB_WORKSPACE/results/vintagedoctor_${VERSION}.zip" $files)
+          unzip -l "results/vintagedoctor_${VERSION}.zip" | tee results/zip-contents.txt
+          # The same things the doctor checks in other mods' zips.
+          unzip -Z1 "results/vintagedoctor_${VERSION}.zip" | grep -qx "modinfo.json" || { echo "::error::modinfo.json is not at the top of the zip"; exit 1; }
+          if unzip -Z1 "results/vintagedoctor_${VERSION}.zip" | grep -q '\\'; then echo "::error::backslashes in the zip's file names"; exit 1; fi
+
+      - name: Run a server with the mod
+        run: |
+          set +e
+          data="$PWD/data"
+          mkdir -p "$data/Mods" "$data/ModConfig"
+          # The doctor from its zip, as a player would install it; the examples as folders.
+          cp "results/vintagedoctor_${VERSION}.zip" "$data/Mods/"
+          cp -r example/DoctorExample/bin/Release/doctorexample "$data/Mods/"
+          cp -r example/doctorexamplejson "$data/Mods/"
+          if [ -n "$EXTRA_MODS" ]; then
+            ids=$(echo "$EXTRA_MODS" | tr -d ' ')
+            curl -fsSL "https://mods.vintagestory.at/api/v2/mods/install-information?ids=${ids}&gv=${VS_VERSION}" -o extra.json || echo '{}' > extra.json
+            python3 - "$data/Mods" <<'PY'
+          import json, sys, urllib.request
+          info = json.load(open("extra.json")).get("data", {})
+          for mod, r in info.items():
+              if "fileUrl" not in r:
+                  print("no file for", mod, r); continue
+              url = r["fileUrl"] if r["fileUrl"].startswith("http") else "https://mods.vintagestory.at" + r["fileUrl"]
+              dest = sys.argv[1] + "/" + r["fileName"]
+              try:
+                  urllib.request.urlretrieve(url, dest)
+                  print("added", mod, "->", dest)
+              except Exception as e:
+                  print("could not download", mod, e)
+          PY
+          fi
+          ls -la "$data/Mods" | tee results/mods.txt
+          echo '{ "SelfTestOnStart": true }' > "$data/ModConfig/vintagedoctor.json"
+          cd "$VSDIR"
+          dotnet VintagestoryServer.dll --dataPath "$data" > "$GITHUB_WORKSPACE/results/server-console.log" 2>&1 &
+          pid=$!
+          for i in $(seq 1 150); do
+            if [ -f "$data/ModData/vintagedoctor/selftest/selftest.txt" ]; then echo "self-test finished after $((i*4))s"; sleep 6; break; fi
+            if ! kill -0 $pid 2>/dev/null; then echo "server exited early"; break; fi
+            sleep 4
+          done
+          kill -INT $pid 2>/dev/null; sleep 12; kill -9 $pid 2>/dev/null
+          cd "$GITHUB_WORKSPACE"
+          tail -30 results/server-console.log
+
+      - name: Collect results
+        if: always()
+        run: |
+          mkdir -p results
+          cp -r data/ModData/vintagedoctor/selftest results/selftest 2>/dev/null || true
+          rm -rf results/selftest/fixture-mods results/selftest/fixture-backups results/selftest/fixture-config results/selftest/inner-real.zip
+          cp data/ModData/vintagedoctor/selftest/selftest.txt results/selftest.txt 2>/dev/null || true
+          cp data/ModData/vintagedoctor/*.txt results/ 2>/dev/null || true
+          cp data/ModData/vintagedoctor/state-server.json results/ 2>/dev/null || true
+          cp data/ModConfig/vintagedoctor.json results/vintagedoctor-config.json 2>/dev/null || true
+          cp data/Logs/server-main.log results/server-main.log 2>/dev/null || true
+          cp data/Logs/*crash* results/ 2>/dev/null || true
+          grep -n "vintagedoctor\|doctorexample" data/Logs/server-main.log > results/server-main-doctor-lines.txt 2>/dev/null || true
+          echo "game=${VS_VERSION} commit=${GITHUB_SHA} ref=${GITHUB_REF_NAME} run=${GITHUB_RUN_ID} extraMods=${EXTRA_MODS} release=${RELEASE}" > results/README.txt
+          ls -la results | head -80
+
+      - name: Push the results to a branch
+        if: always()
+        run: |
+          branch="$RESULTS_BRANCH"
+          if [ -z "$branch" ]; then branch="ci-results-$(echo "${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}" | tr -c 'A-Za-z0-9._-' '-' | sed 's/-*$//')"; fi
+          cd results
+          git init -q -b "$branch"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -qm "Test results for ${GITHUB_SHA} on Vintage Story ${VS_VERSION}"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git" "$branch"
+
+      - name: Judge the run
+        run: |
+          set -e
+          [ -f "bin/Release/Mods/vintagedoctor/VintageDoctor.dll" ] || { echo "::error::the mod did not compile (results/build.log)"; exit 1; }
+          [ -f results/selftest.txt ] || { echo "::error::the self-test never finished (results/server-console.log)"; exit 1; }
+          cat results/selftest.txt
+          if grep -q "^FAIL" results/selftest.txt; then echo "::error::the self-test has failures"; exit 1; fi
+          grep -q "^Self-test: .* 0 failed" results/selftest.txt || { echo "::error::the self-test did not finish cleanly"; exit 1; }
+
+      - name: Publish the release
+        if: env.RELEASE == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -e
+          if [ "$GITHUB_REF_NAME" != "main" ]; then echo "::error::releases are made from main"; exit 1; fi
+          file="results/vintagedoctor_${VERSION}.zip"
+          python3 tools/release_notes.py "$VERSION" > notes.md
+          if gh release view "v$VERSION" > /dev/null 2>&1; then
+            gh release upload "v$VERSION" "$file" --clobber
+            gh release edit "v$VERSION" --notes-file notes.md
+            echo "updated the existing v$VERSION release"
+          else
+            gh release create "v$VERSION" "$file" --target "$GITHUB_SHA" --title "Vintage Doctor $VERSION" --notes-file notes.md
+          fi

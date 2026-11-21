@@ -1,0 +1,519 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
+using System.Linq;
+using System.Text;
+using Newtonsoft.Json.Linq;
+using Vintagestory.API.Common;
+using Vintagestory.API.Datastructures;
+using Vintagestory.API.Server;
+using VintageDoctor.API;
+
+namespace VintageDoctor
+{
+    /// <summary>
+    /// The doctor examining itself on a real server (the CI run sets SelfTestOnStart): made-up logs, crash reports,
+    /// Mods folders and config files with known faults go through the same readers and fixes the players get, every
+    /// page is built from the real server's own logs, and the API is used the way another mod would. Results go to
+    /// ModData/vintagedoctor/selftest (selftest.txt and one text per page).
+    /// </summary>
+    public static class SelfTest
+    {
+        sealed class Run_
+        {
+            public readonly List<string> Lines = new List<string>();
+            public int Passed, Failed;
+            public void Check(string name, bool ok, string detail = null)
+            {
+                if (ok) Passed++; else Failed++;
+                Lines.Add((ok ? "PASS " : "FAIL ") + name + (string.IsNullOrEmpty(detail) ? "" : " (" + detail + ")"));
+            }
+            public void Skip(string name, string why) => Lines.Add("SKIP " + name + " (" + why + ")");
+            public void Guard(string name, Action body)
+            {
+                try { body(); }
+                catch (Exception e) { Check(name, false, "threw " + e.GetType().Name + ": " + e.Message + " @ " + (e.StackTrace ?? "").Split('\n').FirstOrDefault()?.Trim()); }
+            }
+        }
+
+        const string FixtureLog = @"21.11.2026 10:00:00 [Notification] Server logger started.
+21.11.2026 10:00:00 [Notification] Game Version: v1.22.7 (Stable)
+21.11.2026 10:00:00 [Notification] Operating System: Linux (Ubuntu 26.04.1 LTS) [Kernel 7.0.0.1019]
+21.11.2026 10:00:00 [Notification] CPU: Test CPU
+21.11.2026 10:00:00 [Notification] Available RAM: 15983 MB
+21.11.2026 10:00:00 [Notification] Entering runphase LoadAssets
+21.11.2026 10:00:00 [Notification] Will search the following paths for mods:
+21.11.2026 10:00:00 [Notification]     /home/someone/.config/VintagestoryData/Mods
+21.11.2026 10:00:01 [Warning] The following mods where blocked from loading:
+21.11.2026 10:00:01 [Warning]   badmod@1.0.0: known to corrupt saves
+21.11.2026 10:00:01 [Warning] Multiple mods share the mod ID 'twice' ('twice_1.0.0.zip', 'twice_1.1.0.zip'). Will only load the highest version one - v1.1.0.
+21.11.2026 10:00:01 [Notification] Found 9 mods (1 disabled)
+21.11.2026 10:00:01 [Error] [needy] Could not resolve some dependencies:
+21.11.2026 10:00:01 [Error] [needy]     somelib@1.2.0 - Missing
+21.11.2026 10:00:01 [Error] [needy]     otherlib@2.0.0 - Version mismatch (has 1.5.0)
+21.11.2026 10:00:01 [Error] [broken.zip] Missing modinfo.json
+21.11.2026 10:00:01 [Notification] Mods, sorted by dependency: game, creative, survival, crashy
+21.11.2026 10:00:02 [Error] [crashy] An exception was thrown when trying to start the mod:
+21.11.2026 10:00:02 [Error] [crashy] Exception: Method not found: 'Void Vintagestory.API.Common.Something.Gone()'.
+   at Crashy.CrashySystem.StartServerSide(ICoreServerAPI api) in C:\Users\someone\src\Crashy.cs:line 12
+   at Vintagestory.Common.ModLoader.TryRunModPhase(Mod mod, ModSystem system, ICoreAPI api, ModRunPhase phase)
+21.11.2026 10:00:02 [Error] Failed to start system Crashy.CrashySystem
+21.11.2026 10:00:03 [Error] Patch 0 (target: game:blocktypes/plant/crop/pineapple.json) in patchy:patches/crops.json failed because supplied path /dropsByType/*-16/1/x is invalid
+21.11.2026 10:00:03 [Error] Patch 3 (target: game:itemtypes/x.json) in patchy:patches/items.json failed because supplied path /a/b is invalid
+21.11.2026 10:00:04 [Warning] Failed resolving crafting recipe ingredient with code armory:part-hammerhead-steel in Grid recipe
+21.11.2026 10:00:04 [Error] Grid Recipe with output 'armory:part-hammerhead-steel' contains an ingredient that cannot be resolved: Item code armory:part-hammerhead-steel
+21.11.2026 10:00:05 [Notification] Entering runphase RunGame
+21.11.2026 10:00:06 [Warning] Drink portion size 1 is greater than capacity 0.4 for bricks:mug-red, setting drink portion size to capacity.
+21.11.2026 10:00:06 [Warning] Drink portion size 1 is greater than capacity 0.2 for bricks:mug-blue, setting drink portion size to capacity.
+21.11.2026 10:00:07 [Error] Exception: Object reference not set to an instance of an object.
+   at Crashy.Machines.Pump.Tick(Single dt)
+   at Vintagestory.Common.GameTickListener.OnTriggered(Int64 ellapsedMilliseconds)
+21.11.2026 10:00:08 [Error] Exception: Object reference not set to an instance of an object.
+   at Crashy.Machines.Pump.Tick(Single dt)
+   at Vintagestory.Common.GameTickListener.OnTriggered(Int64 ellapsedMilliseconds)
+21.11.2026 10:00:09 [Warning] Server overloaded. A tick took 2377ms to complete.
+21.11.2026 10:00:10 [Error] The doctor self-test's made-up problem number 7 from 203.0.113.9:42420
+";
+
+        const string FixtureCrash = @"Game Version: v1.22.6 (Stable)
+11/20/2026 9:15:01 PM: Critical error occurred in the following mod: crashy@0.9.0
+Loaded Mods: crashy@0.9.0, game@1.22.6, creative@1.22.6, survival@1.22.6
+Involved Harmony IDs: crashy.patches
+System.NullReferenceException: Object reference not set to an instance of an object.
+   at Crashy.Machines.Pump.Tick(Single dt) in C:\Users\someone\src\Pump.cs:line 40
+   at Vintagestory.Common.GameTickListener.OnTriggered(Int64 ellapsedMilliseconds)
+Game Version: v1.22.7 (Stable)
+11/21/2026 8:01:44 AM: Critical error occurred
+Loaded Mods: game@1.22.7, creative@1.22.7, survival@1.22.7
+System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Version=1.0.0.0'. The system cannot find the file specified.
+   at Vintagestory.Server.ServerMain.Process()
+";
+
+        public static string Run(VintageDoctorSystem doctor, ICoreServerAPI sapi)
+        {
+            var t = new Run_();
+            string folder = Path.Combine(doctor.DataFolder, "selftest");
+            try { if (Directory.Exists(folder)) Directory.Delete(folder, true); } catch { }
+            Directory.CreateDirectory(folder);
+            bool ci = doctor.Config.SelfTestOnStart;
+
+            t.Guard("small things", () => SmallThings(t));
+            t.Guard("the log reader", () => LogReader(t, doctor));
+            t.Guard("the crash reader", () => CrashReader(t));
+            t.Guard("the Mods folder", () => ModsFolder(t, folder));
+            t.Guard("config files", () => ConfigFiles(t, folder));
+            t.Guard("known problems from JSON", () => KnownJson(t));
+            t.Guard("the API", () => Api(t, doctor, sapi));
+            t.Guard("the pages", () => PagesOnRealServer(t, doctor, sapi, folder));
+            t.Guard("the example mods", () => Examples(t, doctor, sapi, folder));
+            if (ci) t.Guard("fixes on the real server", () => RealFixes(t, doctor, sapi));
+            else t.Skip("fixes on the real server", "only with SelfTestOnStart");
+
+            // The measured run takes a few seconds: its result is added when it is over, and the file written then.
+            bool started = doctor.Profile.Start(sapi.World, 5);
+            t.Check("the tick profiler starts", started, doctor.Profile.Error);
+            if (started)
+            {
+                sapi.Event.RegisterCallback(_ =>
+                {
+                    t.Guard("the tick profiler", () =>
+                    {
+                        TickProfile p = doctor.Profile;
+                        t.Check("the tick profiler finished with ticks", p.HasResult, "ticks " + p.Ticks + ", entries " + p.ByPath.Count + (p.Error != null ? ", " + p.Error : ""));
+                        var (all, work) = p.PerTick();
+                        t.Check("a tick's time was measured", all > 0, "all " + all.ToString("0.00") + " ms, work " + work.ToString("0.00") + " ms");
+                        DoctorReport r = doctor.BuildPage(doctor.EvidenceNow(false), null, "en", Checks.TopicPerf, "");
+                        string text = r.PlainText(sapi.World);
+                        File.WriteAllText(Path.Combine(folder, "page-perf-profiled.txt"), text);
+                        t.Check("the performance page shows the measured run", text.Contains("ms") && text.Contains("%"), null);
+                    });
+                    Finish(t, doctor, sapi, folder);
+                }, 8000);
+            }
+            else Finish(t, doctor, sapi, folder);
+            return string.Join("\n", t.Lines) + "\n" + t.Passed + " passed, " + t.Failed + " failed so far; the profiler's result follows in " + Anonymise.Short(Path.Combine(folder, "selftest.txt"));
+        }
+
+        static void Finish(Run_ t, VintageDoctorSystem doctor, ICoreServerAPI sapi, string folder)
+        {
+            string summary = "Self-test: " + t.Passed + " passed, " + t.Failed + " failed";
+            try { File.WriteAllText(Path.Combine(folder, "selftest.txt"), string.Join("\n", t.Lines) + "\n" + summary + "\n"); }
+            catch (Exception e) { sapi.Logger.Error("[vintagedoctor] Could not write the self-test's results: {0}", e.Message); }
+            if (t.Failed == 0) sapi.Logger.Notification("[vintagedoctor self-test] {0}", summary);
+            else sapi.Logger.Error("[vintagedoctor self-test] {0}: {1}", summary, string.Join(" | ", t.Lines.Where(l => l.StartsWith("FAIL", StringComparison.Ordinal)).Take(10)));
+            // The console command, as an admin would type it (its text lands in the server's console).
+            try { sapi.InjectConsole("/doctor"); sapi.InjectConsole("/doctor mods"); } catch (Exception e) { sapi.Logger.Warning("[vintagedoctor] /doctor from the console failed: {0}", e.Message); }
+        }
+
+        static void SmallThings(Run_ t)
+        {
+            t.Check("versions: 1.10.0 is newer than 1.9.2", Versions.Compare("1.10.0", "1.9.2") > 0);
+            t.Check("versions: 1.0.0 is newer than 1.0.0-rc.1", Versions.Compare("1.0.0", "1.0.0-rc.1") > 0);
+            t.Check("versions: rc.2 is newer than rc.1", Versions.Compare("1.0.0-rc.2", "1.0.0-rc.1") > 0);
+            t.Check("versions: v1.2 equals 1.2.0", Versions.Compare("v1.2", "1.2.0") == 0);
+            string anon = Anonymise.Line("from 203.0.113.9:42420 at /home/someone/data and C:\\Users\\Some One\\x, Version=1.2.3.4");
+            t.Check("addresses and user folders are taken out", !anon.Contains("203.0.113.9") && !anon.Contains("someone") && anon.Contains("1.2.3.4"), anon);
+            t.Check("messages that differ only in a code or a number count as one",
+                LogScan.Normalise("Drink portion size 1 is greater than capacity 0.4 for bricks:mug-red") == LogScan.Normalise("Drink portion size 2 is greater than capacity 0.2 for bricks:mug-blue"));
+            var r = new DoctorReport();
+            r.Add(DoctorReport.OkMark + " fine", DoctorLineStyle.Check);
+            r.Add(DoctorReport.ProblemMark + " bad " + DoctorReport.Fix('s', "doctor:x", "a|b{c}", "Do it"), DoctorLineStyle.Check);
+            r.Add(DoctorReport.Open("mod", "carryon", "Carry On's page"), DoctorLineStyle.Text, 1);
+            string plain = r.PlainText(null);
+            t.Check("a page as text names the commands behind its buttons", plain.Contains("/doctor fix doctor:x a/b(c)") && plain.Contains("/doctor mod carryon"), plain.Replace("\n", " / "));
+            t.Check("a page counts its problems", r.Problems == 1 && r.Warnings == 0);
+            DoctorReport back = DoctorReport.FromPacket(r.ToPacket(7));
+            t.Check("a page survives being sent", back.Lines.Count == r.Lines.Count && back.Lines[2].Indent == 1 && back.Lines[0].Style == DoctorLineStyle.Check);
+        }
+
+        static void LogReader(Run_ t, VintageDoctorSystem doctor)
+        {
+            LogScan log = LogScan.FromText(FixtureLog, doctor.Snapshot());
+            t.Check("log: read without error", log.Error == null, log.Error);
+            t.Check("log: the game version", log.GameVersion == "v1.22.7 (Stable)", log.GameVersion);
+            t.Check("log: a mod left out for missing dependencies, with both reasons", log.Skipped.Count == 1 && log.Skipped[0].Mod == "needy" && log.Skipped[0].Needs.Count == 2
+                && log.Skipped[0].Needs[0].dep == "somelib@1.2.0" && log.Skipped[0].Needs[1].why.StartsWith("Version mismatch"), log.Skipped.Count + " skipped");
+            t.Check("log: a blocked mod", log.Blocked.Count == 1 && log.Blocked[0].StartsWith("badmod@1.0.0"), string.Join(";", log.Blocked));
+            t.Check("log: a mod id installed twice", log.DuplicateIds.Count == 1 && log.DuplicateIds[0].StartsWith("twice"), string.Join(";", log.DuplicateIds));
+            t.Check("log: mods found and disabled", log.ModsFound == 9 && log.ModsDisabled == 1, log.ModsFound + "/" + log.ModsDisabled);
+            StartFailure crashy = log.StartFailures.FirstOrDefault(f => f.Mod == "crashy");
+            t.Check("log: a mod that threw while starting, with its error, trace and system", crashy != null && crashy.Error.StartsWith("Method not found") && crashy.Stack.Count == 2 && crashy.Systems.Contains("Crashy.CrashySystem"),
+                crashy == null ? "none" : crashy.Error + " / " + crashy.Stack.Count + " frames / " + string.Join(",", crashy.Systems));
+            t.Check("log: a file that isn't a mod", log.StartFailures.Any(f => f.Mod == "broken.zip" && f.IsFile), string.Join(";", log.StartFailures.Select(f => f.Mod)));
+            t.Check("log: failed JSON patches by mod", log.FailedPatches.TryGetValue("patchy", out int n) && n == 2, string.Join(";", log.FailedPatches.Select(kv => kv.Key + "=" + kv.Value)));
+            t.Check("log: recipes naming things that don't exist, once each", log.Unresolved.TryGetValue("armory", out int u) && u == 1, string.Join(";", log.Unresolved.Select(kv => kv.Key + "=" + kv.Value)));
+            t.Check("log: a slow tick", log.Overloads.Count == 1 && log.Overloads[0].ms == 2377);
+            LogIssue drink = log.Issues.FirstOrDefault(i => i.Message.StartsWith("Drink portion"));
+            t.Check("log: the same warning twice is one entry with a count", drink != null && drink.Count == 2 && !drink.Startup, drink?.Count.ToString());
+            LogIssue nre = log.Issues.FirstOrDefault(i => i.Message.StartsWith("Exception: Object reference"));
+            t.Check("log: an exception keeps its stack trace and count", nre != null && nre.Count == 2 && nre.Stack.Count == 2, nre == null ? "none" : nre.Count + "x, " + nre.Stack.Count + " frames");
+            t.Check("log: start-up lines aren't counted as errors of their own", !log.Issues.Any(i => i.Message.Contains("Could not resolve") || i.Message.Contains("Patch 0")), log.Issues.Count + " issues");
+            t.Check("an error is explained in plain words", WhyFor(doctor, "Method not found: 'Void X.Y()'") != null && WhyFor(doctor, "Could not load file or assembly 'A'") != null && WhyFor(doctor, "all is well") == null);
+
+            // The same through the known-problem list and the ignore list.
+            var known = new KnownProblems();
+            known.Add(new KnownProblem { Id = "t:made-up", ModId = "tester", Match = "made-up problem number \\d+", IsRegex = true, Level = DoctorLevel.Problem, Title = "A made-up problem" });
+            var ev = new Evidence { Side = EnumAppSide.Server, Mods = doctor.Snapshot(), Log = LogScan.FromText(FixtureLog, doctor.Snapshot()) };
+            ev.Apply(known, new DoctorConfig { IgnoreLogMessages = new List<string> { "Drink portion" } });
+            LogIssue made = ev.Log.Issues.FirstOrDefault(i => i.Message.Contains("made-up"));
+            t.Check("a known problem is recognised by its pattern and counted against its mod", made?.Known != null && made.Known.Id == "t:made-up" && made.Mod == "tester", made?.Mod);
+            t.Check("ignored messages are left out", !ev.Log.Issues.Any(i => i.Message.StartsWith("Drink portion")));
+        }
+
+        static string WhyFor(VintageDoctorSystem doctor, string message)
+        {
+            var x = new DoctorContext { Doctor = doctor, LanguageCode = "en" };
+            return Checks.Why(x, message);
+        }
+
+        static void CrashReader(Run_ t)
+        {
+            CrashScan scan = CrashScan.FromText(FixtureCrash, null);
+            t.Check("crash: two reports read", scan.Error == null && scan.Entries.Count == 2, scan.Error ?? scan.Entries.Count.ToString());
+            if (scan.Entries.Count < 2) return;
+            CrashEntry a = scan.Entries[0], b = scan.Entries[1];
+            t.Check("crash: the mod the game named, and its version then", a.NamedMods.Count == 1 && a.NamedMods[0] == "crashy@0.9.0" && a.VersionAtCrash("crashy") == "0.9.0" && a.Culprits.First() == "crashy", string.Join(",", a.NamedMods));
+            t.Check("crash: the error and its trace", a.ExceptionType == "System.NullReferenceException" && a.Message.StartsWith("Object reference") && a.Stack.Count == 2, a.ExceptionType + " / " + a.Stack.Count);
+            t.Check("crash: the Harmony ids involved", a.HarmonyIds.Count == 1 && a.HarmonyIds[0] == "crashy.patches");
+            t.Check("crash: when it happened is kept as written", a.When == "11/20/2026 9:15:01 PM", a.When);
+            t.Check("crash: one with no mod named", b.NamedMods.Count == 0 && b.ExceptionType == "System.IO.FileNotFoundException" && b.LoadedMods.Count == 3, b.ExceptionType);
+            t.Check("crash: the latest is the last in the file", scan.Latest == b);
+        }
+
+        static void WriteZip(string path, params (string name, string text)[] entries)
+        {
+            using ZipArchive zip = ZipFile.Open(path, ZipArchiveMode.Create);
+            foreach (var (name, text) in entries)
+            {
+                using Stream s = zip.CreateEntry(name).Open();
+                byte[] bytes = Encoding.UTF8.GetBytes(text);
+                s.Write(bytes, 0, bytes.Length);
+            }
+        }
+
+        static string Info(string id, string version, string game = "1.22.0") =>
+            "{ \"type\": \"content\", \"modid\": \"" + id + "\", \"name\": \"" + id + "\", \"version\": \"" + version + "\", \"dependencies\": { \"game\": \"" + game + "\", \"somelib\": \"1.0.0\" } }";
+
+        static void ModsFolder(Run_ t, string folder)
+        {
+            string mods = Path.Combine(folder, "fixture-mods"), backups = Path.Combine(folder, "fixture-backups");
+            Directory.CreateDirectory(mods);
+            WriteZip(Path.Combine(mods, "good_1.0.0.zip"), ("modinfo.json", Info("good", "1.0.0")), ("assets/good/lang/en.json", "{}"));
+            WriteZip(Path.Combine(mods, "backslash.zip"), ("modinfo.json", Info("backslash", "1.0.0")), ("assets\\backslash\\lang\\en.json", "{}"));
+            WriteZip(Path.Combine(mods, "nested.zip"), ("Nested-main/modinfo.json", Info("nested", "2.0.0")), ("Nested-main/assets/nested/lang/en.json", "{}"));
+            WriteZip(Path.Combine(mods, "notamod.zip"), ("readme.txt", "hello"));
+            WriteZip(Path.Combine(mods, "source.zip"), ("Thing.csproj", "<Project/>"), ("src/Thing.cs", "class Thing {}"));
+            WriteZip(Path.Combine(mods, "twice_1.0.0.zip"), ("modinfo.json", Info("twice", "1.0.0")));
+            WriteZip(Path.Combine(mods, "twice_1.10.0.zip"), ("modinfo.json", Info("twice", "1.10.0")));
+            WriteZip(Path.Combine(mods, "future.zip"), ("modinfo.json", Info("future", "1.0.0", "9.0.0")));
+            WriteZip(Path.Combine(mods, "badinfo.zip"), ("modinfo.json", "{ \"modid\": \"badinfo\", "));
+            WriteZip(Path.Combine(folder, "inner-real.zip"), ("modinfo.json", Info("wrapped", "1.0.0")));
+            using (ZipArchive outer = ZipFile.Open(Path.Combine(mods, "wrapped-download.zip"), ZipArchiveMode.Create)) outer.CreateEntryFromFile(Path.Combine(folder, "inner-real.zip"), "wrapped_1.0.0.zip");
+            File.WriteAllBytes(Path.Combine(mods, "corrupt.zip"), Encoding.ASCII.GetBytes("this is not a zip file at all, just some text pretending"));
+            File.WriteAllText(Path.Combine(mods, "packed.rar"), "x");
+            File.WriteAllText(Path.Combine(mods, "half.zip.crdownload"), "x");
+            File.WriteAllText(Path.Combine(mods, "notes.txt"), "x");
+            Directory.CreateDirectory(Path.Combine(mods, "foldermod"));
+            File.WriteAllText(Path.Combine(mods, "foldermod", "modinfo.json"), Info("foldermod", "0.1.0"));
+
+            FolderScan scan = FolderScan.Read(new[] { mods }, null);
+            ModFile F(string name) => scan.Files.FirstOrDefault(f => f.Name == name);
+            t.Check("folder: every mod file found, a text file left alone", scan.Files.Count == 14 && F("notes.txt") == null, scan.Files.Count + ": " + string.Join(",", scan.Files.Select(f => f.Name)));
+            t.Check("folder: a good zip", F("good_1.0.0.zip") is ModFile g && !g.Broken && g.ModId == "good" && g.Version == "1.0.0" && g.GameDep == "1.22.0" && g.Deps.Count == 1);
+            t.Check("folder: backslashes in file names", F("backslash.zip")?.Backslashes == true);
+            t.Check("folder: modinfo one folder down", F("nested.zip")?.NestedFolder == "Nested-main" && F("nested.zip").ModId == "nested");
+            t.Check("folder: a zip that isn't a mod", F("notamod.zip")?.NoModInfo == true && F("notamod.zip").SourceCode == false);
+            t.Check("folder: source code instead of a release", F("source.zip")?.SourceCode == true);
+            t.Check("folder: a broken modinfo.json", F("badinfo.zip")?.ModInfoError != null);
+            t.Check("folder: a zip inside a zip", F("wrapped-download.zip")?.InnerZip == "wrapped_1.0.0.zip");
+            t.Check("folder: a damaged zip", F("corrupt.zip")?.ReadError != null);
+            t.Check("folder: an archive the game can't read, and a download that didn't finish", F("packed.rar")?.Kind == "archive" && F("half.zip.crdownload")?.Kind == "partial");
+            t.Check("folder: a mod in a folder", F("foldermod")?.Kind == "folder" && F("foldermod").ModId == "foldermod");
+            var dups = scan.Duplicates();
+            t.Check("folder: a mod installed twice, newest first", dups.Count == 1 && dups[0].id == "twice" && dups[0].copies[0].Version == "1.10.0", dups.Count + " duplicates");
+            t.Check("folder: reading a damaged zip to the end fails, a good one doesn't", FolderScan.TestZip(Path.Combine(mods, "good_1.0.0.zip")) == null && FolderScan.TestZip(Path.Combine(mods, "corrupt.zip")) != null);
+
+            int changed = FolderScan.Repack(Path.Combine(mods, "backslash.zip"), backups, out string backup1);
+            ModFile fixedSlash = FolderScan.Look(Path.Combine(mods, "backslash.zip"));
+            t.Check("fix: backslashes repacked, the original kept", changed == 1 && fixedSlash != null && !fixedSlash.Backslashes && !fixedSlash.Broken && fixedSlash.Entries == 2 && File.Exists(backup1), "changed " + changed);
+            FolderScan.Repack(Path.Combine(mods, "nested.zip"), backups, out string backup2);
+            ModFile fixedNested = FolderScan.Look(Path.Combine(mods, "nested.zip"));
+            t.Check("fix: the outer folder taken away, the original kept", fixedNested != null && fixedNested.NestedFolder == null && !fixedNested.NoModInfo && fixedNested.ModId == "nested" && File.Exists(backup2));
+            bool refused = false;
+            try { FolderScan.Repack(Path.Combine(mods, "notamod.zip"), backups, out _); } catch (InvalidOperationException) { refused = true; }
+            t.Check("fix: a zip that can't be made right is left as it was", refused && File.Exists(Path.Combine(mods, "notamod.zip")) && !File.Exists(Path.Combine(mods, "notamod.zip.doctor-tmp")));
+            string moved = FolderScan.MoveAside(Path.Combine(mods, "corrupt.zip"), backups);
+            string movedFolder = FolderScan.MoveAside(Path.Combine(mods, "foldermod"), backups);
+            t.Check("fix: a file and a folder moved aside, not deleted", File.Exists(moved) && !File.Exists(Path.Combine(mods, "corrupt.zip")) && Directory.Exists(movedFolder) && !Directory.Exists(Path.Combine(mods, "foldermod")));
+            string again = FolderScan.MoveAside(Path.Combine(mods, "packed.rar"), backups);
+            File.WriteAllText(Path.Combine(mods, "packed.rar"), "y");
+            string again2 = FolderScan.MoveAside(Path.Combine(mods, "packed.rar"), backups);
+            t.Check("fix: a second file of the same name doesn't overwrite the first backup", again != again2 && File.Exists(again) && File.Exists(again2));
+        }
+
+        static void ConfigFiles(Run_ t, string folder)
+        {
+            string dir = Path.Combine(folder, "fixture-config");
+            Directory.CreateDirectory(dir);
+            File.WriteAllText(Path.Combine(dir, "good.json"), "{ // a comment, as the game allows\n  \"a\": 1, \"b\": [1, 2, 3] }");
+            File.WriteAllText(Path.Combine(dir, "broken.json"), "{ \"a\": 1,\n  \"b\": [1, 2,\n}");
+            File.WriteAllText(Path.Combine(dir, "empty.json"), "");
+            File.WriteAllBytes(Path.Combine(dir, "zeros.json"), new byte[64]);
+            ConfigFile good = ConfigScan.Check(Path.Combine(dir, "good.json")), broken = ConfigScan.Check(Path.Combine(dir, "broken.json")),
+                empty = ConfigScan.Check(Path.Combine(dir, "empty.json")), zeros = ConfigScan.Check(Path.Combine(dir, "zeros.json"));
+            t.Check("config: a good file with a comment passes", !good.Bad, good.Error);
+            t.Check("config: a broken file fails with where", broken.Error != null && broken.Error.Contains("line"), broken.Error);
+            t.Check("config: an empty file and one full of zeros", empty.Empty && zeros.Empty);
+            ConfigScan scan = ConfigScan.Read(dir, dir, null, new[] { new KeyValuePair<string, string>("good.json", "ownermod") });
+            t.Check("config: a folder is read, and a declared owner kept", scan.Files.Count == 4 && scan.Files.First(f => f.Name == "good.json").Mod == "ownermod", scan.Files.Count + " files");
+        }
+
+        static void KnownJson(Run_ t)
+        {
+            var known = new KnownProblems();
+            JObject root = JObject.Parse(@"{
+              ""knownProblems"": [
+                { ""id"": ""old"", ""match"": ""config is outdated"", ""level"": ""warning"", ""title"": ""The config is from an older version"", ""explain"": ""why"", ""advice"": ""do"",
+                  ""fix"": { ""type"": ""resetConfig"", ""file"": ""mymod.json"", ""label"": ""Start it afresh"" } },
+                { ""id"": ""rx"", ""match"": ""pump \\d+ jammed"", ""regex"": true, ""level"": ""problem"", ""title"": ""A pump jammed"", ""side"": ""server"",
+                  ""fix"": { ""type"": ""command"", ""command"": ""/mymod unjam"" } },
+                { ""match"": ""no title here"" },
+                { ""id"": ""bad"", ""match"": ""x"", ""title"": ""y"", ""fix"": { ""type"": ""format-disk"" } }
+              ],
+              ""conflicts"": [ { ""with"": ""othermod"", ""level"": ""problem"", ""why"": ""both replace the firepit"" } ],
+              ""recommends"": [ { ""mod"": ""helper"", ""why"": ""nicer"" } ],
+              ""configFiles"": [ ""mymod.json"", ""mymod/extra.json"" ]
+            }");
+            List<JsonFix> fixes = known.LoadJson("mymod", "test.json", root);
+            t.Check("json: known problems read, the incomplete one refused", known.Count == 3 && known.LoadErrors.Count == 2, known.Count + " read, errors: " + string.Join(" | ", known.LoadErrors));
+            t.Check("json: fixes read, an unknown kind refused", fixes.Count == 2 && fixes[0].Type == "resetconfig" && fixes[0].File == "mymod.json" && fixes[1].Type == "command" && fixes[1].Command == "/mymod unjam", fixes.Count.ToString());
+            t.Check("json: conflicts, recommendations and config files", known.Conflicts.Count == 1 && known.Conflicts[0].other == "othermod" && known.Conflicts[0].level == DoctorLevel.Problem
+                && known.Recommends.Count == 1 && known.ConfigOwners.Count == 2 && known.ConfigOwners["mymod/extra.json"] == "mymod");
+            var issue = new LogIssue { Level = "Error", Message = "[mymod] pump 12 jammed" };
+            t.Check("json: a pattern matches on its side only", known.Match(issue, EnumAppSide.Server)?.Id == "mymod:rx" && known.Match(issue, EnumAppSide.Client) == null);
+        }
+
+        static void Api(Run_ t, VintageDoctorSystem doctor, ICoreServerAPI sapi)
+        {
+            IDoctorApi api = DoctorApi.Get(sapi);
+            t.Check("api: other mods can find the doctor", api != null && api.ApiVersion == 1 && api.DoctorVersion == doctor.DoctorVersion);
+            if (api == null) return;
+            const string me = "doctorselftest";
+            bool fixRan = false;
+            api.RegisterCheck(new DoctorCheck(me, me + ":pipes", ctx =>
+            {
+                ctx.Warn("3 pipes aren't connected");
+                ctx.Detail("at 10 5 10");
+                ctx.Explain("pipes need a neighbour");
+                ctx.Advice("connect them");
+                ctx.FixButton(me + ":reconnect", "all", "Reconnect them");
+                ctx.Ok("pumps are fine");
+            }));
+            api.RegisterCheck(new DoctorCheck(me, me + ":slow", ctx => ctx.Info("a deeper look")) { Deep = true });
+            api.RegisterCheck(new DoctorCheck(me, me + ":throws", ctx => throw new InvalidOperationException("the check's own bug")));
+            api.RegisterFix(new DoctorFix(me, me + ":reconnect", ctx => { fixRan = true; return ctx.Argument == "all" ? "Reconnected 3 pipes" : ctx.Failed("which?"); }));
+            api.RegisterTopic(new DoctorTopic(me, "selftest-pipes", "My pipes aren't moving anything", ctx => ctx.Ok("page built with " + ctx.Argument)));
+            api.RegisterKnownProblem(new KnownProblem { Id = me + ":known", ModId = me, Match = "pipe network overflow", Title = "The pipe network overflowed" });
+            api.ReportIncident(me, DoctorLevel.Warning, "A pump jammed", "at 1 2 3");
+            api.ReportIncident(me, DoctorLevel.Warning, "A pump jammed", "at 4 5 6");
+            busTest = true;
+            EventBusListenerDelegate collect = (string name, ref EnumHandling handling, IAttribute data) =>
+            {
+                if (!busTest || !(data is ITreeAttribute tree) || !(tree["results"] is ITreeAttribute results)) return;
+                ITreeAttribute r = results.GetOrAddTreeAttribute("busmod:tanks");
+                r.SetString("level", "warning");
+                r.SetString("title", "2 tanks are leaking");
+                r.SetString("details", "tank at 1 1 1\ntank at 2 2 2");
+                r.SetString("fix", "busmod:seal");
+                r.SetString("fixLabel", "Seal them");
+            };
+            EventBusListenerDelegate busFix = (string name, ref EnumHandling handling, IAttribute data) =>
+            {
+                if (busTest && data is ITreeAttribute tree && tree.GetString("id") == "busmod:seal") tree.SetString("result", "Sealed 2 tanks");
+            };
+            sapi.Event.RegisterEventBusListener(collect, 0.5, VintageDoctorSystem.CollectEvent);
+            sapi.Event.RegisterEventBusListener(busFix, 0.5, VintageDoctorSystem.FixEvent);
+
+            Evidence ev = doctor.EvidenceNow(false);
+            string overview = doctor.BuildPage(ev, null, "en", Pages.Overview, "").PlainText(sapi.World);
+            t.Check("api: a registered check shows in the check-up with its details and fix", overview.Contains("3 pipes aren't connected") && overview.Contains("at 10 5 10") && overview.Contains("/doctor fix " + me + ":reconnect all")
+                && overview.Contains("pumps are fine"), null);
+            t.Check("api: a deep check stays out of the check-up", !overview.Contains("a deeper look"));
+            t.Check("api: a check that throws is reported, and the rest still runs", overview.Contains("the check's own bug") && overview.Contains("A pump jammed"));
+            t.Check("api: an incident reported twice is shown once with a count", overview.Contains("A pump jammed (×2)"));
+            t.Check("api: findings handed over on the event bus show too", overview.Contains("2 tanks are leaking") && overview.Contains("tank at 2 2 2") && overview.Contains("/doctor fix bus:busmod:seal"));
+            string deep = doctor.BuildPage(ev, null, "en", Pages.Deep, "").PlainText(sapi.World);
+            t.Check("api: the deeper checks run the deep check", deep.Contains("a deeper look"));
+            string outcome = doctor.RunFix(me + ":reconnect", "all", null, "en", ev);
+            t.Check("api: a registered fix runs and reports", fixRan && outcome == "Reconnected 3 pipes", outcome);
+            t.Check("api: a fix can say it failed", doctor.RunFix(me + ":reconnect", "", null, "en", ev).StartsWith(DoctorReport.WarnMark));
+            t.Check("api: an unknown fix is refused", doctor.RunFix("nobody:nothing", "", null, "en", ev).StartsWith(DoctorReport.WarnMark));
+            t.Check("api: a fix over the event bus runs", doctor.RunFix("bus:busmod:seal", "", null, "en", ev) == "Sealed 2 tanks");
+            t.Check("api: a fix nobody answers on the event bus is reported", doctor.RunFix("bus:busmod:other", "", null, "en", ev).StartsWith(DoctorReport.WarnMark));
+            string topic = doctor.BuildPage(ev, null, "en", "selftest-pipes", "north").PlainText(sapi.World);
+            t.Check("api: a registered page opens with its argument", topic.Contains("page built with north") && topic.Contains("My pipes aren't moving anything"), topic.Replace("\n", " / "));
+            bool refused = false;
+            try { api.RegisterTopic(new DoctorTopic(me, "crash", "x", ctx => { })); } catch (ArgumentException) { refused = true; }
+            t.Check("api: a page can't take one of the doctor's own names", refused);
+            var x = new DoctorContext { Doctor = doctor, Api = sapi, Side = EnumAppSide.Server, LanguageCode = "en", Ev = ev };
+            Pages.Questions(x, null, true, false);
+            t.Check("api: a registered page is among the questions", x.R.PlainText(sapi.World).Contains("My pipes aren't moving anything (/doctor selftest-pipes)"));
+            LogIssue issue = new LogIssue { Level = "Error", Message = "pipe network overflow in sector 7" };
+            t.Check("api: a registered known problem matches", doctor.Known.Match(issue, EnumAppSide.Server)?.Id == me + ":known");
+            api.Unregister(me);
+            busTest = false;
+            string after = doctor.BuildPage(ev, null, "en", Pages.Overview, "").PlainText(sapi.World);
+            t.Check("api: unregistering takes everything of that mod away", !after.Contains("3 pipes aren't connected") && !after.Contains("A pump jammed") && doctor.TopicFor("selftest-pipes") == null
+                && doctor.Known.Match(issue, EnumAppSide.Server) == null);
+        }
+
+        /// <summary>The self-test's listeners on the event bus only answer while it runs (they can't be taken off again).</summary>
+        static bool busTest;
+
+        static void PagesOnRealServer(Run_ t, VintageDoctorSystem doctor, ICoreServerAPI sapi, string folder)
+        {
+            Evidence ev = doctor.EvidenceNow(true);
+            t.Check("real: the server's log was read", ev.Log != null && ev.Log.Found && ev.Log.Error == null && ev.Log.GameVersion != null, ev.Log?.Error ?? (ev.Log?.Lines + " lines, " + ev.Log?.Issues.Count + " kinds of errors and warnings, read in " + ev.ReadMilliseconds + " ms"));
+            t.Check("real: the Mods folders were looked through", ev.Folder != null && ev.Folder.Folders.Count > 0 && ev.Folder.Files.Any(f => f.ModId == DoctorApi.ModId && f.Loaded),
+                ev.Folder == null ? "none" : ev.Folder.Folders.Count + " folders, " + ev.Folder.Files.Count + " files");
+            t.Check("real: the doctor knows its own mod", ev.Mods.Get(DoctorApi.ModId) != null && ev.Mods.ModOfType(typeof(SelfTest).FullName) == DoctorApi.ModId
+                && ev.Mods.ModOfFrame("   at VintageDoctor.SelfTest.Run(VintageDoctorSystem doctor) in x.cs:line 1") == DoctorApi.ModId && ev.Mods.ModOfFrame("   at Vintagestory.Server.ServerMain.Process()") == null);
+            t.Check("real: the doctor's own list of known problems was read from its assets", doctor.Known.Sources.Any(s => s.StartsWith("vintagedoctor:")) && doctor.Known.Count > 0,
+                doctor.Known.Count + " known, sources: " + string.Join(", ", doctor.Known.Sources) + (doctor.Known.LoadErrors.Count > 0 ? "; errors: " + string.Join(" | ", doctor.Known.LoadErrors) : ""));
+            t.Check("real: no known-problem list failed to load", doctor.Known.LoadErrors.Count == 0, string.Join(" | ", doctor.Known.LoadErrors));
+
+            string firstMod = ev.Mods.UserMods.FirstOrDefault(m => m.Id != DoctorApi.ModId)?.Id ?? DoctorApi.ModId;
+            var pages = new List<(string topic, string arg)>
+            {
+                (Pages.Overview, ""), (Pages.Deep, ""), (Checks.TopicCrash, ""), (Checks.TopicStartup, ""), (Checks.TopicLog, ""), (Checks.TopicLog, firstMod), (Checks.TopicMods, ""),
+                (Checks.TopicMod, DoctorApi.ModId), (Checks.TopicMod, firstMod), (Checks.TopicMod, "nosuchmod"), (Checks.TopicPerf, ""), (Checks.TopicFiles, ""), (Checks.TopicPatches, ""),
+                (Checks.TopicChanges, ""), (Checks.TopicWorld, ""), (Checks.TopicItem, "game:ingot-copper"), (Checks.TopicItem, "game:nosuchitem"), (Checks.TopicItem, ""), (Checks.TopicBlock, ""),
+                (Checks.TopicCraft, "game:axe-copper"), (Checks.TopicCraft, "game:ingot-copper"), (Pages.BugReportTopic, ""), (Pages.BugReportTopic, firstMod), (Pages.Api, ""),
+                ("nosuchpage", ""), (firstMod, ""), ("game:ingot-copper", "")
+            };
+            foreach (var (topic, arg) in pages)
+            {
+                string name = "page-" + topic.Replace(':', '_') + (arg.Length > 0 ? "-" + arg.Replace(':', '_') : "");
+                try
+                {
+                    var x = new DoctorContext { Doctor = doctor, Api = sapi, Side = EnumAppSide.Server, LanguageCode = "en", Topic = topic, Argument = arg, Ev = ev };
+                    Pages.Build(x);
+                    if (x.Topic == Pages.Overview) Pages.Questions(x, null, true, false);
+                    string text = x.R.PlainText(sapi.World);
+                    File.WriteAllText(Path.Combine(folder, name + ".txt"), text);
+                    // A text missing from the lang file comes back as its key.
+                    bool keys = System.Text.RegularExpressions.Regex.IsMatch(text, @"vintagedoctor:[a-z]+-[a-z0-9-]+");
+                    bool crashed = text.Contains("check-crashed") || text.Contains("stopped with an error");
+                    t.Check("real: " + name, text.Length > 20 && !keys && !crashed, text.Length + " chars" + (keys ? ", a text is missing from the lang file" : "") + (crashed ? ", a check threw" : ""));
+                }
+                catch (Exception e) { t.Check("real: " + name, false, e.GetType().Name + ": " + e.Message); }
+            }
+            string overview = File.ReadAllText(Path.Combine(folder, "page-overview.txt"));
+            t.Check("real: the check-up has cards and questions", overview.Contains(DoctorReport.OkMark) && overview.Contains("/doctor crash") && overview.Contains("/doctor bugreport"));
+            string bug = File.ReadAllText(Path.Combine(folder, "page-bugreport.txt"));
+            t.Check("real: the bug report has the mod list and no addresses", bug.Contains("Mods (") && bug.Contains("Findings") && !System.Text.RegularExpressions.Regex.IsMatch(bug, @"\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d+"));
+            t.Check("real: the bug report was saved", File.Exists(Path.Combine(doctor.DataFolder, "bug-report-server.txt")));
+        }
+
+        /// <summary>The two example mods from the repository's example folder, when the test run loaded them: the API as a real mod uses it.</summary>
+        static void Examples(Run_ t, VintageDoctorSystem doctor, ICoreServerAPI sapi, string folder)
+        {
+            Evidence ev = doctor.EvidenceNow(false);
+            if (!ev.Mods.Has("doctorexample") || !ev.Mods.Has("doctorexamplejson")) { t.Skip("the example mods", "not loaded in this run"); return; }
+            string overview = doctor.BuildPage(ev, null, "en", Pages.Overview, "").PlainText(sapi.World);
+            t.Check("example: a mod's check, registered without the doctor being a requirement", overview.Contains("3 example pumps are jammed") && overview.Contains("/doctor fix doctorexample:unjam all"));
+            t.Check("example: the check can read the log through the doctor", overview.Contains("message(s) from this mod in the log"));
+            t.Check("example: a finding over the event bus, and an incident", overview.Contains("2 example tanks are half empty") && overview.Contains("The example mod started"));
+            t.Check("example: a known problem and a clash from a JSON file, with no code", overview.Contains("An example pump jammed") && overview.Contains("Doctor Example (JSON) and Doctor Example don't get on")
+                && overview.Contains("/doctor fix doctorexamplejson:pump-jammed/fix"));
+            string modPage = doctor.BuildPage(ev, null, "en", Checks.TopicMod, "doctorexample").PlainText(sapi.World);
+            File.WriteAllText(Path.Combine(folder, "page-mod-doctorexample.txt"), modPage);
+            t.Check("example: the mod's own page has its check, its event-bus finding and its log lines", modPage.Contains("example pumps are jammed") && modPage.Contains("example tanks are half empty") && modPage.Contains("pump 3 jammed"));
+            string jsonPage = doctor.BuildPage(ev, null, "en", Checks.TopicMod, "doctorexamplejson").PlainText(sapi.World);
+            File.WriteAllText(Path.Combine(folder, "page-mod-doctorexamplejson.txt"), jsonPage);
+            t.Check("example: a recommended mod that isn't installed shows on the mod's page", jsonPage.Contains("works better with doctorexamplemissing"));
+            string topic = doctor.BuildPage(ev, null, "en", "example-pumps", "").PlainText(sapi.World);
+            t.Check("example: the mod's own page of the doctor", topic.Contains("My example pumps aren't pumping") && topic.Contains("jammed pumps"));
+            t.Check("example: the mod's fix runs", doctor.RunFix("doctorexample:unjam", "all", null, "en", ev) == "Restarted 3 example pumps");
+            t.Check("example: after the fix the check passes", doctor.BuildPage(ev, null, "en", Pages.Overview, "").PlainText(sapi.World).Contains("All example pumps are running"));
+            t.Check("example: the fix over the event bus runs", doctor.RunFix("bus:doctorexample:fill", "", null, "en", ev) == "Filled 2 example tanks");
+            // The fix the JSON file describes: its config file moved aside.
+            string config = Path.Combine(Vintagestory.API.Config.GamePaths.ModConfig, "doctorexample.json");
+            File.WriteAllText(config, "{ }");
+            string reset = doctor.RunFix("doctorexamplejson:pump-jammed/fix", "", null, "en", ev);
+            t.Check("example: the fix described in JSON runs", !reset.StartsWith(DoctorReport.WarnMark) && !File.Exists(config), reset);
+            string api = doctor.BuildPage(ev, null, "en", Pages.Api, "").PlainText(sapi.World);
+            File.WriteAllText(Path.Combine(folder, "page-api-with-examples.txt"), api);
+            t.Check("example: the page for mod authors lists what was handed over", api.Contains("doctorexample:pumps") && api.Contains("doctorexamplejson:config/vintagedoctor.json"));
+        }
+
+        static void RealFixes(Run_ t, VintageDoctorSystem doctor, ICoreServerAPI sapi)
+        {
+            // A broken config file in the real ModConfig folder: found, then moved aside by the fix.
+            string name = "doctor-selftest-broken.json";
+            string path = Path.Combine(Vintagestory.API.Config.GamePaths.ModConfig, name);
+            File.WriteAllText(path, "{ \"half\": ");
+            Evidence ev = doctor.EvidenceNow(true);
+            string configs = doctor.BuildPage(ev, null, "en", Checks.TopicFiles, "").PlainText(sapi.World);
+            t.Check("real fix: a broken config file is found", configs.Contains(name) && configs.Contains("/doctor fix doctor:reset-config " + name), null);
+            string outcome = doctor.RunFix("doctor:reset-config", name, null, "en", ev);
+            t.Check("real fix: it is moved aside", !outcome.StartsWith(DoctorReport.WarnMark) && !File.Exists(path) && Directory.Exists(Path.Combine(doctor.DataFolder, "backups")), outcome);
+            t.Check("real fix: a path outside ModConfig is refused", doctor.RunFix("doctor:reset-config", "../serverconfig.json", null, "en", ev).StartsWith(DoctorReport.WarnMark));
+            t.Check("real fix: the doctor's own config is refused", doctor.RunFix("doctor:reset-config", VintageDoctorSystem.ConfigFile, null, "en", ev).StartsWith(DoctorReport.WarnMark));
+            string items = doctor.RunFix("doctor:remove-items", "", null, "en", ev);
+            t.Check("real fix: removing dropped items runs", !items.StartsWith(DoctorReport.WarnMark), items);
+            t.Check("real fix: a loaded mod's file can't be moved by a made-up argument", doctor.RunFix("doctor:move-file", "9/whatever.zip", null, "en", ev).StartsWith(DoctorReport.WarnMark));
+            // Switching a mod off on a dedicated server goes through the server's own config.
+            ModEntry victim = ev.Mods.UserMods.FirstOrDefault(m => m.Id == "doctorexamplejson") ?? ev.Mods.UserMods.FirstOrDefault(m => m.Id != DoctorApi.ModId && !m.Id.StartsWith("doctorexample"));
+            if (victim != null && sapi.Server.IsDedicated)
+            {
+                string off = doctor.RunFix("doctor:disable-mod", victim.Id, null, "en", ev);
+                t.Check("real fix: switching a mod off on a dedicated server", !off.StartsWith(DoctorReport.WarnMark), off);
+            }
+            else t.Skip("real fix: switching a mod off", "no other mod loaded, or not a dedicated server");
+            t.Check("real fix: the doctor won't switch itself off", doctor.RunFix("doctor:disable-mod", DoctorApi.ModId, null, "en", ev).StartsWith(DoctorReport.WarnMark));
+            doctor.ForgetEvidence();
+        }
+    }
+}

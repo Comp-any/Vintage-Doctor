@@ -1,0 +1,101 @@
+{
+  "//": "Log messages Vintage Doctor explains by itself. Other mods add their own with a file of the same name and shape in assets/<their mod id>/config/ (see docs/api.md).",
+  "knownProblems": [
+    {
+      "id": "shape-duplicate-attachment",
+      "match": "Found duplicated attachment point code",
+      "level": "info",
+      "title": "A model has two attachment points with the same name",
+      "explain": "Whatever gets attached there (clothes, a tool in a hand, a rider) may sit in the wrong place. Nothing else is affected.",
+      "advice": "The model's author can fix it by giving each point its own name."
+    },
+    {
+      "id": "lang-stray-tag",
+      "match": "Found closing tag char > but no tag was opened",
+      "level": "info",
+      "title": "A text has a stray '>' in it",
+      "explain": "The game reads '<' and '>' as formatting marks. That one text may show oddly; nothing else is affected."
+    },
+    {
+      "id": "lang-too-few-values",
+      "match": "Index (zero based) must be greater than or equal to zero and less than the size of the argument list",
+      "matchStack": "TranslationService",
+      "level": "info",
+      "title": "A translated text asks for more values than the game gives it",
+      "explain": "Only that text shows wrong (usually as its raw key). The mod's author or its translator can fix it."
+    },
+    {
+      "id": "schematic-missing-blocks",
+      "match": "uses blocks that could no longer be found",
+      "level": "info",
+      "title": "A structure that generates in the world uses blocks that don't exist",
+      "explain": "Those parts of the structure will be air. The structure was made for another version of the game or expects another mod."
+    },
+    {
+      "id": "schematic-missing-items",
+      "match": "uses items that could no longer be found",
+      "level": "info",
+      "title": "A structure that generates in the world holds items that don't exist",
+      "explain": "Chests and shelves in it will hold unknown items instead. The structure was made for another version of the game or expects another mod."
+    },
+    {
+      "id": "blockpatch-unresolved",
+      "match": "Unable to resolve block with code",
+      "level": "info",
+      "title": "World generation names a plant or block that doesn't exist",
+      "explain": "That plant simply won't generate. A mod's world-generation file expects another mod, or an older version of one."
+    },
+    {
+      "id": "drink-portion",
+      "match": "Drink portion size",
+      "level": "info",
+      "title": "A cup is set to hold a bigger sip than it can",
+      "explain": "The game corrects it by itself. Harmless."
+    },
+    {
+      "id": "remap-failed",
+      "match": "Failed remaps entry",
+      "level": "info",
+      "title": "A renamed block or item from an older version wasn't in this world",
+      "explain": "After a game or mod update, old names are mapped to new ones. This one had nothing to map, which is normal for worlds that never had it."
+    },
+    {
+      "id": "code-mod-no-systems",
+      "match": "Is a Code mod, but no ModSystems found",
+      "level": "warning",
+      "title": "A mod with code has no code that starts",
+      "explain": "The mod says it is a code mod, but the game found nothing in it to run on this side, so it does nothing here. On a server this is normal for a mod that only works in the player's game.",
+      "advice": "If the mod should be doing something on this side, download it again or look for a version for this game."
+    },
+    {
+      "id": "content-mod-with-code",
+      "match": "files were found. These will be ignored",
+      "level": "warning",
+      "title": "A mod carries code the game won't run",
+      "explain": "Its modinfo.json says it is not a code mod, so the game ignores the code inside it. Whatever that code was for is missing.",
+      "advice": "The mod's author has to set the type in modinfo.json to \"code\"."
+    },
+    {
+      "id": "entity-tick-exception",
+      "match": "Exception while ticking entity",
+      "level": "warning",
+      "title": "A creature threw an error while the server moved it",
+      "explain": "The game skips that creature for the moment and carries on. If it repeats, that creature (or the mod it comes from) is broken: it may stand still, and the repeated error slows the server.",
+      "advice": "The error right after it in the log names the code at fault. Removing the creature (or the mod) stops it."
+    },
+    {
+      "id": "player-tick-exception",
+      "match": "Exception while ticking player",
+      "level": "warning",
+      "title": "A player's character threw an error while the server moved it",
+      "explain": "Something the player wears, holds or is affected by fails every tick. The error right after it in the log names the code at fault."
+    },
+    {
+      "id": "mod-cache-locked",
+      "match": "There was an exception deleting the cached mod folder",
+      "level": "info",
+      "title": "An old unpacked copy of a mod couldn't be cleaned up",
+      "explain": "The game unpacks mods into its Cache folder and clears old copies at start. Another program (an antivirus, a second copy of the game) held this one. It only wastes a little disk space."
+    }
+  ]
+}

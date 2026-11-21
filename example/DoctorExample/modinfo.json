@@ -1,0 +1,11 @@
+{
+  "type": "code",
+  "modid": "doctorexample",
+  "name": "Doctor Example",
+  "authors": [ "demonic69" ],
+  "description": "Shows how a mod hands Vintage Doctor its own checks and fixes. Only for trying the API out.",
+  "version": "1.0.0",
+  "side": "Server",
+  "requiredOnClient": false,
+  "dependencies": { "game": "1.22.0" }
+}
