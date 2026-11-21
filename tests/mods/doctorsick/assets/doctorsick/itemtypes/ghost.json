@@ -1,4 +1,5 @@
 {
   "code": "ghost",
-  "class": "DoctorGhostItem"
+  "class": "DoctorGhostItem",
+  "behaviors": [ { "name": "DoctorGhostBehavior" } ]
 }

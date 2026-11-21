@@ -76,8 +76,13 @@ namespace VintageDoctor
         public readonly Dictionary<string, string> FailedPatchExample = new Dictionary<string, string>(StringComparer.Ordinal);
         public readonly Dictionary<string, int> Unresolved = new Dictionary<string, int>(StringComparer.Ordinal);
         public readonly Dictionary<string, string> UnresolvedExample = new Dictionary<string, string>(StringComparer.Ordinal);
-        /// <summary>Blocks and items that name code the game doesn't have ("has defined a block class X, no such class registered").</summary>
+        /// <summary>
+        /// Blocks and items that name code the game doesn't have ("has defined a block class X, no such class registered",
+        /// "Collectible behavior X for item Y not found"). The kind is block, item, entity (a block's data code) or behavior.
+        /// </summary>
         public readonly List<(string kind, string code, string className)> MissingClasses = new List<(string, string, string)>();
+        /// <summary>Blocks and items the game refused to add ("Failed registering item X"), most often because the name was taken.</summary>
+        public readonly List<(string kind, string code)> FailedRegistrations = new List<(string, string)>();
         /// <summary>Files of a mod (blocks, items, recipes...) the game could not read and skipped, by the mod (asset domain) they are in.</summary>
         public readonly Dictionary<string, List<string>> BrokenTypes = new Dictionary<string, List<string>>(StringComparer.Ordinal);
         /// <summary>JSON patches for files that aren't there, by the mod that has the patch: the files it wanted to change.</summary>
@@ -103,6 +108,8 @@ namespace VintageDoctor
         static readonly Regex PatchFail = new Regex(@"^Patch \d+ \(target: ([^)]*)\) in ([a-z0-9_.-]+):(\S*)", RegexOptions.Compiled);
         static readonly Regex PatchNoFile = new Regex(@"^Patch \d+ in ([a-z0-9_.-]+):(\S+?): File (\S+?) not found", RegexOptions.Compiled);
         static readonly Regex NoClass = new Regex(@"^(Block|Item) with code (\S+) has defined an? (block entity|block|item) class (\S+?),", RegexOptions.Compiled);
+        static readonly Regex NoBehavior = new Regex(@"^(?:Block or Collectible|Block entity|Block|Collectible) behavior (\S+) for (?:block|item) (\S+) not found", RegexOptions.Compiled);
+        static readonly Regex NotRegistered = new Regex(@"^Failed registering (item|block) (\S+?):?$", RegexOptions.Compiled);
         static readonly Regex TypeNotLoaded = new Regex(@"^(Item|Block|Entity) type ([a-z0-9_.-]+):(\S+?) could not be loaded", RegexOptions.Compiled);
         static readonly Regex SyntaxError = new Regex(@"^Syntax error in json file '([a-z0-9_.-]+):([^']+)'", RegexOptions.Compiled);
         static readonly Regex Unresolvable = new Regex(@"^Failed resolving .* with code ([a-z0-9_.-]+):(\S+)", RegexOptions.Compiled);
@@ -350,6 +357,15 @@ namespace VintageDoctor
                     if (MissingClasses.Count < 2000 && !MissingClasses.Contains((kind, nc.Groups[2].Value, nc.Groups[4].Value))) MissingClasses.Add((kind, nc.Groups[2].Value, nc.Groups[4].Value));
                     // No "continue": it counts as one of the mod's errors too.
                 }
+                Match nb = NoBehavior.Match(text);
+                if (nb.Success)
+                {
+                    var lacking = ("behavior", nb.Groups[2].Value, nb.Groups[1].Value);
+                    if (MissingClasses.Count < 2000 && !MissingClasses.Contains(lacking)) MissingClasses.Add(lacking);
+                }
+                Match fr = NotRegistered.Match(text.TrimEnd());
+                if (fr.Success && FailedRegistrations.Count < 2000 && !FailedRegistrations.Contains((fr.Groups[1].Value, fr.Groups[2].Value)))
+                    FailedRegistrations.Add((fr.Groups[1].Value, fr.Groups[2].Value));
                 // 1.22 says "Syntax error in json file 'mod:itemtypes/x.json': ..."; newer versions "Item type mod:itemtypes/x.json could not be loaded".
                 Match tn = TypeNotLoaded.Match(text);
                 Match se = tn.Success ? Match.Empty : SyntaxError.Match(text);

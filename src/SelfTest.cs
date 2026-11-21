@@ -66,6 +66,11 @@ namespace VintageDoctor
 21.11.2026 10:00:03 [Error] Block with code ghosty:machine-north has defined a block class GhostMachine, no such class registered. Will ignore.
 21.11.2026 10:00:03 [Error] Block with code ghosty:machine-north has defined a block entity class GhostMachineEntity, no such class registered. Will ignore.
 21.11.2026 10:00:03 [Error] Item with code ghosty:wand has defined an item class GhostWand, but no such class registered. Will ignore.
+21.11.2026 10:00:03 [Warning] Collectible behavior GhostGlow for item ghosty:wand not found
+21.11.2026 10:00:03 [Warning] Block or Collectible behavior GhostHum for block ghosty:machine-north not found
+21.11.2026 10:00:03 [Warning] Block entity behavior GhostPower for block ghosty:machine-north not found
+21.11.2026 10:00:03 [Error] Failed registering item ghosty:wand:
+21.11.2026 10:00:03 [Error] Failed registering block ghosty:machine-north
 21.11.2026 10:00:03 [Error] Item type ghosty:itemtypes/broken.json could not be loaded. Will ignore. Exception:
 21.11.2026 10:00:03 [Error] Syntax error in json file 'ghosty:recipes/grid/cutshort.json': Failed deserializing cutshort.json: Unexpected end when reading token. Path ''.
 21.11.2026 10:00:03 [Warning] [ghosty] Is a Content mod, but .cs or .dll files were found. These will be ignored.
@@ -205,12 +210,16 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             t.Check("log: a patch for a mod that isn't installed is noted, not counted as failed", log.MissingTargets.TryGetValue("patchy", out List<string> compat) && compat.Count == 1
                 && compat[0] == "selftestabsentmod:itemtypes/thing.json", string.Join(";", log.MissingTargets.Select(kv => kv.Key + "=" + string.Join(",", kv.Value))));
             t.Check("log: a patch for a file the game no longer has counts as failed", log.FailedPatches.TryGetValue("oldpatchy", out int old) && old == 1 && log.MissingTargets.ContainsKey("oldpatchy"));
-            t.Check("log: blocks and items whose code is missing", log.MissingClasses.Count == 3 && log.MissingClasses.Contains(("block", "ghosty:machine-north", "GhostMachine"))
+            t.Check("log: blocks and items whose code is missing", log.MissingClasses.Count == 6 && log.MissingClasses.Contains(("block", "ghosty:machine-north", "GhostMachine"))
+                && log.MissingClasses.Contains(("behavior", "ghosty:wand", "GhostGlow")) && log.MissingClasses.Contains(("behavior", "ghosty:machine-north", "GhostHum"))
+                && log.MissingClasses.Contains(("behavior", "ghosty:machine-north", "GhostPower"))
                 && log.MissingClasses.Contains(("entity", "ghosty:machine-north", "GhostMachineEntity")) && log.MissingClasses.Contains(("item", "ghosty:wand", "GhostWand")),
                 string.Join(";", log.MissingClasses.Select(m => m.kind + " " + m.code + " " + m.className)));
             t.Check("log: files of a mod the game couldn't read, in the words of two game versions", log.BrokenTypes.TryGetValue("ghosty", out List<string> unread) && unread.Count == 2
                 && unread[0] == "itemtypes/broken.json" && unread[1] == "recipes/grid/cutshort.json",
                 string.Join(";", log.BrokenTypes.Select(kv => kv.Key + "=" + string.Join(",", kv.Value))));
+            t.Check("log: blocks and items the game refused to add", log.FailedRegistrations.Count == 2 && log.FailedRegistrations.Contains(("item", "ghosty:wand"))
+                && log.FailedRegistrations.Contains(("block", "ghosty:machine-north")), string.Join(";", log.FailedRegistrations.Select(r => r.kind + " " + r.code)));
             t.Check("log: code in a mod that calls itself a content mod", log.IgnoredCode.Count == 1 && log.IgnoredCode[0] == "ghosty", string.Join(";", log.IgnoredCode));
             t.Check("log: a slow tick", log.Overloads.Count == 1 && log.Overloads[0].ms == 2377);
             LogIssue drink = log.Issues.FirstOrDefault(i => i.Message.StartsWith("Drink portion"));
@@ -539,9 +548,11 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             string replacedFile = "";
             try { replacedFile = File.ReadAllText(Path.Combine(Vintagestory.API.Config.GamePaths.ModConfig, "doctor-sick-override.txt")).Trim(); } catch { }
             t.Check("sick: a .dll in a subfolder of a zip", files.Contains("doctor-sick-straydll.zip has code where the game doesn't accept it (lib/Helper.dll)"), First(files, "straydll"));
-            t.Check("sick: a block and an item whose code is missing, the block's data code too", clashes.Contains("Doctor Sick: 3 block(s) or item(s) need code that isn't in the game")
+            t.Check("sick: a block and an item whose code is missing, the block's data code too", clashes.Contains("Doctor Sick: 2 block(s) or item(s) need code that isn't in the game")
                 && clashes.Contains("doctorsick:ghost (its code: DoctorGhostItem)") && clashes.Contains("doctorsick:ghostblock (its code: DoctorGhostBlock)")
                 && clashes.Contains("doctorsick:ghostblock (its data code: DoctorGhostEntity)"), First(clashes, "need code") + " / " + First(clashes, "DoctorGhostEntity"));
+            t.Check("sick: a behaviour no mod has", clashes.Contains("doctorsick:ghost (a behaviour: DoctorGhostBehavior)"), First(clashes, "DoctorGhostBehavior"));
+            t.Check("sick: an item two files both add", clashes.Contains("Doctor Sick: 1 block(s) or item(s) couldn't be added to the game") && clashes.Contains("doctorsick:ghost"), First(clashes, "couldn't be added"));
             t.Check("sick: an item file the game couldn't read", clashes.Contains("Doctor Sick: 1 of its files couldn't be read") && clashes.Contains("doctorsick:itemtypes/broken.json"),
                 First(clashes, "couldn't be read"));
             t.Check("sick: a patch for a file the game doesn't have, and one for a mod that isn't installed", clashes.Contains("Doctor Sick tries to change 1 file(s) that aren't there")
@@ -566,7 +577,7 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
                 First(clashes, "with code were made"));
             t.Check("sick: two recipes with the same ingredients", clashes.Contains("1 recipe(s) have exactly the same ingredients as another recipe"), First(clashes, "same ingredients"));
             t.Check("sick: the same on the item's own crafting page", flint.Contains("Another recipe has exactly the same ingredients"), First(flint, "same ingredients"));
-            t.Check("sick: a mod's own page has what is wrong with its files", sickMod.Contains("3 block(s) or item(s) need code that isn't in the game") && sickMod.Contains("1 of its files couldn't be read")
+            t.Check("sick: a mod's own page has what is wrong with its files", sickMod.Contains("2 block(s) or item(s) need code that isn't in the game") && sickMod.Contains("1 of its files couldn't be read")
                 && sickMod.Contains("tries to change 1 file(s) that aren't there") && sickMod.Contains("It replaces 1 of the game's own files"), First(sickMod, "need code") + " / " + First(sickMod, "replaces"));
             t.Check("sick: the check-up shows the clashes that matter and leads to the rest", overview.Contains("need code that isn't in the game") && overview.Contains("/doctor clashes")
                 && !overview.Contains("brings its own copy"), First(overview, "/doctor clashes"));

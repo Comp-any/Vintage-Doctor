@@ -552,5 +552,8 @@
   "why-native": "The mod needs a library that isn't part of .NET, and it isn't there or isn't made for this system: a Windows-only mod on Linux or macOS, or a download that is missing files.",
   "why-badimage": "A code file is damaged or isn't made for this system. Download the mod again; if that doesn't help, the mod wasn't built for this kind of computer.",
   "why-duplicate": "Something was added under a name that is already taken: two mods add a thing with the same name, the same mod was loaded twice, or one mod adds the same thing twice. One of the two is left out, and what depends on it may misbehave.",
-  "why-packaging": "The mod's zip is put together in a way the game doesn't accept: a code mod needs exactly one .dll of its own at the top of the zip. That is for the mod's author to fix; getting the mod again from its page sometimes helps."
+  "why-packaging": "The mod's zip is put together in a way the game doesn't accept: a code mod needs exactly one .dll of its own at the top of the zip. That is for the mod's author to fix; getting the mod again from its page sometimes helps.",
+  "missing-behavior": "a behaviour:",
+  "notadded-title": "{0}: {1} block(s) or item(s) couldn't be added to the game",
+  "notadded-why": "The game refused them while loading. Most often something with the same name was already there: two mods, or two files of one mod, add a thing with the same name, and only the first one exists. The log has the game's reason for each."
 }

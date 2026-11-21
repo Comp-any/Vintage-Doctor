@@ -35,6 +35,7 @@ namespace VintageDoctor
             if (worldParts)
             {
                 Guarded(x, "missing code", () => MissingClasses(x, full));
+                Guarded(x, "not added", () => NotAdded(x, full));
                 Guarded(x, "unreadable files", () => UnreadableTypes(x, full));
                 Guarded(x, "patch targets", () => PatchTargets(x, full));
             }
@@ -91,13 +92,21 @@ namespace VintageDoctor
         {
             var byMod = new Dictionary<string, List<string>>(StringComparer.Ordinal);
             var names = new Dictionary<string, List<string>>(StringComparer.Ordinal);
+            var things = new Dictionary<string, HashSet<string>>(StringComparer.Ordinal);
             var seen = new HashSet<string>(StringComparer.Ordinal);
             void Found(string code, string kind, string className)
             {
                 if (!seen.Add(kind + "|" + code + "|" + className)) return;
                 string domain = DomainOf(code);
-                if (!byMod.TryGetValue(domain, out List<string> list)) { byMod[domain] = list = new List<string>(); names[domain] = new List<string>(); }
-                list.Add(code + " (" + (kind == "entity" ? x.T("missing-entityclass") : x.T("missing-class")) + " " + className + ")");
+                if (!byMod.TryGetValue(domain, out List<string> list))
+                {
+                    byMod[domain] = list = new List<string>();
+                    names[domain] = new List<string>();
+                    things[domain] = new HashSet<string>(StringComparer.Ordinal);
+                }
+                string what = kind == "entity" ? x.T("missing-entityclass") : kind == "behavior" ? x.T("missing-behavior") : x.T("missing-class");
+                list.Add(code + " (" + what + " " + className + ")");
+                things[domain].Add(code);
                 if (!names[domain].Contains(className)) names[domain].Add(className);
             }
 
@@ -133,7 +142,7 @@ namespace VintageDoctor
             {
                 if (onlyMod != null && !string.Equals(kv.Key, onlyMod, StringComparison.OrdinalIgnoreCase)) continue;
                 bool startFailed = log != null && log.StartFailures.Any(f => string.Equals(f.Mod, kv.Key, StringComparison.OrdinalIgnoreCase));
-                x.Problem(x.T("missing-title", OwnerName(x, kv.Key), kv.Value.Count, string.Join(", ", names[kv.Key].Take(8))));
+                x.Problem(x.T("missing-title", OwnerName(x, kv.Key), things[kv.Key].Count, string.Join(", ", names[kv.Key].Take(8)) + (names[kv.Key].Count > 8 ? ", ..." : "")));
                 foreach (string line in kv.Value.Take(shown)) x.Detail(line);
                 if (kv.Value.Count > shown) x.Detail(x.T("more-lines", kv.Value.Count - shown));
                 x.Explain(startFailed ? x.T("missing-why-startfailed", x.ModName(kv.Key)) : x.T("missing-why"));
@@ -141,6 +150,26 @@ namespace VintageDoctor
                 if (onlyMod == null && x.Ev.Mods.Has(kv.Key)) ModButtons(x, kv.Key, false);
             }
             if (byMod.Count == 0 && full && onlyMod == null) x.Ok(x.T("missing-none"));
+        }
+
+        // ---------------------------------------------------------------- blocks and items the game refused to add
+
+        /// <summary>Blocks and items the game refused while loading, most often because another one of the same name was already there.</summary>
+        public static void NotAdded(DoctorContext x, bool full, string onlyMod = null)
+        {
+            LogScan log = x.Ev.Log;
+            if (log == null || log.FailedRegistrations.Count == 0) return;
+            int shown = full ? 20 : 4;
+            foreach (var g in log.FailedRegistrations.GroupBy(r => DomainOf(r.code)).OrderByDescending(g => g.Count()))
+            {
+                if (onlyMod != null && !string.Equals(g.Key, onlyMod, StringComparison.OrdinalIgnoreCase)) continue;
+                var codes = g.Select(r => r.code).Distinct().ToList();
+                x.Warn(x.T("notadded-title", OwnerName(x, g.Key), codes.Count));
+                foreach (string code in codes.Take(shown)) x.Detail(code);
+                if (codes.Count > shown) x.Detail(x.T("more-lines", codes.Count - shown));
+                x.Explain(x.T("notadded-why"));
+                if (onlyMod == null && x.Ev.Mods.Has(g.Key)) ModButtons(x, g.Key, false);
+            }
         }
 
         // ---------------------------------------------------------------- block and item files the game couldn't read
@@ -560,6 +589,7 @@ namespace VintageDoctor
             if (x.Side == EnumAppSide.Server || !x.Doctor.ServerAnswers)
             {
                 MissingClasses(x, true, m.Id);
+                NotAdded(x, true, m.Id);
                 UnreadableTypes(x, true, m.Id);
                 PatchTargets(x, true, m.Id);
             }
