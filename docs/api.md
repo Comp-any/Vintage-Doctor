@@ -12,6 +12,9 @@ There are three ways in. Use whichever suits your mod; they can be mixed.
 | [The event bus](#2-the-event-bus-no-reference) | two event listeners | nothing |
 | [The C# API](#3-the-c-api) | a few calls | a reference to `VintageDoctor.dll` (not a requirement for players) |
 
+A mod that already has a doctor of its own can hand the whole thing over: see
+[A whole doctor of your own](#4-a-whole-doctor-of-your-own).
+
 Everything here is tried on a real server at every build: the two mods in [`example/`](../example) use all three ways,
 and the doctor's own test loads them and checks their cards, fixes and pages show up.
 
@@ -145,8 +148,20 @@ What the doctor puts in the tree it sends:
 | `language` | The asking player's language code. |
 | `player` | The asking player's uid; empty for the console and the start-up check. |
 
+Since 1.2.0 it also has `held` and `heldCode` (what the player holds: the item stack as bytes, and
+`item:game:ingot-copper`), `hasLookedAt` with `lookedAtX`, `lookedAtY`, `lookedAtZ`, `lookedAtDim` (the block they look
+at), `compact` (true for a bug report: facts only) and `clientfacts` (see section 4).
+
+A result can also carry a link to another page: `link` (a page id, yours or one of the doctor's), `linkArgument` and
+`linkLabel`.
+
 The fix event's tree has `id`, `argument`, `side`, `language` and `player`. On the server a fix only runs for
 players allowed to see the server's report (admins, by default) and for the console.
+
+**A card on the page about one item or block (1.2.0).** On the doctor's pages about one thing (`/doctor item`,
+`/doctor block`, `/doctor craft`) it pushes `vintagedoctor:about` instead, with the same tree plus `subject`
+(`item:game:ingot-copper` or `block:game:anvil-copper`); `topic` is `item`, `block` or `craft`. Answer the same way
+as for `vintagedoctor:collect`, about that thing only.
 
 If Vintage Doctor isn't installed, nobody pushes these events and your listeners simply never run.
 
@@ -212,7 +227,20 @@ Don't list `vintagedoctor` under `dependencies` in your modinfo.json unless you 
 | `RegisterKnownProblem(KnownProblem)` | The same as a JSON known problem, from code. |
 | `ReportIncident(modId, level, title, details)` | Something that went wrong just now (a machine jammed, a save failed). Kept for the session and shown under your mod's name; the same title again raises a count. Safe from any thread. |
 | `Unregister(modId)` | Takes everything of your mod away again. |
-| `DoctorVersion`, `ApiVersion` | `ApiVersion` is 1. It only goes up when something is added; nothing is removed. |
+| `RegisterClientFacts(modId, collect)` | (API 2, on the player's side) Something your server-side checks need to know about this player's game. `collect(topic, argument)` returns bytes (64 KB at most); they travel with each request and your check reads them with `ctx.ClientFacts(modId)`. |
+| `OpenPage(topic, argument, player)` | (API 2) Opens the doctor's window at a page. On the server it asks that player's game; false when their game doesn't have the doctor. |
+| `DoctorVersion`, `ApiVersion` | `ApiVersion` is 2 since Vintage Doctor 1.2.0 (1 before). It only goes up when something is added; nothing is removed. |
+
+Everything marked "API 2" needs Vintage Doctor 1.2.0. If your mod should also work with an older doctor, check
+`ApiVersion >= 2` and keep the code that uses those members in a class of its own, as the example mod does
+(`WithDoctor2`).
+
+**`DoctorCheck`** has `Deep`, and since API 2 `Pages`: the pages the check runs on. Left empty it runs on the
+check-up and your mod's page; set to any of `"overview"`, `"mod"`, `"item"`, `"block"`, `"craft"` it runs only there.
+On the last three it is about one thing, found in `ctx.Subject`.
+
+**`DoctorTopic`** has, since API 2, `OwnHeadings`: the page writes its own headings, so the doctor doesn't put the
+question above it as one.
 
 **`IDoctorContext`** (what a check or page gets)
 
@@ -228,9 +256,127 @@ Don't list `vintagedoctor` under `dependencies` in your modinfo.json unless you 
 | `Translate(key, args)` | A text from your lang file in the asking player's language. |
 | `LogIssues(modId)` | This session's errors and warnings from the log, grouped; with a mod id, only that mod's. |
 | `Api`, `Side`, `Player`, `LanguageCode`, `Topic`, `Argument`, `HeldItem`, `Compact` | Who asked and for what. `Player` is null for the console and the start-up check. |
+| `LookedAt`, `Subject` | (API 2) The block the asker looks at; on the item, block and craft pages, the thing the page is about. |
+| `ClientFacts(modId)` | (API 2) What your mod on the asker's own game sent along (`RegisterClientFacts`); null when nothing came. |
+| `Write(text, indent)`, `LinkText(...)`, `FixText(...)` | (API 2) A plain line outside any card, and buttons as text to put into it, several on one line. |
 
 A check runs on the game's main thread, so it may read the world. Keep it quick (a few milliseconds); set `Deep`
 for the rest. If a check throws, the doctor shows a card saying so with your check's name, and carries on.
+
+## 4. A whole doctor of your own
+
+For a mod that already has its own "what's wrong" window or command and wants Vintage Doctor to show it instead
+when the doctor is installed. Everything here is on the event bus, so your mod needs no reference to the doctor and
+loses nothing when it isn't there: keep your own window for that case, and hand over when
+`api.ModLoader.IsModEnabled("vintagedoctor")` (and its version is 1.2.0 or newer; an older doctor never pushes
+these events). Vintage-E does exactly this.
+
+**Your pages.** The doctor asks which pages you have with `vintagedoctor:topics`, and asks for one with
+`vintagedoctor:page`:
+
+```csharp
+api.Event.RegisterEventBusListener(OnTopics, 0.5, "vintagedoctor:topics");
+api.Event.RegisterEventBusListener(OnPage, 0.5, "vintagedoctor:page");
+
+void OnTopics(string eventName, ref EnumHandling handling, IAttribute data)
+{
+    if (!(data is ITreeAttribute tree) || tree.GetString("side") != "server") return;
+    ITreeAttribute page = tree.GetOrAddTreeAttribute("topics").GetOrAddTreeAttribute("mymod");   // /doctor mymod
+    page.SetString("mod", "mymod");
+    page.SetString("question", "Something is wrong with my machines");   // the line among the doctor's questions
+    page.SetBool("ownHeadings", true);                                   // your page starts with its own heading
+}
+
+void OnPage(string eventName, ref EnumHandling handling, IAttribute data)
+{
+    if (!(data is ITreeAttribute tree) || tree.GetString("topic") != "mymod") return;
+    string argument = tree.GetString("argument");      // whatever followed: one page id can be a whole set of pages
+    tree["texts"] = new StringArrayAttribute(new[] { "My machines", "⚠ 2 machines have no power", "at 10 5 10",
+        "{{fix|mymod:power|all|Power them}} {{open|mymod|list|All machines}}" });
+    tree.SetBytes("styles", new byte[] { 1, 5, 3, 0 });
+    tree.SetBytes("indents", new byte[] { 0, 0, 1, 1 });
+}
+```
+
+A page is lines of text, each with a style and an indent:
+
+| Style | |
+|---|---|
+| 0 | Text. |
+| 1 | A heading. |
+| 2 | A result line (what a fix did). |
+| 3 | A quiet note. |
+| 4 | A warning line. |
+| 5 | A card. It starts with `✓` (passed), `•` (to know), `⚠` (may affect play) or `✖` (a problem); the indented lines after it are its details, shown when the card is opened. A line starting with `→` is advice. |
+
+Inside a line:
+
+- `{{open|<page>|<argument>|<label>}}` is a button to a page: yours (`mymod`, with any argument) or one of the
+  doctor's (`mod` with a mod id, `log` with a mod id, `item` with a code, `startup`, `files`...).
+- `{{fix|<fix id>|<argument>|<label>}}` is a button that pushes `vintagedoctor:fix` with that id on the side that
+  built the page, then shows the page again with the result at the top. Write `{{fix|c:bus:<fix id>|...}}` for a fix
+  that has to run on the player's side (opening a window of yours, say).
+- `{{url|<address>||<label>}}` opens a web page, `{{copy|<text>||<label>}}` copies text.
+- `[[item:game:ingot-copper]]` or `[[block:...]]` shows the thing's icon and name.
+
+Labels and arguments can't contain `{`, `}` or `|`.
+
+**Pages and fixes that take a while.** A page handler runs on the game's main thread and must return quickly. When
+the page needs more (reading files, working something out on another thread), say so and deliver later:
+
+```csharp
+string request = tree.GetString("request");
+tree.SetBool("later", true);
+tree.SetInt("seconds", 30);          // how long the doctor waits before giving up: 5 to 300, 60 if left out
+Task.Run(() =>
+{
+    string[] lines = WorkItOut();
+    api.Event.EnqueueMainThreadTask(() =>
+    {
+        var answer = new TreeAttribute();
+        answer.SetString("request", request);
+        answer["texts"] = new StringArrayAttribute(lines);
+        api.Event.PushEvent("vintagedoctor:deliver", answer);   // from the main thread
+    }, "mymod-doctor");
+});
+```
+
+The doctor tells the player's window to keep waiting, and puts your lines where they belong when they come. A fix
+works the same way: set `later` in the fix event's tree and push `vintagedoctor:deliver` with `request` and `result`
+(and `failed`) when it is done. From the server console, where a command has to answer at once, the page or result
+is written to the console when it comes.
+
+**What your mod on the player's game knows.** A server-side page often needs to know something about the asking
+player's game: which version of your mod it has, whether your data arrived there. On the player's side, answer
+`vintagedoctor:clientfacts`; whatever bytes you add travel with every request to the server:
+
+```csharp
+capi.Event.RegisterEventBusListener((string n, ref EnumHandling h, IAttribute data) =>
+{
+    if (data is ITreeAttribute tree && tree["facts"] is ITreeAttribute facts) facts.SetBytes("mymod", MyFactsAsBytes());
+}, 0.5, "vintagedoctor:clientfacts");
+```
+
+On the server they are in every tree the doctor sends (`vintagedoctor:page`, `collect`, `about`, `fix`) as
+`clientfacts`: `(tree["clientfacts"] as ITreeAttribute)?.GetBytes("mymod")`. 64 KB per mod at most. Nothing is there
+when the console asked or the player's game doesn't have your mod.
+
+**Opening the doctor at your page.** From your own hotkey or command, instead of your own window:
+
+```csharp
+var tree = new TreeAttribute();
+tree.SetString("topic", "mymod");
+tree.SetString("argument", "list");
+// tree.SetString("player", player.PlayerUID);   // on the server: whose window
+api.Event.PushEvent("vintagedoctor:open", tree);
+bool opened = tree.GetBool("opened");            // false: fall back to your own window
+```
+
+On the server this only works for players whose own game has the doctor too; `opened` tells you.
+
+**Which side.** The server's doctor and the one in each player's game ask separately, and the window shows both
+halves. Offer your page on the side that knows (usually the server) and leave the other side silent: the doctor
+doesn't put anything in its place.
 
 ## Good checks
 

@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.2.0
+
+For mods that already have a doctor of their own: they can now hand the whole thing over, so there is one window instead of two. Vintage-E is the first to do it (from its version 1.26.0): with Vintage Doctor installed, its EMC check-up, its pages and its fixes show up here, under "Something is wrong with EMC values". Nothing changes for players who don't have such a mod.
+
+- **A mod's own pages, written by the mod.** A mod can offer whole pages line by line (headings, cards, buttons), opened like any other page and listed among the questions. One page id can be a whole set of pages.
+- **Pages and fixes that take a while.** A mod can say "this needs a moment" and deliver its page or its fix's result a few seconds later. The window keeps waiting and says a mod is working on it; from the server console the result is written out when it comes. A mod that never answers leaves a warning instead of a page that hangs.
+- **What a mod on your own game knows travels with the request,** so its checks on the server can compare the two sides (is the same version on both, did its data arrive).
+- **Cards from mods on the pages about one thing:** an item, the block you look at, why something can't be crafted.
+- **A mod can open the doctor's window at its page** from its own key or command.
+- A page that only the server (or only your game) has no longer makes the other side answer with the check-up.
+- For mod authors: all of it works over the event bus, with no reference to the doctor, and most of it from the C# API too (API version 2). See [docs/api.md](docs/api.md), section 4; the example mod uses every part, and the test run checks it on a real server.
+
 ## 1.1.0
 
 The ways mods break themselves and each other. A new page, **Are any mods getting in each other's way?** (`/doctor clashes`), and what matters from it on the check-up.

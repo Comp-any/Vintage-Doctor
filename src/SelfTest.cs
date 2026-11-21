@@ -126,6 +126,7 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             t.Guard("config files", () => ConfigFiles(t, folder));
             t.Guard("known problems from JSON", () => KnownJson(t));
             t.Guard("the API", () => Api(t, doctor, sapi));
+            t.Guard("mods as guests", () => Guests(t, doctor, sapi));
             t.Guard("the pages", () => PagesOnRealServer(t, doctor, sapi, folder));
             t.Guard("the example mods", () => Examples(t, doctor, sapi, folder));
             if (ci) t.Guard("fixes on the real server", () => RealFixes(t, doctor, sapi));
@@ -133,6 +134,36 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
 
             // What is known so far, in case the server doesn't live to see the end.
             try { File.WriteAllText(Path.Combine(folder, "selftest-sync.txt"), string.Join("\n", t.Lines) + "\n" + t.Passed + " passed, " + t.Failed + " failed before the profiler\n"); } catch { }
+
+            // A page and a fix of the example mod that it delivers half a second later, through the game's own ticks:
+            // asked for here, looked at when the profiler is done.
+            DoctorReport slowPage = null;
+            string slowFix = null;
+            bool withExample = doctor.Snapshot().Has("doctorexample");
+            if (withExample)
+            {
+                t.Guard("asking the example mod for what takes a while", () =>
+                {
+                    Evidence evNow = doctor.EvidenceNow(false);
+                    doctor.BuildPageThen(evNow, null, "en", "example-tanks", "slow", null, null, false, null, null, false, r => slowPage = r);
+                    doctor.RunFixThen("bus:doctorexample:slowfill", "", null, "en", evNow, null, o => slowFix = o);
+                    t.Check("example: a page and a fix that take a while aren't there at once", slowPage == null && slowFix == null, slowFix);
+                    sapi.InjectConsole("/doctor example-tanks slow");
+                });
+            }
+            Action whatCameLater = () =>
+            {
+                if (!withExample) return;
+                t.Guard("what the example mod delivered later", () =>
+                {
+                    string page = slowPage?.PlainText(sapi.World) ?? "";
+                    t.Check("example: the page came, through the game's own ticks", page.Contains("This page came a moment later") && page.Contains("== The example tanks =="), page.Replace("\n", " / "));
+                    t.Check("example: so did the fix's result", slowFix == "Filled 2 example tanks, slowly", slowFix);
+                    string last = File.ReadAllText(Path.Combine(doctor.DataFolder, "last-report-server.txt"));
+                    t.Check("example: asked for from the console, the page is written out when it comes", last.Contains("This page came a moment later"), First(last, "This page"));
+                    t.Check("example: nothing is still being waited for", doctor.WaitingRequests().Count == 0, string.Join(",", doctor.WaitingRequests()));
+                });
+            };
 
             // The measured run takes a few seconds: its result is added when it is over, and the file written then.
             bool started = doctor.Profile.Start(sapi.World, 5);
@@ -152,10 +183,11 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
                         File.WriteAllText(Path.Combine(folder, "page-perf-profiled.txt"), text);
                         t.Check("the performance page shows the measured run", text.Contains("ms") && text.Contains("%"), null);
                     });
+                    whatCameLater();
                     Finish(t, doctor, sapi, folder);
                 }, 8000);
             }
-            else Finish(t, doctor, sapi, folder);
+            else sapi.Event.RegisterCallback(_ => { whatCameLater(); Finish(t, doctor, sapi, folder); }, 4000);
             return string.Join("\n", t.Lines) + "\n" + t.Passed + " passed, " + t.Failed + " failed so far; the profiler's result follows in " + Anonymise.Short(Path.Combine(folder, "selftest.txt"));
         }
 
@@ -413,7 +445,7 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
         static void Api(Run_ t, VintageDoctorSystem doctor, ICoreServerAPI sapi)
         {
             IDoctorApi api = DoctorApi.Get(sapi);
-            t.Check("api: other mods can find the doctor", api != null && api.ApiVersion == 1 && api.DoctorVersion == doctor.DoctorVersion);
+            t.Check("api: other mods can find the doctor", api != null && api.ApiVersion == 2 && api.DoctorVersion == doctor.DoctorVersion);
             if (api == null) return;
             const string me = "doctorselftest";
             bool fixRan = false;
@@ -482,6 +514,197 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             string after = doctor.BuildPage(ev, null, "en", Pages.Overview, "").PlainText(sapi.World);
             t.Check("api: unregistering takes everything of that mod away", !after.Contains("3 pipes aren't connected") && !after.Contains("A pump jammed") && doctor.TopicFor("selftest-pipes") == null
                 && doctor.Known.Match(issue, EnumAppSide.Server) == null);
+        }
+
+        static bool guestTest;
+
+        /// <summary>
+        /// A mod as a guest (1.2.0): pages it writes itself over the event bus, now or later, fixes that finish later,
+        /// what its copy on the player's game sends along, cards on the pages about one thing, opening the window.
+        /// The "later" cases are delivered by the test itself here; the example mod does it through real game ticks.
+        /// </summary>
+        static void Guests(Run_ t, VintageDoctorSystem doctor, ICoreServerAPI sapi)
+        {
+            IDoctorApi api = DoctorApi.Get(sapi);
+            if (api == null) { t.Check("guests: the doctor is there", false); return; }
+            const string me = "guestmod";
+            guestTest = true;
+            string askedFacts = null, askedHeld = null, askedAbout = null, laterRequest = null;
+
+            void Fill(ITreeAttribute tree, string last)
+            {
+                tree["texts"] = new StringArrayAttribute(new[]
+                {
+                    "Guest notes", DoctorReport.WarnMark + " 1 note is unread", "note 7",
+                    "{{fix|guestmod:read|7|Read it}} {{fix|c:bus:guestmod:show|7|Show it}} {{open|guest-notes|all|All notes}}", last
+                });
+                tree.SetBytes("styles", new byte[] { 1, 5, 3, 0, 3 });
+                tree.SetBytes("indents", new byte[] { 0, 0, 1, 1, 0 });
+            }
+            EventBusListenerDelegate topics = (string name, ref EnumHandling handling, IAttribute data) =>
+            {
+                if (!guestTest || !(data is ITreeAttribute tree)) return;
+                ITreeAttribute list = tree.GetOrAddTreeAttribute("topics");
+                ITreeAttribute notes = list.GetOrAddTreeAttribute("guest-notes");
+                notes.SetString("mod", me);
+                notes.SetString("question", "My guest notes are missing");
+                notes.SetBool("ownHeadings", true);
+                list.GetOrAddTreeAttribute("crash").SetString("question", "a name the doctor uses itself");
+            };
+            EventBusListenerDelegate page = (string name, ref EnumHandling handling, IAttribute data) =>
+            {
+                if (!guestTest || !(data is ITreeAttribute tree) || tree.GetString("topic") != "guest-notes") return;
+                byte[] sent = (tree["clientfacts"] as ITreeAttribute)?.GetBytes(me, null);
+                askedFacts = sent == null ? null : Encoding.UTF8.GetString(sent);
+                askedHeld = tree.GetString("heldCode");
+                if (tree.GetString("argument") == "slow")
+                {
+                    laterRequest = tree.GetString("request");
+                    tree.SetBool("later", true);
+                    tree.SetInt("seconds", 30);
+                    return;
+                }
+                Fill(tree, "argument: " + tree.GetString("argument"));
+            };
+            EventBusListenerDelegate fix = (string name, ref EnumHandling handling, IAttribute data) =>
+            {
+                if (!guestTest || !(data is ITreeAttribute tree)) return;
+                string id = tree.GetString("id");
+                if (id == "guestmod:read") tree.SetString("result", "Read note " + tree.GetString("argument"));
+                if (id == "guestmod:slowread") { laterRequest = tree.GetString("request"); tree.SetBool("later", true); }
+            };
+            EventBusListenerDelegate about = (string name, ref EnumHandling handling, IAttribute data) =>
+            {
+                if (!guestTest || !(data is ITreeAttribute tree) || !(tree["results"] is ITreeAttribute results)) return;
+                askedAbout = tree.GetString("topic") + " " + tree.GetString("subject");
+                ITreeAttribute r = results.GetOrAddTreeAttribute("guestmod:worth");
+                r.SetString("level", "info");
+                r.SetString("title", "Worth 3 guest notes");
+                r.SetString("link", "guest-notes");
+                r.SetString("linkArgument", "all");
+                r.SetString("linkLabel", "All guest notes");
+            };
+            EventBusListenerDelegate clientFacts = (string name, ref EnumHandling handling, IAttribute data) =>
+            {
+                if (!guestTest || !(data is ITreeAttribute tree) || !(tree["facts"] is ITreeAttribute f)) return;
+                f.SetBytes("busfacts", Encoding.UTF8.GetBytes("asked for " + tree.GetString("topic")));
+                f.SetBytes("toobig", new byte[70000]);
+                f.SetString("notbytes", "left out");
+            };
+            sapi.Event.RegisterEventBusListener(topics, 0.5, VintageDoctorSystem.TopicsEvent);
+            sapi.Event.RegisterEventBusListener(page, 0.5, VintageDoctorSystem.PageEvent);
+            sapi.Event.RegisterEventBusListener(fix, 0.5, VintageDoctorSystem.FixEvent);
+            sapi.Event.RegisterEventBusListener(about, 0.5, VintageDoctorSystem.AboutEvent);
+            sapi.Event.RegisterEventBusListener(clientFacts, 0.5, VintageDoctorSystem.ClientFactsEvent);
+            doctor.ForgetBusTopics();
+
+            Evidence ev = doctor.EvidenceNow(false);
+            t.Check("guests: a page offered on the event bus is known, one with a name the doctor uses isn't", doctor.TopicFor("guest-notes")?.ModId == me && !doctor.AllTopics().Any(tp => tp.Id == "crash"),
+                string.Join(",", doctor.AllTopics().Select(tp => tp.Id)));
+            var ask = new DoctorContext { Doctor = doctor, Api = sapi, Side = EnumAppSide.Server, LanguageCode = "en", Ev = ev };
+            Pages.Questions(ask, null, true, false);
+            t.Check("guests: it is among the questions", ask.R.PlainText(sapi.World).Contains("My guest notes are missing (/doctor guest-notes)"));
+
+            // What the player's game sends along: gathered there, packed, unpacked here, handed to the mod.
+            api.RegisterClientFacts(me, (topic, arg) => Encoding.UTF8.GetBytes("table 5 for " + topic + " " + arg));
+            ITreeAttribute gathered = doctor.GatherClientFacts("guest-notes", "all");
+            ITreeAttribute facts = VintageDoctorSystem.FactsFromBytes(VintageDoctorSystem.FactsToBytes(gathered));
+            t.Check("guests: what mods send along from the player's game is gathered, packed and unpacked; too much and the wrong kind are left out",
+                facts != null && facts.Count == 2 && Encoding.UTF8.GetString(facts.GetBytes(me, null) ?? new byte[0]) == "table 5 for guest-notes all"
+                && Encoding.UTF8.GetString(facts.GetBytes("busfacts", null) ?? new byte[0]) == "asked for guest-notes", facts == null ? "nothing" : facts.Count + " entries");
+
+            Item copper = sapi.World.GetItem(new AssetLocation("game:ingot-copper"));
+            ItemStack held = copper == null ? null : new ItemStack(copper);
+            DoctorReport now = null;
+            doctor.BuildPageThen(ev, null, "en", "guest-notes", "all", held, null, false, null, facts, false, r => now = r);
+            string text = now?.PlainText(sapi.World) ?? "";
+            t.Check("guests: the mod's own lines make the page, at once, under its own heading", now != null && text.Contains("== Guest notes ==") && text.Contains(DoctorReport.WarnMark + " 1 note is unread")
+                && text.Contains("  note 7") && text.Contains("argument: all") && !text.Contains("My guest notes are missing") && now.Warnings == 1, text.Replace("\n", " / "));
+            t.Check("guests: its buttons: a fix for the event bus on this side, one for the player's side, a link", text.Contains("Read it (/doctor fix bus:guestmod:read 7)")
+                && text.Contains("Show it (.doctor fix bus:guestmod:show 7)") && text.Contains("All notes (/doctor guest-notes all)"), First(text, "Read it"));
+            t.Check("guests: what the player's game sent along and what they hold reach the mod", askedFacts == "table 5 for guest-notes all" && askedHeld == "item:game:ingot-copper", askedFacts + " / " + askedHeld);
+
+            // A page that comes later.
+            DoctorReport slow = null;
+            int told = 0;
+            doctor.BuildPageThen(ev, null, "en", "guest-notes", "slow", null, null, false, null, null, false, r => slow = r, s => told = s);
+            string firstRequest = laterRequest;
+            t.Check("guests: a page that comes later isn't handed on yet, and how long it may take is passed on", slow == null && told == 30 && firstRequest != null && doctor.WaitingRequests().Contains(firstRequest),
+                "told " + told + ", waiting " + string.Join(",", doctor.WaitingRequests()));
+            var answer = new TreeAttribute();
+            answer.SetString("request", firstRequest ?? "");
+            Fill(answer, "delivered later");
+            sapi.Event.PushEvent(VintageDoctorSystem.DeliverEvent, answer);
+            t.Check("guests: it is handed on when the mod delivers", slow != null && slow.PlainText(sapi.World).Contains("delivered later") && answer.GetBool("accepted") && !doctor.WaitingRequests().Contains(firstRequest ?? ""));
+            var again = new TreeAttribute();
+            again.SetString("request", firstRequest ?? "");
+            sapi.Event.PushEvent(VintageDoctorSystem.DeliverEvent, again);
+            t.Check("guests: a second delivery for the same page is ignored", !again.GetBool("accepted"));
+            DoctorReport never = null;
+            laterRequest = null;
+            doctor.BuildPageThen(ev, null, "en", "guest-notes", "slow", null, null, false, null, null, false, r => never = r);
+            bool expired = laterRequest != null && doctor.ExpireNow(laterRequest);
+            t.Check("guests: a mod that never delivers leaves a warning, not a page that hangs", expired && never != null && never.Warnings == 1 && never.PlainText(sapi.World).Contains("didn't answer"),
+                never?.PlainText(sapi.World).Replace("\n", " / "));
+            string sync = doctor.BuildPage(ev, null, "en", "guest-notes", "slow").PlainText(sapi.World);
+            t.Check("guests: where nothing can wait, the page says the mod is still working", sync.Contains("is still putting its part together"), sync.Replace("\n", " / "));
+
+            // Fixes, at once and later.
+            string fixNow = null, fixLater = null;
+            int fixTold = 0;
+            doctor.RunFixThen("bus:guestmod:read", "7", null, "en", ev, null, o => fixNow = o);
+            t.Check("guests: a fix over the event bus answers at once when it can", fixNow == "Read note 7", fixNow);
+            laterRequest = null;
+            doctor.RunFixThen("bus:guestmod:slowread", "8", null, "en", ev, null, o => fixLater = o, s => fixTold = s);
+            bool fixWaits = fixLater == null && laterRequest != null && fixTold == 60;
+            var done = new TreeAttribute();
+            done.SetString("request", laterRequest ?? "");
+            done.SetString("result", "Read note 8, slowly");
+            sapi.Event.PushEvent(VintageDoctorSystem.DeliverEvent, done);
+            t.Check("guests: a fix that needs time is waited for", fixWaits && fixLater == "Read note 8, slowly", fixLater + ", told " + fixTold);
+            laterRequest = null;
+            doctor.RunFixThen("bus:guestmod:slowread", "9", null, "en", ev, null, o => fixLater = o);
+            t.Check("guests: a fix that is never finished says so", laterRequest != null && doctor.ExpireNow(laterRequest) && fixLater.StartsWith(DoctorReport.WarnMark), fixLater);
+            t.Check("guests: where nothing can wait, the fix says the mod is working on it", doctor.RunFix("bus:guestmod:slowread", "9", null, "en", ev).Contains("working on it"));
+
+            // Cards on the pages about one thing, from the event bus and from code.
+            api.RegisterCheck(new DoctorCheck(me, me + ":about", ctx => ctx.Info("typed check about " + ctx.Subject?.Code + (ctx.ClientFacts(me) != null ? " with facts" : ""))) { Pages = new[] { "item", "craft" } });
+            string item = doctor.BuildPage(ev, null, "en", Checks.TopicItem, "game:ingot-copper", facts: facts).PlainText(sapi.World);
+            t.Check("guests: a mod's card on an item's page, with a link to its own page", item.Contains("What your mods say about it") && item.Contains("guestmod: Worth 3 guest notes")
+                && item.Contains("All guest notes (/doctor guest-notes all)") && askedAbout == "item item:game:ingot-copper", askedAbout + " / " + First(item, "Worth"));
+            t.Check("guests: a check registered for the item page runs there, with the thing and the facts", item.Contains("typed check about game:ingot-copper with facts"), First(item, "typed check"));
+            string craft = doctor.BuildPage(ev, null, "en", Checks.TopicCraft, "game:ingot-copper").PlainText(sapi.World);
+            t.Check("guests: and on the crafting page", craft.Contains("typed check about game:ingot-copper") && craft.Contains("Worth 3 guest notes"), First(craft, "typed check"));
+            string overview = doctor.BuildPage(ev, null, "en", Pages.Overview, "").PlainText(sapi.World);
+            t.Check("guests: but not on the check-up", !overview.Contains("typed check about") && !overview.Contains("Worth 3 guest notes"));
+
+            // A page written in code with its own headings, several buttons on a line, and the block looked at.
+            api.RegisterTopic(new DoctorTopic(me, "guest-typed", "A typed guest page", ctx =>
+            {
+                ctx.Section("My own heading");
+                ctx.Write("Plain line " + ctx.LinkText("guest-notes", "all", "notes") + " " + ctx.FixText(me + ":x", "1", "do it"), 1);
+                ctx.Info("looked at " + (ctx.LookedAt == null ? "nothing" : ctx.LookedAt.X + "," + ctx.LookedAt.Y + "," + ctx.LookedAt.Z));
+            }) { OwnHeadings = true });
+            string typed = doctor.BuildPage(ev, null, "en", "guest-typed", "", lookedAt: new Vintagestory.API.MathTools.BlockPos(1, 2, 3, 0)).PlainText(sapi.World);
+            t.Check("guests: a page in code with its own heading, buttons on one line and the block looked at", typed.Contains("== My own heading ==") && !typed.Contains("A typed guest page")
+                && typed.Contains("Plain line notes (/doctor guest-notes all) do it (/doctor fix guestmod:x 1)") && typed.Contains("looked at 1,2,3"), typed.Replace("\n", " / "));
+
+            // A page that only the other side of the game has: nothing from here, and not the check-up instead.
+            DoctorReport other = null;
+            doctor.BuildPageThen(ev, null, "en", "only-on-the-client", "x", null, null, false, null, null, true, r => other = r);
+            t.Check("guests: a page only the other side has gets nothing from this side", other != null && other.Lines.Count == 0 && other.Key == "only-on-the-client|x", other?.Lines.Count + " lines, " + other?.Key);
+
+            // Opening the window for someone.
+            var open = new TreeAttribute();
+            open.SetString("topic", "guest-notes");
+            open.SetString("player", "nobody");
+            sapi.Event.PushEvent(VintageDoctorSystem.OpenEvent, open);
+            t.Check("guests: opening the window for a player who isn't there says it couldn't", !api.OpenPage("guest-notes", "all", null) && open.TryGetBool("opened") == false);
+
+            api.Unregister(me);
+            guestTest = false;
+            doctor.ForgetBusTopics();
+            t.Check("guests: when the mod stops answering, its page is gone", doctor.TopicFor("guest-notes") == null && doctor.TopicFor("guest-typed") == null && doctor.GatherClientFacts("x", "") == null);
         }
 
         public const string SickMarker = "doctor-sick-server.marker";
@@ -654,7 +877,7 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
                 (Checks.TopicMod, DoctorApi.ModId), (Checks.TopicMod, firstMod), (Checks.TopicMod, "nosuchmod"), (Checks.TopicPerf, ""), (Checks.TopicFiles, ""), (Checks.TopicPatches, ""), (Checks.TopicClashes, ""),
                 (Checks.TopicChanges, ""), (Checks.TopicWorld, ""), (Checks.TopicItem, "game:ingot-copper"), (Checks.TopicItem, "game:nosuchitem"), (Checks.TopicItem, ""), (Checks.TopicBlock, ""),
                 (Checks.TopicCraft, "game:axe-copper"), (Checks.TopicCraft, "game:ingot-copper"), (Pages.BugReportTopic, ""), (Pages.BugReportTopic, firstMod), (Pages.Api, ""),
-                ("nosuchpage", ""), (firstMod, ""), ("game:ingot-copper", "")
+                ("example-tanks", ""), ("example-pipes", ""), ("nosuchpage", ""), (firstMod, ""), ("game:ingot-copper", "")
             };
             foreach (var (topic, arg) in pages)
             {
@@ -707,6 +930,16 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             File.WriteAllText(config, "{ }");
             string reset = doctor.RunFix("doctorexamplejson:pump-jammed/fix", "", null, "en", ev);
             t.Check("example: the fix described in JSON runs", !reset.StartsWith(DoctorReport.WarnMark) && !File.Exists(config), reset);
+            string tanks = doctor.BuildPage(ev, null, "en", "example-tanks", "").PlainText(sapi.World);
+            t.Check("example: a whole page written by the mod over the event bus", tanks.Contains("== The example tanks ==") && tanks.Contains("This page came at once")
+                && tanks.Contains("/doctor fix bus:doctorexample:fill") && tanks.Contains("The same page, slowly (/doctor example-tanks slow)"), tanks.Replace("\n", " / "));
+            string copper = doctor.BuildPage(ev, null, "en", Checks.TopicItem, "game:ingot-copper").PlainText(sapi.World);
+            File.WriteAllText(Path.Combine(folder, "page-item-with-examples.txt"), copper);
+            t.Check("example: the mod's cards on an item's page, over the event bus and from code", copper.Contains("Example pumps are made of this") && copper.Contains("The example tanks (/doctor example-tanks)")
+                && copper.Contains("(game:ingot-copper) for its pipes") && copper.Contains("The example pumps (/doctor example-pumps)"), First(copper, "Example pumps") + " / " + First(copper, "for its pipes"));
+            string pipes = doctor.BuildPage(ev, null, "en", "example-pipes", "").PlainText(sapi.World);
+            t.Check("example: a page in code with its own heading and three buttons on a line", pipes.Contains("== The example pipes ==") && !pipes.Contains("My example pipes leak")
+                && pipes.Contains("The pumps (/doctor example-pumps) The tanks (/doctor example-tanks) Restart the pumps (/doctor fix doctorexample:unjam all)"), pipes.Replace("\n", " / "));
             string api = doctor.BuildPage(ev, null, "en", Pages.Api, "").PlainText(sapi.World);
             File.WriteAllText(Path.Combine(folder, "page-api-with-examples.txt"), api);
             t.Check("example: the page for mod authors lists what was handed over", api.Contains("doctorexample:pumps") && api.Contains("doctorexamplejson:config/vintagedoctor.json"));

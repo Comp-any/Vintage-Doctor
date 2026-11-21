@@ -19,11 +19,43 @@ namespace VintageDoctor
         /// <summary>Runs the checks other mods registered (code, event bus) and shows what they reported while playing.</summary>
         public static void ModChecks(DoctorContext x, bool deep, string onlyMod = null, bool heading = true)
         {
-            var checks = x.Doctor.ChecksFor(onlyMod).Where(c => deep || !c.Deep).ToList();
+            // A check that names its pages only runs on those; one that doesn't is for the check-up and its mod's page.
+            string page = onlyMod != null ? "mod" : "overview";
+            var checks = x.Doctor.ChecksFor(onlyMod).Where(c => (deep || !c.Deep) && (c.Pages == null || c.Pages.Contains(page))).ToList();
             var incidents = x.Doctor.IncidentsFor(onlyMod);
             var bus = x.Doctor.CollectFromEventBus(x, onlyMod);
             if (checks.Count == 0 && incidents.Count == 0 && bus.Count == 0) return;
             if (heading) x.Section(x.T("sec-modchecks"));
+            RunChecks(x, checks);
+            ShowBus(x, bus);
+            foreach (Incident i in incidents)
+            {
+                x.Owner = i.Mod;
+                x.Result(i.Level, i.Title + (i.Count > 1 ? " (×" + i.Count + ")" : ""));
+                if (!string.IsNullOrEmpty(i.Details)) x.Detail(i.Details);
+                x.Detail(x.T("incident-when", Time(i.Last)));
+                x.Owner = null;
+            }
+        }
+
+        /// <summary>
+        /// On the pages about one thing (an item, the block looked at, why something can't be crafted): what other mods
+        /// have to say about that thing. Checks registered for the page (<see cref="DoctorCheck.Pages"/>) and answers to
+        /// "vintagedoctor:about" on the event bus. <see cref="DoctorContext.Subject"/> is the thing.
+        /// </summary>
+        public static void AboutChecks(DoctorContext x)
+        {
+            string page = x.Topic ?? "";
+            var checks = x.Doctor.ChecksFor(null).Where(c => c.Pages != null && c.Pages.Contains(page)).ToList();
+            var bus = x.Doctor.CollectFromEventBus(x, null, VintageDoctorSystem.AboutEvent);
+            if (checks.Count == 0 && bus.Count == 0) return;
+            x.Section(x.T("sec-about-mods"));
+            RunChecks(x, checks);
+            ShowBus(x, bus);
+        }
+
+        static void RunChecks(DoctorContext x, List<DoctorCheck> checks)
+        {
             foreach (DoctorCheck check in checks)
             {
                 x.Owner = check.ModId;
@@ -38,6 +70,10 @@ namespace VintageDoctor
                 }
                 x.Owner = null;
             }
+        }
+
+        static void ShowBus(DoctorContext x, List<BusResult> bus)
+        {
             foreach (BusResult r in bus)
             {
                 x.Owner = r.Mod;
@@ -45,14 +81,7 @@ namespace VintageDoctor
                 foreach (string d in r.Details) x.Detail(d);
                 if (!string.IsNullOrEmpty(r.Advice)) x.Advice(r.Advice);
                 if (!string.IsNullOrEmpty(r.FixId)) x.FixButton("bus:" + r.FixId, r.FixArg ?? "", string.IsNullOrEmpty(r.FixLabel) ? x.T("btn-fix") : r.FixLabel);
-                x.Owner = null;
-            }
-            foreach (Incident i in incidents)
-            {
-                x.Owner = i.Mod;
-                x.Result(i.Level, i.Title + (i.Count > 1 ? " (×" + i.Count + ")" : ""));
-                if (!string.IsNullOrEmpty(i.Details)) x.Detail(i.Details);
-                x.Detail(x.T("incident-when", Time(i.Last)));
+                if (!string.IsNullOrEmpty(r.Link)) x.LinkButton(r.Link, r.LinkArg ?? "", string.IsNullOrEmpty(r.LinkLabel) ? r.Link : r.LinkLabel);
                 x.Owner = null;
             }
         }

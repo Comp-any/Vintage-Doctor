@@ -111,6 +111,8 @@ namespace VintageDoctor
                 return;
             }
             CollectibleCard(x, c);
+            x.Subject = c;
+            Guarded(x, "what mods say about it", () => AboutChecks(x));
             if (!x.Compact)
             {
                 x.Section(x.T("sec-next"));
@@ -187,6 +189,8 @@ namespace VintageDoctor
                 }
             }
             catch (Exception e) { x.Line("block entity: " + e.Message, DoctorLineStyle.Note); }
+            x.Subject = block;
+            Guarded(x, "what mods say about it", () => AboutChecks(x));
         }
 
         // ---------------------------------------------------------------- why can't I craft this?
@@ -208,6 +212,7 @@ namespace VintageDoctor
             }
             catch (Exception e) { x.Info(x.T("craft-error", e.Message)); return; }
             x.Line(DoctorReport.Ref(c) + " " + x.T("craft-count", recipes.Count), DoctorLineStyle.Text);
+            x.Subject = c;
             if (recipes.Count == 0)
             {
                 x.Info(x.T("craft-none"));
@@ -217,6 +222,8 @@ namespace VintageDoctor
                     x.Warn(x.T("craft-unresolved", unresolved, x.ModName(c.Code.Domain)));
                     x.Explain(x.T("start-unresolved-why"));
                 }
+                // A mod may know another way to get it (a machine of its own, a trade).
+                Guarded(x, "what mods say about it", () => AboutChecks(x));
                 return;
             }
             int n = 0;
@@ -235,6 +242,7 @@ namespace VintageDoctor
             if (recipes.Count > 10) x.Line(x.T("more-lines", recipes.Count - 10));
             RecipeShadows(x, c, true);
             x.Line(x.T("craft-tips"));
+            Guarded(x, "what mods say about it", () => AboutChecks(x));
         }
 
         static string Ingredients(GridRecipe r)

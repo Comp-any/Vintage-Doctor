@@ -4,6 +4,7 @@ using System.Linq;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
+using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
 using Vintagestory.API.Util;
 
@@ -31,6 +32,10 @@ namespace VintageDoctor
             public DoctorReportPacket Server;
             public bool ServerDone, ServerMissing, TimedOut, Done;
             public string LocalOutcome;
+            /// <summary>When to stop waiting for the server (the game's clock, ms). A server that says a mod is still working moves it.</summary>
+            public long Deadline;
+            /// <summary>What mods on this game sent along with the request.</summary>
+            public ITreeAttribute Facts;
         }
 
         int requestSeq;
@@ -137,6 +142,7 @@ namespace VintageDoctor
             bool serverFix = fix != null && fix.StartsWith("s:", StringComparison.Ordinal);
             bool clientFix = fix != null && fix.StartsWith("c:", StringComparison.Ordinal);
             try { ServerAnswers = capi.Network.GetChannelState(Channel) == EnumChannelState.Connected; } catch { ServerAnswers = false; }
+            p.Facts = GatherClientFacts(topic, arg);
 
             if (ServerAnswers)
             {
@@ -145,19 +151,16 @@ namespace VintageDoctor
                     var packet = new DoctorRequestPacket
                     {
                         Id = p.Seq, Topic = topic, Arg = arg, Fresh = fresh, HeldStack = HeldStackBytes(), SameProcess = capi.IsSinglePlayer, ClientVersion = DoctorVersion,
-                        FixId = serverFix ? fix.Substring(2) : "", FixArg = serverFix ? fixArg ?? "" : ""
+                        FixId = serverFix ? fix.Substring(2) : "", FixArg = serverFix ? fixArg ?? "" : "",
+                        ClientFacts = FactsToBytes(p.Facts), ClientHasTopic = TopicFor(topic) != null
                     };
                     BlockPos looked = capi.World.Player.CurrentBlockSelection?.Position;
                     if (looked != null) { packet.HasLookedAt = true; packet.LookedAtX = looked.X; packet.LookedAtY = looked.Y; packet.LookedAtZ = looked.Z; packet.LookedAtDim = looked.dimension; }
                     clientChannel.SendPacket(packet);
                     // The server reads its logs off the main thread; a busy or crashed one may never answer.
-                    capi.Event.RegisterCallback(_ =>
-                    {
-                        if (p.ServerDone || p != pending) return;
-                        p.TimedOut = true;
-                        p.ServerDone = true;
-                        Finish(p);
-                    }, serverFix ? 30000 : 15000);
+                    int wait = serverFix ? 30000 : 15000;
+                    p.Deadline = capi.ElapsedMilliseconds + wait;
+                    capi.Event.RegisterCallback(_ => ServerTimeout(p), wait);
                 }
                 catch (Exception e)
                 {
@@ -178,17 +181,50 @@ namespace VintageDoctor
                 // The fix may need what was read from the folders; then everything is read again.
                 WithEvidence(false, ev =>
                 {
-                    p.LocalOutcome = RunFix(fix.Substring(2), fixArg, capi.World.Player, ClientLang, ev);
-                    WithEvidence(true, after => { p.Ev = after; Finish(p); });
+                    RunFixThen(fix.Substring(2), fixArg, capi.World.Player, ClientLang, ev, p.Facts, outcome =>
+                    {
+                        p.LocalOutcome = outcome;
+                        WithEvidence(true, after => { p.Ev = after; Finish(p); });
+                    });
                 });
             }
             else WithEvidence(fresh || serverFix, ev => { p.Ev = ev; Finish(p); });
+        }
+
+        /// <summary>The server hasn't answered in time. Unless it said a mod is still working: then the wait goes on until that time is up.</summary>
+        void ServerTimeout(PendingPage p)
+        {
+            if (p.ServerDone || p != pending) return;
+            long left = p.Deadline - capi.ElapsedMilliseconds;
+            if (left > 200)
+            {
+                capi.Event.RegisterCallback(_ => ServerTimeout(p), (int)Math.Min(left, 60000));
+                return;
+            }
+            p.TimedOut = true;
+            p.ServerDone = true;
+            Finish(p);
+        }
+
+        /// <summary>Opens the window here at a page (for other mods, through the API or the event bus).</summary>
+        bool OpenHere(string topic, string arg)
+        {
+            if (capi?.World?.Player == null) return false;
+            OpenDoctor(topic, arg);
+            return true;
         }
 
         void OnServerReport(DoctorReportPacket packet)
         {
             PendingPage p = pending;
             if (packet == null || p == null || packet.Id != p.Seq || p.ServerDone) return;
+            if (packet.Working)
+            {
+                // A mod on the server needs a while for its page or its fix: keep waiting, and say so.
+                p.Deadline = Math.Max(p.Deadline, capi.ElapsedMilliseconds + (Math.Max(5, Math.Min(300, packet.WaitSeconds)) + 5) * 1000L);
+                dialog?.SetBusy(Lang.Get("vintagedoctor:gui-working"));
+                return;
+            }
             p.Server = packet;
             p.ServerDone = true;
             if (packet.ServerMods != null) ServerMods = packet.ServerMods;
@@ -206,7 +242,24 @@ namespace VintageDoctor
                 IClientPlayer player = capi.World.Player;
                 ItemStack held = player?.InventoryManager?.ActiveHotbarSlot?.Itemstack;
                 bool two = p.Server != null && !p.Server.Denied;
-                DoctorReport local = BuildPage(p.Ev, player, ClientLang, p.Topic, p.Arg, held, player?.CurrentBlockSelection?.Position, capi.IsSinglePlayer, two ? Lang.Get("vintagedoctor:side-client") : null);
+                // A page of a mod's that only the server has: this game has nothing to put beside it.
+                bool serverHasTopic = two && p.Server.ServerTopics != null && p.Server.ServerTopics.Any(s => s != null && s.StartsWith(p.Topic + "|", StringComparison.Ordinal));
+                BuildPageThen(p.Ev, player, ClientLang, p.Topic, p.Arg, held, player?.CurrentBlockSelection?.Position, capi.IsSinglePlayer, two ? Lang.Get("vintagedoctor:side-client") : null,
+                    p.Facts, serverHasTopic, local => PutTogether(p, local, player, held, two), _ => dialog?.SetBusy(Lang.Get("vintagedoctor:gui-working")));
+            }
+            catch (Exception e)
+            {
+                capi.Logger.Error("[vintagedoctor] Could not put the page together: {0}", e);
+                dialog?.SetIdle(Lang.Get("vintagedoctor:gui-failed", e.Message));
+            }
+        }
+
+        /// <summary>This game's half, then the server's, then where to go next: the page as the window shows it.</summary>
+        void PutTogether(PendingPage p, DoctorReport local, IClientPlayer player, ItemStack held, bool two)
+        {
+            if (p != pending) return;
+            try
+            {
                 var final = new DoctorReport { Title = local.Title, Key = local.Key, File = local.File };
                 foreach (string outcome in new[] { p.LocalOutcome, p.Server?.Outcome })
                 {

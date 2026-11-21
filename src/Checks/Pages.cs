@@ -63,6 +63,14 @@ namespace VintageDoctor
             // A mod id or an item code given straight: "/doctor carryon", "/doctor game:ingot-copper".
             if (!Topics.Contains(topic) && x.Doctor.TopicFor(topic) == null)
             {
+                // A mod's page that only the other side of the game has: nothing to add from here.
+                if (x.OtherSideHasTopic)
+                {
+                    x.Topic = topic;
+                    x.R.Key = topic + "|" + arg;
+                    x.R.Title = x.T("title");
+                    return;
+                }
                 if (x.Ev.Mods.Get(topic) != null || x.Ev.Mods.Get(x.Ev.Mods.ByLooseName(topic)) != null) { arg = topic; topic = Checks.TopicMod; }
                 else if (topic.IndexOf(':') > 0) { arg = x.Topic.Trim(); topic = Checks.TopicItem; }
                 else
@@ -119,7 +127,7 @@ namespace VintageDoctor
                     {
                         DoctorTopic t = x.Doctor.TopicFor(topic);
                         if (t == null) break;
-                        x.Section(x.Words(t.Question ?? t.Id));
+                        if (!t.OwnHeadings) x.Section(x.Words(t.Question ?? t.Id));
                         x.Owner = t.ModId;
                         try { t.Run?.Invoke(x); }
                         catch (Exception e) { x.Owner = null; x.Warn(x.T("modcheck-failed", x.ModName(t.ModId), t.Id, e.GetType().Name + ": " + e.Message)); }

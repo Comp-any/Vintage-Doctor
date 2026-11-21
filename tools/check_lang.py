@@ -27,7 +27,7 @@ def calls(source):
 
 WHY = ["why-sameassembly", "why-missingassembly", "why-version", "why-harmony", "why-format", "why-json", "why-memory", "why-diskfull",
        "why-savecorrupt", "why-fileaccess", "why-graphics", "why-network", "why-null", "why-bug", "why-native", "why-badimage", "why-duplicate", "why-packaging"]
-NOT_TEXTS = {"collect", "fix"}  # the event names "vintagedoctor:collect" and "vintagedoctor:fix"
+NOT_TEXTS = {"collect", "fix", "topics", "page", "deliver", "clientfacts", "open", "about"}  # event names such as "vintagedoctor:collect"
 
 def main():
     used = {}

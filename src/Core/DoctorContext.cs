@@ -22,7 +22,14 @@ namespace VintageDoctor
         public string Argument { get; set; } = "";
         public bool Compact { get; set; }
         public ItemStack HeldItem { get; set; }
-        public BlockPos LookedAt;
+        public BlockPos LookedAt { get; set; }
+        public CollectibleObject Subject { get; set; }
+        /// <summary>What mods on the asker's game sent along (mod id → bytes); null when nothing came.</summary>
+        public Vintagestory.API.Datastructures.ITreeAttribute Facts;
+        /// <summary>A mod's page that will arrive later (it said so on the event bus): the page isn't finished until then.</summary>
+        public Deferred Pending;
+        /// <summary>The page is one of a mod's that only the other side of the game has: this side has nothing to add to it.</summary>
+        public bool OtherSideHasTopic;
         /// <summary>The asker's game runs in the same program as this server (single player).</summary>
         public bool SameProcess;
         public Evidence Ev;
@@ -120,6 +127,18 @@ namespace VintageDoctor
         }
 
         public string FixToken(string fixId, string argument, string label) => DoctorReport.Fix(SideChar, fixId, argument, label);
+
+        public byte[] ClientFacts(string modId)
+        {
+            if (Facts == null || string.IsNullOrEmpty(modId)) return null;
+            try { return Facts.GetBytes(modId, null); } catch { return null; }
+        }
+
+        public void Write(string text, int indent = 0) => R.Add(text ?? "", DoctorLineStyle.Text, indent);
+        public string LinkText(string topic, string argument, string label) => Compact ? "" : DoctorReport.Open(topic, argument, label);
+        public string FixText(string fixId, string argument, string label) => Compact || string.IsNullOrEmpty(fixId) ? "" : DoctorReport.Fix(SideChar, fixId, argument, label);
+        /// <summary>'s' or 'c': the side a fix button made here runs on.</summary>
+        public char SideLetter => SideChar;
 
         /// <summary>A fix that belongs on the player's own computer when the server is part of their game (single player): switching a mod off, say.</summary>
         public string PlayerFixToken(string fixId, string argument, string label) => DoctorReport.Fix(Side == EnumAppSide.Server && SameProcess ? 'c' : SideChar, fixId, argument, label);

@@ -555,5 +555,12 @@
   "why-packaging": "The mod's zip is put together in a way the game doesn't accept: a code mod needs exactly one .dll of its own at the top of the zip. That is for the mod's author to fix; getting the mod again from its page sometimes helps.",
   "missing-behavior": "a behaviour:",
   "notadded-title": "{0}: {1} block(s) or item(s) couldn't be added to the game",
-  "notadded-why": "The game refused them while loading. Most often something with the same name was already there: two mods, or two files of one mod, add a thing with the same name, and only the first one exists. The log has the game's reason for each."
+  "notadded-why": "The game refused them while loading. Most often something with the same name was already there: two mods, or two files of one mod, add a thing with the same name, and only the first one exists. The log has the game's reason for each.",
+  "sec-about-mods": "What your mods say about it",
+  "guest-empty": "{0} had nothing to show here.",
+  "guest-timeout": "{0} said it needed a moment and then didn't answer. Its part is missing here; the server log may say why.",
+  "guest-working": "{0} is still putting its part together. Open the page again in a moment.",
+  "guest-fix-working": "The mod behind '{0}' is working on it; the log will say when it is done.",
+  "cmd-working": "A mod is still working on that. The result follows in a moment.",
+  "gui-working": "A mod is still working on it..."
 }

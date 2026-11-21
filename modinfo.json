@@ -6,7 +6,7 @@
     "demonic69"
   ],
   "description": "Works out what's wrong with your game and your mods, and fixes what it can: crashes traced to the mod that caused them, mods that failed to start or were left out, errors in the log by mod, broken config files and mod zips, lag measured by mod, clashing keys and code patches. Other mods can hand it their own checks and fixes.",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "side": "Universal",
   "requiredOnClient": false,
   "requiredOnServer": false,

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
+using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
 using Vintagestory.API.Server;
 
@@ -110,18 +111,29 @@ namespace VintageDoctor
                 BlockPos looked = p.HasLookedAt ? new BlockPos(p.LookedAtX, p.LookedAtY, p.LookedAtZ, p.LookedAtDim) : null;
                 string lang = player.LanguageCode;
                 bool hasFix = !string.IsNullOrEmpty(p.FixId);
+                ITreeAttribute facts = FactsFromBytes(p.ClientFacts);
+
+                // A mod that needs time for its page or its fix: the player's window is told to keep waiting.
+                void Working(int seconds)
+                {
+                    try { serverChannel.SendPacket(new DoctorReportPacket { Id = p.Id, Working = true, WaitSeconds = seconds, Key = (p.Topic ?? "") + "|" + (p.Arg ?? ""), ServerVersion = DoctorVersion }, player); }
+                    catch { }
+                }
 
                 void Answer(Evidence ev, string outcome)
                 {
                     string label = Lang.GetL(lang, p.SameProcess ? "vintagedoctor:side-world" : "vintagedoctor:side-server");
-                    DoctorReport r = BuildPage(ev, player, lang, p.Topic, p.Arg, held, looked, p.SameProcess, label);
-                    r.File = SaveText("last-report-server.txt", r.PlainText(sapi.World));
-                    DoctorReportPacket packet = r.ToPacket(p.Id);
-                    packet.Outcome = outcome ?? "";
-                    packet.ServerVersion = DoctorVersion;
-                    packet.ServerMods = ev.Mods.UserMods.Select(m => m.Key).ToArray();
-                    packet.ServerTopics = AllTopics().Select(t => t.Id + "|" + (t.Question ?? t.Id)).ToArray();
-                    serverChannel.SendPacket(packet, player);
+                    BuildPageThen(ev, player, lang, p.Topic, p.Arg, held, looked, p.SameProcess, label, facts, p.ClientHasTopic, r =>
+                    {
+                        if (player.ConnectionState != EnumClientState.Playing) return;
+                        r.File = SaveText("last-report-server.txt", r.PlainText(sapi.World));
+                        DoctorReportPacket packet = r.ToPacket(p.Id);
+                        packet.Outcome = outcome ?? "";
+                        packet.ServerVersion = DoctorVersion;
+                        packet.ServerMods = ev.Mods.UserMods.Select(m => m.Key).ToArray();
+                        packet.ServerTopics = AllTopics().Select(t => t.Id + "|" + (t.Question ?? t.Id)).ToArray();
+                        serverChannel.SendPacket(packet, player);
+                    }, Working);
                 }
 
                 if (hasFix)
@@ -129,9 +141,8 @@ namespace VintageDoctor
                     WithEvidence(false, ev =>
                     {
                         if (p.FixId == "doctor:profile") profileAsker = player.PlayerUID;
-                        string outcome = RunFix(p.FixId, p.FixArg, player, lang, ev);
                         // What was read may no longer be true after a fix.
-                        WithEvidence(true, fresh => Answer(fresh, outcome));
+                        RunFixThen(p.FixId, p.FixArg, player, lang, ev, facts, outcome => WithEvidence(true, fresh => Answer(fresh, outcome)), Working);
                     });
                     return;
                 }
@@ -197,21 +208,46 @@ namespace VintageDoctor
                     return TextCommandResult.Success(SelfTest.Run(this, sapi));
                 }
                 Evidence ev = EvidenceNow(true);
+                // A command has to answer at once. When a mod needs time for its fix or its page, the answer says so,
+                // and the result follows in chat (for a player) or in the server's console and log.
+                void Later(string text)
+                {
+                    try
+                    {
+                        if (player != null) { if (player.ConnectionState == EnumClientState.Playing) player.SendMessage(GlobalConstants.GeneralChatGroup, ChatSafe(text), EnumChatType.CommandSuccess); }
+                        else sapi.Logger.Notification("[vintagedoctor] /doctor {0} {1}\n{2}", topic, arg, text);
+                    }
+                    catch (Exception e) { sapi.Logger.Warning("[vintagedoctor] Could not pass on what a mod delivered later: {0}", e.Message); }
+                }
+                bool answered = false;
                 if (topic.Equals("fix", StringComparison.OrdinalIgnoreCase))
                 {
                     string[] parts = arg.Split(new[] { ' ' }, 2);
                     if (parts[0].Length == 0) return TextCommandResult.Error(Lang.GetL(lang, "vintagedoctor:cmd-fix-usage"));
-                    string outcome = RunFix(parts[0], parts.Length > 1 ? parts[1] : "", player, lang, ev);
+                    string now = null;
+                    RunFixThen(parts[0], parts.Length > 1 ? parts[1] : "", player, lang, ev, null, outcome =>
+                    {
+                        ForgetEvidence();
+                        if (!answered) now = outcome; else Later(outcome);
+                    });
+                    answered = true;
                     ForgetEvidence();
-                    return outcome.StartsWith(DoctorReport.WarnMark, StringComparison.Ordinal) ? TextCommandResult.Error(ChatSafe(outcome)) : TextCommandResult.Success(ChatSafe(outcome));
+                    if (now == null) return TextCommandResult.Success(Lang.GetL(lang, "vintagedoctor:cmd-working"));
+                    return now.StartsWith(DoctorReport.WarnMark, StringComparison.Ordinal) ? TextCommandResult.Error(ChatSafe(now)) : TextCommandResult.Success(ChatSafe(now));
                 }
-                var x = new DoctorContext { Doctor = this, Api = sapi, Side = EnumAppSide.Server, Player = player, LanguageCode = lang, Topic = topic, Argument = arg, Ev = ev, HeldItem = player?.InventoryManager?.ActiveHotbarSlot?.Itemstack };
-                Pages.Build(x);
-                if (x.Topic == Pages.Overview) Pages.Questions(x, null, true, false);
-                string text = x.R.PlainText(sapi.World);
-                string file = SaveText("last-report-server.txt", text);
-                if (file != null) text += "\n" + Lang.GetL(lang, "vintagedoctor:cmd-saved", Anonymise.Short(file));
-                return TextCommandResult.Success(player != null ? ChatSafe(text) : text);
+                string page = null;
+                BuildPageThen(ev, player, lang, topic, arg, player?.InventoryManager?.ActiveHotbarSlot?.Itemstack, null, false, null, null, false, r =>
+                {
+                    var x = new DoctorContext { Doctor = this, Api = sapi, Side = EnumAppSide.Server, Player = player, LanguageCode = lang, Topic = topic, Argument = arg, Ev = ev, R = r };
+                    if (r.Key.StartsWith(Pages.Overview + "|", StringComparison.Ordinal)) Pages.Questions(x, null, true, false);
+                    string text = r.PlainText(sapi.World);
+                    string file = SaveText("last-report-server.txt", text);
+                    if (file != null) text += "\n" + Lang.GetL(lang, "vintagedoctor:cmd-saved", Anonymise.Short(file));
+                    if (!answered) page = text; else Later(text);
+                });
+                answered = true;
+                if (page == null) return TextCommandResult.Success(Lang.GetL(lang, "vintagedoctor:cmd-working"));
+                return TextCommandResult.Success(player != null ? ChatSafe(page) : page);
             }
             catch (Exception e)
             {

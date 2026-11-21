@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Vintagestory.API.Common;
+using Vintagestory.API.MathTools;
 
 namespace VintageDoctor.API
 {
@@ -28,7 +29,12 @@ namespace VintageDoctor.API
         /// <summary>Vintage Doctor's version, e.g. "1.0.0".</summary>
         string DoctorVersion { get; }
 
-        /// <summary>The API's version. Raised only when something is added; nothing is ever removed from version 1.</summary>
+        /// <summary>
+        /// The API's version. Raised only when something is added; nothing is ever removed from version 1.
+        /// Version 2 (Vintage Doctor 1.2.0) added <see cref="RegisterClientFacts"/>, <see cref="OpenPage"/>,
+        /// <see cref="DoctorCheck.Pages"/>, <see cref="DoctorTopic.OwnHeadings"/> and, on <see cref="IDoctorContext"/>,
+        /// LookedAt, Subject, ClientFacts, Write, LinkText and FixText. Check it before using any of those.
+        /// </summary>
         int ApiVersion { get; }
 
         /// <summary>Adds a check to the check-up (and to your mod's own page in the doctor). Registering the same Id again replaces it.</summary>
@@ -51,6 +57,22 @@ namespace VintageDoctor.API
 
         /// <summary>Removes everything registered with this mod id (for mods that reload themselves).</summary>
         void Unregister(string modId);
+
+        /// <summary>
+        /// (API 2, on the player's side) Something of yours that the server's checks need to know about this player's
+        /// game: your mod's version there, whether its data arrived, what it has patched. Each time the window asks the
+        /// server for a page, <paramref name="collect"/> is called with the page's topic and argument; the bytes it
+        /// returns (64 KB at most, null for nothing) travel with the request, and your server-side check reads them
+        /// with <see cref="IDoctorContext.ClientFacts"/>.
+        /// </summary>
+        void RegisterClientFacts(string modId, System.Func<string, string, byte[]> collect);
+
+        /// <summary>
+        /// (API 2) Opens the doctor's window at a page, e.g. your own topic. On the player's side it opens here and
+        /// <paramref name="player"/> is ignored; on the server it asks that player's game to open it. False when that
+        /// can't be done (the player's game doesn't have Vintage Doctor), so you can fall back to something of your own.
+        /// </summary>
+        bool OpenPage(string topic, string argument = "", IPlayer player = null);
     }
 
     /// <summary>One check: a piece of code that looks at something and says what it found.</summary>
@@ -62,6 +84,12 @@ namespace VintageDoctor.API
         public string ModId;
         /// <summary>Only run when the player asks for the deeper checks (for anything that takes more than a few milliseconds).</summary>
         public bool Deep;
+        /// <summary>
+        /// (API 2) Which pages the check runs on. Null (the default): the check-up and your mod's own page. Otherwise any of
+        /// "overview", "mod", "item", "block", "craft": on the last three the check is about one thing, which it finds in
+        /// <see cref="IDoctorContext.Subject"/> (and <see cref="IDoctorContext.LookedAt"/> for a block in the world).
+        /// </summary>
+        public string[] Pages;
         /// <summary>
         /// The check itself. Call <see cref="IDoctorContext.Ok"/>, <see cref="IDoctorContext.Warn"/>... once or more.
         /// Runs on the game's main thread, so it may read the world. An exception is caught and shown as a problem
@@ -102,6 +130,8 @@ namespace VintageDoctor.API
         public string Question;
         /// <summary>Builds the page. <see cref="IDoctorContext.Argument"/> is whatever followed the id.</summary>
         public Action<IDoctorContext> Run;
+        /// <summary>(API 2) The page writes its own headings with <see cref="IDoctorContext.Section"/>, so the doctor doesn't put the question above it as one.</summary>
+        public bool OwnHeadings;
 
         public DoctorTopic() { }
         public DoctorTopic(string modId, string id, string question, Action<IDoctorContext> run) { ModId = modId; Id = id; Question = question; Run = run; }
@@ -150,6 +180,16 @@ namespace VintageDoctor.API
         bool Compact { get; }
         /// <summary>The item the asker holds, if any.</summary>
         ItemStack HeldItem { get; }
+        /// <summary>(API 2) The block the asker is looking at, if any.</summary>
+        BlockPos LookedAt { get; }
+        /// <summary>(API 2) On the "item", "block" and "craft" pages: the block or item the page is about. Null elsewhere.</summary>
+        CollectibleObject Subject { get; }
+        /// <summary>
+        /// (API 2) What your mod on the asker's own game sent along with this request (see
+        /// <see cref="IDoctorApi.RegisterClientFacts"/>). Null when there is nothing: the console asked, the player's
+        /// game doesn't have your mod, or it sent nothing.
+        /// </summary>
+        byte[] ClientFacts(string modId);
 
         /// <summary>A test that passed.</summary>
         void Ok(string text);
@@ -178,6 +218,15 @@ namespace VintageDoctor.API
         void CopyButton(string text, string label);
         /// <summary>A heading; findings after it are grouped under it.</summary>
         void Section(string heading);
+        /// <summary>
+        /// (API 2) A plain line of text outside any card (an introduction, a list of links). It may hold buttons made
+        /// with <see cref="LinkText"/> and <see cref="FixText"/>, several on one line.
+        /// </summary>
+        void Write(string text, int indent = 0);
+        /// <summary>(API 2) A link to another page, as text to put inside a line you <see cref="Write"/>.</summary>
+        string LinkText(string topic, string argument, string label);
+        /// <summary>(API 2) A fix button, as text to put inside a line you <see cref="Write"/>.</summary>
+        string FixText(string fixId, string argument, string label);
 
         /// <summary>Text that shows a block or item as its icon and name (which opens its page) when put into any finding.</summary>
         string ItemRef(CollectibleObject collectible);

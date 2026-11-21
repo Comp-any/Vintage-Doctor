@@ -25,7 +25,7 @@ namespace VintageDoctor
     /// <summary>A finding a mod handed over on the event bus (see docs/api.md).</summary>
     public sealed class BusResult
     {
-        public string Mod, Title, Advice, FixId, FixArg, FixLabel;
+        public string Mod, Title, Advice, FixId, FixArg, FixLabel, Link, LinkArg, LinkLabel;
         public DoctorLevel Level;
         public List<string> Details = new List<string>();
     }
@@ -50,7 +50,7 @@ namespace VintageDoctor
         public bool IsDedicated { get; private set; }
 
         public string DoctorVersion => Mod?.Info?.Version ?? "?";
-        public int ApiVersion => 1;
+        public int ApiVersion => 2;
 
         // What this session started from (read once per side at start).
         public SessionRecord PreviousSession { get; private set; }
@@ -88,6 +88,7 @@ namespace VintageDoctor
                 .RegisterMessageType<DoctorReportPacket>()
                 .RegisterMessageType<DoctorOpenPacket>();
             BuiltInFixes.Register(this, api);
+            StartGuests(api);
         }
 
         public override void AssetsLoaded(ICoreAPI api)
@@ -175,7 +176,7 @@ namespace VintageDoctor
         {
             if (topic == null || string.IsNullOrWhiteSpace(topic.Id) || topic.Run == null) throw new ArgumentException("A doctor topic needs an Id and a Run action.");
             string id = topic.Id.Trim().ToLowerInvariant();
-            if (Pages.Topics.Contains(id) || id == "fix" || id == "selftest" || !System.Text.RegularExpressions.Regex.IsMatch(id, "^[a-z0-9-]+$"))
+            if (!ValidTopicId(id))
                 throw new ArgumentException("The topic id '" + topic.Id + "' is taken by the doctor itself or has characters other than a-z, 0-9 and '-'.");
             topic.Id = id;
             lock (gate) topics[id] = topic;
@@ -209,6 +210,7 @@ namespace VintageDoctor
                 foreach (string id in fixes.Where(kv => kv.Value.ModId == modId).Select(kv => kv.Key).ToList()) fixes.Remove(id);
                 foreach (string id in topics.Where(kv => kv.Value.ModId == modId).Select(kv => kv.Key).ToList()) topics.Remove(id);
                 incidents.RemoveAll(i => i.Mod == modId);
+                factProviders.Remove(modId);
             }
             Known.RemoveMod(modId);
         }
@@ -223,14 +225,18 @@ namespace VintageDoctor
             lock (gate) return incidents.Where(i => modId == null || i.Mod == modId).OrderByDescending(i => i.Last).Take(30).ToList();
         }
 
+        /// <summary>A mod's page by its id: one registered in code, or one offered on the event bus.</summary>
         public DoctorTopic TopicFor(string id)
         {
-            lock (gate) return id != null && topics.TryGetValue(id, out DoctorTopic t) ? t : null;
+            if (id == null) return null;
+            RefreshBusTopics();
+            lock (gate) return topics.TryGetValue(id, out DoctorTopic t) || busTopics.TryGetValue(id, out t) ? t : null;
         }
 
         public List<DoctorTopic> AllTopics()
         {
-            lock (gate) return topics.Values.OrderBy(t => t.Id, StringComparer.Ordinal).ToList();
+            RefreshBusTopics();
+            lock (gate) return topics.Values.Concat(busTopics.Values.Where(b => !topics.ContainsKey(b.Id))).OrderBy(t => t.Id, StringComparer.Ordinal).ToList();
         }
 
         public List<DoctorFix> AllFixes()
@@ -244,20 +250,16 @@ namespace VintageDoctor
         /// Asks on the event bus for findings: listeners of "vintagedoctor:collect" add a tree per finding under "results"
         /// (level, title, details, advice, fix, fixArgument, fixLabel, mod).
         /// </summary>
-        public List<BusResult> CollectFromEventBus(DoctorContext x, string onlyMod)
+        public List<BusResult> CollectFromEventBus(DoctorContext x, string onlyMod, string eventName = CollectEvent)
         {
             var list = new List<BusResult>();
             try
             {
                 var tree = new TreeAttribute();
-                tree.SetString("side", x.Side == EnumAppSide.Server ? "server" : "client");
-                tree.SetString("topic", x.Topic ?? "");
-                tree.SetString("argument", x.Argument ?? "");
-                tree.SetString("language", x.LanguageCode ?? "en");
-                tree.SetString("player", x.Player?.PlayerUID ?? "");
+                FillAsk(tree, x);
                 if (onlyMod != null) tree.SetString("mod", onlyMod);
                 tree["results"] = new TreeAttribute();
-                api.Event.PushEvent(CollectEvent, tree);
+                api.Event.PushEvent(eventName, tree);
                 if (!(tree["results"] is ITreeAttribute results)) return list;
                 foreach (KeyValuePair<string, IAttribute> kv in results)
                 {
@@ -273,7 +275,10 @@ namespace VintageDoctor
                         Advice = r.GetString("advice"),
                         FixId = r.GetString("fix"),
                         FixArg = r.GetString("fixArgument"),
-                        FixLabel = r.GetString("fixLabel")
+                        FixLabel = r.GetString("fixLabel"),
+                        Link = r.GetString("link"),
+                        LinkArg = r.GetString("linkArgument"),
+                        LinkLabel = r.GetString("linkLabel")
                     };
                     string details = r.GetString("details");
                     if (!string.IsNullOrEmpty(details)) b.Details.AddRange(details.Replace("\r\n", "\n").Split('\n').Where(d => d.Length > 0).Take(40));
@@ -286,18 +291,13 @@ namespace VintageDoctor
             return list;
         }
 
+        /// <summary>A fix over the event bus, for callers that can't wait: a mod that needs time gets it, and the caller is told so.</summary>
         string RunBusFix(string id, string arg, IPlayer player, string lang)
         {
-            var tree = new TreeAttribute();
-            tree.SetString("id", id);
-            tree.SetString("argument", arg ?? "");
-            tree.SetString("side", api.Side == EnumAppSide.Server ? "server" : "client");
-            tree.SetString("language", lang ?? "en");
-            tree.SetString("player", player?.PlayerUID ?? "");
+            ITreeAttribute tree = BusFixTree(id, arg, player, lang, null, NextRequest());
             api.Event.PushEvent(FixEvent, tree);
-            string result = tree.GetString("result");
-            if (result == null) return DoctorReport.WarnMark + " " + Lang.GetL(lang ?? "en", "vintagedoctor:fix-nobody", id);
-            return tree.GetBool("failed") ? DoctorReport.WarnMark + " " + result : result;
+            if (tree.GetBool("later")) return Lang.GetL(lang ?? "en", "vintagedoctor:guest-fix-working", id);
+            return BusFixOutcome(tree, id, lang);
         }
 
         // ---------------------------------------------------------------- fixes
@@ -368,21 +368,19 @@ namespace VintageDoctor
             return ev;
         }
 
-        /// <summary>Builds this side's half of a page.</summary>
+        /// <summary>
+        /// Builds this side's half of a page, here and now. A mod's page that will only come later (see
+        /// <see cref="BuildPageThen"/>) is left out, with a line saying so.
+        /// </summary>
         public DoctorReport BuildPage(Evidence ev, IPlayer player, string lang, string topic, string arg, ItemStack held = null,
-            Vintagestory.API.MathTools.BlockPos lookedAt = null, bool sameProcess = false, string sideLabel = null)
+            Vintagestory.API.MathTools.BlockPos lookedAt = null, bool sameProcess = false, string sideLabel = null, ITreeAttribute facts = null)
         {
-            var x = new DoctorContext
+            DoctorContext x = NewContext(ev, player, lang, topic, arg, held, lookedAt, sameProcess, sideLabel, facts, false);
+            BuildInto(x);
+            if (x.Pending != null)
             {
-                Doctor = this, Api = api, Side = api.Side, Player = player, LanguageCode = string.IsNullOrEmpty(lang) ? "en" : lang, Topic = topic ?? "", Argument = arg ?? "",
-                HeldItem = held, LookedAt = lookedAt, SameProcess = sameProcess, Ev = ev, SideLabel = sideLabel
-            };
-            try { Pages.Build(x); }
-            catch (Exception e)
-            {
-                api.Logger.Error("[vintagedoctor] Building the page '{0}' failed: {1}", topic, e);
-                x.Owner = null;
-                x.Warn(x.T("check-crashed", topic ?? "?", e.GetType().Name + ": " + e.Message));
+                x.R.Lines.Insert(Math.Min(x.Pending.InsertAt, x.R.Lines.Count), new DoctorLine { Text = x.T("guest-working", x.ModName(x.Pending.Mod)), Style = DoctorLineStyle.Note });
+                x.Pending = null;
             }
             return x.R;
         }

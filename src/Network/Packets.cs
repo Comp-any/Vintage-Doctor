@@ -29,6 +29,10 @@ namespace VintageDoctor
         /// see alike (the Mods folder, config files, code patches, memory) is only reported once, by the game.</summary>
         [ProtoMember(13)] public bool SameProcess;
         [ProtoMember(14)] public string ClientVersion;
+        /// <summary>What mods on this game want their server halves to know: a tree of mod id → bytes, as bytes.</summary>
+        [ProtoMember(15)] public byte[] ClientFacts;
+        /// <summary>The page is one of a mod's that this game has itself, so a server that doesn't know it has nothing to add (and shouldn't answer with the check-up).</summary>
+        [ProtoMember(16)] public bool ClientHasTopic;
     }
 
     /// <summary>Server → client: a page, as lines (see <see cref="DoctorReport"/>).</summary>
@@ -51,6 +55,9 @@ namespace VintageDoctor
         [ProtoMember(11)] public string[] ServerMods;
         /// <summary>Pages other mods added on the server: "id|question".</summary>
         [ProtoMember(12)] public string[] ServerTopics;
+        /// <summary>Not the page yet: a mod on the server is still working on it, for up to <see cref="WaitSeconds"/> more.</summary>
+        [ProtoMember(13)] public bool Working;
+        [ProtoMember(14)] public int WaitSeconds;
     }
 
     /// <summary>Server → client: open the doctor's window on this page (the player typed /doctor).</summary>
