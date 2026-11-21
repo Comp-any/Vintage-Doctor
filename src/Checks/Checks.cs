@@ -200,13 +200,29 @@ namespace VintageDoctor
             }
             int before = x.Problems + x.Warnings;
 
-            foreach (var group in log.StartFailures.GroupBy(f => f.Mod))
+            // Files in the Mods folder the game could not even read as a mod. What the game says about these is of no
+            // use to a player (for a zip without a modinfo.json it logs an error of its own), so the doctor's own look
+            // at the file says what it is, and the Mods folder page has the fix.
+            var fileFailures = log.StartFailures.Where(f => f.IsFile && x.Ev.Mods?.Get(f.Mod) == null).GroupBy(f => f.Mod).ToList();
+            if (fileFailures.Count > 0)
+            {
+                x.Problem(x.T("start-files-failed", fileFailures.Count, string.Join(", ", fileFailures.Take(full ? 30 : 6).Select(g => g.Key)) + (!full && fileFailures.Count > 6 ? ", …" : "")));
+                foreach (var g in fileFailures.Take(full ? 30 : 6))
+                {
+                    StartFailure f = g.First();
+                    x.Detail(g.Key + ": " + (FileReason(x, g.Key) ?? LogScan.Shorten(f.Error ?? f.What, 200)));
+                }
+                x.Explain(x.T("start-files-failed-why"));
+                x.LinkButton(TopicFiles, "", x.T("btn-files"));
+            }
+
+            foreach (var group in log.StartFailures.Where(f => !(f.IsFile && x.Ev.Mods?.Get(f.Mod) == null)).GroupBy(f => f.Mod))
             {
                 StartFailure f = group.First();
                 ModEntry mod = x.Ev.Mods?.Get(f.Mod);
                 string name = mod?.Name ?? f.Mod;
                 string error = group.Select(g => g.Error).FirstOrDefault(e => !string.IsNullOrEmpty(e)) ?? f.What;
-                x.Problem(f.IsFile && mod == null ? x.T("start-file-failed", name, LogScan.Shorten(error, 160)) : x.T("start-failed", name, LogScan.Shorten(error, 160)));
+                x.Problem(x.T("start-failed", name, LogScan.Shorten(error, 160)));
                 foreach (StartFailure g in group.Take(4))
                 {
                     x.Detail(g.What);
@@ -279,6 +295,19 @@ namespace VintageDoctor
             }
             if (!full && (found > 0 || log.Unresolved.Count > 0)) x.LinkButton(TopicStartup, "", x.T("btn-startup"));
             return found;
+        }
+
+        /// <summary>What a file in the Mods folder is, in a few words, from the doctor's own look at it; null when it looked fine or wasn't looked at.</summary>
+        static string FileReason(DoctorContext x, string fileName)
+        {
+            ModFile f = x.Ev.Folder?.Files.FirstOrDefault(m => string.Equals(m.Name, fileName, StringComparison.OrdinalIgnoreCase));
+            if (f == null) return null;
+            if (f.ReadError != null) return x.T("reason-damaged");
+            if (f.InnerZip != null) return x.T("reason-innerzip", f.InnerZip);
+            if (f.NestedFolder != null) return f.SourceCode ? x.T("reason-source") : x.T("reason-nested", f.NestedFolder);
+            if (f.NoModInfo) return f.SourceCode ? x.T("reason-source") : x.T("reason-nomodinfo");
+            if (f.ModInfoError != null) return x.T("reason-modinfo");
+            return null;
         }
 
         static string Need(DoctorContext x, (string dep, string why) n)

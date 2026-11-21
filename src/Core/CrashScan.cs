@@ -115,8 +115,10 @@ namespace VintageDoctor
                     if (h.Groups[2].Success) cur.NamedMods.AddRange(SplitList(h.Groups[2].Value));
                     continue;
                 }
-                if (line.StartsWith("Loaded Mods: ", StringComparison.Ordinal)) { cur.LoadedMods.AddRange(SplitList(line.Substring(13))); continue; }
-                if (line.StartsWith("Involved Harmony IDs: ", StringComparison.Ordinal)) { cur.HarmonyIds.AddRange(SplitList(line.Substring(22))); continue; }
+                // A server's report has "Loaded Mods: " with nothing after it (the list is only kept by the player's game).
+                if (line.StartsWith("Loaded Mods:", StringComparison.Ordinal)) { cur.LoadedMods.AddRange(SplitList(line.Substring(12))); continue; }
+                if (line.StartsWith("Involved Harmony IDs:", StringComparison.Ordinal)) { cur.HarmonyIds.AddRange(SplitList(line.Substring(21))); continue; }
+                if (line.StartsWith("Running on ", StringComparison.Ordinal) || line.StartsWith("Crash written to file", StringComparison.Ordinal)) continue;
                 string trimmed = line.TrimStart();
                 if (trimmed.StartsWith("at ", StringComparison.Ordinal))
                 {

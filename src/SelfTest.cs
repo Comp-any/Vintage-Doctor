@@ -230,6 +230,10 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             t.Check("crash: when it happened is kept as written", a.When == "11/20/2026 9:15:01 PM", a.When);
             t.Check("crash: one with no mod named", b.NamedMods.Count == 0 && b.ExceptionType == "System.IO.FileNotFoundException" && b.LoadedMods.Count == 3, b.ExceptionType);
             t.Check("crash: the latest is the last in the file", scan.Latest == b);
+            // A server's own report: the mod list is empty there.
+            CrashScan server = CrashScan.FromText("Game Version: v1.22.7 (Stable)\n11/21/2026 05:56:18: Critical error occurred\nLoaded Mods: \nSystem.NullReferenceException: Object reference not set to an instance of an object.\n   at Vintagestory.API.Common.FrameProfilerUtil.End()\n", null);
+            t.Check("crash: a server's report with an empty mod list", server.Entries.Count == 1 && server.Latest.ExceptionType == "System.NullReferenceException" && server.Latest.LoadedMods.Count == 0 && server.Latest.Stack.Count == 1,
+                server.Latest?.ExceptionType + " / " + server.Latest?.Message);
         }
 
         static void WriteZip(string path, params (string name, string text)[] entries)
@@ -451,7 +455,9 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             t.Check("sick: a mod that failed to start is named, with its error", startup.Contains("Doctor Crashy threw an error while starting: Method not found"), First(startup, "threw an error"));
             t.Check("sick: the error is explained", startup.Contains("built for a different version"));
             t.Check("sick: the part of the mod the game gave up on is named", startup.Contains("Not started: ") && startup.Contains("DoctorCrashy"), First(startup, "Not started"));
-            t.Check("sick: a zip the game couldn't load as a mod", startup.Contains("doctor-sick-notamod.zip in the Mods folder could not be loaded"), First(startup, "notamod"));
+            t.Check("sick: files the game couldn't load as mods, each with what it really is", startup.Contains("4 file(s) in the Mods folder aren't mods the game can load")
+                && startup.Contains("doctor-sick-notamod.zip: it has no modinfo.json") && startup.Contains("doctor-sick-nested.zip: the mod sits one folder down")
+                && startup.Contains("doctor-sick-wrapped.zip: it holds another zip") && startup.Contains("doctor-sick-corrupt.zip: the zip is damaged"), First(startup, "aren't mods"));
             t.Check("sick: the game's own notice of a mod installed twice", startup.Contains("in the Mods folder more than once") && startup.Contains("doctordup"), First(startup, "more than once"));
             t.Check("sick: a JSON patch that didn't apply, by mod", startup.Contains("JSON patch(es) didn't apply") && startup.Contains("Doctor Sick ("), First(startup, "patch"));
             t.Check("sick: a recipe naming something that doesn't exist", startup.Contains("name things that don't exist") && startup.Contains("doctorsick ("), First(startup, "don't exist"));
@@ -471,7 +477,7 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
                 && crashy.Contains("/doctor fix doctor:disable-mod doctorcrashy") && crashy.Contains("a made-up error"));
             var counted = new DoctorReport();
             foreach (string line in overview.Split('\n')) if (line.StartsWith(DoctorReport.ProblemMark) || line.StartsWith(DoctorReport.WarnMark)) counted.Add(line, DoctorLineStyle.Check);
-            t.Check("sick: the check-up counts the problems", counted.Problems >= 6 && counted.Warnings >= 4, counted.Problems + " problems, " + counted.Warnings + " warnings");
+            t.Check("sick: the check-up counts the problems", counted.Problems >= 6 && counted.Warnings >= 5, counted.Problems + " problems, " + counted.Warnings + " warnings");
 
             // The fixes, on the real Mods folder.
             string Arg(string name) { ModFile f = ev.Folder.Files.FirstOrDefault(x => x.Name == name); return f == null ? "?/" + name : Checks.FileArg(ev.Folder, f); }

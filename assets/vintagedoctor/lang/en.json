@@ -164,7 +164,6 @@
   "start-clean": "All {0} mod(s) loaded and started without the game reporting a problem.",
   "start-clean-why": "Read from this session's log: mods the game left out, mods that threw an error while starting, patches that didn't fit.",
   "start-failed": "{0} threw an error while starting: {1}",
-  "start-file-failed": "{0} in the Mods folder could not be loaded: {1}",
   "start-failed-why": "The game carries on without the part that failed, so the mod is only half there: its blocks may exist while what they do is missing.",
   "start-failed-advice": "Look for an update of {0} that fits this game version, check it has every mod it needs, or switch it off. Its author needs the lines above.",
   "start-systems": "Not started: {0}",
@@ -473,5 +472,13 @@
   "api-docs": "Three ways in: a few lines of C#, the event bus (no reference to the doctor needed), or a JSON file in your mod's assets (no code at all).",
   "bugreport-help": "Everything a mod's author or the game's forum needs, with addresses, player ids and user folders taken out. Read it over, then post it with what you were doing and what you expected.",
   "bugreport-saved": "Saved to {0}",
-  "bugreport-send": "Copy this page (the button below) or attach the saved file."
+  "bugreport-send": "Copy this page (the button below) or attach the saved file.",
+  "start-files-failed": "{0} file(s) in the Mods folder aren't mods the game can load: {1}",
+  "start-files-failed-why": "The game tries everything in the Mods folder at every start, and reports an error for each of these. The Mods folder page says what each one is and offers the fix.",
+  "reason-damaged": "the zip is damaged",
+  "reason-innerzip": "it holds another zip ({0}) instead of the mod",
+  "reason-nested": "the mod sits one folder down inside it (in '{0}')",
+  "reason-nomodinfo": "it has no modinfo.json, so it isn't a mod",
+  "reason-source": "it is a mod's source code, not the mod",
+  "reason-modinfo": "its modinfo.json can't be read"
 }
