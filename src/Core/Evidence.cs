@@ -83,8 +83,8 @@ namespace VintageDoctor
                 using (var reader = new StreamReader(fs))
                     text = reader.ReadToEnd();
                 if (text.Trim('\0', ' ', '\t', '\r', '\n', '﻿').Length == 0) { f.Empty = true; return f; }
-                using var json = new JsonTextReader(new StringReader(text));
-                while (json.Read()) { }
+                // The whole document, as the game reads it: a file cut short fails here too (a bare reader stops quietly at the end).
+                JToken.Parse(text);
             }
             catch (JsonException e) { f.Error = e.Message; }
             catch (Exception e) { f.Error = e.GetType().Name + ": " + e.Message; }

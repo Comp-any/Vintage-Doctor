@@ -1,0 +1,11 @@
+{
+  "type": "code",
+  "modid": "doctorcrashy",
+  "name": "Doctor Crashy",
+  "authors": [ "demonic69" ],
+  "description": "Broken on purpose: Vintage Doctor's test checks that it is found and explained.",
+  "version": "1.0.0",
+  "side": "Server",
+  "requiredOnClient": false,
+  "dependencies": { "game": "1.22.0" }
+}

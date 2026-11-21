@@ -20,7 +20,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="tools/**;bin/**;obj/**;example/**" />
+    <Compile Remove="tools/**;bin/**;obj/**;example/**;tests/**" />
   </ItemGroup>
 
   <ItemGroup>

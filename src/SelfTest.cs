@@ -98,6 +98,14 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             Directory.CreateDirectory(folder);
             bool ci = doctor.Config.SelfTestOnStart;
 
+            // The test run's second server is full of broken things on purpose: there, only those are looked at.
+            if (File.Exists(Path.Combine(Vintagestory.API.Config.GamePaths.ModConfig, SickMarker)))
+            {
+                t.Guard("the sick server", () => SickServer(t, doctor, sapi, folder));
+                Finish(t, doctor, sapi, folder);
+                return string.Join("\n", t.Lines);
+            }
+
             t.Guard("small things", () => SmallThings(t));
             t.Guard("the log reader", () => LogReader(t, doctor));
             t.Guard("the crash reader", () => CrashReader(t));
@@ -301,6 +309,7 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             Directory.CreateDirectory(dir);
             File.WriteAllText(Path.Combine(dir, "good.json"), "{ // a comment, as the game allows\n  \"a\": 1, \"b\": [1, 2, 3] }");
             File.WriteAllText(Path.Combine(dir, "broken.json"), "{ \"a\": 1,\n  \"b\": [1, 2,\n}");
+            File.WriteAllText(Path.Combine(dir, "cutshort.json"), "{ \"a\": 1, \"b\": ");
             File.WriteAllText(Path.Combine(dir, "empty.json"), "");
             File.WriteAllBytes(Path.Combine(dir, "zeros.json"), new byte[64]);
             ConfigFile good = ConfigScan.Check(Path.Combine(dir, "good.json")), broken = ConfigScan.Check(Path.Combine(dir, "broken.json")),
@@ -308,8 +317,9 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             t.Check("config: a good file with a comment passes", !good.Bad, good.Error);
             t.Check("config: a broken file fails with where", broken.Error != null && broken.Error.Contains("line"), broken.Error);
             t.Check("config: an empty file and one full of zeros", empty.Empty && zeros.Empty);
+            t.Check("config: a file cut short fails", ConfigScan.Check(Path.Combine(dir, "cutshort.json")).Error != null);
             ConfigScan scan = ConfigScan.Read(dir, dir, null, new[] { new KeyValuePair<string, string>("good.json", "ownermod") });
-            t.Check("config: a folder is read, and a declared owner kept", scan.Files.Count == 4 && scan.Files.First(f => f.Name == "good.json").Mod == "ownermod", scan.Files.Count + " files");
+            t.Check("config: a folder is read, and a declared owner kept", scan.Files.Count == 5 && scan.Files.First(f => f.Name == "good.json").Mod == "ownermod", scan.Files.Count + " files");
         }
 
         static void KnownJson(Run_ t)
@@ -409,6 +419,96 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             string after = doctor.BuildPage(ev, null, "en", Pages.Overview, "").PlainText(sapi.World);
             t.Check("api: unregistering takes everything of that mod away", !after.Contains("3 pipes aren't connected") && !after.Contains("A pump jammed") && doctor.TopicFor("selftest-pipes") == null
                 && doctor.Known.Match(issue, EnumAppSide.Server) == null);
+        }
+
+        public const string SickMarker = "doctor-sick-server.marker";
+
+        static string SickPage(VintageDoctorSystem doctor, ICoreServerAPI sapi, Evidence ev, string folder, string topic, string arg, string name)
+        {
+            string text = doctor.BuildPage(ev, null, "en", topic, arg).PlainText(sapi.World);
+            File.WriteAllText(Path.Combine(folder, name + ".txt"), text);
+            return text;
+        }
+
+        /// <summary>
+        /// A real server set up by tools/ci_sick_server.py with the mods in tests/mods: a mod that fails to start, a
+        /// patch and a recipe that don't fit, zips packed wrongly, a mod installed twice, a config file cut short and
+        /// an old crash report. Everything the doctor says here comes from what the game itself wrote and left on disk,
+        /// so this is where a wrong guess about the game's messages would show. Then the fixes are used for real.
+        /// </summary>
+        static void SickServer(Run_ t, VintageDoctorSystem doctor, ICoreServerAPI sapi, string folder)
+        {
+            Evidence ev = doctor.EvidenceNow(true);
+            string overview = SickPage(doctor, sapi, ev, folder, Pages.Overview, "", "sick-overview");
+            string startup = SickPage(doctor, sapi, ev, folder, Checks.TopicStartup, "", "sick-startup");
+            string files = SickPage(doctor, sapi, ev, folder, Checks.TopicFiles, "", "sick-files");
+            string crash = SickPage(doctor, sapi, ev, folder, Checks.TopicCrash, "", "sick-crash");
+            string log = SickPage(doctor, sapi, ev, folder, Checks.TopicLog, "", "sick-log");
+            string mods = SickPage(doctor, sapi, ev, folder, Checks.TopicMods, "", "sick-mods");
+            string crashy = SickPage(doctor, sapi, ev, folder, Checks.TopicMod, "doctorcrashy", "sick-mod-doctorcrashy");
+            SickPage(doctor, sapi, ev, folder, Pages.BugReportTopic, "", "sick-bugreport");
+
+            t.Check("sick: a mod that failed to start is named, with its error", startup.Contains("Doctor Crashy threw an error while starting: Method not found"), First(startup, "threw an error"));
+            t.Check("sick: the error is explained", startup.Contains("built for a different version"));
+            t.Check("sick: the part of the mod the game gave up on is named", startup.Contains("Not started: ") && startup.Contains("DoctorCrashy"), First(startup, "Not started"));
+            t.Check("sick: a zip the game couldn't load as a mod", startup.Contains("doctor-sick-notamod.zip in the Mods folder could not be loaded"), First(startup, "notamod"));
+            t.Check("sick: the game's own notice of a mod installed twice", startup.Contains("in the Mods folder more than once") && startup.Contains("doctordup"), First(startup, "more than once"));
+            t.Check("sick: a JSON patch that didn't apply, by mod", startup.Contains("JSON patch(es) didn't apply") && startup.Contains("Doctor Sick ("), First(startup, "patch"));
+            t.Check("sick: a recipe naming something that doesn't exist", startup.Contains("name things that don't exist") && startup.Contains("doctorsick ("), First(startup, "don't exist"));
+            t.Check("sick: backslashes in a zip", files.Contains("doctor-sick-backslash.zip was packed with"), First(files, "backslash"));
+            t.Check("sick: a mod one folder down in its zip", files.Contains("doctor-sick-nested.zip has its files one folder down, in 'Nested-main'"), First(files, "nested"));
+            t.Check("sick: a zip that isn't a mod", files.Contains("doctor-sick-notamod.zip isn't a mod"), First(files, "notamod"));
+            t.Check("sick: a zip inside a zip", files.Contains("doctor-sick-wrapped.zip holds nothing but another zip"), First(files, "wrapped"));
+            t.Check("sick: a damaged zip", files.Contains("doctor-sick-corrupt.zip can't be opened"), First(files, "corrupt"));
+            t.Check("sick: an archive the game can't read", files.Contains("doctor-sick-packed.rar is an archive the game can't read"), First(files, ".rar"));
+            t.Check("sick: a mod installed twice, newest first", files.Contains("doctordup is installed 2 times (1.1.0, 1.0.0)"), First(files, "doctordup"));
+            t.Check("sick: a config file cut short, and whose it is", files.Contains("The config file doctorcrashy.json can't be read (most likely Doctor Crashy's)"), First(files, "doctorcrashy.json"));
+            t.Check("sick: the crash report left by an earlier session", crash.Contains("The game crashed (11/21/2026 05:56:18): NullReferenceException"), First(crash, "crashed"));
+            t.Check("sick: the crash is explained and its trace shown", crash.Contains("used something that wasn't there") && crash.Contains("FrameProfilerUtil.End()"));
+            t.Check("sick: the same error three times is one kind, counted against its mod", log.Contains("×3 [Error] [doctorcrashy] a made-up error") && log.Contains("Doctor Crashy: 1 kind(s) of errors"), First(log, "Doctor Crashy"));
+            t.Check("sick: the mods page puts the broken mod first", mods.Contains("Doctor Crashy 1.0.0: 1 error(s) while starting"), First(mods, "Doctor Crashy"));
+            t.Check("sick: the broken mod's own page has all of it and offers to switch it off", crashy.Contains("threw an error while starting") && crashy.Contains("doctorcrashy.json can't be read")
+                && crashy.Contains("/doctor fix doctor:disable-mod doctorcrashy") && crashy.Contains("a made-up error"));
+            var counted = new DoctorReport();
+            foreach (string line in overview.Split('\n')) if (line.StartsWith(DoctorReport.ProblemMark) || line.StartsWith(DoctorReport.WarnMark)) counted.Add(line, DoctorLineStyle.Check);
+            t.Check("sick: the check-up counts the problems", counted.Problems >= 6 && counted.Warnings >= 4, counted.Problems + " problems, " + counted.Warnings + " warnings");
+
+            // The fixes, on the real Mods folder.
+            string Arg(string name) { ModFile f = ev.Folder.Files.FirstOrDefault(x => x.Name == name); return f == null ? "?/" + name : Checks.FileArg(ev.Folder, f); }
+            string Where(string name) => ev.Folder.Files.FirstOrDefault(x => x.Name == name)?.Path ?? "";
+            bool Ok(string outcome) => !outcome.StartsWith(DoctorReport.WarnMark);
+            string slash = Where("doctor-sick-backslash.zip"), nested = Where("doctor-sick-nested.zip"), wrapped = Where("doctor-sick-wrapped.zip");
+            string r1 = doctor.RunFix("doctor:repack", Arg("doctor-sick-backslash.zip"), null, "en", ev);
+            t.Check("sick fix: the backslash zip repacked", Ok(r1) && FolderScan.Look(slash) is ModFile a && !a.Backslashes && !a.Broken, r1);
+            string r2 = doctor.RunFix("doctor:repack", Arg("doctor-sick-nested.zip"), null, "en", ev);
+            t.Check("sick fix: the nested zip repacked", Ok(r2) && FolderScan.Look(nested) is ModFile b && b.NestedFolder == null && b.ModId == "doctorsicknested", r2);
+            string r3 = doctor.RunFix("doctor:unwrap", Arg("doctor-sick-wrapped.zip"), null, "en", ev);
+            t.Check("sick fix: the inner zip taken out", Ok(r3) && !File.Exists(wrapped) && File.Exists(Path.Combine(Path.GetDirectoryName(wrapped), "doctorwrapped_1.0.0.zip")), r3);
+            string r4 = doctor.RunFix("doctor:move-file", Arg("doctor-sick-notamod.zip"), null, "en", ev);
+            string r5 = doctor.RunFix("doctor:move-file", Arg("doctor-sick-corrupt.zip"), null, "en", ev);
+            string r6 = doctor.RunFix("doctor:move-file", Arg("doctor-sick-packed.rar"), null, "en", ev);
+            t.Check("sick fix: three files that aren't mods moved aside", Ok(r4) && Ok(r5) && Ok(r6) && !File.Exists(Where("doctor-sick-notamod.zip")) && !File.Exists(Where("doctor-sick-corrupt.zip")) && !File.Exists(Where("doctor-sick-packed.rar")), r4 + " | " + r5 + " | " + r6);
+            string r7 = doctor.RunFix("doctor:move-duplicates", "doctordup", null, "en", ev);
+            t.Check("sick fix: the older copy moved, the newer kept", Ok(r7) && !File.Exists(Where("doctordup_1.0.0.zip")) && File.Exists(Where("doctordup_1.1.0.zip")), r7);
+            string r8 = doctor.RunFix("doctor:reset-config", "doctorcrashy.json", null, "en", ev);
+            t.Check("sick fix: the broken config moved aside", Ok(r8) && !File.Exists(Path.Combine(Vintagestory.API.Config.GamePaths.ModConfig, "doctorcrashy.json")), r8);
+            string r9 = doctor.RunFix("doctor:move-file", Arg("doctordup_1.1.0.zip"), null, "en", ev);
+            t.Check("sick fix: a mod the game has loaded is not moved", !Ok(r9) && File.Exists(Where("doctordup_1.1.0.zip")), r9);
+            string r10 = doctor.RunFix("doctor:disable-mod", "doctorcrashy", null, "en", ev);
+            t.Check("sick fix: the broken mod switched off for the next start", Ok(r10), r10);
+
+            Evidence after = doctor.EvidenceNow(true);
+            string filesAfter = SickPage(doctor, sapi, after, folder, Checks.TopicFiles, "", "sick-files-after-fixes");
+            t.Check("sick: after the fixes the Mods folder and the config files are clean", filesAfter.Contains("nothing wrong with them") && filesAfter.Contains("read without a problem"), First(filesAfter, DoctorReport.ProblemMark) + First(filesAfter, DoctorReport.WarnMark));
+            int kept = Directory.Exists(Path.Combine(doctor.DataFolder, "backups")) ? Directory.GetFiles(Path.Combine(doctor.DataFolder, "backups"), "*", SearchOption.AllDirectories).Length : 0;
+            t.Check("sick: everything that was moved is in the backups, nothing deleted", kept == 8, kept + " files in the backups");
+        }
+
+        /// <summary>The first line of a page that has a word in it, for a failed check's detail.</summary>
+        static string First(string text, string word)
+        {
+            foreach (string line in text.Split('\n')) if (line.IndexOf(word, StringComparison.OrdinalIgnoreCase) >= 0) return LogScan.Shorten(line.Trim(), 260);
+            return "no line with '" + word + "'";
         }
 
         /// <summary>The self-test's listeners on the event bus only answer while it runs (they can't be taken off again).</summary>

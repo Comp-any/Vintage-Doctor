@@ -164,7 +164,11 @@ namespace VintageDoctor
             if (type != null)
             {
                 string mod = x.Ev.Mods?.ModOfType(type);
-                string shortType = type.Substring(type.LastIndexOf('.') + 1);
+                // "MySystem+<>c__DisplayClass12_0" is a lambda inside MySystem.
+                string plain = type;
+                int made = plain.IndexOf("+<", StringComparison.Ordinal);
+                if (made > 0) plain = plain.Substring(0, made);
+                string shortType = plain.Substring(plain.LastIndexOf('.') + 1);
                 string kind = code.StartsWith("gmle", StringComparison.Ordinal) || code.StartsWith("gmlb", StringComparison.Ordinal) ? x.T("prof-ticking")
                     : code.StartsWith("rendGui", StringComparison.Ordinal) ? x.T("prof-gui")
                     : code.StartsWith("dc", StringComparison.Ordinal) || code.StartsWith("sdc", StringComparison.Ordinal) ? x.T("prof-callback") : "";

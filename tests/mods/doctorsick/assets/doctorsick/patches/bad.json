@@ -1,0 +1,3 @@
+[
+  { "op": "replace", "path": "/doesnotexist/deeper/still", "value": 1, "file": "game:itemtypes/resource/ingot.json" }
+]

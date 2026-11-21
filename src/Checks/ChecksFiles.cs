@@ -36,6 +36,7 @@ namespace VintageDoctor
                     x.Warn(x.T("folder-archive", name));
                     x.Explain(x.T("folder-archive-why"));
                     x.Advice(x.T("folder-archive-advice"));
+                    x.FixButton("doctor:move-file", arg, x.T("btn-move-aside", name));
                 }
                 else if (f.Kind == "partial")
                 {

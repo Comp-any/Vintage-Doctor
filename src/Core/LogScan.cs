@@ -132,11 +132,57 @@ namespace VintageDoctor
             return scan;
         }
 
+        /// <summary>
+        /// After very many lines the game carries on in a new file (server-main-2.log, -3.log...): the newest of those
+        /// holds what is happening now, the first file what happened at start-up. Null when there is none.
+        /// </summary>
+        static string LatestSplit(string file)
+        {
+            try
+            {
+                string dir = Path.GetDirectoryName(file), stem = Path.GetFileNameWithoutExtension(file);
+                string latest = null;
+                int best = -1;
+                foreach (string f in Directory.GetFiles(dir, stem + "-*.log"))
+                {
+                    string tail = Path.GetFileNameWithoutExtension(f).Substring(stem.Length + 1);
+                    if (int.TryParse(tail, NumberStyles.None, CultureInfo.InvariantCulture, out int n) && n > best) { best = n; latest = f; }
+                }
+                return latest;
+            }
+            catch { return null; }
+        }
+
+        static void ReadTail(string file, long bytes, List<string> lines)
+        {
+            using var fs = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+            bool cut = fs.Length > bytes;
+            if (cut) fs.Seek(fs.Length - bytes, SeekOrigin.Begin);
+            using var reader = new StreamReader(fs);
+            if (cut) reader.ReadLine(); // a partial line
+            string l;
+            while ((l = reader.ReadLine()) != null) lines.Add(l);
+        }
+
         static List<string> ReadLines(string file, LogScan scan)
         {
             var lines = new List<string>();
+            string split = LatestSplit(file);
             using var fs = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
             scan.Bytes = fs.Length;
+            if (split != null)
+            {
+                // The start of the session from the first file, the present from the newest.
+                scan.Truncated = true;
+                using (var head = new StreamReader(fs, System.Text.Encoding.UTF8, true, 65536, leaveOpen: true))
+                {
+                    long read = 0;
+                    string l;
+                    while (read < Part && (l = head.ReadLine()) != null) { lines.Add(l); read += l.Length + 1; }
+                }
+                try { scan.Bytes += new FileInfo(split).Length; ReadTail(split, Part, lines); } catch { }
+                return lines;
+            }
             if (fs.Length <= Whole)
             {
                 using var all = new StreamReader(fs);
