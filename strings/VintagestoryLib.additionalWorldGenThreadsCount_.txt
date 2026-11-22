@@ -1,0 +1,406 @@
+Vintagestory.Server/ServerSystemSupplyChunks.cs-47-		server.RegisterGameTickListener((float dt) =>
+Vintagestory.Server/ServerSystemSupplyChunks.cs-48-		{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-49-			server.serverChunkDataPool.SlowDispose();
+Vintagestory.Server/ServerSystemSupplyChunks.cs-50-		}, 1000);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-51-	}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-52-
+Vintagestory.Server/ServerSystemSupplyChunks.cs-53-	public override int GetUpdateInterval()
+Vintagestory.Server/ServerSystemSupplyChunks.cs-54-	{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-55-		if (chunkthread.requestedChunkColumns.Count == 0 || !is8Core)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-56-		{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-57-			return MagicNum.ChunkThreadTickTime;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-58-		}
+Vintagestory.Server/ServerSystemSupplyChunks.cs:59:		return chunkthread.additionalWorldGenThreadsCount - 1;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-60-	}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-61-
+Vintagestory.Server/ServerSystemSupplyChunks.cs-62-	public override void OnBeginGameReady(SaveGame savegame)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-63-	{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-64-		requiresChunkBorderSmoothing = savegame.CreatedWorldGenVersion != 3;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-65-		requiresSetEmptyFlag = GameVersion.IsLowerVersionThan(server.SaveGameData.LastSavedGameVersion, "1.12-dev.1");
+Vintagestory.Server/ServerSystemSupplyChunks.cs:66:		if (chunkthread.additionalWorldGenThreadsCount > 0)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-67-		{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-68-			int num = 1;
+Vintagestory.Server/ServerSystemSupplyChunks.cs:69:			for (int i = 0; i < chunkthread.additionalWorldGenThreadsCount; i++)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-70-			{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-71-				CreateAdditionalWorldGenThread(num, num + 1, i + 1);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-72-				num++;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-73-			}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-74-		}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-75-	}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-76-
+Vintagestory.Server/ServerSystemSupplyChunks.cs-77-	public override void OnSeparateThreadTick()
+Vintagestory.Server/ServerSystemSupplyChunks.cs-78-	{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-79-		if (server.RunPhase != EnumServerRunPhase.RunGame)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-80-		{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-81-			return;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-82-		}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-83-		deleteChunkColumns();
+Vintagestory.Server/ServerSystemSupplyChunks.cs-84-		moveRequestsToGeneratingQueue();
+Vintagestory.Server/ServerSystemSupplyChunks.cs-85-		KeyValuePair<HorRectanglei, ChunkLoadOptions> result;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-86-		while (!server.fastChunkQueue.IsEmpty && server.fastChunkQueue.TryDequeue(out result))
+Vintagestory.Server/ServerSystemSupplyChunks.cs-87-		{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-88-			loadChunkAreaBlocking(result.Key.X1, result.Key.Z1, result.Key.X2, result.Key.Z2, isStartupLoad: false, result.Value.ChunkGenParams);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-89-			if (result.Value.OnLoaded != null)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-90-			{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-91-				server.EnqueueMainThreadTask(result.Value.OnLoaded);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-92-			}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-93-		}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-94-		if (!server.simpleLoadRequests.IsEmpty && server.mapMiddleSpawnPos != null)
+--
+Vintagestory.Server/ServerSystemSupplyChunks.cs-285-
+Vintagestory.Server/ServerSystemSupplyChunks.cs-286-	private bool tryLoadOrGenerateChunkColumnsInQueue()
+Vintagestory.Server/ServerSystemSupplyChunks.cs-287-	{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-288-		if (chunkthread.requestedChunkColumns.Count == 0)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-289-		{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-290-			return false;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-291-		}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-292-		if (pauseAllWorldgenThreads > 0)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-293-		{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-294-			return false;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-295-		}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-296-		CleanupRequestsQueue();
+Vintagestory.Server/ServerSystemSupplyChunks.cs:297:		int additionalWorldGenThreadsCount = chunkthread.additionalWorldGenThreadsCount;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-298-		foreach (ChunkColumnLoadRequest requestedChunkColumn in chunkthread.requestedChunkColumns)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-299-		{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-300-			if (requestedChunkColumn == null || requestedChunkColumn.Disposed)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-301-			{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-302-				continue;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-303-			}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-304-			int currentIncompletePass_AsInt = requestedChunkColumn.CurrentIncompletePass_AsInt;
+Vintagestory.Server/ServerSystemSupplyChunks.cs:305:			if (currentIncompletePass_AsInt == 0 || currentIncompletePass_AsInt > additionalWorldGenThreadsCount)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-306-			{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-307-				if (server.Suspended)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-308-				{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-309-					return false;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-310-				}
+Vintagestory.Server/ServerSystemSupplyChunks.cs:311:				if (loadOrGenerateChunkColumn_OnChunkThread(requestedChunkColumn, currentIncompletePass_AsInt) && chunkthread.additionalWorldGenThreadsCount == 0)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-312-				{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-313-					return true;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-314-				}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-315-			}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-316-		}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-317-		return false;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-318-	}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-319-
+Vintagestory.Server/ServerSystemSupplyChunks.cs-320-	private int CleanupRequestsQueue()
+Vintagestory.Server/ServerSystemSupplyChunks.cs-321-	{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-322-		int num = 0;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-323-		ConcurrentIndexedFifoQueue<ChunkColumnLoadRequest> requestedChunkColumns = chunkthread.requestedChunkColumns;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-324-		while (requestedChunkColumns.Count > 0)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-325-		{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-326-			ChunkColumnLoadRequest chunkColumnLoadRequest = requestedChunkColumns.Peek();
+Vintagestory.Server/ServerSystemSupplyChunks.cs-327-			if (chunkColumnLoadRequest == null || chunkColumnLoadRequest.disposeOrRequeueFlags == 0)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-328-			{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-329-				break;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-330-			}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-331-			if (chunkColumnLoadRequest.Disposed)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-332-			{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-333-				requestedChunkColumns.DequeueWithoutRemovingFromIndex();
+Vintagestory.Server/ServerSystemSupplyChunks.cs-334-				num++;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-335-			}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-336-			else
+--
+Vintagestory.Server/ServerSystemSupplyChunks.cs-405-					GenerateNewChunkColumn(orCreateMapChunk, chunkRequest);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-406-					return false;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-407-				}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-408-			}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-409-			server.EnqueueMainThreadTask(() =>
+Vintagestory.Server/ServerSystemSupplyChunks.cs-410-			{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-411-				mainThreadLoadChunkColumn(chunkRequest);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-412-				chunkthread.requestedChunkColumns.elementsByIndex.Remove(chunkRequest.Index);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-413-			});
+Vintagestory.Server/ServerSystemSupplyChunks.cs-414-			chunkRequest.FlagToDispose();
+Vintagestory.Server/ServerSystemSupplyChunks.cs-415-			return true;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-416-		}
+Vintagestory.Server/ServerSystemSupplyChunks.cs:417:		if (orCreateMapChunk.currentpass != stage && orCreateMapChunk.currentpass <= chunkthread.additionalWorldGenThreadsCount)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-418-		{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-419-			return stage == 0;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-420-		}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-421-		bool flag2 = CanGenerateChunkColumn(chunkRequest);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-422-		if (flag2)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-423-		{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-424-			PopulateChunk(chunkRequest);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-425-		}
+Vintagestory.Server/ServerSystemSupplyChunks.cs:426:		if (!flag2 || chunkthread.additionalWorldGenThreadsCount == 0)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-427-		{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-428-			chunkRequest.FlagToRequeue();
+Vintagestory.Server/ServerSystemSupplyChunks.cs-429-		}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-430-		return flag2;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-431-	}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-432-
+Vintagestory.Server/ServerSystemSupplyChunks.cs-433-	public int GenerateChunkColumns_OnSeparateThread(int stageStart, int stageEnd)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-434-	{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-435-		ChunkColumnLoadRequest chunkColumnLoadRequest = null;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-436-		long num = long.MinValue;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-437-		foreach (ChunkColumnLoadRequest requestedChunkColumn in chunkthread.requestedChunkColumns)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-438-		{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-439-			if (requestedChunkColumn == null || requestedChunkColumn.Disposed)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-440-			{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-441-				continue;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-442-			}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-443-			int currentIncompletePass_AsInt = requestedChunkColumn.CurrentIncompletePass_AsInt;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-444-			if (currentIncompletePass_AsInt < stageStart || currentIncompletePass_AsInt >= stageEnd)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-445-			{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-446-				continue;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-447-			}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-448-			if (currentIncompletePass_AsInt >= requestedChunkColumn.untilPass)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-449-			{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-450-				requestedChunkColumn.FlagToRequeue();
+Vintagestory.Server/ServerSystemSupplyChunks.cs-451-			}
+--
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1299-					ServerMain.Logger.StoryEvent("...");
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1300-				}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1301-				storyEventPrints++;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1302-			}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1303-			bool flag = false;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1304-			foreach (ChunkColumnLoadRequest requestedChunkColumn2 in chunkthread.requestedChunkColumns)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1305-			{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1306-				if (requestedChunkColumn2 == null || requestedChunkColumn2.Disposed)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1307-				{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1308-					continue;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1309-				}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1310-				int currentIncompletePass_AsInt = requestedChunkColumn2.CurrentIncompletePass_AsInt;
+Vintagestory.Server/ServerSystemSupplyChunks.cs:1311:				if (currentIncompletePass_AsInt == 0 || currentIncompletePass_AsInt > chunkthread.additionalWorldGenThreadsCount)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1312-				{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1313-					if (server.exitState.Mode == EnumExitMode.HardExit || server.stopped)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1314-					{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1315-						return;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1316-					}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1317-					flag |= loadOrGenerateChunkColumn_OnChunkThread(requestedChunkColumn2, currentIncompletePass_AsInt);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1318-				}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1319-			}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1320-			if (flag)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1321-			{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1322-				num3 = Environment.TickCount + 12000;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1323-			}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1324-			else
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1325-			{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1326-				if (Environment.TickCount <= num3)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1327-				{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1328-					continue;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1329-				}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1330-				ServerMain.Logger.Error("Attempting to force generate chunk columns from " + chunkX1 + "," + chunkZ1 + " to " + chunkX2 + "," + chunkZ2);
+Vintagestory.Server/ServerSystemSupplyChunks.cs:1331:				ServerMain.Logger.Error(chunkthread.additionalWorldGenThreadsCount + " additional worldgen threads active, number of 'undone' chunks is " + blockingRequestsRemaining);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1332-				foreach (ChunkColumnLoadRequest requestedChunkColumn3 in chunkthread.requestedChunkColumns)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1333-				{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1334-					if (requestedChunkColumn3 != null)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1335-					{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1336-						string text = ((requestedChunkColumn3.chunkX >= chunkX1 && requestedChunkColumn3.chunkX <= chunkX2 && requestedChunkColumn3.chunkZ >= chunkZ1 && requestedChunkColumn3.chunkZ <= chunkZ2) ? " (in original req)" : "");
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1337-						ServerMain.Logger.Error("Column " + requestedChunkColumn3.ChunkX + "," + requestedChunkColumn3.ChunkZ + " has reached pass " + requestedChunkColumn3.CurrentIncompletePass_AsInt + text);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1338-					}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1339-				}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1340-				throw new Exception("Somehow worldgen has become stuck in an endless loop, please report this as a bug!  Additional data in the server-main log");
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1341-			}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1342-		}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1343-	}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1344-
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1345-	private void PopulateChunk(ChunkColumnLoadRequest chunkRequest)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1346-	{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1347-		chunkRequest.Unpack();
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1348-		chunkRequest.generatingLock.AcquireWriteLock();
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1349-		try
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1350-		{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1351-			if (server.Config.SkipEveryChunkRow > 0 && chunkRequest.chunkX % (server.Config.SkipEveryChunkRow + server.Config.SkipEveryChunkRowWidth) < server.Config.SkipEveryChunkRowWidth)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1352-			{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1353-				if (chunkRequest.CurrentIncompletePass == EnumWorldGenPass.Terrain)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1354-				{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1355-					ushort sunLight = (ushort)server.sunBrightness;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1356-					for (int i = 0; i < chunkRequest.Chunks.Length; i++)
+--
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1476-			if (num <= 0)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1477-			{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1478-				return true;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1479-			}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1480-			ServerMain.Logger.Error("Requested chunks buffer is too small! Can't free enough space to completely generate chunks, clearing whole buffer. This may cause issues. Try increasing servermagicnumbers RequestChunkColumnsQueueSize and/or reducing UncompressedChunkTTL.");
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1481-			FullyClearGeneratingQueue();
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1482-			chunkthread.requestedChunkColumns.Enqueue(curRequest);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1483-			return true;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1484-		}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1485-		finally
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1486-		{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1487-			ResumeAllWorldgenThreads();
+Vintagestory.Server/ServerSystemSupplyChunks.cs:1488:			if (chunkthread.additionalWorldGenThreadsCount > 0)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1489-			{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1490-				ServerMain.Logger.VerboseDebug("Un-pausing all worldgen threads.");
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1491-			}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1492-		}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1493-	}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1494-
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1495-	internal void FullyClearGeneratingQueue()
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1496-	{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1497-		chunkthread.loadsavegame.SaveAllDirtyGeneratingChunks(saveChunksStream ?? (saveChunksStream = new FastMemoryStream()));
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1498-		foreach (ChunkColumnLoadRequest requestedChunkColumn in chunkthread.requestedChunkColumns)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1499-		{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1500-			if (requestedChunkColumn != null && !requestedChunkColumn.Disposed)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1501-			{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1502-				server.loadedMapChunks.Remove(requestedChunkColumn.mapIndex2d);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1503-				server.ChunkColumnRequested.Remove(requestedChunkColumn.mapIndex2d);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1504-			}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1505-		}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1506-		chunkthread.requestedChunkColumns.Clear();
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1507-		ServerMain.Logger.VerboseDebug("Incomplete chunks stored and wiped.");
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1508-	}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1509-
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1510-	private Thread CreateAdditionalWorldGenThread(int stageStart, int stageEnd, int threadnum)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1511-	{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1512-		Thread thread = TyronThreadPool.CreateDedicatedThread(() =>
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1513-		{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1514-			GeneratorThreadLoop(stageStart, stageEnd);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1515-		}, "worldgen" + threadnum);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1516-		thread.Start();
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1517-		return thread;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1518-	}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1519-
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1520-	public void GeneratorThreadLoop(int stageStart, int stageEnd)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1521-	{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1522-		Thread.Sleep(5);
+Vintagestory.Server/ServerSystemSupplyChunks.cs:1523:		int num = Math.Min(3, MagicNum.ChunkColumnsToGeneratePerThreadTick / chunkthread.additionalWorldGenThreadsCount);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1524-		int num2 = 0;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1525-		while (!server.stopped)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1526-		{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1527-			if (chunkthread.requestedChunkColumns.Count > 0 && (!server.Suspended || server.RunPhase == EnumServerRunPhase.WorldReady))
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1528-			{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1529-				try
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1530-				{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1531-					for (int i = 0; i < num; i++)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1532-					{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1533-						int num3 = GenerateChunkColumns_OnSeparateThread(stageStart, stageEnd);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1534-						num2 += num3;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1535-						if (num3 == 0)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1536-						{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1537-							break;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1538-						}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1539-					}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1540-				}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1541-				catch (Exception e)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1542-				{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1543-					ServerMain.Logger.Error(e);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1544-				}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1545-			}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1546-			PauseWorldgenThreadIfRequired(onChunkthread: false);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1547-			Thread.Sleep(1);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1548-		}
+--
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1556-
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1557-	public override void Dispose()
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1558-	{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1559-		BlockAccessorWorldGen.ThreadDispose();
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1560-	}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1561-
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1562-	public bool PauseAllWorldgenThreads(int timeoutms)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1563-	{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1564-		if (Interlocked.CompareExchange(ref pauseAllWorldgenThreads, 1, 0) != 0)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1565-		{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1566-			return false;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1567-		}
+Vintagestory.Server/ServerSystemSupplyChunks.cs:1568:		if (chunkthread.additionalWorldGenThreadsCount > 0)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1569-		{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1570-			ServerMain.Logger.VerboseDebug("Pausing all worldgen threads.");
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1571-		}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1572-		long num = Environment.TickCount + timeoutms;
+Vintagestory.Server/ServerSystemSupplyChunks.cs:1573:		while (pauseAllWorldgenThreads < chunkthread.additionalWorldGenThreadsCount + 1 && !server.stopped)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1574-		{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1575-			if (Environment.TickCount > num)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1576-			{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1577-				ServerMain.Logger.VerboseDebug("Pausing all worldgen threads - exceeded timeout!");
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1578-				return false;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1579-			}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1580-			Thread.Sleep(1);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1581-		}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1582-		return true;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1583-	}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1584-
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1585-	public void ResumeAllWorldgenThreads()
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1586-	{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1587-		pauseAllWorldgenThreads = 0;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1588-	}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1589-
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1590-	public void PauseWorldgenThreadIfRequired(bool onChunkthread)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1591-	{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1592-		if (pauseAllWorldgenThreads <= 0)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1593-		{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1594-			return;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1595-		}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1596-		Interlocked.Increment(ref pauseAllWorldgenThreads);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1597-		long num = Environment.TickCount + 5000;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1598-		while (pauseAllWorldgenThreads != 0 && !server.stopped)
+--
+Vintagestory.Server/ChunkServerThread.cs-23-	internal ServerSystemSupplyChunks loadsavechunks;
+Vintagestory.Server/ChunkServerThread.cs-24-
+Vintagestory.Server/ChunkServerThread.cs-25-	internal ServerSystemLoadAndSaveGame loadsavegame;
+Vintagestory.Server/ChunkServerThread.cs-26-
+Vintagestory.Server/ChunkServerThread.cs-27-	internal IBlockAccessor worldgenBlockAccessor;
+Vintagestory.Server/ChunkServerThread.cs-28-
+Vintagestory.Server/ChunkServerThread.cs-29-	public bool runOffThreadSaveNow;
+Vintagestory.Server/ChunkServerThread.cs-30-
+Vintagestory.Server/ChunkServerThread.cs-31-	public bool BackupInProgress;
+Vintagestory.Server/ChunkServerThread.cs-32-
+Vintagestory.Server/ChunkServerThread.cs-33-	public bool peekMode;
+Vintagestory.Server/ChunkServerThread.cs-34-
+Vintagestory.Server/ChunkServerThread.cs:35:	public int additionalWorldGenThreadsCount;
+Vintagestory.Server/ChunkServerThread.cs-36-
+Vintagestory.Server/ChunkServerThread.cs-37-	private bool additionalThreadsPaused;
+Vintagestory.Server/ChunkServerThread.cs-38-
+Vintagestory.Server/ChunkServerThread.cs-39-	public ILogger Logger => ServerMain.Logger;
+Vintagestory.Server/ChunkServerThread.cs-40-
+Vintagestory.Server/ChunkServerThread.cs-41-	public ChunkServerThread(ServerMain server, string threadname, CancellationToken cancellationToken)
+Vintagestory.Server/ChunkServerThread.cs-42-		: base(server, threadname, cancellationToken)
+Vintagestory.Server/ChunkServerThread.cs-43-	{
+Vintagestory.Server/ChunkServerThread.cs-44-		int val = 5;
+Vintagestory.Server/ChunkServerThread.cs:45:		additionalWorldGenThreadsCount = Math.Min(val, MagicNum.MaxWorldgenThreads - 1);
+Vintagestory.Server/ChunkServerThread.cs-46-		if (server.ReducedServerThreads)
+Vintagestory.Server/ChunkServerThread.cs-47-		{
+Vintagestory.Server/ChunkServerThread.cs:48:			additionalWorldGenThreadsCount = 0;
+Vintagestory.Server/ChunkServerThread.cs-49-		}
+Vintagestory.Server/ChunkServerThread.cs:50:		if (additionalWorldGenThreadsCount < 0)
+Vintagestory.Server/ChunkServerThread.cs-51-		{
+Vintagestory.Server/ChunkServerThread.cs:52:			additionalWorldGenThreadsCount = 0;
+Vintagestory.Server/ChunkServerThread.cs-53-		}
+Vintagestory.Server/ChunkServerThread.cs-54-	}
+Vintagestory.Server/ChunkServerThread.cs-55-
+Vintagestory.Server/ChunkServerThread.cs-56-	protected override void UpdatePausedStatus(bool newpause)
+Vintagestory.Server/ChunkServerThread.cs-57-	{
+Vintagestory.Server/ChunkServerThread.cs-58-		if (newpause != additionalThreadsPaused)
+Vintagestory.Server/ChunkServerThread.cs-59-		{
+Vintagestory.Server/ChunkServerThread.cs-60-			TogglePause(newpause);
+Vintagestory.Server/ChunkServerThread.cs-61-		}
+Vintagestory.Server/ChunkServerThread.cs-62-		base.UpdatePausedStatus(newpause);
+Vintagestory.Server/ChunkServerThread.cs-63-	}
+Vintagestory.Server/ChunkServerThread.cs-64-
+Vintagestory.Server/ChunkServerThread.cs-65-	private void TogglePause(bool paused)
+Vintagestory.Server/ChunkServerThread.cs-66-	{
+Vintagestory.Server/ChunkServerThread.cs-67-		ServerSystemSupplyChunks serverSystemSupplyChunks = (ServerSystemSupplyChunks)serversystems[0];
+Vintagestory.Server/ChunkServerThread.cs-68-		if (paused)
+Vintagestory.Server/ChunkServerThread.cs-69-		{
+Vintagestory.Server/ChunkServerThread.cs-70-			serverSystemSupplyChunks.PauseAllWorldgenThreads(1500);
+Vintagestory.Server/ChunkServerThread.cs-71-			serverSystemSupplyChunks.FullyClearGeneratingQueue();
+Vintagestory.Server/ChunkServerThread.cs-72-		}
+Vintagestory.Server/ChunkServerThread.cs-73-		else
+Vintagestory.Server/ChunkServerThread.cs-74-		{
+Vintagestory.Server/ChunkServerThread.cs-75-			serverSystemSupplyChunks.ResumeAllWorldgenThreads();
+Vintagestory.Server/ChunkServerThread.cs:76:			if (additionalWorldGenThreadsCount > 0)
+Vintagestory.Server/ChunkServerThread.cs-77-			{
+Vintagestory.Server/ChunkServerThread.cs-78-				ServerMain.Logger.VerboseDebug("Un-pausing all worldgen threads.");
+Vintagestory.Server/ChunkServerThread.cs-79-			}
+Vintagestory.Server/ChunkServerThread.cs-80-		}
+Vintagestory.Server/ChunkServerThread.cs-81-		additionalThreadsPaused = paused;
+Vintagestory.Server/ChunkServerThread.cs-82-	}
+Vintagestory.Server/ChunkServerThread.cs-83-
+Vintagestory.Server/ChunkServerThread.cs-84-	public ServerChunk GetGeneratingChunkAtPos(int posX, int posY, int posZ)
+Vintagestory.Server/ChunkServerThread.cs-85-	{
+Vintagestory.Server/ChunkServerThread.cs-86-		return GetGeneratingChunk(posX / MagicNum.ServerChunkSize, posY / MagicNum.ServerChunkSize, posZ / MagicNum.ServerChunkSize);
+Vintagestory.Server/ChunkServerThread.cs-87-	}
+Vintagestory.Server/ChunkServerThread.cs-88-
+Vintagestory.Server/ChunkServerThread.cs-89-	public ServerChunk GetGeneratingChunkAtPos(BlockPos pos)
+Vintagestory.Server/ChunkServerThread.cs-90-	{
+Vintagestory.Server/ChunkServerThread.cs-91-		return GetGeneratingChunk(pos.X / MagicNum.ServerChunkSize, pos.Y / MagicNum.ServerChunkSize, pos.Z / MagicNum.ServerChunkSize);
+Vintagestory.Server/ChunkServerThread.cs-92-	}
+Vintagestory.Server/ChunkServerThread.cs-93-
+Vintagestory.Server/ChunkServerThread.cs-94-	public ChunkColumnLoadRequest GetChunkRequestAtPos(int posX, int posZ)
+Vintagestory.Server/ChunkServerThread.cs-95-	{
+Vintagestory.Server/ChunkServerThread.cs-96-		long index = server.WorldMap.MapChunkIndex2D(posX / MagicNum.ServerChunkSize, posZ / MagicNum.ServerChunkSize);
+Vintagestory.Server/ChunkServerThread.cs-97-		if (!peekMode)
+Vintagestory.Server/ChunkServerThread.cs-98-		{
+Vintagestory.Server/ChunkServerThread.cs-99-			return requestedChunkColumns.GetByIndex(index);
+Vintagestory.Server/ChunkServerThread.cs-100-		}
+Vintagestory.Server/ChunkServerThread.cs-101-		return peekingChunkColumns.GetByIndex(index);

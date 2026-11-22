@@ -1,0 +1,467 @@
+Vintagestory.Server/ServerAPI.cs-37-	public int ServerUptimeSeconds => (int)server.totalUnpausedTime.Elapsed.TotalSeconds;
+Vintagestory.Server/ServerAPI.cs-38-
+Vintagestory.Server/ServerAPI.cs-39-	public long ServerUptimeMilliseconds => (int)server.totalUnpausedTime.ElapsedMilliseconds;
+Vintagestory.Server/ServerAPI.cs-40-
+Vintagestory.Server/ServerAPI.cs-41-	public bool IsShuttingDown => server.exitState.Exit;
+Vintagestory.Server/ServerAPI.cs-42-
+Vintagestory.Server/ServerAPI.cs-43-	public EnumServerRunPhase CurrentRunPhase => server.RunPhase;
+Vintagestory.Server/ServerAPI.cs-44-
+Vintagestory.Server/ServerAPI.cs-45-	public IServerConfig Config => server.Config;
+Vintagestory.Server/ServerAPI.cs-46-
+Vintagestory.Server/ServerAPI.cs-47-	public IServerPlayer[] Players => server.PlayersByUid.Values.ToArray();
+Vintagestory.Server/ServerAPI.cs-48-
+Vintagestory.Server/ServerAPI.cs:49:	public bool ReducedServerThreads => server.ReducedServerThreads;
+Vintagestory.Server/ServerAPI.cs-50-
+Vintagestory.Server/ServerAPI.cs-51-	public ServerAPI(ServerMain server)
+Vintagestory.Server/ServerAPI.cs-52-		: base(server)
+Vintagestory.Server/ServerAPI.cs-53-	{
+Vintagestory.Server/ServerAPI.cs-54-	}
+Vintagestory.Server/ServerAPI.cs-55-
+Vintagestory.Server/ServerAPI.cs-56-	public void LogChat(string s)
+Vintagestory.Server/ServerAPI.cs-57-	{
+Vintagestory.Server/ServerAPI.cs-58-		ServerMain.Logger.Chat(s);
+Vintagestory.Server/ServerAPI.cs-59-	}
+Vintagestory.Server/ServerAPI.cs-60-
+Vintagestory.Server/ServerAPI.cs-61-	public void LogBuild(string message, params object[] args)
+Vintagestory.Server/ServerAPI.cs-62-	{
+Vintagestory.Server/ServerAPI.cs-63-		ServerMain.Logger.Build(message, args);
+Vintagestory.Server/ServerAPI.cs-64-	}
+Vintagestory.Server/ServerAPI.cs-65-
+Vintagestory.Server/ServerAPI.cs-66-	public void LogChat(string message, params object[] args)
+Vintagestory.Server/ServerAPI.cs-67-	{
+Vintagestory.Server/ServerAPI.cs-68-		ServerMain.Logger.Chat(message, args);
+Vintagestory.Server/ServerAPI.cs-69-	}
+Vintagestory.Server/ServerAPI.cs-70-
+Vintagestory.Server/ServerAPI.cs-71-	public void LogVerboseDebug(string message, params object[] args)
+Vintagestory.Server/ServerAPI.cs-72-	{
+Vintagestory.Server/ServerAPI.cs-73-		ServerMain.Logger.VerboseDebug(message, args);
+Vintagestory.Server/ServerAPI.cs-74-	}
+--
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-299-				server.SaveGameData.PlayerDataByUID = null;
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-300-			}
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-301-			if (SetDefaultSpawnOnce != null)
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-302-			{
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-303-				server.SaveGameData.DefaultSpawn = SetDefaultSpawnOnce;
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-304-				SetDefaultSpawnOnce = null;
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-305-			}
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-306-			server.SaveGameData.IsNewWorld = false;
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-307-			ServerMain.Logger.Notification("Loaded existing save game data. Playstyle: {0}, Playstyle Lang code: {1}, WorldType: {2}", server.SaveGameData.PlayStyle, server.SaveGameData.PlayStyleLangCode, server.SaveGameData.WorldType);
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-308-		}
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-309-		server.WorldMap.Init(server.SaveGameData.MapSizeX, server.SaveGameData.MapSizeY, server.SaveGameData.MapSizeZ);
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-310-		int stages = Math.Max(1, Math.Min(6, MagicNum.MaxWorldgenThreads)) + 1;
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs:311:		if (server.ReducedServerThreads)
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-312-		{
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-313-			stages = 1;
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-314-		}
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-315-		chunkthread.requestedChunkColumns = new ConcurrentIndexedFifoQueue<ChunkColumnLoadRequest>(MagicNum.RequestChunkColumnsQueueSize, stages);
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-316-		chunkthread.peekingChunkColumns = new IndexedFifoQueue<ChunkColumnLoadRequest>(MagicNum.RequestChunkColumnsQueueSize / 5);
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-317-		ServerMain.Logger.Notification("Savegame {0} loaded", GamePaths.RemoveUsername(saveFilepath));
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-318-		ServerMain.Logger.Notification("World size = {0} {1} {2}", server.SaveGameData.MapSizeX, server.SaveGameData.MapSizeY, server.SaveGameData.MapSizeZ);
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-319-	}
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-320-
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-321-	private void SaveGameWorld(bool saveLater = false)
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-322-	{
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-323-		if (!saveLater)
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-324-		{
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-325-			chunkthread.runOffThreadSaveNow = false;
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-326-		}
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-327-		if (ServerMain.FrameProfiler == null)
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-328-		{
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-329-			ServerMain.FrameProfiler = new FrameProfilerUtil((string text) =>
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-330-			{
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-331-				ServerMain.Logger.Notification(text);
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-332-			});
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-333-			ServerMain.FrameProfiler.Begin(null);
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-334-		}
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-335-		ServerMain.FrameProfiler.Mark("savegameworld-begin");
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-336-		ServerMain.Logger.Event("Mods and systems notified, now saving everything...");
+--
+Vintagestory.Server/PhysicsManager.cs-68-					}
+Vintagestory.Server/PhysicsManager.cs-69-					catch (Exception e)
+Vintagestory.Server/PhysicsManager.cs-70-					{
+Vintagestory.Server/PhysicsManager.cs-71-						ServerMain.Logger.Error(e);
+Vintagestory.Server/PhysicsManager.cs-72-					}
+Vintagestory.Server/PhysicsManager.cs-73-				}
+Vintagestory.Server/PhysicsManager.cs-74-				busy = false;
+Vintagestory.Server/PhysicsManager.cs-75-			}
+Vintagestory.Server/PhysicsManager.cs-76-		}
+Vintagestory.Server/PhysicsManager.cs-77-
+Vintagestory.Server/PhysicsManager.cs-78-		internal void QueueAsyncTask(Action a)
+Vintagestory.Server/PhysicsManager.cs-79-		{
+Vintagestory.Server/PhysicsManager.cs:80:			if (physicsManager.server.ReducedServerThreads)
+Vintagestory.Server/PhysicsManager.cs-81-			{
+Vintagestory.Server/PhysicsManager.cs-82-				a();
+Vintagestory.Server/PhysicsManager.cs-83-				return;
+Vintagestory.Server/PhysicsManager.cs-84-			}
+Vintagestory.Server/PhysicsManager.cs-85-			queue.Enqueue(a);
+Vintagestory.Server/PhysicsManager.cs-86-			if (!idle)
+Vintagestory.Server/PhysicsManager.cs-87-			{
+Vintagestory.Server/PhysicsManager.cs-88-				return;
+Vintagestory.Server/PhysicsManager.cs-89-			}
+Vintagestory.Server/PhysicsManager.cs-90-			lock (this)
+Vintagestory.Server/PhysicsManager.cs-91-			{
+Vintagestory.Server/PhysicsManager.cs-92-				Monitor.Pulse(this);
+Vintagestory.Server/PhysicsManager.cs-93-			}
+Vintagestory.Server/PhysicsManager.cs-94-		}
+Vintagestory.Server/PhysicsManager.cs-95-
+Vintagestory.Server/PhysicsManager.cs-96-		internal bool Busy()
+Vintagestory.Server/PhysicsManager.cs-97-		{
+Vintagestory.Server/PhysicsManager.cs-98-			if (!busy)
+Vintagestory.Server/PhysicsManager.cs-99-			{
+Vintagestory.Server/PhysicsManager.cs-100-				return !queue.IsEmpty;
+Vintagestory.Server/PhysicsManager.cs-101-			}
+Vintagestory.Server/PhysicsManager.cs-102-			return true;
+Vintagestory.Server/PhysicsManager.cs-103-		}
+Vintagestory.Server/PhysicsManager.cs-104-	}
+Vintagestory.Server/PhysicsManager.cs-105-
+--
+Vintagestory.Server/PhysicsManager.cs-180-
+Vintagestory.Server/PhysicsManager.cs-181-	private static float rateModifier = 1f;
+Vintagestory.Server/PhysicsManager.cs-182-
+Vintagestory.Server/PhysicsManager.cs-183-	private float deltaT;
+Vintagestory.Server/PhysicsManager.cs-184-
+Vintagestory.Server/PhysicsManager.cs-185-	public PhysicsManager(ICoreServerAPI sapi, ServerUdpNetwork udpNetwork)
+Vintagestory.Server/PhysicsManager.cs-186-	{
+Vintagestory.Server/PhysicsManager.cs-187-		this.sapi = sapi;
+Vintagestory.Server/PhysicsManager.cs-188-		this.udpNetwork = udpNetwork;
+Vintagestory.Server/PhysicsManager.cs-189-		AnimationsAndTagsChannel = sapi.Network.RegisterChannel("EntityAnims");
+Vintagestory.Server/PhysicsManager.cs-190-		AnimationsAndTagsChannel.RegisterMessageType<AnimationPacket>().RegisterMessageType<BulkAnimationPacket>().RegisterMessageType<EntityTagPacket>();
+Vintagestory.Server/PhysicsManager.cs-191-		maxPhysicsThreads = Math.Clamp(MagicNum.MaxPhysicsThreads, 1, 8);
+Vintagestory.Server/PhysicsManager.cs:192:		if (sapi.Server.ReducedServerThreads)
+Vintagestory.Server/PhysicsManager.cs-193-		{
+Vintagestory.Server/PhysicsManager.cs-194-			maxPhysicsThreads = 1;
+Vintagestory.Server/PhysicsManager.cs-195-		}
+Vintagestory.Server/PhysicsManager.cs-196-		entitiesFullUpdate = new Dictionary<long, Packet_EntityAttributes>[maxPhysicsThreads];
+Vintagestory.Server/PhysicsManager.cs-197-		entitiesPartialUpdate = new Dictionary<long, Packet_EntityAttributeUpdate>[maxPhysicsThreads];
+Vintagestory.Server/PhysicsManager.cs-198-		entitiesDebugUpdate = new Dictionary<long, Packet_EntityAttributes>[maxPhysicsThreads];
+Vintagestory.Server/PhysicsManager.cs-199-		entitiesPositionPackets = new Dictionary<long, Packet_EntityPosition>[maxPhysicsThreads];
+Vintagestory.Server/PhysicsManager.cs-200-		entitiesAnimPackets = new Dictionary<long, AnimationPacket>[maxPhysicsThreads];
+Vintagestory.Server/PhysicsManager.cs-201-		entitiesTagPackets = new ConcurrentDictionary<long, EntityTagPacket>(maxPhysicsThreads, 32);
+Vintagestory.Server/PhysicsManager.cs-202-		entitiesUpdateReusableBuffers = new FastMemoryStream[maxPhysicsThreads];
+Vintagestory.Server/PhysicsManager.cs-203-		for (int i = 0; i < entitiesFullUpdate.Length; i++)
+Vintagestory.Server/PhysicsManager.cs-204-		{
+Vintagestory.Server/PhysicsManager.cs-205-			entitiesFullUpdate[i] = new Dictionary<long, Packet_EntityAttributes>();
+Vintagestory.Server/PhysicsManager.cs-206-		}
+Vintagestory.Server/PhysicsManager.cs-207-		for (int j = 0; j < entitiesPartialUpdate.Length; j++)
+Vintagestory.Server/PhysicsManager.cs-208-		{
+Vintagestory.Server/PhysicsManager.cs-209-			entitiesPartialUpdate[j] = new Dictionary<long, Packet_EntityAttributeUpdate>();
+Vintagestory.Server/PhysicsManager.cs-210-		}
+Vintagestory.Server/PhysicsManager.cs-211-		for (int k = 0; k < entitiesDebugUpdate.Length; k++)
+Vintagestory.Server/PhysicsManager.cs-212-		{
+Vintagestory.Server/PhysicsManager.cs-213-			entitiesDebugUpdate[k] = new Dictionary<long, Packet_EntityAttributes>();
+Vintagestory.Server/PhysicsManager.cs-214-		}
+Vintagestory.Server/PhysicsManager.cs-215-		for (int l = 0; l < entitiesPositionPackets.Length; l++)
+Vintagestory.Server/PhysicsManager.cs-216-		{
+Vintagestory.Server/PhysicsManager.cs-217-			entitiesPositionPackets[l] = new Dictionary<long, Packet_EntityPosition>();
+--
+Vintagestory.Server/PhysicsManager.cs-219-		for (int m = 0; m < entitiesAnimPackets.Length; m++)
+Vintagestory.Server/PhysicsManager.cs-220-		{
+Vintagestory.Server/PhysicsManager.cs-221-			entitiesAnimPackets[m] = new Dictionary<long, AnimationPacket>();
+Vintagestory.Server/PhysicsManager.cs-222-		}
+Vintagestory.Server/PhysicsManager.cs-223-		for (int n = 0; n < entitiesUpdateReusableBuffers.Length; n++)
+Vintagestory.Server/PhysicsManager.cs-224-		{
+Vintagestory.Server/PhysicsManager.cs-225-			entitiesUpdateReusableBuffers[n] = new FastMemoryStream();
+Vintagestory.Server/PhysicsManager.cs-226-		}
+Vintagestory.Server/PhysicsManager.cs-227-		server = sapi.World as ServerMain;
+Vintagestory.Server/PhysicsManager.cs-228-		loadBalancer = new LoadBalancer(this, ServerMain.Logger);
+Vintagestory.Server/PhysicsManager.cs-229-		loadBalancer.CreateDedicatedThreads(maxPhysicsThreads, "physicsManager", server.Serverthreads);
+Vintagestory.Server/PhysicsManager.cs-230-		offthreadProcess = new PhysicsOffthreadTasks(this);
+Vintagestory.Server/PhysicsManager.cs:231:		if (!server.ReducedServerThreads)
+Vintagestory.Server/PhysicsManager.cs-232-		{
+Vintagestory.Server/PhysicsManager.cs-233-			Thread thread = TyronThreadPool.CreateDedicatedThread(offthreadProcess.Start, "physicsManagerHelper");
+Vintagestory.Server/PhysicsManager.cs-234-			thread.IsBackground = true;
+Vintagestory.Server/PhysicsManager.cs-235-			thread.Priority = Thread.CurrentThread.Priority;
+Vintagestory.Server/PhysicsManager.cs-236-			server.Serverthreads.Add(thread);
+Vintagestory.Server/PhysicsManager.cs-237-		}
+Vintagestory.Server/PhysicsManager.cs-238-		listener = server.RegisterGameTickListener(ServerTick, 1);
+Vintagestory.Server/PhysicsManager.cs-239-		rateModifier = 1f;
+Vintagestory.Server/PhysicsManager.cs-240-		PhysicsBehaviorBase.InitServerMT(sapi);
+Vintagestory.Server/PhysicsManager.cs-241-	}
+Vintagestory.Server/PhysicsManager.cs-242-
+Vintagestory.Server/PhysicsManager.cs-243-	public void Init()
+Vintagestory.Server/PhysicsManager.cs-244-	{
+Vintagestory.Server/PhysicsManager.cs-245-		es = server.Systems.First((ServerSystem s) => s is ServerSystemEntitySimulation) as ServerSystemEntitySimulation;
+Vintagestory.Server/PhysicsManager.cs-246-		es.physicsManager = this;
+Vintagestory.Server/PhysicsManager.cs-247-	}
+Vintagestory.Server/PhysicsManager.cs-248-
+Vintagestory.Server/PhysicsManager.cs-249-	public void ForceClientUpdateTick(ConnectedClient client)
+Vintagestory.Server/PhysicsManager.cs-250-	{
+Vintagestory.Server/PhysicsManager.cs-251-		attrUpdateAccum = 0.2f;
+Vintagestory.Server/PhysicsManager.cs-252-	}
+Vintagestory.Server/PhysicsManager.cs-253-
+Vintagestory.Server/PhysicsManager.cs-254-	public void ServerTick(float dt)
+Vintagestory.Server/PhysicsManager.cs-255-	{
+Vintagestory.Server/PhysicsManager.cs-256-		ServerMain.FrameProfiler.Enter("physicsmanager-servertick");
+--
+Vintagestory.Server/ChunkServerThread.cs-34-
+Vintagestory.Server/ChunkServerThread.cs-35-	public int additionalWorldGenThreadsCount;
+Vintagestory.Server/ChunkServerThread.cs-36-
+Vintagestory.Server/ChunkServerThread.cs-37-	private bool additionalThreadsPaused;
+Vintagestory.Server/ChunkServerThread.cs-38-
+Vintagestory.Server/ChunkServerThread.cs-39-	public ILogger Logger => ServerMain.Logger;
+Vintagestory.Server/ChunkServerThread.cs-40-
+Vintagestory.Server/ChunkServerThread.cs-41-	public ChunkServerThread(ServerMain server, string threadname, CancellationToken cancellationToken)
+Vintagestory.Server/ChunkServerThread.cs-42-		: base(server, threadname, cancellationToken)
+Vintagestory.Server/ChunkServerThread.cs-43-	{
+Vintagestory.Server/ChunkServerThread.cs-44-		int val = 5;
+Vintagestory.Server/ChunkServerThread.cs-45-		additionalWorldGenThreadsCount = Math.Min(val, MagicNum.MaxWorldgenThreads - 1);
+Vintagestory.Server/ChunkServerThread.cs:46:		if (server.ReducedServerThreads)
+Vintagestory.Server/ChunkServerThread.cs-47-		{
+Vintagestory.Server/ChunkServerThread.cs-48-			additionalWorldGenThreadsCount = 0;
+Vintagestory.Server/ChunkServerThread.cs-49-		}
+Vintagestory.Server/ChunkServerThread.cs-50-		if (additionalWorldGenThreadsCount < 0)
+Vintagestory.Server/ChunkServerThread.cs-51-		{
+Vintagestory.Server/ChunkServerThread.cs-52-			additionalWorldGenThreadsCount = 0;
+Vintagestory.Server/ChunkServerThread.cs-53-		}
+Vintagestory.Server/ChunkServerThread.cs-54-	}
+Vintagestory.Server/ChunkServerThread.cs-55-
+Vintagestory.Server/ChunkServerThread.cs-56-	protected override void UpdatePausedStatus(bool newpause)
+Vintagestory.Server/ChunkServerThread.cs-57-	{
+Vintagestory.Server/ChunkServerThread.cs-58-		if (newpause != additionalThreadsPaused)
+Vintagestory.Server/ChunkServerThread.cs-59-		{
+Vintagestory.Server/ChunkServerThread.cs-60-			TogglePause(newpause);
+Vintagestory.Server/ChunkServerThread.cs-61-		}
+Vintagestory.Server/ChunkServerThread.cs-62-		base.UpdatePausedStatus(newpause);
+Vintagestory.Server/ChunkServerThread.cs-63-	}
+Vintagestory.Server/ChunkServerThread.cs-64-
+Vintagestory.Server/ChunkServerThread.cs-65-	private void TogglePause(bool paused)
+Vintagestory.Server/ChunkServerThread.cs-66-	{
+Vintagestory.Server/ChunkServerThread.cs-67-		ServerSystemSupplyChunks serverSystemSupplyChunks = (ServerSystemSupplyChunks)serversystems[0];
+Vintagestory.Server/ChunkServerThread.cs-68-		if (paused)
+Vintagestory.Server/ChunkServerThread.cs-69-		{
+Vintagestory.Server/ChunkServerThread.cs-70-			serverSystemSupplyChunks.PauseAllWorldgenThreads(1500);
+Vintagestory.Server/ChunkServerThread.cs-71-			serverSystemSupplyChunks.FullyClearGeneratingQueue();
+--
+Vintagestory.Server/ServerSystemEntitySpawner.cs-61-
+Vintagestory.Server/ServerSystemEntitySpawner.cs-62-	private bool errorLoggedThisTick;
+Vintagestory.Server/ServerSystemEntitySpawner.cs-63-
+Vintagestory.Server/ServerSystemEntitySpawner.cs-64-	public volatile bool paused;
+Vintagestory.Server/ServerSystemEntitySpawner.cs-65-
+Vintagestory.Server/ServerSystemEntitySpawner.cs-66-	private ConcurrentQueue<EntitySpawnerResult> readyToSpawn = new ConcurrentQueue<EntitySpawnerResult>();
+Vintagestory.Server/ServerSystemEntitySpawner.cs-67-
+Vintagestory.Server/ServerSystemEntitySpawner.cs-68-	private readonly BlockPos tmpPos = new BlockPos(0);
+Vintagestory.Server/ServerSystemEntitySpawner.cs-69-
+Vintagestory.Server/ServerSystemEntitySpawner.cs-70-	public ServerSystemEntitySpawner(ServerMain server)
+Vintagestory.Server/ServerSystemEntitySpawner.cs-71-		: base(server)
+Vintagestory.Server/ServerSystemEntitySpawner.cs-72-	{
+Vintagestory.Server/ServerSystemEntitySpawner.cs:73:		multithreaded = !server.ReducedServerThreads;
+Vintagestory.Server/ServerSystemEntitySpawner.cs-74-	}
+Vintagestory.Server/ServerSystemEntitySpawner.cs-75-
+Vintagestory.Server/ServerSystemEntitySpawner.cs-76-	public override void OnBeginModsAndConfigReady()
+Vintagestory.Server/ServerSystemEntitySpawner.cs-77-	{
+Vintagestory.Server/ServerSystemEntitySpawner.cs-78-		List<EntityProperties> entityTypes = server.EntityTypes;
+Vintagestory.Server/ServerSystemEntitySpawner.cs-79-		for (int i = 0; i < entityTypes.Count; i++)
+Vintagestory.Server/ServerSystemEntitySpawner.cs-80-		{
+Vintagestory.Server/ServerSystemEntitySpawner.cs-81-			EntityProperties entityProperties = entityTypes[i];
+Vintagestory.Server/ServerSystemEntitySpawner.cs-82-			entityTypesByCode[entityProperties.Code] = entityProperties;
+Vintagestory.Server/ServerSystemEntitySpawner.cs-83-		}
+Vintagestory.Server/ServerSystemEntitySpawner.cs-84-	}
+Vintagestory.Server/ServerSystemEntitySpawner.cs-85-
+Vintagestory.Server/ServerSystemEntitySpawner.cs-86-	public override void OnBeginGameReady(SaveGame savegame)
+Vintagestory.Server/ServerSystemEntitySpawner.cs-87-	{
+Vintagestory.Server/ServerSystemEntitySpawner.cs-88-		base.OnBeginGameReady(savegame);
+Vintagestory.Server/ServerSystemEntitySpawner.cs-89-		cachingBlockAccessor = server.GetCachingBlockAccessor(synchronize: false, relight: false);
+Vintagestory.Server/ServerSystemEntitySpawner.cs-90-		server.RegisterGameTickListener(SpawnReadyMobs, 250);
+Vintagestory.Server/ServerSystemEntitySpawner.cs-91-		if (multithreaded)
+Vintagestory.Server/ServerSystemEntitySpawner.cs-92-		{
+Vintagestory.Server/ServerSystemEntitySpawner.cs-93-			Thread thread = TyronThreadPool.CreateDedicatedThread(new SpawnerOffthread(this).Start, "physicsManagerHelper");
+Vintagestory.Server/ServerSystemEntitySpawner.cs-94-			thread.IsBackground = true;
+Vintagestory.Server/ServerSystemEntitySpawner.cs-95-			thread.Priority = Thread.CurrentThread.Priority;
+Vintagestory.Server/ServerSystemEntitySpawner.cs-96-			server.Serverthreads.Add(thread);
+Vintagestory.Server/ServerSystemEntitySpawner.cs-97-		}
+Vintagestory.Server/ServerSystemEntitySpawner.cs-98-		if (savegame.IsNewWorld || !savegame.ModData.ContainsKey("graceTimeUntilTotalDays"))
+--
+Vintagestory.Server/ServerMain.cs-126-	public long TotalSentBytes;
+Vintagestory.Server/ServerMain.cs-127-
+Vintagestory.Server/ServerMain.cs-128-	public long TotalSentBytesUdp;
+Vintagestory.Server/ServerMain.cs-129-
+Vintagestory.Server/ServerMain.cs-130-	public long TotalReceivedBytes;
+Vintagestory.Server/ServerMain.cs-131-
+Vintagestory.Server/ServerMain.cs-132-	public long TotalReceivedBytesUdp;
+Vintagestory.Server/ServerMain.cs-133-
+Vintagestory.Server/ServerMain.cs-134-	public ServerConfig Config;
+Vintagestory.Server/ServerMain.cs-135-
+Vintagestory.Server/ServerMain.cs-136-	public bool ConfigNeedsSaving;
+Vintagestory.Server/ServerMain.cs-137-
+Vintagestory.Server/ServerMain.cs:138:	public bool ReducedServerThreads;
+Vintagestory.Server/ServerMain.cs-139-
+Vintagestory.Server/ServerMain.cs-140-	internal long lastDisconnectTotalMs;
+Vintagestory.Server/ServerMain.cs-141-
+Vintagestory.Server/ServerMain.cs-142-	private int lastClientId;
+Vintagestory.Server/ServerMain.cs-143-
+Vintagestory.Server/ServerMain.cs-144-	public ConcurrentQueue<BlockPos> DirtyBlockEntities = new ConcurrentQueue<BlockPos>();
+Vintagestory.Server/ServerMain.cs-145-
+Vintagestory.Server/ServerMain.cs-146-	public ConcurrentQueue<BlockPos> ModifiedBlocks = new ConcurrentQueue<BlockPos>();
+Vintagestory.Server/ServerMain.cs-147-
+Vintagestory.Server/ServerMain.cs-148-	public ConcurrentQueue<Vec4i> DirtyBlocks = new ConcurrentQueue<Vec4i>();
+Vintagestory.Server/ServerMain.cs-149-
+Vintagestory.Server/ServerMain.cs-150-	public ConcurrentQueue<BlockPos> ModifiedDecors = new ConcurrentQueue<BlockPos>();
+Vintagestory.Server/ServerMain.cs-151-
+Vintagestory.Server/ServerMain.cs-152-	public ConcurrentQueue<BlockPos> ModifiedBlocksNoRelight = new ConcurrentQueue<BlockPos>();
+Vintagestory.Server/ServerMain.cs-153-
+Vintagestory.Server/ServerMain.cs-154-	public List<BlockPos> ModifiedBlocksMinimal = new List<BlockPos>();
+Vintagestory.Server/ServerMain.cs-155-
+Vintagestory.Server/ServerMain.cs-156-	public Queue<BlockPos> UpdatedBlocks = new Queue<BlockPos>();
+Vintagestory.Server/ServerMain.cs-157-
+Vintagestory.Server/ServerMain.cs-158-	internal int nextFreeBlockId;
+Vintagestory.Server/ServerMain.cs-159-
+Vintagestory.Server/ServerMain.cs-160-	public Vintagestory.API.Datastructures.OrderedDictionary<AssetLocation, ITreeGenerator> TreeGeneratorsByTreeCode = new Vintagestory.API.Datastructures.OrderedDictionary<AssetLocation, ITreeGenerator>();
+Vintagestory.Server/ServerMain.cs-161-
+Vintagestory.Server/ServerMain.cs-162-	public Vintagestory.API.Datastructures.OrderedDictionary<AssetLocation, EntityProperties> EntityTypesByCode = new Vintagestory.API.Datastructures.OrderedDictionary<AssetLocation, EntityProperties>();
+Vintagestory.Server/ServerMain.cs-163-
+--
+Vintagestory.Server/ServerMain.cs-1043-		{
+Vintagestory.Server/ServerMain.cs-1044-			ServerSystemLoadConfig.GenerateConfig(this);
+Vintagestory.Server/ServerMain.cs-1045-			ServerSystemLoadConfig.SaveConfig(this);
+Vintagestory.Server/ServerMain.cs-1046-			if (Logger != null)
+Vintagestory.Server/ServerMain.cs-1047-			{
+Vintagestory.Server/ServerMain.cs-1048-				Logger.Notification("Config generated.");
+Vintagestory.Server/ServerMain.cs-1049-				Logger.Dispose();
+Vintagestory.Server/ServerMain.cs-1050-			}
+Vintagestory.Server/ServerMain.cs-1051-			return;
+Vintagestory.Server/ServerMain.cs-1052-		}
+Vintagestory.Server/ServerMain.cs-1053-		if (progArgs.ReducedThreads)
+Vintagestory.Server/ServerMain.cs-1054-		{
+Vintagestory.Server/ServerMain.cs:1055:			ReducedServerThreads = true;
+Vintagestory.Server/ServerMain.cs-1056-		}
+Vintagestory.Server/ServerMain.cs-1057-		ServerConsoleClient = new ServerConsoleClient(serverConsoleId)
+Vintagestory.Server/ServerMain.cs-1058-		{
+Vintagestory.Server/ServerMain.cs-1059-			FallbackPlayerName = "Admin",
+Vintagestory.Server/ServerMain.cs-1060-			IsNewClient = false
+Vintagestory.Server/ServerMain.cs-1061-		};
+Vintagestory.Server/ServerMain.cs-1062-		ServerConsoleClient.WorldData = new ServerWorldPlayerData
+Vintagestory.Server/ServerMain.cs-1063-		{
+Vintagestory.Server/ServerMain.cs-1064-			PlayerUID = "Admin"
+Vintagestory.Server/ServerMain.cs-1065-		};
+Vintagestory.Server/ServerMain.cs-1066-		FrameProfiler = new FrameProfilerUtil(Logger.Notification);
+Vintagestory.Server/ServerMain.cs-1067-		AnimatorBase.logAntiSpam.Clear();
+Vintagestory.Server/ServerMain.cs-1068-		if (IsDedicatedServer)
+Vintagestory.Server/ServerMain.cs-1069-		{
+Vintagestory.Server/ServerMain.cs-1070-			serverConsole = new ServerConsole(this, _consoleThreadsCts.Token);
+Vintagestory.Server/ServerMain.cs-1071-		}
+Vintagestory.Server/ServerMain.cs-1072-		foreach (Thread serverthread in Serverthreads)
+Vintagestory.Server/ServerMain.cs-1073-		{
+Vintagestory.Server/ServerMain.cs-1074-			serverthread?.Start();
+Vintagestory.Server/ServerMain.cs-1075-		}
+Vintagestory.Server/ServerMain.cs-1076-		totalUpTime.Start();
+Vintagestory.Server/ServerMain.cs-1077-	}
+Vintagestory.Server/ServerMain.cs-1078-
+Vintagestory.Server/ServerMain.cs-1079-	private Thread CreateThread(string name, ServerSystem[] serversystems, CancellationToken cancellationToken)
+Vintagestory.Server/ServerMain.cs-1080-	{
+--
+Vintagestory.Server/ServerMain.cs-1098-		Thread thread = CreateThread(name, new ServerSystem[1] { serverSystem }, ServerThreadsCts.Token);
+Vintagestory.Server/ServerMain.cs-1099-		Serverthreads.Add(thread);
+Vintagestory.Server/ServerMain.cs-1100-		Array.Resize(ref Systems, Systems.Length + 1);
+Vintagestory.Server/ServerMain.cs-1101-		Systems[Systems.Length - 1] = serverSystem;
+Vintagestory.Server/ServerMain.cs-1102-		if (RunPhase >= EnumServerRunPhase.RunGame)
+Vintagestory.Server/ServerMain.cs-1103-		{
+Vintagestory.Server/ServerMain.cs-1104-			thread.Start();
+Vintagestory.Server/ServerMain.cs-1105-		}
+Vintagestory.Server/ServerMain.cs-1106-	}
+Vintagestory.Server/ServerMain.cs-1107-
+Vintagestory.Server/ServerMain.cs-1108-	public void PreLaunch()
+Vintagestory.Server/ServerMain.cs-1109-	{
+Vintagestory.Server/ServerMain.cs:1110:		if (!ReducedServerThreads)
+Vintagestory.Server/ServerMain.cs-1111-		{
+Vintagestory.Server/ServerMain.cs-1112-			ClientPacketParsingThread = CreateBackgroundThread("clientPacketsParser", new ClientPacketParserOffthread(this).Start);
+Vintagestory.Server/ServerMain.cs-1113-		}
+Vintagestory.Server/ServerMain.cs-1114-	}
+Vintagestory.Server/ServerMain.cs-1115-
+Vintagestory.Server/ServerMain.cs-1116-	public void StandbyLaunch()
+Vintagestory.Server/ServerMain.cs-1117-	{
+Vintagestory.Server/ServerMain.cs-1118-		MainSockets[1] = new TcpNetServer();
+Vintagestory.Server/ServerMain.cs-1119-		UdpSockets[1] = new UdpNetServer(Clients);
+Vintagestory.Server/ServerMain.cs-1120-		ServerSystemLoadConfig.EnsureConfigExists(this);
+Vintagestory.Server/ServerMain.cs-1121-		ServerSystemLoadConfig.LoadConfig(this);
+Vintagestory.Server/ServerMain.cs-1122-		startSockets();
+Vintagestory.Server/ServerMain.cs-1123-		if (HeartbeatSystem == null)
+Vintagestory.Server/ServerMain.cs-1124-		{
+Vintagestory.Server/ServerMain.cs-1125-			HeartbeatSystem = new ServerSystemHeartbeat(this);
+Vintagestory.Server/ServerMain.cs-1126-		}
+Vintagestory.Server/ServerMain.cs-1127-		HeartbeatSystem.StandbyLaunch();
+Vintagestory.Server/ServerMain.cs-1128-		Logger.Event("Server launched in standby mode. Full launch will commence on first connection attempt. Only /stop and /stats commands will be functioning");
+Vintagestory.Server/ServerMain.cs-1129-	}
+Vintagestory.Server/ServerMain.cs-1130-
+Vintagestory.Server/ServerMain.cs-1131-	public void Launch()
+Vintagestory.Server/ServerMain.cs-1132-	{
+Vintagestory.Server/ServerMain.cs-1133-		loadedChunksLock = new FastRWLock(this);
+Vintagestory.Server/ServerMain.cs-1134-		serverChunkDataPool = new ChunkDataPool(MagicNum.ServerChunkSize, this);
+Vintagestory.Server/ServerMain.cs-1135-		InitBasicPacketHandlers();
+--
+Vintagestory.Server/ServerMain.cs-1447-		}
+Vintagestory.Server/ServerMain.cs-1448-		if (progArgs.Port != null)
+Vintagestory.Server/ServerMain.cs-1449-		{
+Vintagestory.Server/ServerMain.cs-1450-			if (!int.TryParse(progArgs.Port, out CurrentPort))
+Vintagestory.Server/ServerMain.cs-1451-			{
+Vintagestory.Server/ServerMain.cs-1452-				CurrentPort = Config.Port;
+Vintagestory.Server/ServerMain.cs-1453-			}
+Vintagestory.Server/ServerMain.cs-1454-		}
+Vintagestory.Server/ServerMain.cs-1455-		else
+Vintagestory.Server/ServerMain.cs-1456-		{
+Vintagestory.Server/ServerMain.cs-1457-			CurrentPort = Config.Port;
+Vintagestory.Server/ServerMain.cs-1458-		}
+Vintagestory.Server/ServerMain.cs:1459:		if (!ReducedServerThreads)
+Vintagestory.Server/ServerMain.cs-1460-		{
+Vintagestory.Server/ServerMain.cs-1461-			ClientPacketParsingThread.TryStart();
+Vintagestory.Server/ServerMain.cs-1462-		}
+Vintagestory.Server/ServerMain.cs-1463-		MainSockets[1]?.SetIpAndPort(CurrentIp, CurrentPort);
+Vintagestory.Server/ServerMain.cs-1464-		MainSockets[1]?.Start();
+Vintagestory.Server/ServerMain.cs-1465-		UdpSockets[1]?.SetIpAndPort(CurrentIp, CurrentPort);
+Vintagestory.Server/ServerMain.cs-1466-		UdpSockets[1]?.Start();
+Vintagestory.Server/ServerMain.cs-1467-	}
+Vintagestory.Server/ServerMain.cs-1468-
+Vintagestory.Server/ServerMain.cs-1469-	public void Process()
+Vintagestory.Server/ServerMain.cs-1470-	{
+Vintagestory.Server/ServerMain.cs-1471-		TickPosition = 0;
+Vintagestory.Server/ServerMain.cs-1472-		if (Suspended)
+Vintagestory.Server/ServerMain.cs-1473-		{
+Vintagestory.Server/ServerMain.cs-1474-			Thread.Sleep(2);
+Vintagestory.Server/ServerMain.cs-1475-			return;
+Vintagestory.Server/ServerMain.cs-1476-		}
+Vintagestory.Server/ServerMain.cs-1477-		if (RunPhase == EnumServerRunPhase.Standby)
+Vintagestory.Server/ServerMain.cs-1478-		{
+Vintagestory.Server/ServerMain.cs-1479-			ProcessMain();
+Vintagestory.Server/ServerMain.cs-1480-			Thread.Sleep(5);
+Vintagestory.Server/ServerMain.cs-1481-			return;
+Vintagestory.Server/ServerMain.cs-1482-		}
+Vintagestory.Server/ServerMain.cs-1483-		FrameProfiler.Begin("{0} players online - ", Clients.Count - ConnectionQueue.Count);
+Vintagestory.Server/ServerMain.cs-1484-		TickPosition++;
+--
+Vintagestory.Server/ServerMain.cs-1572-		}
+Vintagestory.Server/ServerMain.cs-1573-		FrameProfiler.End();
+Vintagestory.Server/ServerMain.cs-1574-	}
+Vintagestory.Server/ServerMain.cs-1575-
+Vintagestory.Server/ServerMain.cs-1576-	public void ProcessMain()
+Vintagestory.Server/ServerMain.cs-1577-	{
+Vintagestory.Server/ServerMain.cs-1578-		if (MainSockets == null)
+Vintagestory.Server/ServerMain.cs-1579-		{
+Vintagestory.Server/ServerMain.cs-1580-			return;
+Vintagestory.Server/ServerMain.cs-1581-		}
+Vintagestory.Server/ServerMain.cs-1582-		ProcessMainThreadTasks();
+Vintagestory.Server/ServerMain.cs-1583-		FrameProfiler.Mark("mtasks");
+Vintagestory.Server/ServerMain.cs:1584:		if (ReducedServerThreads)
+Vintagestory.Server/ServerMain.cs-1585-		{
+Vintagestory.Server/ServerMain.cs-1586-			PacketParsingLoop();
+Vintagestory.Server/ServerMain.cs-1587-			FrameProfiler.Mark("mt-net-pp");
+Vintagestory.Server/ServerMain.cs-1588-		}
+Vintagestory.Server/ServerMain.cs-1589-		ReceivedClientPacket result;
+Vintagestory.Server/ServerMain.cs-1590-		while (ClientPackets.TryDequeue(out result))
+Vintagestory.Server/ServerMain.cs-1591-		{
+Vintagestory.Server/ServerMain.cs-1592-			try
+Vintagestory.Server/ServerMain.cs-1593-			{
+Vintagestory.Server/ServerMain.cs-1594-				HandleClientPacket_mainthread(result);
+Vintagestory.Server/ServerMain.cs-1595-			}
+Vintagestory.Server/ServerMain.cs-1596-			catch (Exception e)
+Vintagestory.Server/ServerMain.cs-1597-			{
+Vintagestory.Server/ServerMain.cs-1598-				if (IsDedicatedServer)
+Vintagestory.Server/ServerMain.cs-1599-				{
+Vintagestory.Server/ServerMain.cs-1600-					Logger.Warning("Exception at client " + result.client.Id + ". Disconnecting client.");
+Vintagestory.Server/ServerMain.cs-1601-					DisconnectPlayer(result.client, "Threw an exception at the server", "An action you (or your client) did caused an unhandled exception");
+Vintagestory.Server/ServerMain.cs-1602-				}
+Vintagestory.Server/ServerMain.cs-1603-				Logger.Error(e);
+Vintagestory.Server/ServerMain.cs-1604-			}
+Vintagestory.Server/ServerMain.cs-1605-		}
+Vintagestory.Server/ServerMain.cs-1606-		DisconnectedClientsThisTick.Clear();
+Vintagestory.Server/ServerMain.cs-1607-		FrameProfiler.Mark("net-read-done");
+Vintagestory.Server/ServerMain.cs-1608-		TickPosition++;
+Vintagestory.Server/ServerMain.cs-1609-		foreach (KeyValuePair<Timer, Timer.Tick> timer in Timers)

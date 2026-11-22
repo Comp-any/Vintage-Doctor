@@ -1,0 +1,153 @@
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-298-				}
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-299-				server.SaveGameData.PlayerDataByUID = null;
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-300-			}
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-301-			if (SetDefaultSpawnOnce != null)
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-302-			{
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-303-				server.SaveGameData.DefaultSpawn = SetDefaultSpawnOnce;
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-304-				SetDefaultSpawnOnce = null;
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-305-			}
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-306-			server.SaveGameData.IsNewWorld = false;
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-307-			ServerMain.Logger.Notification("Loaded existing save game data. Playstyle: {0}, Playstyle Lang code: {1}, WorldType: {2}", server.SaveGameData.PlayStyle, server.SaveGameData.PlayStyleLangCode, server.SaveGameData.WorldType);
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-308-		}
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-309-		server.WorldMap.Init(server.SaveGameData.MapSizeX, server.SaveGameData.MapSizeY, server.SaveGameData.MapSizeZ);
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs:310:		int stages = Math.Max(1, Math.Min(6, MagicNum.MaxWorldgenThreads)) + 1;
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-311-		if (server.ReducedServerThreads)
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-312-		{
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-313-			stages = 1;
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-314-		}
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-315-		chunkthread.requestedChunkColumns = new ConcurrentIndexedFifoQueue<ChunkColumnLoadRequest>(MagicNum.RequestChunkColumnsQueueSize, stages);
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-316-		chunkthread.peekingChunkColumns = new IndexedFifoQueue<ChunkColumnLoadRequest>(MagicNum.RequestChunkColumnsQueueSize / 5);
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-317-		ServerMain.Logger.Notification("Savegame {0} loaded", GamePaths.RemoveUsername(saveFilepath));
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-318-		ServerMain.Logger.Notification("World size = {0} {1} {2}", server.SaveGameData.MapSizeX, server.SaveGameData.MapSizeY, server.SaveGameData.MapSizeZ);
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-319-	}
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-320-
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-321-	private void SaveGameWorld(bool saveLater = false)
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-322-	{
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-323-		if (!saveLater)
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-324-		{
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-325-			chunkthread.runOffThreadSaveNow = false;
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-326-		}
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-327-		if (ServerMain.FrameProfiler == null)
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-328-		{
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-329-			ServerMain.FrameProfiler = new FrameProfilerUtil((string text) =>
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-330-			{
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-331-				ServerMain.Logger.Notification(text);
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-332-			});
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-333-			ServerMain.FrameProfiler.Begin(null);
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-334-		}
+Vintagestory.Server/ServerSystemLoadAndSaveGame.cs-335-		ServerMain.FrameProfiler.Mark("savegameworld-begin");
+--
+Vintagestory.Server/ChunkServerThread.cs-33-	public bool peekMode;
+Vintagestory.Server/ChunkServerThread.cs-34-
+Vintagestory.Server/ChunkServerThread.cs-35-	public int additionalWorldGenThreadsCount;
+Vintagestory.Server/ChunkServerThread.cs-36-
+Vintagestory.Server/ChunkServerThread.cs-37-	private bool additionalThreadsPaused;
+Vintagestory.Server/ChunkServerThread.cs-38-
+Vintagestory.Server/ChunkServerThread.cs-39-	public ILogger Logger => ServerMain.Logger;
+Vintagestory.Server/ChunkServerThread.cs-40-
+Vintagestory.Server/ChunkServerThread.cs-41-	public ChunkServerThread(ServerMain server, string threadname, CancellationToken cancellationToken)
+Vintagestory.Server/ChunkServerThread.cs-42-		: base(server, threadname, cancellationToken)
+Vintagestory.Server/ChunkServerThread.cs-43-	{
+Vintagestory.Server/ChunkServerThread.cs-44-		int val = 5;
+Vintagestory.Server/ChunkServerThread.cs:45:		additionalWorldGenThreadsCount = Math.Min(val, MagicNum.MaxWorldgenThreads - 1);
+Vintagestory.Server/ChunkServerThread.cs-46-		if (server.ReducedServerThreads)
+Vintagestory.Server/ChunkServerThread.cs-47-		{
+Vintagestory.Server/ChunkServerThread.cs-48-			additionalWorldGenThreadsCount = 0;
+Vintagestory.Server/ChunkServerThread.cs-49-		}
+Vintagestory.Server/ChunkServerThread.cs-50-		if (additionalWorldGenThreadsCount < 0)
+Vintagestory.Server/ChunkServerThread.cs-51-		{
+Vintagestory.Server/ChunkServerThread.cs-52-			additionalWorldGenThreadsCount = 0;
+Vintagestory.Server/ChunkServerThread.cs-53-		}
+Vintagestory.Server/ChunkServerThread.cs-54-	}
+Vintagestory.Server/ChunkServerThread.cs-55-
+Vintagestory.Server/ChunkServerThread.cs-56-	protected override void UpdatePausedStatus(bool newpause)
+Vintagestory.Server/ChunkServerThread.cs-57-	{
+Vintagestory.Server/ChunkServerThread.cs-58-		if (newpause != additionalThreadsPaused)
+Vintagestory.Server/ChunkServerThread.cs-59-		{
+Vintagestory.Server/ChunkServerThread.cs-60-			TogglePause(newpause);
+Vintagestory.Server/ChunkServerThread.cs-61-		}
+Vintagestory.Server/ChunkServerThread.cs-62-		base.UpdatePausedStatus(newpause);
+Vintagestory.Server/ChunkServerThread.cs-63-	}
+Vintagestory.Server/ChunkServerThread.cs-64-
+Vintagestory.Server/ChunkServerThread.cs-65-	private void TogglePause(bool paused)
+Vintagestory.Server/ChunkServerThread.cs-66-	{
+Vintagestory.Server/ChunkServerThread.cs-67-		ServerSystemSupplyChunks serverSystemSupplyChunks = (ServerSystemSupplyChunks)serversystems[0];
+Vintagestory.Server/ChunkServerThread.cs-68-		if (paused)
+Vintagestory.Server/ChunkServerThread.cs-69-		{
+Vintagestory.Server/ChunkServerThread.cs-70-			serverSystemSupplyChunks.PauseAllWorldgenThreads(1500);
+--
+Vintagestory.Server/MagicNum.cs-68-	public static double PlayerDesyncTolerance;
+Vintagestory.Server/MagicNum.cs-69-
+Vintagestory.Server/MagicNum.cs-70-	[JsonProperty(Order = 22)]
+Vintagestory.Server/MagicNum.cs-71-	public static double PlayerDesyncMaxIntervalls;
+Vintagestory.Server/MagicNum.cs-72-
+Vintagestory.Server/MagicNum.cs-73-	[JsonProperty(Order = 23)]
+Vintagestory.Server/MagicNum.cs-74-	public static int ChunkThreadTickTime;
+Vintagestory.Server/MagicNum.cs-75-
+Vintagestory.Server/MagicNum.cs-76-	[JsonProperty(Order = 27)]
+Vintagestory.Server/MagicNum.cs-77-	public static int MaxPhysicsThreads;
+Vintagestory.Server/MagicNum.cs-78-
+Vintagestory.Server/MagicNum.cs-79-	[JsonProperty(Order = 28)]
+Vintagestory.Server/MagicNum.cs:80:	public static int MaxWorldgenThreads;
+Vintagestory.Server/MagicNum.cs-81-
+Vintagestory.Server/MagicNum.cs-82-	[JsonProperty(Order = 29)]
+Vintagestory.Server/MagicNum.cs-83-	public static int MaxEntitySpawnsPerTick;
+Vintagestory.Server/MagicNum.cs-84-
+Vintagestory.Server/MagicNum.cs-85-	[JsonProperty(Order = 30)]
+Vintagestory.Server/MagicNum.cs-86-	public static string ServerMagicNumVersion;
+Vintagestory.Server/MagicNum.cs-87-
+Vintagestory.Server/MagicNum.cs-88-	[JsonProperty(Order = 31)]
+Vintagestory.Server/MagicNum.cs-89-	public static int PublicJoinLeaveDeathMessagesThreshold;
+Vintagestory.Server/MagicNum.cs-90-
+Vintagestory.Server/MagicNum.cs-91-	static MagicNum()
+Vintagestory.Server/MagicNum.cs-92-	{
+Vintagestory.Server/MagicNum.cs-93-		FileName = Path.Combine(GamePaths.Config, "servermagicnumbers.json");
+Vintagestory.Server/MagicNum.cs-94-		DefaultEntityTrackingRange = 4;
+Vintagestory.Server/MagicNum.cs-95-		DefaultSimulationRange = 128;
+Vintagestory.Server/MagicNum.cs-96-		ServerChunkSize = 32;
+Vintagestory.Server/MagicNum.cs-97-		ServerChunkSizeMask = 31;
+Vintagestory.Server/MagicNum.cs-98-		RequestChunkColumnsQueueSize = 2000;
+Vintagestory.Server/MagicNum.cs-99-		ReadyChunksQueueSize = 200;
+Vintagestory.Server/MagicNum.cs-100-		ChunksColumnsToRequestPerTick = 4;
+Vintagestory.Server/MagicNum.cs-101-		ChunksToSendPerTick = 192;
+Vintagestory.Server/MagicNum.cs-102-		ChunkRequestTickTime = 20;
+Vintagestory.Server/MagicNum.cs-103-		ChunkColumnsToGeneratePerThreadTick = 30;
+Vintagestory.Server/MagicNum.cs-104-		ServerAutoSave = 300L;
+Vintagestory.Server/MagicNum.cs-105-		SpawnChunksWidth = 7;
+Vintagestory.Server/MagicNum.cs-106-		TrackedEntitiesPerClient = 3000;
+Vintagestory.Server/MagicNum.cs-107-		ChunkRegionSizeInChunks = 16;
+Vintagestory.Server/MagicNum.cs-108-		CalendarPacketSecondInterval = 60;
+Vintagestory.Server/MagicNum.cs-109-		ChunkUnloadInterval = 4000;
+Vintagestory.Server/MagicNum.cs-110-		UncompressedChunkTTL = 15000;
+Vintagestory.Server/MagicNum.cs-111-		CompressedChunkTTL = 45000L;
+Vintagestory.Server/MagicNum.cs-112-		MapRegionSize = ChunkRegionSizeInChunks * ServerChunkSize;
+Vintagestory.Server/MagicNum.cs-113-		PlayerDesyncTolerance = 0.02;
+Vintagestory.Server/MagicNum.cs-114-		PlayerDesyncMaxIntervalls = 20.0;
+Vintagestory.Server/MagicNum.cs-115-		ChunkThreadTickTime = 5;
+Vintagestory.Server/MagicNum.cs-116-		MaxPhysicsThreads = 1;
+Vintagestory.Server/MagicNum.cs:117:		MaxWorldgenThreads = 1;
+Vintagestory.Server/MagicNum.cs-118-		MaxEntitySpawnsPerTick = 8;
+Vintagestory.Server/MagicNum.cs-119-		ServerMagicNumVersion = null;
+Vintagestory.Server/MagicNum.cs-120-		PublicJoinLeaveDeathMessagesThreshold = 50;
+Vintagestory.Server/MagicNum.cs-121-		Load();
+Vintagestory.Server/MagicNum.cs-122-	}
+Vintagestory.Server/MagicNum.cs-123-
+Vintagestory.Server/MagicNum.cs-124-	public static void Save()
+Vintagestory.Server/MagicNum.cs-125-	{
+Vintagestory.Server/MagicNum.cs-126-		ServerMagicNumVersion = "1.3";
+Vintagestory.Server/MagicNum.cs-127-		using TextWriter textWriter = new StreamWriter(FileName);
+Vintagestory.Server/MagicNum.cs-128-		textWriter.Write(JsonConvert.SerializeObject(new MagicNum(), Formatting.Indented));
+Vintagestory.Server/MagicNum.cs-129-		textWriter.Close();
+Vintagestory.Server/MagicNum.cs-130-	}
+Vintagestory.Server/MagicNum.cs-131-
+Vintagestory.Server/MagicNum.cs-132-	public static void Load()
+Vintagestory.Server/MagicNum.cs-133-	{
+Vintagestory.Server/MagicNum.cs-134-		bool flag = false;
+Vintagestory.Server/MagicNum.cs-135-		if (File.Exists(FileName))
+Vintagestory.Server/MagicNum.cs-136-		{
+Vintagestory.Server/MagicNum.cs-137-			using TextReader textReader = new StreamReader(FileName);
+Vintagestory.Server/MagicNum.cs-138-			JsonConvert.DeserializeObject<MagicNum>(textReader.ReadToEnd());
+Vintagestory.Server/MagicNum.cs-139-			textReader.Close();
+Vintagestory.Server/MagicNum.cs-140-		}
+Vintagestory.Server/MagicNum.cs-141-		else
+Vintagestory.Server/MagicNum.cs-142-		{

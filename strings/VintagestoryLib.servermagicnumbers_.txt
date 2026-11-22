@@ -1,0 +1,135 @@
+Vintagestory.Common/ConcurrentIndexedFifoQueue.cs-53-
+Vintagestory.Common/ConcurrentIndexedFifoQueue.cs-54-	public void Enqueue(T elem)
+Vintagestory.Common/ConcurrentIndexedFifoQueue.cs-55-	{
+Vintagestory.Common/ConcurrentIndexedFifoQueue.cs-56-		elementsByIndex[elem.Index] = elem;
+Vintagestory.Common/ConcurrentIndexedFifoQueue.cs-57-		EnqueueWithoutAddingToIndex(elem);
+Vintagestory.Common/ConcurrentIndexedFifoQueue.cs-58-	}
+Vintagestory.Common/ConcurrentIndexedFifoQueue.cs-59-
+Vintagestory.Common/ConcurrentIndexedFifoQueue.cs-60-	internal void EnqueueWithoutAddingToIndex(T elem)
+Vintagestory.Common/ConcurrentIndexedFifoQueue.cs-61-	{
+Vintagestory.Common/ConcurrentIndexedFifoQueue.cs-62-		uint num = endBleedingEdge;
+Vintagestory.Common/ConcurrentIndexedFifoQueue.cs-63-		if ((int)(num - start) > length - 1)
+Vintagestory.Common/ConcurrentIndexedFifoQueue.cs-64-		{
+Vintagestory.Common/ConcurrentIndexedFifoQueue.cs:65:			throw new Exception("Indexed Fifo Queue overflow. Try increasing servermagicnumbers RequestChunkColumnsQueueSize?");
+Vintagestory.Common/ConcurrentIndexedFifoQueue.cs-66-		}
+Vintagestory.Common/ConcurrentIndexedFifoQueue.cs-67-		uint num2;
+Vintagestory.Common/ConcurrentIndexedFifoQueue.cs-68-		while ((num2 = Interlocked.CompareExchange(ref endBleedingEdge, num + 1, num)) != num)
+Vintagestory.Common/ConcurrentIndexedFifoQueue.cs-69-		{
+Vintagestory.Common/ConcurrentIndexedFifoQueue.cs-70-			num = num2;
+Vintagestory.Common/ConcurrentIndexedFifoQueue.cs-71-			if ((int)(num2 - start) > length - 1)
+Vintagestory.Common/ConcurrentIndexedFifoQueue.cs-72-			{
+Vintagestory.Common/ConcurrentIndexedFifoQueue.cs:73:				throw new Exception("Indexed Fifo Queue overflow. Try increasing servermagicnumbers RequestChunkColumnsQueueSize?");
+Vintagestory.Common/ConcurrentIndexedFifoQueue.cs-74-			}
+Vintagestory.Common/ConcurrentIndexedFifoQueue.cs-75-		}
+Vintagestory.Common/ConcurrentIndexedFifoQueue.cs-76-		elements[(ushort)num % length] = elem;
+Vintagestory.Common/ConcurrentIndexedFifoQueue.cs-77-		Interlocked.Increment(ref end);
+Vintagestory.Common/ConcurrentIndexedFifoQueue.cs-78-		if (!elementsByIndex.ContainsKey(elem.Index))
+Vintagestory.Common/ConcurrentIndexedFifoQueue.cs-79-		{
+Vintagestory.Common/ConcurrentIndexedFifoQueue.cs-80-			throw new Exception("In queue but missed from index!");
+Vintagestory.Common/ConcurrentIndexedFifoQueue.cs-81-		}
+Vintagestory.Common/ConcurrentIndexedFifoQueue.cs-82-	}
+Vintagestory.Common/ConcurrentIndexedFifoQueue.cs-83-
+Vintagestory.Common/ConcurrentIndexedFifoQueue.cs-84-	public T DequeueWithoutRemovingFromIndex()
+Vintagestory.Common/ConcurrentIndexedFifoQueue.cs-85-	{
+Vintagestory.Common/ConcurrentIndexedFifoQueue.cs-86-		uint num = startBleedingEdge;
+Vintagestory.Common/ConcurrentIndexedFifoQueue.cs-87-		if ((int)(num - end) >= 0)
+Vintagestory.Common/ConcurrentIndexedFifoQueue.cs-88-		{
+Vintagestory.Common/ConcurrentIndexedFifoQueue.cs-89-			return default;
+Vintagestory.Common/ConcurrentIndexedFifoQueue.cs-90-		}
+Vintagestory.Common/ConcurrentIndexedFifoQueue.cs-91-		uint num2;
+Vintagestory.Common/ConcurrentIndexedFifoQueue.cs-92-		while ((num2 = Interlocked.CompareExchange(ref startBleedingEdge, num + 1, num)) != num)
+Vintagestory.Common/ConcurrentIndexedFifoQueue.cs-93-		{
+Vintagestory.Common/ConcurrentIndexedFifoQueue.cs-94-			num = num2;
+Vintagestory.Common/ConcurrentIndexedFifoQueue.cs-95-			if ((int)(num2 - end) >= 0)
+Vintagestory.Common/ConcurrentIndexedFifoQueue.cs-96-			{
+Vintagestory.Common/ConcurrentIndexedFifoQueue.cs-97-				return default;
+Vintagestory.Common/ConcurrentIndexedFifoQueue.cs-98-			}
+--
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1457-	{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1458-		int num = chunkthread.requestedChunkColumns.Count + 30 - chunkthread.requestedChunkColumns.Capacity;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1459-		if (num <= 0)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1460-		{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1461-			return true;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1462-		}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1463-		if (!PauseAllWorldgenThreads(5000))
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1464-		{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1465-			return false;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1466-		}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1467-		try
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1468-		{
+Vintagestory.Server/ServerSystemSupplyChunks.cs:1469:			ServerMain.Logger.Warning("Requested chunks buffer is too small! Taking measures to attempt to free enough space. Try increasing servermagicnumbers RequestChunkColumnsQueueSize?");
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1470-			((ServerSystemUnloadChunks)chunkthread.serversystems[2]).UnloadGeneratingChunkColumns(MagicNum.UncompressedChunkTTL / 10);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1471-			foreach (ChunkColumnLoadRequest item in chunkthread.requestedChunkColumns.Snapshot())
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1472-			{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1473-				item.FlagToRequeue();
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1474-			}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1475-			num -= CleanupRequestsQueue();
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1476-			if (num <= 0)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1477-			{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1478-				return true;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1479-			}
+Vintagestory.Server/ServerSystemSupplyChunks.cs:1480:			ServerMain.Logger.Error("Requested chunks buffer is too small! Can't free enough space to completely generate chunks, clearing whole buffer. This may cause issues. Try increasing servermagicnumbers RequestChunkColumnsQueueSize and/or reducing UncompressedChunkTTL.");
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1481-			FullyClearGeneratingQueue();
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1482-			chunkthread.requestedChunkColumns.Enqueue(curRequest);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1483-			return true;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1484-		}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1485-		finally
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1486-		{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1487-			ResumeAllWorldgenThreads();
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1488-			if (chunkthread.additionalWorldGenThreadsCount > 0)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1489-			{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1490-				ServerMain.Logger.VerboseDebug("Un-pausing all worldgen threads.");
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1491-			}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1492-		}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1493-	}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1494-
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1495-	internal void FullyClearGeneratingQueue()
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1496-	{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1497-		chunkthread.loadsavegame.SaveAllDirtyGeneratingChunks(saveChunksStream ?? (saveChunksStream = new FastMemoryStream()));
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1498-		foreach (ChunkColumnLoadRequest requestedChunkColumn in chunkthread.requestedChunkColumns)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1499-		{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1500-			if (requestedChunkColumn != null && !requestedChunkColumn.Disposed)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1501-			{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1502-				server.loadedMapChunks.Remove(requestedChunkColumn.mapIndex2d);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1503-				server.ChunkColumnRequested.Remove(requestedChunkColumn.mapIndex2d);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1504-			}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1505-		}
+--
+Vintagestory.Server/MagicNum.cs-81-
+Vintagestory.Server/MagicNum.cs-82-	[JsonProperty(Order = 29)]
+Vintagestory.Server/MagicNum.cs-83-	public static int MaxEntitySpawnsPerTick;
+Vintagestory.Server/MagicNum.cs-84-
+Vintagestory.Server/MagicNum.cs-85-	[JsonProperty(Order = 30)]
+Vintagestory.Server/MagicNum.cs-86-	public static string ServerMagicNumVersion;
+Vintagestory.Server/MagicNum.cs-87-
+Vintagestory.Server/MagicNum.cs-88-	[JsonProperty(Order = 31)]
+Vintagestory.Server/MagicNum.cs-89-	public static int PublicJoinLeaveDeathMessagesThreshold;
+Vintagestory.Server/MagicNum.cs-90-
+Vintagestory.Server/MagicNum.cs-91-	static MagicNum()
+Vintagestory.Server/MagicNum.cs-92-	{
+Vintagestory.Server/MagicNum.cs:93:		FileName = Path.Combine(GamePaths.Config, "servermagicnumbers.json");
+Vintagestory.Server/MagicNum.cs-94-		DefaultEntityTrackingRange = 4;
+Vintagestory.Server/MagicNum.cs-95-		DefaultSimulationRange = 128;
+Vintagestory.Server/MagicNum.cs-96-		ServerChunkSize = 32;
+Vintagestory.Server/MagicNum.cs-97-		ServerChunkSizeMask = 31;
+Vintagestory.Server/MagicNum.cs-98-		RequestChunkColumnsQueueSize = 2000;
+Vintagestory.Server/MagicNum.cs-99-		ReadyChunksQueueSize = 200;
+Vintagestory.Server/MagicNum.cs-100-		ChunksColumnsToRequestPerTick = 4;
+Vintagestory.Server/MagicNum.cs-101-		ChunksToSendPerTick = 192;
+Vintagestory.Server/MagicNum.cs-102-		ChunkRequestTickTime = 20;
+Vintagestory.Server/MagicNum.cs-103-		ChunkColumnsToGeneratePerThreadTick = 30;
+Vintagestory.Server/MagicNum.cs-104-		ServerAutoSave = 300L;
+Vintagestory.Server/MagicNum.cs-105-		SpawnChunksWidth = 7;
+Vintagestory.Server/MagicNum.cs-106-		TrackedEntitiesPerClient = 3000;
+Vintagestory.Server/MagicNum.cs-107-		ChunkRegionSizeInChunks = 16;
+Vintagestory.Server/MagicNum.cs-108-		CalendarPacketSecondInterval = 60;
+Vintagestory.Server/MagicNum.cs-109-		ChunkUnloadInterval = 4000;
+Vintagestory.Server/MagicNum.cs-110-		UncompressedChunkTTL = 15000;
+Vintagestory.Server/MagicNum.cs-111-		CompressedChunkTTL = 45000L;
+Vintagestory.Server/MagicNum.cs-112-		MapRegionSize = ChunkRegionSizeInChunks * ServerChunkSize;
+Vintagestory.Server/MagicNum.cs-113-		PlayerDesyncTolerance = 0.02;
+Vintagestory.Server/MagicNum.cs-114-		PlayerDesyncMaxIntervalls = 20.0;
+Vintagestory.Server/MagicNum.cs-115-		ChunkThreadTickTime = 5;
+Vintagestory.Server/MagicNum.cs-116-		MaxPhysicsThreads = 1;
+Vintagestory.Server/MagicNum.cs-117-		MaxWorldgenThreads = 1;
+Vintagestory.Server/MagicNum.cs-118-		MaxEntitySpawnsPerTick = 8;

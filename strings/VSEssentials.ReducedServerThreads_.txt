@@ -1,0 +1,77 @@
+Vintagestory.ServerMods.NoObf/ModRegistryObjectTypeLoader.cs-48-	{
+Vintagestory.ServerMods.NoObf/ModRegistryObjectTypeLoader.cs-49-		if (!(coreApi is ICoreServerAPI coreServerAPI))
+Vintagestory.ServerMods.NoObf/ModRegistryObjectTypeLoader.cs-50-		{
+Vintagestory.ServerMods.NoObf/ModRegistryObjectTypeLoader.cs-51-			return;
+Vintagestory.ServerMods.NoObf/ModRegistryObjectTypeLoader.cs-52-		}
+Vintagestory.ServerMods.NoObf/ModRegistryObjectTypeLoader.cs-53-		api = coreServerAPI;
+Vintagestory.ServerMods.NoObf/ModRegistryObjectTypeLoader.cs-54-		coreServerAPI.Logger.VerboseDebug("Starting to preload tags");
+Vintagestory.ServerMods.NoObf/ModRegistryObjectTypeLoader.cs-55-		PreloadTags();
+Vintagestory.ServerMods.NoObf/ModRegistryObjectTypeLoader.cs-56-		coreServerAPI.Logger.VerboseDebug("Starting to gather blocktypes, itemtypes and entities");
+Vintagestory.ServerMods.NoObf/ModRegistryObjectTypeLoader.cs-57-		LoadWorldProperties();
+Vintagestory.ServerMods.NoObf/ModRegistryObjectTypeLoader.cs-58-		int max = (coreServerAPI.Server.IsDedicated ? 3 : 8);
+Vintagestory.ServerMods.NoObf/ModRegistryObjectTypeLoader.cs-59-		int threadsCount = GameMath.Clamp(Environment.ProcessorCount / 2 - 2, 1, max);
+Vintagestory.ServerMods.NoObf/ModRegistryObjectTypeLoader.cs:60:		if (coreServerAPI.Server.ReducedServerThreads)
+Vintagestory.ServerMods.NoObf/ModRegistryObjectTypeLoader.cs-61-		{
+Vintagestory.ServerMods.NoObf/ModRegistryObjectTypeLoader.cs-62-			threadsCount = 1;
+Vintagestory.ServerMods.NoObf/ModRegistryObjectTypeLoader.cs-63-		}
+Vintagestory.ServerMods.NoObf/ModRegistryObjectTypeLoader.cs-64-		itemTypes = new Dictionary<AssetLocation, RegistryObjectType>();
+Vintagestory.ServerMods.NoObf/ModRegistryObjectTypeLoader.cs-65-		blockTypes = new Dictionary<AssetLocation, RegistryObjectType>();
+Vintagestory.ServerMods.NoObf/ModRegistryObjectTypeLoader.cs-66-		entityTypes = new Dictionary<AssetLocation, RegistryObjectType>();
+Vintagestory.ServerMods.NoObf/ModRegistryObjectTypeLoader.cs-67-		foreach (KeyValuePair<AssetLocation, JObject> item in coreServerAPI.Assets.GetMany<JObject>(coreServerAPI.Server.Logger, "itemtypes/"))
+Vintagestory.ServerMods.NoObf/ModRegistryObjectTypeLoader.cs-68-		{
+Vintagestory.ServerMods.NoObf/ModRegistryObjectTypeLoader.cs-69-			if (item.Key.Path.EndsWithOrdinal(".json"))
+Vintagestory.ServerMods.NoObf/ModRegistryObjectTypeLoader.cs-70-			{
+Vintagestory.ServerMods.NoObf/ModRegistryObjectTypeLoader.cs-71-				try
+Vintagestory.ServerMods.NoObf/ModRegistryObjectTypeLoader.cs-72-				{
+Vintagestory.ServerMods.NoObf/ModRegistryObjectTypeLoader.cs-73-					ItemType itemType = new ItemType();
+Vintagestory.ServerMods.NoObf/ModRegistryObjectTypeLoader.cs-74-					itemType.CreateBasetype(coreServerAPI, item.Key.Path, item.Key.Domain, item.Value);
+Vintagestory.ServerMods.NoObf/ModRegistryObjectTypeLoader.cs-75-					itemTypes.Add(item.Key, itemType);
+Vintagestory.ServerMods.NoObf/ModRegistryObjectTypeLoader.cs-76-				}
+Vintagestory.ServerMods.NoObf/ModRegistryObjectTypeLoader.cs-77-				catch (Exception e)
+Vintagestory.ServerMods.NoObf/ModRegistryObjectTypeLoader.cs-78-				{
+Vintagestory.ServerMods.NoObf/ModRegistryObjectTypeLoader.cs-79-					coreServerAPI.World.Logger.Error("Item type {0} could not be loaded. Will ignore. Exception thrown:", item.Key);
+Vintagestory.ServerMods.NoObf/ModRegistryObjectTypeLoader.cs-80-					coreServerAPI.World.Logger.Error(e);
+Vintagestory.ServerMods.NoObf/ModRegistryObjectTypeLoader.cs-81-				}
+Vintagestory.ServerMods.NoObf/ModRegistryObjectTypeLoader.cs-82-			}
+Vintagestory.ServerMods.NoObf/ModRegistryObjectTypeLoader.cs-83-		}
+Vintagestory.ServerMods.NoObf/ModRegistryObjectTypeLoader.cs-84-		itemVariants = new List<RegistryObjectType>[itemTypes.Count];
+Vintagestory.ServerMods.NoObf/ModRegistryObjectTypeLoader.cs-85-		coreServerAPI.Logger.VerboseDebug("Starting parsing ItemTypes in " + threadsCount + " threads");
+--
+Vintagestory.ServerMods/GenTerra.cs-122-
+Vintagestory.ServerMods/GenTerra.cs-123-	public override void StartServerSide(ICoreServerAPI api)
+Vintagestory.ServerMods/GenTerra.cs-124-	{
+Vintagestory.ServerMods/GenTerra.cs-125-		api.Event.InitWorldGenerator(initWorldGen, "standard");
+Vintagestory.ServerMods/GenTerra.cs-126-		api.Event.ChunkColumnGeneration(OnChunkColumnGen, EnumWorldGenPass.Terrain, "standard");
+Vintagestory.ServerMods/GenTerra.cs-127-	}
+Vintagestory.ServerMods/GenTerra.cs-128-
+Vintagestory.ServerMods/GenTerra.cs-129-	public void initWorldGen()
+Vintagestory.ServerMods/GenTerra.cs-130-	{
+Vintagestory.ServerMods/GenTerra.cs-131-		LoadGlobalConfig(api);
+Vintagestory.ServerMods/GenTerra.cs-132-		LandformMapByRegion.Clear();
+Vintagestory.ServerMods/GenTerra.cs-133-		maxThreads = Math.Clamp(Environment.ProcessorCount - (api.Server.IsDedicated ? 4 : 6), 1, api.Server.Config.HostedMode ? 4 : 10);
+Vintagestory.ServerMods/GenTerra.cs:134:		if (api.Server.ReducedServerThreads && maxThreads > 1)
+Vintagestory.ServerMods/GenTerra.cs-135-		{
+Vintagestory.ServerMods/GenTerra.cs-136-			maxThreads = 2;
+Vintagestory.ServerMods/GenTerra.cs-137-		}
+Vintagestory.ServerMods/GenTerra.cs-138-		regionMapSize = (int)Math.Ceiling((double)api.WorldManager.MapSizeX / (double)api.WorldManager.RegionSize);
+Vintagestory.ServerMods/GenTerra.cs-139-		noiseScale = Math.Max(1f, (float)api.WorldManager.MapSizeY / 256f);
+Vintagestory.ServerMods/GenTerra.cs-140-		terrainGenOctaves = TerraGenConfig.GetTerrainOctaveCount(api.WorldManager.MapSizeY);
+Vintagestory.ServerMods/GenTerra.cs-141-		terrainNoise = NewNormalizedSimplexFractalNoise.FromDefaultOctaves(terrainGenOctaves, 0.00030618621784789723 / (double)noiseScale, 0.9, api.WorldManager.Seed);
+Vintagestory.ServerMods/GenTerra.cs-142-		distort2dx = new SimplexNoise(new double[4] { 55.0, 40.0, 30.0, 10.0 }, scaleAdjustedFreqs(new double[4] { 0.2, 0.4, 0.8, 1.5384615384615383 }, noiseScale), api.World.Seed + 9876);
+Vintagestory.ServerMods/GenTerra.cs-143-		distort2dz = new SimplexNoise(new double[4] { 55.0, 40.0, 30.0, 10.0 }, scaleAdjustedFreqs(new double[4] { 0.2, 0.4, 0.8, 1.5384615384615383 }, noiseScale), api.World.Seed + 9876 + 2);
+Vintagestory.ServerMods/GenTerra.cs-144-		geoUpheavalNoise = new NormalizedSimplexNoise(new double[6] { 55.0, 40.0, 30.0, 15.0, 7.0, 4.0 }, scaleAdjustedFreqs(new double[6]
+Vintagestory.ServerMods/GenTerra.cs-145-		{
+Vintagestory.ServerMods/GenTerra.cs-146-			186.0 / 1023.0,
+Vintagestory.ServerMods/GenTerra.cs-147-			0.4,
+Vintagestory.ServerMods/GenTerra.cs-148-			48.0 / 55.0,
+Vintagestory.ServerMods/GenTerra.cs-149-			1.6783216783216783,
+Vintagestory.ServerMods/GenTerra.cs-150-			2.6666666666666665,
+Vintagestory.ServerMods/GenTerra.cs-151-			4.8
+Vintagestory.ServerMods/GenTerra.cs-152-		}, noiseScale), api.World.Seed + 9876 + 1);
+Vintagestory.ServerMods/GenTerra.cs-153-		tempDataThreadLocal = new ThreadLocal<ThreadLocalTempData>(() => new ThreadLocalTempData
+Vintagestory.ServerMods/GenTerra.cs-154-		{
+Vintagestory.ServerMods/GenTerra.cs-155-			LerpedAmplitudes = new double[terrainGenOctaves],
+Vintagestory.ServerMods/GenTerra.cs-156-			LerpedThresholds = new double[terrainGenOctaves],
+Vintagestory.ServerMods/GenTerra.cs-157-			landformWeights = new float[NoiseLandforms.landforms.LandFormsByIndex.Length]
+Vintagestory.ServerMods/GenTerra.cs-158-		});
+Vintagestory.ServerMods/GenTerra.cs-159-		columnResults = new ColumnResult[1024];
