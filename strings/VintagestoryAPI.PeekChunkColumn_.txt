@@ -1,0 +1,38 @@
+Vintagestory.API.Server/IWorldManagerAPI.cs-248-	/// <param name="keepLoaded">If true, the chunk will never get unloaded unless UnloadChunkColumn() is called</param>
+Vintagestory.API.Server/IWorldManagerAPI.cs-249-	void LoadChunkColumn(int chunkX, int chunkZ, bool keepLoaded = false);
+Vintagestory.API.Server/IWorldManagerAPI.cs-250-
+Vintagestory.API.Server/IWorldManagerAPI.cs-251-	/// <summary>
+Vintagestory.API.Server/IWorldManagerAPI.cs-252-	/// Generates a chunk at a given coordinate from scratch without keeping it in the list of loaded chunks.
+Vintagestory.API.Server/IWorldManagerAPI.cs-253-	/// This will check if the map region this chunk is part of is loaded, and if not, it will load it from disk if it exists.
+Vintagestory.API.Server/IWorldManagerAPI.cs-254-	/// Only if the map region did not exist, it will generate it as well, but it won't save it or load it into the loaded map region list.
+Vintagestory.API.Server/IWorldManagerAPI.cs-255-	/// </summary>
+Vintagestory.API.Server/IWorldManagerAPI.cs-256-	/// <param name="chunkX"></param>
+Vintagestory.API.Server/IWorldManagerAPI.cs-257-	/// <param name="chunkZ"></param>
+Vintagestory.API.Server/IWorldManagerAPI.cs-258-	/// <param name="options"></param>
+Vintagestory.API.Server/IWorldManagerAPI.cs-259-	/// <returns></returns>
+Vintagestory.API.Server/IWorldManagerAPI.cs:260:	void PeekChunkColumn(int chunkX, int chunkZ, ChunkPeekOptions options);
+Vintagestory.API.Server/IWorldManagerAPI.cs-261-
+Vintagestory.API.Server/IWorldManagerAPI.cs-262-	/// <summary>
+Vintagestory.API.Server/IWorldManagerAPI.cs-263-	/// Asynchrounly checks if this chunk is currently loaded or in the savegame database. Calls the callback method with true or false once done looking up. Does not load the actual chunk data.
+Vintagestory.API.Server/IWorldManagerAPI.cs-264-	/// </summary>
+Vintagestory.API.Server/IWorldManagerAPI.cs-265-	/// <param name="chunkX"></param>
+Vintagestory.API.Server/IWorldManagerAPI.cs-266-	/// <param name="chunkY"></param>
+Vintagestory.API.Server/IWorldManagerAPI.cs-267-	/// <param name="chunkZ"></param>
+Vintagestory.API.Server/IWorldManagerAPI.cs-268-	/// <param name="onTested"></param>
+Vintagestory.API.Server/IWorldManagerAPI.cs-269-	/// <returns></returns>
+Vintagestory.API.Server/IWorldManagerAPI.cs-270-	void TestChunkExists(int chunkX, int chunkY, int chunkZ, Action<bool> onTested);
+Vintagestory.API.Server/IWorldManagerAPI.cs-271-
+Vintagestory.API.Server/IWorldManagerAPI.cs-272-	/// <summary>
+Vintagestory.API.Server/IWorldManagerAPI.cs-273-	/// Asynchrounly checks if this map chunk is currently loaded or in the savegame database. Calls the callback method with true or false once done looking up. Does not load the actual map chunk data.
+Vintagestory.API.Server/IWorldManagerAPI.cs-274-	/// </summary>
+Vintagestory.API.Server/IWorldManagerAPI.cs-275-	/// <param name="chunkX"></param>
+Vintagestory.API.Server/IWorldManagerAPI.cs-276-	/// <param name="chunkZ"></param>
+Vintagestory.API.Server/IWorldManagerAPI.cs-277-	/// <param name="onTested"></param>
+Vintagestory.API.Server/IWorldManagerAPI.cs-278-	void TestMapChunkExists(int chunkX, int chunkZ, Action<bool> onTested);
+Vintagestory.API.Server/IWorldManagerAPI.cs-279-
+Vintagestory.API.Server/IWorldManagerAPI.cs-280-	/// <summary>
+Vintagestory.API.Server/IWorldManagerAPI.cs-281-	/// Asynchrounly checks if this mapregion is currently loaded or in the savegame database. Calls the callback method with true or false once done looking up. Does not load the actual map region data.
+Vintagestory.API.Server/IWorldManagerAPI.cs-282-	/// </summary>
+Vintagestory.API.Server/IWorldManagerAPI.cs-283-	/// <param name="regionX"></param>
+Vintagestory.API.Server/IWorldManagerAPI.cs-284-	/// <param name="regionZ"></param>
+Vintagestory.API.Server/IWorldManagerAPI.cs-285-	/// <param name="onTested"></param>

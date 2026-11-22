@@ -1,0 +1,116 @@
+Vintagestory.Server/ServerSystemSupplyChunks.cs-90-			{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-91-				server.EnqueueMainThreadTask(result.Value.OnLoaded);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-92-			}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-93-		}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-94-		if (!server.simpleLoadRequests.IsEmpty && server.mapMiddleSpawnPos != null)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-95-		{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-96-			ChunkColumnLoadRequest result2;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-97-			while (server.simpleLoadRequests.TryDequeue(out result2))
+Vintagestory.Server/ServerSystemSupplyChunks.cs-98-			{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-99-				simplyLoadChunkColumn(result2);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-100-			}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-101-		}
+Vintagestory.Server/ServerSystemSupplyChunks.cs:102:		if (!server.peekChunkColumnQueue.IsEmpty && server.peekChunkColumnQueue.TryDequeue(out var result3))
+Vintagestory.Server/ServerSystemSupplyChunks.cs-103-		{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-104-			if (PauseAllWorldgenThreads(3600))
+Vintagestory.Server/ServerSystemSupplyChunks.cs-105-			{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-106-				PeekChunkAreaLocking(result3.Key, result3.Value.UntilPass, result3.Value.OnGenerated, result3.Value.ChunkGenParams);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-107-			}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-108-			ResumeAllWorldgenThreads();
+Vintagestory.Server/ServerSystemSupplyChunks.cs-109-		}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-110-		while (!server.testChunkExistsQueue.IsEmpty)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-111-		{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-112-			if (!server.testChunkExistsQueue.TryDequeue(out var val))
+Vintagestory.Server/ServerSystemSupplyChunks.cs-113-			{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-114-				break;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-115-			}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-116-			bool exists = false;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-117-			switch (val.Type)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-118-			{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-119-			case EnumChunkType.Chunk:
+Vintagestory.Server/ServerSystemSupplyChunks.cs-120-				exists = chunkthread.gameDatabase.ChunkExists(val.chunkX, val.chunkY, val.chunkZ);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-121-				break;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-122-			case EnumChunkType.MapChunk:
+Vintagestory.Server/ServerSystemSupplyChunks.cs-123-				exists = chunkthread.gameDatabase.MapChunkExists(val.chunkX, val.chunkZ);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-124-				break;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-125-			case EnumChunkType.MapRegion:
+Vintagestory.Server/ServerSystemSupplyChunks.cs-126-				exists = chunkthread.gameDatabase.MapRegionExists(val.chunkX, val.chunkZ);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-127-				break;
+--
+Vintagestory.Server/ServerMain.cs-311-	internal ConcurrentQueue<long> unloadedChunks = new ConcurrentQueue<long>();
+Vintagestory.Server/ServerMain.cs-312-
+Vintagestory.Server/ServerMain.cs-313-	internal HashSet<long> forceLoadedChunkColumns = new HashSet<long>();
+Vintagestory.Server/ServerMain.cs-314-
+Vintagestory.Server/ServerMain.cs-315-	internal ConcurrentQueue<ChunkColumnLoadRequest> simpleLoadRequests = new ConcurrentQueue<ChunkColumnLoadRequest>();
+Vintagestory.Server/ServerMain.cs-316-
+Vintagestory.Server/ServerMain.cs-317-	internal ConcurrentQueue<long> deleteChunkColumns = new ConcurrentQueue<long>();
+Vintagestory.Server/ServerMain.cs-318-
+Vintagestory.Server/ServerMain.cs-319-	internal ConcurrentQueue<long> deleteMapRegions = new ConcurrentQueue<long>();
+Vintagestory.Server/ServerMain.cs-320-
+Vintagestory.Server/ServerMain.cs-321-	internal ConcurrentQueue<KeyValuePair<HorRectanglei, ChunkLoadOptions>> fastChunkQueue = new ConcurrentQueue<KeyValuePair<HorRectanglei, ChunkLoadOptions>>();
+Vintagestory.Server/ServerMain.cs-322-
+Vintagestory.Server/ServerMain.cs:323:	internal ConcurrentQueue<KeyValuePair<Vec2i, ChunkPeekOptions>> peekChunkColumnQueue = new ConcurrentQueue<KeyValuePair<Vec2i, ChunkPeekOptions>>();
+Vintagestory.Server/ServerMain.cs-324-
+Vintagestory.Server/ServerMain.cs-325-	internal ConcurrentQueue<ChunkLookupRequest> testChunkExistsQueue = new ConcurrentQueue<ChunkLookupRequest>();
+Vintagestory.Server/ServerMain.cs-326-
+Vintagestory.Server/ServerMain.cs-327-	private ChunkLoadOptions defaultOptions = new ChunkLoadOptions();
+Vintagestory.Server/ServerMain.cs-328-
+Vintagestory.Server/ServerMain.cs-329-	public bool requiresRemaps;
+Vintagestory.Server/ServerMain.cs-330-
+Vintagestory.Server/ServerMain.cs-331-	public override IWorldAccessor World => this;
+Vintagestory.Server/ServerMain.cs-332-
+Vintagestory.Server/ServerMain.cs-333-	protected override WorldMap worldmap => WorldMap;
+Vintagestory.Server/ServerMain.cs-334-
+Vintagestory.Server/ServerMain.cs-335-	public int Seed => SaveGameData.Seed;
+Vintagestory.Server/ServerMain.cs-336-
+Vintagestory.Server/ServerMain.cs-337-	public string SavegameIdentifier => SaveGameData.SavegameIdentifier;
+Vintagestory.Server/ServerMain.cs-338-
+Vintagestory.Server/ServerMain.cs-339-	public bool Suspended => suspended;
+Vintagestory.Server/ServerMain.cs-340-
+Vintagestory.Server/ServerMain.cs-341-	FrameProfilerUtil IWorldAccessor.FrameProfiler => FrameProfiler;
+Vintagestory.Server/ServerMain.cs-342-
+Vintagestory.Server/ServerMain.cs-343-	public override ClassRegistry ClassRegistryInt
+Vintagestory.Server/ServerMain.cs-344-	{
+Vintagestory.Server/ServerMain.cs-345-		get
+Vintagestory.Server/ServerMain.cs-346-		{
+Vintagestory.Server/ServerMain.cs-347-			return ClassRegistry;
+Vintagestory.Server/ServerMain.cs-348-		}
+--
+Vintagestory.Server/ServerMain.cs-5053-
+Vintagestory.Server/ServerMain.cs-5054-	public void PeekChunkColumn(int chunkX, int chunkZ, ChunkPeekOptions options)
+Vintagestory.Server/ServerMain.cs-5055-	{
+Vintagestory.Server/ServerMain.cs-5056-		if (options == null)
+Vintagestory.Server/ServerMain.cs-5057-		{
+Vintagestory.Server/ServerMain.cs-5058-			throw new ArgumentNullException("options argument must not be null");
+Vintagestory.Server/ServerMain.cs-5059-		}
+Vintagestory.Server/ServerMain.cs-5060-		if (options.OnGenerated == null)
+Vintagestory.Server/ServerMain.cs-5061-		{
+Vintagestory.Server/ServerMain.cs-5062-			throw new ArgumentNullException("options.OnGenerated must not be null (there is no point to calling this method otherwise)");
+Vintagestory.Server/ServerMain.cs-5063-		}
+Vintagestory.Server/ServerMain.cs-5064-		KeyValuePair<Vec2i, ChunkPeekOptions> item = new KeyValuePair<Vec2i, ChunkPeekOptions>(new Vec2i(chunkX, chunkZ), options);
+Vintagestory.Server/ServerMain.cs:5065:		peekChunkColumnQueue.Enqueue(item);
+Vintagestory.Server/ServerMain.cs-5066-	}
+Vintagestory.Server/ServerMain.cs-5067-
+Vintagestory.Server/ServerMain.cs-5068-	public void TestChunkExists(int chunkX, int chunkY, int chunkZ, Action<bool> onTested, EnumChunkType type)
+Vintagestory.Server/ServerMain.cs-5069-	{
+Vintagestory.Server/ServerMain.cs-5070-		testChunkExistsQueue.Enqueue(new ChunkLookupRequest(chunkX, chunkY, chunkZ, onTested)
+Vintagestory.Server/ServerMain.cs-5071-		{
+Vintagestory.Server/ServerMain.cs-5072-			Type = type
+Vintagestory.Server/ServerMain.cs-5073-		});
+Vintagestory.Server/ServerMain.cs-5074-	}
+Vintagestory.Server/ServerMain.cs-5075-
+Vintagestory.Server/ServerMain.cs-5076-	public void LoadChunkColumn(int chunkX, int chunkZ, bool keepLoaded = false)
+Vintagestory.Server/ServerMain.cs-5077-	{
+Vintagestory.Server/ServerMain.cs-5078-		long num = WorldMap.MapChunkIndex2D(chunkX, chunkZ);
+Vintagestory.Server/ServerMain.cs-5079-		if (keepLoaded)
+Vintagestory.Server/ServerMain.cs-5080-		{
+Vintagestory.Server/ServerMain.cs-5081-			AddChunkColumnToForceLoadedList(num);
+Vintagestory.Server/ServerMain.cs-5082-		}
+Vintagestory.Server/ServerMain.cs-5083-		if (!IsChunkColumnFullyLoaded(chunkX, chunkZ))
+Vintagestory.Server/ServerMain.cs-5084-		{
+Vintagestory.Server/ServerMain.cs-5085-			lock (requestedChunkColumnsLock)
+Vintagestory.Server/ServerMain.cs-5086-			{
+Vintagestory.Server/ServerMain.cs-5087-				requestedChunkColumns.Enqueue(num);
+Vintagestory.Server/ServerMain.cs-5088-			}
+Vintagestory.Server/ServerMain.cs-5089-		}
+Vintagestory.Server/ServerMain.cs-5090-	}

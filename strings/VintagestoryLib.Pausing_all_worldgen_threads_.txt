@@ -1,0 +1,51 @@
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1558-	{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1559-		BlockAccessorWorldGen.ThreadDispose();
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1560-	}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1561-
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1562-	public bool PauseAllWorldgenThreads(int timeoutms)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1563-	{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1564-		if (Interlocked.CompareExchange(ref pauseAllWorldgenThreads, 1, 0) != 0)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1565-		{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1566-			return false;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1567-		}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1568-		if (chunkthread.additionalWorldGenThreadsCount > 0)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1569-		{
+Vintagestory.Server/ServerSystemSupplyChunks.cs:1570:			ServerMain.Logger.VerboseDebug("Pausing all worldgen threads.");
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1571-		}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1572-		long num = Environment.TickCount + timeoutms;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1573-		while (pauseAllWorldgenThreads < chunkthread.additionalWorldGenThreadsCount + 1 && !server.stopped)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1574-		{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1575-			if (Environment.TickCount > num)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1576-			{
+Vintagestory.Server/ServerSystemSupplyChunks.cs:1577:				ServerMain.Logger.VerboseDebug("Pausing all worldgen threads - exceeded timeout!");
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1578-				return false;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1579-			}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1580-			Thread.Sleep(1);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1581-		}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1582-		return true;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1583-	}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1584-
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1585-	public void ResumeAllWorldgenThreads()
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1586-	{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1587-		pauseAllWorldgenThreads = 0;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1588-	}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1589-
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1590-	public void PauseWorldgenThreadIfRequired(bool onChunkthread)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1591-	{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1592-		if (pauseAllWorldgenThreads <= 0)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1593-		{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1594-			return;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1595-		}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1596-		Interlocked.Increment(ref pauseAllWorldgenThreads);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1597-		long num = Environment.TickCount + 5000;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1598-		while (pauseAllWorldgenThreads != 0 && !server.stopped)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1599-		{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1600-			if (Environment.TickCount > num)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1601-			{
+Vintagestory.Server/ServerSystemSupplyChunks.cs:1602:				ServerMain.Logger.VerboseDebug("Pausing all worldgen threads - exceeded 5s timeout!");
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1603-				break;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1604-			}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1605-			Thread.Sleep(15);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1606-		}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1607-	}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-1608-}

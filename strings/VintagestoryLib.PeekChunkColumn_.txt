@@ -1,0 +1,79 @@
+Vintagestory.Server/WorldAPI.cs-326-	}
+Vintagestory.Server/WorldAPI.cs-327-
+Vintagestory.Server/WorldAPI.cs-328-	public void LoadChunkColumnFast(int chunkX1, int chunkZ1, int chunkX2, int chunkZ2, ChunkLoadOptions options = null)
+Vintagestory.Server/WorldAPI.cs-329-	{
+Vintagestory.Server/WorldAPI.cs-330-		server.LoadChunkColumnFast(chunkX1, chunkZ1, chunkX2, chunkZ2, options);
+Vintagestory.Server/WorldAPI.cs-331-	}
+Vintagestory.Server/WorldAPI.cs-332-
+Vintagestory.Server/WorldAPI.cs-333-	public void LoadChunkColumnPriority(int chunkX1, int chunkZ1, int chunkX2, int chunkZ2, ChunkLoadOptions options = null)
+Vintagestory.Server/WorldAPI.cs-334-	{
+Vintagestory.Server/WorldAPI.cs-335-		server.LoadChunkColumnFast(chunkX1, chunkZ1, chunkX2, chunkZ2, options);
+Vintagestory.Server/WorldAPI.cs-336-	}
+Vintagestory.Server/WorldAPI.cs-337-
+Vintagestory.Server/WorldAPI.cs:338:	public void PeekChunkColumn(int chunkX, int chunkZ, ChunkPeekOptions options)
+Vintagestory.Server/WorldAPI.cs-339-	{
+Vintagestory.Server/WorldAPI.cs:340:		server.PeekChunkColumn(chunkX, chunkZ, options);
+Vintagestory.Server/WorldAPI.cs-341-	}
+Vintagestory.Server/WorldAPI.cs-342-
+Vintagestory.Server/WorldAPI.cs-343-	public void TestChunkExists(int chunkX, int chunkY, int chunkZ, Action<bool> onTested)
+Vintagestory.Server/WorldAPI.cs-344-	{
+Vintagestory.Server/WorldAPI.cs-345-		server.TestChunkExists(chunkX, chunkY, chunkZ, onTested, EnumChunkType.Chunk);
+Vintagestory.Server/WorldAPI.cs-346-	}
+Vintagestory.Server/WorldAPI.cs-347-
+Vintagestory.Server/WorldAPI.cs-348-	public void TestMapChunkExists(int chunkX, int chunkZ, Action<bool> onTested)
+Vintagestory.Server/WorldAPI.cs-349-	{
+Vintagestory.Server/WorldAPI.cs-350-		server.TestChunkExists(chunkX, 0, chunkZ, onTested, EnumChunkType.MapChunk);
+Vintagestory.Server/WorldAPI.cs-351-	}
+Vintagestory.Server/WorldAPI.cs-352-
+Vintagestory.Server/WorldAPI.cs-353-	public void TestMapRegionExists(int regionX, int regionZ, Action<bool> onTested)
+Vintagestory.Server/WorldAPI.cs-354-	{
+Vintagestory.Server/WorldAPI.cs-355-		server.TestChunkExists(regionX, 0, regionZ, onTested, EnumChunkType.MapRegion);
+Vintagestory.Server/WorldAPI.cs-356-	}
+Vintagestory.Server/WorldAPI.cs-357-
+Vintagestory.Server/WorldAPI.cs-358-	public void BroadcastChunk(int chunkX, int chunkY, int chunkZ, bool onlyIfInRange)
+Vintagestory.Server/WorldAPI.cs-359-	{
+Vintagestory.Server/WorldAPI.cs-360-		server.BroadcastChunk(chunkX, chunkY, chunkZ, onlyIfInRange);
+Vintagestory.Server/WorldAPI.cs-361-	}
+Vintagestory.Server/WorldAPI.cs-362-
+Vintagestory.Server/WorldAPI.cs-363-	public void SendChunk(int chunkX, int chunkY, int chunkZ, IServerPlayer player, bool onlyIfInRange)
+Vintagestory.Server/WorldAPI.cs-364-	{
+Vintagestory.Server/WorldAPI.cs-365-		server.SendChunk(chunkX, chunkY, chunkZ, player, onlyIfInRange);
+--
+Vintagestory.Server/ServerMain.cs-5042-			{
+Vintagestory.Server/ServerMain.cs-5043-				for (int j = chunkZ1; j <= chunkZ2; j++)
+Vintagestory.Server/ServerMain.cs-5044-				{
+Vintagestory.Server/ServerMain.cs-5045-					long mapindex2d = WorldMap.MapChunkIndex2D(i, j);
+Vintagestory.Server/ServerMain.cs-5046-					AddChunkColumnToForceLoadedList(mapindex2d);
+Vintagestory.Server/ServerMain.cs-5047-				}
+Vintagestory.Server/ServerMain.cs-5048-			}
+Vintagestory.Server/ServerMain.cs-5049-		}
+Vintagestory.Server/ServerMain.cs-5050-		KeyValuePair<HorRectanglei, ChunkLoadOptions> item = new KeyValuePair<HorRectanglei, ChunkLoadOptions>(new HorRectanglei(chunkX1, chunkZ1, chunkX2, chunkZ2), options);
+Vintagestory.Server/ServerMain.cs-5051-		fastChunkQueue.Enqueue(item);
+Vintagestory.Server/ServerMain.cs-5052-	}
+Vintagestory.Server/ServerMain.cs-5053-
+Vintagestory.Server/ServerMain.cs:5054:	public void PeekChunkColumn(int chunkX, int chunkZ, ChunkPeekOptions options)
+Vintagestory.Server/ServerMain.cs-5055-	{
+Vintagestory.Server/ServerMain.cs-5056-		if (options == null)
+Vintagestory.Server/ServerMain.cs-5057-		{
+Vintagestory.Server/ServerMain.cs-5058-			throw new ArgumentNullException("options argument must not be null");
+Vintagestory.Server/ServerMain.cs-5059-		}
+Vintagestory.Server/ServerMain.cs-5060-		if (options.OnGenerated == null)
+Vintagestory.Server/ServerMain.cs-5061-		{
+Vintagestory.Server/ServerMain.cs-5062-			throw new ArgumentNullException("options.OnGenerated must not be null (there is no point to calling this method otherwise)");
+Vintagestory.Server/ServerMain.cs-5063-		}
+Vintagestory.Server/ServerMain.cs-5064-		KeyValuePair<Vec2i, ChunkPeekOptions> item = new KeyValuePair<Vec2i, ChunkPeekOptions>(new Vec2i(chunkX, chunkZ), options);
+Vintagestory.Server/ServerMain.cs-5065-		peekChunkColumnQueue.Enqueue(item);
+Vintagestory.Server/ServerMain.cs-5066-	}
+Vintagestory.Server/ServerMain.cs-5067-
+Vintagestory.Server/ServerMain.cs-5068-	public void TestChunkExists(int chunkX, int chunkY, int chunkZ, Action<bool> onTested, EnumChunkType type)
+Vintagestory.Server/ServerMain.cs-5069-	{
+Vintagestory.Server/ServerMain.cs-5070-		testChunkExistsQueue.Enqueue(new ChunkLookupRequest(chunkX, chunkY, chunkZ, onTested)
+Vintagestory.Server/ServerMain.cs-5071-		{
+Vintagestory.Server/ServerMain.cs-5072-			Type = type
+Vintagestory.Server/ServerMain.cs-5073-		});
+Vintagestory.Server/ServerMain.cs-5074-	}
+Vintagestory.Server/ServerMain.cs-5075-
+Vintagestory.Server/ServerMain.cs-5076-	public void LoadChunkColumn(int chunkX, int chunkZ, bool keepLoaded = false)
+Vintagestory.Server/ServerMain.cs-5077-	{
+Vintagestory.Server/ServerMain.cs-5078-		long num = WorldMap.MapChunkIndex2D(chunkX, chunkZ);
+Vintagestory.Server/ServerMain.cs-5079-		if (keepLoaded)

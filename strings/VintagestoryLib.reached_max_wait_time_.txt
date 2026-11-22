@@ -1,0 +1,38 @@
+Vintagestory.Server/ServerMain.cs-1634-					ServerSystem[] systems = Systems;
+Vintagestory.Server/ServerMain.cs-1635-					for (int i = 0; i < systems.Length; i++)
+Vintagestory.Server/ServerMain.cs-1636-					{
+Vintagestory.Server/ServerMain.cs-1637-						systems[i].OnServerPause();
+Vintagestory.Server/ServerMain.cs-1638-					}
+Vintagestory.Server/ServerMain.cs-1639-					while (maxWaitMilliseconds > 0 && (ServerThreadLoops.Any((ServerThread st) => !st.paused && st.Alive && st.threadName != "ServerConsole") || !api.eventapi.CanSuspendServer()))
+Vintagestory.Server/ServerMain.cs-1640-					{
+Vintagestory.Server/ServerMain.cs-1641-						Thread.Sleep(10);
+Vintagestory.Server/ServerMain.cs-1642-						maxWaitMilliseconds -= 10;
+Vintagestory.Server/ServerMain.cs-1643-					}
+Vintagestory.Server/ServerMain.cs-1644-					if (maxWaitMilliseconds <= 0 && suspended)
+Vintagestory.Server/ServerMain.cs-1645-					{
+Vintagestory.Server/ServerMain.cs:1646:						Logger.Warning("Server suspend requested, but reached max wait time. A thread is possibly deadlocked/in an endless loop. Will resume again.");
+Vintagestory.Server/ServerMain.cs-1647-						Logger.Warning("The following threads were not suspended: {0}", string.Join(",", from st in ServerThreadLoops
+Vintagestory.Server/ServerMain.cs-1648-							where !st.paused && st.Alive && st.threadName != "ServerConsole"
+Vintagestory.Server/ServerMain.cs-1649-							select st.threadName));
+Vintagestory.Server/ServerMain.cs-1650-						suspended = false;
+Vintagestory.Server/ServerMain.cs-1651-						totalUnpausedTime.Start();
+Vintagestory.Server/ServerMain.cs-1652-						systems = Systems;
+Vintagestory.Server/ServerMain.cs-1653-						for (int i = 0; i < systems.Length; i++)
+Vintagestory.Server/ServerMain.cs-1654-						{
+Vintagestory.Server/ServerMain.cs-1655-							systems[i].OnServerResume();
+Vintagestory.Server/ServerMain.cs-1656-						}
+Vintagestory.Server/ServerMain.cs-1657-						api.eventapi.ResumeServer();
+Vintagestory.Server/ServerMain.cs-1658-						Logger.Notification("Server ticking has been resumed");
+Vintagestory.Server/ServerMain.cs-1659-						subsequentSuspendFailures++;
+Vintagestory.Server/ServerMain.cs-1660-						if (subsequentSuspendFailures >= 20)
+Vintagestory.Server/ServerMain.cs-1661-						{
+Vintagestory.Server/ServerMain.cs-1662-							Logger.Fatal("Server suspend failed {0} times in a row. This usually indicates an engine bug. In order to prevent data loss, server will stop now.", subsequentSuspendFailures);
+Vintagestory.Server/ServerMain.cs-1663-							Stop("Server autosave failure", EnumExitMode.SoftExit);
+Vintagestory.Server/ServerMain.cs-1664-						}
+Vintagestory.Server/ServerMain.cs-1665-						return false;
+Vintagestory.Server/ServerMain.cs-1666-					}
+Vintagestory.Server/ServerMain.cs-1667-					Logger.Notification("Server ticking has been suspended");
+Vintagestory.Server/ServerMain.cs-1668-				}
+Vintagestory.Server/ServerMain.cs-1669-				else
+Vintagestory.Server/ServerMain.cs-1670-				{
+Vintagestory.Server/ServerMain.cs-1671-					totalUnpausedTime.Start();

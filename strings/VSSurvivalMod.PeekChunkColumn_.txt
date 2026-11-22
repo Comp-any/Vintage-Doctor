@@ -1,0 +1,38 @@
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-314-				findNextChunk = true;
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-315-				return;
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-316-			}
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-317-			ChunkPeekOptions options = new ChunkPeekOptions
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-318-			{
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-319-				OnGenerated = (Dictionary<Vec2i, IServerChunk[]> chunks) =>
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-320-				{
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-321-					TestForExitPoint(chunks, chunkX, chunkZ);
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-322-				},
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-323-				UntilPass = EnumWorldGenPass.TerrainFeatures,
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-324-				ChunkGenParams = chunkGenParams()
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-325-			};
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs:326:			sapi.WorldManager.PeekChunkColumn(chunkX, chunkZ, options);
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-327-		}
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-328-		if (canTeleport && Activated)
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-329-		{
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-330-			try
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-331-			{
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-332-				HandleTeleportingServer(dt);
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-333-			}
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-334-			catch (Exception e)
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-335-			{
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-336-				Api.Logger.Warning("Exception when ticking Static Translocator at {0}", Pos);
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-337-				Api.Logger.Error(e);
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-338-			}
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-339-		}
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-340-	}
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-341-
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-342-	private ITreeAttribute chunkGenParams()
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-343-	{
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-344-		TreeAttribute treeAttribute = new TreeAttribute();
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-345-		TreeAttribute treeAttribute2 = (TreeAttribute)(treeAttribute["structureChanceModifier"] = new TreeAttribute());
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-346-		treeAttribute2.SetFloat("gates", 10f);
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-347-		treeAttribute2 = (TreeAttribute)(treeAttribute["structureMaxCount"] = new TreeAttribute());
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-348-		treeAttribute2.SetInt("gates", 1);
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-349-		return treeAttribute;
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-350-	}
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-351-
