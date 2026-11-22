@@ -1,0 +1,110 @@
+Vintagestory.Server/ServerMain.cs-1473-		{
+Vintagestory.Server/ServerMain.cs-1474-			Thread.Sleep(2);
+Vintagestory.Server/ServerMain.cs-1475-			return;
+Vintagestory.Server/ServerMain.cs-1476-		}
+Vintagestory.Server/ServerMain.cs-1477-		if (RunPhase == EnumServerRunPhase.Standby)
+Vintagestory.Server/ServerMain.cs-1478-		{
+Vintagestory.Server/ServerMain.cs-1479-			ProcessMain();
+Vintagestory.Server/ServerMain.cs-1480-			Thread.Sleep(5);
+Vintagestory.Server/ServerMain.cs-1481-			return;
+Vintagestory.Server/ServerMain.cs-1482-		}
+Vintagestory.Server/ServerMain.cs-1483-		FrameProfiler.Begin("{0} players online - ", Clients.Count - ConnectionQueue.Count);
+Vintagestory.Server/ServerMain.cs-1484-		TickPosition++;
+Vintagestory.Server/ServerMain.cs:1485:		ServerThread.SleepMs = ((!Clients.IsEmpty) ? 2 : ((int)Config.TickTime));
+Vintagestory.Server/ServerMain.cs-1486-		lastFramePassedTime.Restart();
+Vintagestory.Server/ServerMain.cs-1487-		TickPosition++;
+Vintagestory.Server/ServerMain.cs-1488-		try
+Vintagestory.Server/ServerMain.cs-1489-		{
+Vintagestory.Server/ServerMain.cs-1490-			long elapsedMilliseconds = totalUnpausedTime.ElapsedMilliseconds;
+Vintagestory.Server/ServerMain.cs-1491-			if (FrameProfiler.Enabled)
+Vintagestory.Server/ServerMain.cs-1492-			{
+Vintagestory.Server/ServerMain.cs-1493-				for (int i = 0; i < Systems.Length; i++)
+Vintagestory.Server/ServerMain.cs-1494-				{
+Vintagestory.Server/ServerMain.cs-1495-					ServerSystem serverSystem = Systems[i];
+Vintagestory.Server/ServerMain.cs-1496-					long num = elapsedMilliseconds - serverSystem.millisecondsSinceStart;
+Vintagestory.Server/ServerMain.cs-1497-					if (num > serverSystem.GetUpdateInterval())
+Vintagestory.Server/ServerMain.cs-1498-					{
+Vintagestory.Server/ServerMain.cs-1499-						serverSystem.millisecondsSinceStart = elapsedMilliseconds;
+Vintagestory.Server/ServerMain.cs-1500-						serverSystem.OnServerTick((float)num / 1000f);
+Vintagestory.Server/ServerMain.cs-1501-						FrameProfiler.Mark(serverSystem.FrameprofilerName);
+Vintagestory.Server/ServerMain.cs-1502-					}
+Vintagestory.Server/ServerMain.cs-1503-					TickPosition++;
+Vintagestory.Server/ServerMain.cs-1504-				}
+Vintagestory.Server/ServerMain.cs-1505-				FrameProfiler.Mark("ss-tick");
+Vintagestory.Server/ServerMain.cs-1506-				EventManager.TriggerGameTickDebug(elapsedMilliseconds, this);
+Vintagestory.Server/ServerMain.cs-1507-				TickPosition++;
+Vintagestory.Server/ServerMain.cs-1508-				FrameProfiler.Mark("ev-tick");
+Vintagestory.Server/ServerMain.cs-1509-				int num2 = 0;
+Vintagestory.Server/ServerMain.cs-1510-				while (!FrameProfilerUtil.offThreadProfiles.IsEmpty && num2++ < 25)
+--
+Vintagestory.Server/ServerThread.cs-15-	internal string threadName;
+Vintagestory.Server/ServerThread.cs-16-
+Vintagestory.Server/ServerThread.cs-17-	internal bool paused;
+Vintagestory.Server/ServerThread.cs-18-
+Vintagestory.Server/ServerThread.cs-19-	private bool alive;
+Vintagestory.Server/ServerThread.cs-20-
+Vintagestory.Server/ServerThread.cs-21-	public ServerSystem[] serversystems;
+Vintagestory.Server/ServerThread.cs-22-
+Vintagestory.Server/ServerThread.cs-23-	internal ServerMain server;
+Vintagestory.Server/ServerThread.cs-24-
+Vintagestory.Server/ServerThread.cs-25-	private Stopwatch totalPassedTime = new Stopwatch();
+Vintagestory.Server/ServerThread.cs-26-
+Vintagestory.Server/ServerThread.cs:27:	public static int SleepMs = 1;
+Vintagestory.Server/ServerThread.cs-28-
+Vintagestory.Server/ServerThread.cs-29-	private readonly CancellationToken _token;
+Vintagestory.Server/ServerThread.cs-30-
+Vintagestory.Server/ServerThread.cs-31-	public bool Alive => alive;
+Vintagestory.Server/ServerThread.cs-32-
+Vintagestory.Server/ServerThread.cs-33-	public ServerThread(ServerMain server, string threadName, CancellationToken cancellationToken)
+Vintagestory.Server/ServerThread.cs-34-	{
+Vintagestory.Server/ServerThread.cs-35-		this.server = server;
+Vintagestory.Server/ServerThread.cs-36-		this.threadName = threadName;
+Vintagestory.Server/ServerThread.cs-37-		alive = true;
+Vintagestory.Server/ServerThread.cs-38-		_token = cancellationToken;
+Vintagestory.Server/ServerThread.cs-39-	}
+Vintagestory.Server/ServerThread.cs-40-
+Vintagestory.Server/ServerThread.cs-41-	public void Process()
+Vintagestory.Server/ServerThread.cs-42-	{
+Vintagestory.Server/ServerThread.cs-43-		ServerMain.FrameProfiler = new FrameProfilerUtil("[Thread " + threadName + "] ");
+Vintagestory.Server/ServerThread.cs-44-		totalPassedTime.Start();
+Vintagestory.Server/ServerThread.cs-45-		try
+Vintagestory.Server/ServerThread.cs-46-		{
+Vintagestory.Server/ServerThread.cs-47-			while (!_token.IsCancellationRequested)
+Vintagestory.Server/ServerThread.cs-48-			{
+Vintagestory.Server/ServerThread.cs-49-				bool flag = server.Suspended || ShouldPause;
+Vintagestory.Server/ServerThread.cs-50-				bool flag2 = false;
+Vintagestory.Server/ServerThread.cs-51-				if (!flag)
+Vintagestory.Server/ServerThread.cs-52-				{
+Vintagestory.Server/ServerThread.cs-53-					ServerMain.FrameProfiler.Begin(null);
+Vintagestory.Server/ServerThread.cs-54-					flag2 = Update();
+Vintagestory.Server/ServerThread.cs-55-					ServerMain.FrameProfiler.Mark("update");
+Vintagestory.Server/ServerThread.cs-56-				}
+Vintagestory.Server/ServerThread.cs-57-				UpdatePausedStatus(flag);
+Vintagestory.Server/ServerThread.cs-58-				if (!flag2)
+Vintagestory.Server/ServerThread.cs-59-				{
+Vintagestory.Server/ServerThread.cs:60:					Thread.Sleep(SleepMs);
+Vintagestory.Server/ServerThread.cs-61-					ServerMain.FrameProfiler.Mark("sleep");
+Vintagestory.Server/ServerThread.cs-62-				}
+Vintagestory.Server/ServerThread.cs-63-				if (shouldExit)
+Vintagestory.Server/ServerThread.cs-64-				{
+Vintagestory.Server/ServerThread.cs-65-					ShutDown();
+Vintagestory.Server/ServerThread.cs-66-					break;
+Vintagestory.Server/ServerThread.cs-67-				}
+Vintagestory.Server/ServerThread.cs-68-				if (!flag)
+Vintagestory.Server/ServerThread.cs-69-				{
+Vintagestory.Server/ServerThread.cs-70-					ServerMain.FrameProfiler.OffThreadEnd();
+Vintagestory.Server/ServerThread.cs-71-				}
+Vintagestory.Server/ServerThread.cs-72-			}
+Vintagestory.Server/ServerThread.cs-73-		}
+Vintagestory.Server/ServerThread.cs-74-		catch (TaskCanceledException)
+Vintagestory.Server/ServerThread.cs-75-		{
+Vintagestory.Server/ServerThread.cs-76-		}
+Vintagestory.Server/ServerThread.cs-77-		catch (Exception e)
+Vintagestory.Server/ServerThread.cs-78-		{
+Vintagestory.Server/ServerThread.cs-79-			ServerMain.Logger.Fatal("Caught unhandled exception in thread '{0}'. Shutting down server.", threadName);
+Vintagestory.Server/ServerThread.cs-80-			ServerMain.Logger.Fatal(e);
+Vintagestory.Server/ServerThread.cs-81-			server.EnqueueMainThreadTask(() =>
+Vintagestory.Server/ServerThread.cs-82-			{
+Vintagestory.Server/ServerThread.cs-83-				server.Stop("Exception during Process", EnumExitMode.SoftExit);
+Vintagestory.Server/ServerThread.cs-84-			});
+Vintagestory.Server/ServerThread.cs-85-		}

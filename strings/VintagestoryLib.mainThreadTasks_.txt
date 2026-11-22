@@ -1,0 +1,112 @@
+Vintagestory.Server/ServerMain.cs-164-	internal List<EntityProperties> entityTypesCached;
+Vintagestory.Server/ServerMain.cs-165-
+Vintagestory.Server/ServerMain.cs-166-	internal List<string> entityCodesCached;
+Vintagestory.Server/ServerMain.cs-167-
+Vintagestory.Server/ServerMain.cs-168-	public int nextFreeItemId;
+Vintagestory.Server/ServerMain.cs-169-
+Vintagestory.Server/ServerMain.cs-170-	internal Dictionary<EnumClientAwarenessEvent, List<Action<ClientStatistics>>> clientAwarenessEvents;
+Vintagestory.Server/ServerMain.cs-171-
+Vintagestory.Server/ServerMain.cs-172-	internal ServerSystemClientAwareness clientAwarenessSystem;
+Vintagestory.Server/ServerMain.cs-173-
+Vintagestory.Server/ServerMain.cs-174-	internal ServerSystemHeartbeat HeartbeatSystem;
+Vintagestory.Server/ServerMain.cs-175-
+Vintagestory.Server/ServerMain.cs:176:	public object mainThreadTasksLock = new object();
+Vintagestory.Server/ServerMain.cs-177-
+Vintagestory.Server/ServerMain.cs:178:	private Queue<Action> mainThreadTasks = new Queue<Action>();
+Vintagestory.Server/ServerMain.cs-179-
+Vintagestory.Server/ServerMain.cs-180-	public StartServerArgs serverStartArgs;
+Vintagestory.Server/ServerMain.cs-181-
+Vintagestory.Server/ServerMain.cs-182-	public ServerProgramArgs progArgs;
+Vintagestory.Server/ServerMain.cs-183-
+Vintagestory.Server/ServerMain.cs-184-	public string[] RawCmdLineArgs;
+Vintagestory.Server/ServerMain.cs-185-
+Vintagestory.Server/ServerMain.cs-186-	public int TickPosition;
+Vintagestory.Server/ServerMain.cs-187-
+Vintagestory.Server/ServerMain.cs-188-	internal ChunkServerThread chunkThread;
+Vintagestory.Server/ServerMain.cs-189-
+Vintagestory.Server/ServerMain.cs-190-	internal object suspendLock = new object();
+Vintagestory.Server/ServerMain.cs-191-
+Vintagestory.Server/ServerMain.cs-192-	private int subsequentSuspendFailures;
+Vintagestory.Server/ServerMain.cs-193-
+Vintagestory.Server/ServerMain.cs-194-	public int ExitCode;
+Vintagestory.Server/ServerMain.cs-195-
+Vintagestory.Server/ServerMain.cs-196-	private int nextClientID = 1;
+Vintagestory.Server/ServerMain.cs-197-
+Vintagestory.Server/ServerMain.cs-198-	internal DateTime statsupdate;
+Vintagestory.Server/ServerMain.cs-199-
+Vintagestory.Server/ServerMain.cs-200-	public Dictionary<Timer, Timer.Tick> Timers = new Dictionary<Timer, Timer.Tick>();
+Vintagestory.Server/ServerMain.cs-201-
+Vintagestory.Server/ServerMain.cs-202-	private bool ignoreDisconnectCalls;
+Vintagestory.Server/ServerMain.cs-203-
+--
+Vintagestory.Server/ServerMain.cs-3323-			return null;
+Vintagestory.Server/ServerMain.cs-3324-		}
+Vintagestory.Server/ServerMain.cs-3325-		PlayersByUid.TryGetValue(playerUid, out var value);
+Vintagestory.Server/ServerMain.cs-3326-		return value;
+Vintagestory.Server/ServerMain.cs-3327-	}
+Vintagestory.Server/ServerMain.cs-3328-
+Vintagestory.Server/ServerMain.cs-3329-	public void EnqueueMainThreadTask(Action task)
+Vintagestory.Server/ServerMain.cs-3330-	{
+Vintagestory.Server/ServerMain.cs-3331-		if (task == null)
+Vintagestory.Server/ServerMain.cs-3332-		{
+Vintagestory.Server/ServerMain.cs-3333-			throw new ArgumentNullException();
+Vintagestory.Server/ServerMain.cs-3334-		}
+Vintagestory.Server/ServerMain.cs:3335:		lock (mainThreadTasksLock)
+Vintagestory.Server/ServerMain.cs-3336-		{
+Vintagestory.Server/ServerMain.cs:3337:			mainThreadTasks.Enqueue(task);
+Vintagestory.Server/ServerMain.cs-3338-		}
+Vintagestory.Server/ServerMain.cs-3339-	}
+Vintagestory.Server/ServerMain.cs-3340-
+Vintagestory.Server/ServerMain.cs-3341-	public void ProcessMainThreadTasks()
+Vintagestory.Server/ServerMain.cs-3342-	{
+Vintagestory.Server/ServerMain.cs-3343-		if (FrameProfiler != null && FrameProfiler.Enabled)
+Vintagestory.Server/ServerMain.cs-3344-		{
+Vintagestory.Server/ServerMain.cs-3345-			FrameProfiler.Enter("mainthreadtasks");
+Vintagestory.Server/ServerMain.cs:3346:			while (mainThreadTasks.Count > 0)
+Vintagestory.Server/ServerMain.cs-3347-			{
+Vintagestory.Server/ServerMain.cs-3348-				Action action;
+Vintagestory.Server/ServerMain.cs:3349:				lock (mainThreadTasksLock)
+Vintagestory.Server/ServerMain.cs-3350-				{
+Vintagestory.Server/ServerMain.cs:3351:					action = mainThreadTasks.Dequeue();
+Vintagestory.Server/ServerMain.cs-3352-				}
+Vintagestory.Server/ServerMain.cs-3353-				action();
+Vintagestory.Server/ServerMain.cs-3354-				if (action.Target != null)
+Vintagestory.Server/ServerMain.cs-3355-				{
+Vintagestory.Server/ServerMain.cs-3356-					string code = action.Target.GetType().ToString();
+Vintagestory.Server/ServerMain.cs-3357-					FrameProfiler.Mark(code);
+Vintagestory.Server/ServerMain.cs-3358-				}
+Vintagestory.Server/ServerMain.cs-3359-			}
+Vintagestory.Server/ServerMain.cs-3360-			FrameProfiler.Leave();
+Vintagestory.Server/ServerMain.cs-3361-			return;
+Vintagestory.Server/ServerMain.cs-3362-		}
+Vintagestory.Server/ServerMain.cs:3363:		while (mainThreadTasks.Count > 0)
+Vintagestory.Server/ServerMain.cs-3364-		{
+Vintagestory.Server/ServerMain.cs-3365-			Action action2;
+Vintagestory.Server/ServerMain.cs:3366:			lock (mainThreadTasksLock)
+Vintagestory.Server/ServerMain.cs-3367-			{
+Vintagestory.Server/ServerMain.cs:3368:				action2 = mainThreadTasks.Dequeue();
+Vintagestory.Server/ServerMain.cs-3369-			}
+Vintagestory.Server/ServerMain.cs-3370-			action2();
+Vintagestory.Server/ServerMain.cs-3371-		}
+Vintagestory.Server/ServerMain.cs-3372-	}
+Vintagestory.Server/ServerMain.cs-3373-
+Vintagestory.Server/ServerMain.cs-3374-	public void HighlightBlocks(IPlayer player, int slotId, List<BlockPos> blocks, List<int> colors, EnumHighlightBlocksMode mode = EnumHighlightBlocksMode.Absolute, EnumHighlightShape shape = EnumHighlightShape.Arbitrary, float scale = 1f)
+Vintagestory.Server/ServerMain.cs-3375-	{
+Vintagestory.Server/ServerMain.cs-3376-		SendHighlightBlocksPacket((IServerPlayer)player, slotId, blocks, colors, mode, shape, scale);
+Vintagestory.Server/ServerMain.cs-3377-	}
+Vintagestory.Server/ServerMain.cs-3378-
+Vintagestory.Server/ServerMain.cs-3379-	public void HighlightBlocks(IPlayer player, int slotId, List<BlockPos> blocks, EnumHighlightBlocksMode mode = EnumHighlightBlocksMode.Absolute, EnumHighlightShape shape = EnumHighlightShape.Arbitrary)
+Vintagestory.Server/ServerMain.cs-3380-	{
+Vintagestory.Server/ServerMain.cs-3381-		SendHighlightBlocksPacket((IServerPlayer)player, slotId, blocks, null, mode, shape);
+Vintagestory.Server/ServerMain.cs-3382-	}
+Vintagestory.Server/ServerMain.cs-3383-
+Vintagestory.Server/ServerMain.cs-3384-	private void InitBasicPacketHandlers()
+Vintagestory.Server/ServerMain.cs-3385-	{
+Vintagestory.Server/ServerMain.cs-3386-		PacketHandlers[1] = HandlePlayerIdentification;
+Vintagestory.Server/ServerMain.cs-3387-		PacketHandlers[11] = HandleRequestJoin;
+Vintagestory.Server/ServerMain.cs-3388-		PacketHandlers[20] = HandleRequestModeChange;
+Vintagestory.Server/ServerMain.cs-3389-		PacketHandlers[4] = HandleChatLine;
+Vintagestory.Server/ServerMain.cs-3390-		PacketHandlers[14] = HandleLeave;
+Vintagestory.Server/ServerMain.cs-3391-		PacketHandlers[21] = HandleMoveKeyChange;
+Vintagestory.Server/ServerMain.cs-3392-		PacketHandlers[31] = HandleEntityPacket;
+Vintagestory.Server/ServerMain.cs-3393-		PacketHandlers[26] = HandleClientLoaded;

@@ -1,0 +1,339 @@
+Vintagestory.API.Config/GameVersion.cs-248-
+Vintagestory.API.Config/GameVersion.cs-249-	public static void EnsureEqualVersionOrKillExecutable(ICoreAPI api, string version, string reference, string modName)
+Vintagestory.API.Config/GameVersion.cs-250-	{
+Vintagestory.API.Config/GameVersion.cs-251-		if (version != reference)
+Vintagestory.API.Config/GameVersion.cs-252-		{
+Vintagestory.API.Config/GameVersion.cs-253-			if (api.Side == EnumAppSide.Server)
+Vintagestory.API.Config/GameVersion.cs-254-			{
+Vintagestory.API.Config/GameVersion.cs-255-				Exception ex = new Exception(Lang.Get("versionmismatch-server", modName + ".dll"));
+Vintagestory.API.Config/GameVersion.cs-256-				((ICoreServerAPI)api).Server.ShutDown();
+Vintagestory.API.Config/GameVersion.cs-257-				throw ex;
+Vintagestory.API.Config/GameVersion.cs-258-			}
+Vintagestory.API.Config/GameVersion.cs-259-			Exception e = new Exception(Lang.Get("versionmismatch-client", modName + ".dll"));
+Vintagestory.API.Config/GameVersion.cs:260:			((ICoreClientAPI)api).Event.EnqueueMainThreadTask(() =>
+Vintagestory.API.Config/GameVersion.cs-261-			{
+Vintagestory.API.Config/GameVersion.cs-262-				throw e;
+Vintagestory.API.Config/GameVersion.cs-263-			}, "killgame");
+Vintagestory.API.Config/GameVersion.cs-264-		}
+Vintagestory.API.Config/GameVersion.cs-265-	}
+Vintagestory.API.Config/GameVersion.cs-266-}
+--
+Vintagestory.API.Client/GuiElementDynamicText.cs-56-	{
+Vintagestory.API.Client/GuiElementDynamicText.cs-57-		if (autoHeight)
+Vintagestory.API.Client/GuiElementDynamicText.cs-58-		{
+Vintagestory.API.Client/GuiElementDynamicText.cs-59-			AutoHeight();
+Vintagestory.API.Client/GuiElementDynamicText.cs-60-		}
+Vintagestory.API.Client/GuiElementDynamicText.cs-61-		if (async)
+Vintagestory.API.Client/GuiElementDynamicText.cs-62-		{
+Vintagestory.API.Client/GuiElementDynamicText.cs-63-			TyronThreadPool.QueueTask(() =>
+Vintagestory.API.Client/GuiElementDynamicText.cs-64-			{
+Vintagestory.API.Client/GuiElementDynamicText.cs-65-				ImageSurface surface = new ImageSurface(Format.Argb32, (int)Bounds.InnerWidth, (int)Bounds.InnerHeight);
+Vintagestory.API.Client/GuiElementDynamicText.cs-66-				Context ctx = genContext(surface);
+Vintagestory.API.Client/GuiElementDynamicText.cs-67-				DrawMultilineTextAt(ctx, 0.0, 0.0, orientation);
+Vintagestory.API.Client/GuiElementDynamicText.cs:68:				api.Event.EnqueueMainThreadTask(() =>
+Vintagestory.API.Client/GuiElementDynamicText.cs-69-				{
+Vintagestory.API.Client/GuiElementDynamicText.cs-70-					generateTexture(surface, ref textTexture);
+Vintagestory.API.Client/GuiElementDynamicText.cs-71-					ctx.Dispose();
+Vintagestory.API.Client/GuiElementDynamicText.cs-72-					surface.Dispose();
+Vintagestory.API.Client/GuiElementDynamicText.cs-73-				}, "recompstatbar");
+Vintagestory.API.Client/GuiElementDynamicText.cs-74-			}, "DynamicTextRecompose");
+Vintagestory.API.Client/GuiElementDynamicText.cs-75-		}
+Vintagestory.API.Client/GuiElementDynamicText.cs-76-		else
+Vintagestory.API.Client/GuiElementDynamicText.cs-77-		{
+Vintagestory.API.Client/GuiElementDynamicText.cs-78-			ImageSurface imageSurface = new ImageSurface(Format.Argb32, (int)Bounds.InnerWidth, (int)Bounds.InnerHeight);
+Vintagestory.API.Client/GuiElementDynamicText.cs-79-			Context context = genContext(imageSurface);
+Vintagestory.API.Client/GuiElementDynamicText.cs-80-			DrawMultilineTextAt(context, 0.0, 0.0, orientation);
+Vintagestory.API.Client/GuiElementDynamicText.cs-81-			generateTexture(imageSurface, ref textTexture);
+Vintagestory.API.Client/GuiElementDynamicText.cs-82-			context.Dispose();
+Vintagestory.API.Client/GuiElementDynamicText.cs-83-			imageSurface.Dispose();
+Vintagestory.API.Client/GuiElementDynamicText.cs-84-		}
+Vintagestory.API.Client/GuiElementDynamicText.cs-85-	}
+Vintagestory.API.Client/GuiElementDynamicText.cs-86-
+Vintagestory.API.Client/GuiElementDynamicText.cs-87-	public override void RenderInteractiveElements(float deltaTime)
+Vintagestory.API.Client/GuiElementDynamicText.cs-88-	{
+Vintagestory.API.Client/GuiElementDynamicText.cs-89-		api.Render.Render2DTexturePremultipliedAlpha(textTexture.TextureId, (int)Bounds.renderX, (int)Bounds.renderY, (int)Bounds.InnerWidth, (int)Bounds.InnerHeight);
+Vintagestory.API.Client/GuiElementDynamicText.cs-90-	}
+Vintagestory.API.Client/GuiElementDynamicText.cs-91-
+Vintagestory.API.Client/GuiElementDynamicText.cs-92-	public override void OnMouseDownOnElement(ICoreClientAPI api, MouseEvent args)
+Vintagestory.API.Client/GuiElementDynamicText.cs-93-	{
+--
+Vintagestory.API.Client/GuiDialogBlockEntity.cs-68-		}
+Vintagestory.API.Client/GuiDialogBlockEntity.cs-69-	}
+Vintagestory.API.Client/GuiDialogBlockEntity.cs-70-
+Vintagestory.API.Client/GuiDialogBlockEntity.cs-71-	/// <summary>
+Vintagestory.API.Client/GuiDialogBlockEntity.cs-72-	/// This occurs right before the frame is pushed to the screen.
+Vintagestory.API.Client/GuiDialogBlockEntity.cs-73-	/// </summary>
+Vintagestory.API.Client/GuiDialogBlockEntity.cs-74-	/// <param name="dt">The time elapsed.</param>
+Vintagestory.API.Client/GuiDialogBlockEntity.cs-75-	public override void OnFinalizeFrame(float dt)
+Vintagestory.API.Client/GuiDialogBlockEntity.cs-76-	{
+Vintagestory.API.Client/GuiDialogBlockEntity.cs-77-		base.OnFinalizeFrame(dt);
+Vintagestory.API.Client/GuiDialogBlockEntity.cs-78-		if (!capi.World.Player.IsInInteractionRangeOf(BlockEntityPosition, 0.5f))
+Vintagestory.API.Client/GuiDialogBlockEntity.cs-79-		{
+Vintagestory.API.Client/GuiDialogBlockEntity.cs:80:			capi.Event.EnqueueMainThreadTask(() =>
+Vintagestory.API.Client/GuiDialogBlockEntity.cs-81-			{
+Vintagestory.API.Client/GuiDialogBlockEntity.cs-82-				TryClose();
+Vintagestory.API.Client/GuiDialogBlockEntity.cs-83-			}, "closedlg");
+Vintagestory.API.Client/GuiDialogBlockEntity.cs-84-		}
+Vintagestory.API.Client/GuiDialogBlockEntity.cs-85-	}
+Vintagestory.API.Client/GuiDialogBlockEntity.cs-86-
+Vintagestory.API.Client/GuiDialogBlockEntity.cs-87-	/// <summary>
+Vintagestory.API.Client/GuiDialogBlockEntity.cs-88-	/// Render's the object in Orthographic mode.
+Vintagestory.API.Client/GuiDialogBlockEntity.cs-89-	/// </summary>
+Vintagestory.API.Client/GuiDialogBlockEntity.cs-90-	/// <param name="deltaTime">The time elapsed.</param>
+Vintagestory.API.Client/GuiDialogBlockEntity.cs-91-	public override void OnRenderGUI(float deltaTime)
+Vintagestory.API.Client/GuiDialogBlockEntity.cs-92-	{
+Vintagestory.API.Client/GuiDialogBlockEntity.cs-93-		if (capi.Settings.Bool["immersiveMouseMode"])
+Vintagestory.API.Client/GuiDialogBlockEntity.cs-94-		{
+Vintagestory.API.Client/GuiDialogBlockEntity.cs-95-			Vec3d vec3d = MatrixToolsd.Project(new Vec3d((double)BlockEntityPosition.X + 0.5, (double)BlockEntityPosition.Y + FloatyDialogPosition, (double)BlockEntityPosition.Z + 0.5), capi.Render.PerspectiveProjectionMat, capi.Render.PerspectiveViewMat, capi.Render.FrameWidth, capi.Render.FrameHeight);
+Vintagestory.API.Client/GuiDialogBlockEntity.cs-96-			if (vec3d.Z < 0.0)
+Vintagestory.API.Client/GuiDialogBlockEntity.cs-97-			{
+Vintagestory.API.Client/GuiDialogBlockEntity.cs-98-				return;
+Vintagestory.API.Client/GuiDialogBlockEntity.cs-99-			}
+Vintagestory.API.Client/GuiDialogBlockEntity.cs-100-			SingleComposer.Bounds.Alignment = EnumDialogArea.None;
+Vintagestory.API.Client/GuiDialogBlockEntity.cs-101-			SingleComposer.Bounds.fixedOffsetX = 0.0;
+Vintagestory.API.Client/GuiDialogBlockEntity.cs-102-			SingleComposer.Bounds.fixedOffsetY = 0.0;
+Vintagestory.API.Client/GuiDialogBlockEntity.cs-103-			SingleComposer.Bounds.absFixedX = vec3d.X - SingleComposer.Bounds.OuterWidth / 2.0;
+Vintagestory.API.Client/GuiDialogBlockEntity.cs-104-			SingleComposer.Bounds.absFixedY = (double)capi.Render.FrameHeight - vec3d.Y - SingleComposer.Bounds.OuterHeight * FloatyDialogAlign;
+Vintagestory.API.Client/GuiDialogBlockEntity.cs-105-			SingleComposer.Bounds.absMarginX = 0.0;
+--
+Vintagestory.API.Client/GuiElementStatbar.cs-202-		ctx.LineWidth = GuiElement.scaled(2.2);
+Vintagestory.API.Client/GuiElementStatbar.cs-203-		int num9 = Math.Min(50, (int)((maxValue - minValue) / lineInterval));
+Vintagestory.API.Client/GuiElementStatbar.cs-204-		for (int i = 1; i < num9; i++)
+Vintagestory.API.Client/GuiElementStatbar.cs-205-		{
+Vintagestory.API.Client/GuiElementStatbar.cs-206-			ctx.NewPath();
+Vintagestory.API.Client/GuiElementStatbar.cs-207-			ctx.SetSourceRGBA(0.0, 0.0, 0.0, 0.5);
+Vintagestory.API.Client/GuiElementStatbar.cs-208-			double x4 = Bounds.InnerWidth * (double)i / (double)num9;
+Vintagestory.API.Client/GuiElementStatbar.cs-209-			ctx.MoveTo(x4, 0.0);
+Vintagestory.API.Client/GuiElementStatbar.cs-210-			ctx.LineTo(x4, Math.Max(3.0, Bounds.InnerHeight - 1.0));
+Vintagestory.API.Client/GuiElementStatbar.cs-211-			ctx.ClosePath();
+Vintagestory.API.Client/GuiElementStatbar.cs-212-			ctx.Stroke();
+Vintagestory.API.Client/GuiElementStatbar.cs-213-		}
+Vintagestory.API.Client/GuiElementStatbar.cs:214:		api.Event.EnqueueMainThreadTask(() =>
+Vintagestory.API.Client/GuiElementStatbar.cs-215-		{
+Vintagestory.API.Client/GuiElementStatbar.cs-216-			generateTexture(surface, ref barTexture);
+Vintagestory.API.Client/GuiElementStatbar.cs-217-			if (surfacePrev != null)
+Vintagestory.API.Client/GuiElementStatbar.cs-218-			{
+Vintagestory.API.Client/GuiElementStatbar.cs-219-				generateTexture(surfacePrev, ref previousValueTexture);
+Vintagestory.API.Client/GuiElementStatbar.cs-220-				surfacePrev.Dispose();
+Vintagestory.API.Client/GuiElementStatbar.cs-221-				ctxPrev.Dispose();
+Vintagestory.API.Client/GuiElementStatbar.cs-222-				prevValueSize = 1f;
+Vintagestory.API.Client/GuiElementStatbar.cs-223-			}
+Vintagestory.API.Client/GuiElementStatbar.cs-224-			ctx.Dispose();
+Vintagestory.API.Client/GuiElementStatbar.cs-225-			surface.Dispose();
+Vintagestory.API.Client/GuiElementStatbar.cs-226-		}, "recompstatbar");
+Vintagestory.API.Client/GuiElementStatbar.cs-227-	}
+Vintagestory.API.Client/GuiElementStatbar.cs-228-
+Vintagestory.API.Client/GuiElementStatbar.cs-229-	private void ComposeFlashOverlay()
+Vintagestory.API.Client/GuiElementStatbar.cs-230-	{
+Vintagestory.API.Client/GuiElementStatbar.cs-231-		valueHeight = (int)Bounds.OuterHeight + 1;
+Vintagestory.API.Client/GuiElementStatbar.cs-232-		ImageSurface surface = new ImageSurface(Format.Argb32, Bounds.OuterWidthInt + (int)GuiElement.scaled(28.0), Bounds.OuterHeightInt + (int)GuiElement.scaled(28.0));
+Vintagestory.API.Client/GuiElementStatbar.cs-233-		Context ctx = new Context(surface);
+Vintagestory.API.Client/GuiElementStatbar.cs-234-		ctx.SetSourceRGBA(0.0, 0.0, 0.0, 0.0);
+Vintagestory.API.Client/GuiElementStatbar.cs-235-		ctx.Paint();
+Vintagestory.API.Client/GuiElementStatbar.cs-236-		GuiElement.RoundRectangle(ctx, (int)GuiElement.scaled(12.0), (int)GuiElement.scaled(12.0), Bounds.OuterWidthInt + (int)GuiElement.scaled(4.0), Bounds.OuterHeightInt + (int)GuiElement.scaled(4.0), 1.0);
+Vintagestory.API.Client/GuiElementStatbar.cs-237-		ctx.SetSourceRGB(color[0], color[1], color[2]);
+Vintagestory.API.Client/GuiElementStatbar.cs-238-		ctx.FillPreserve();
+Vintagestory.API.Client/GuiElementStatbar.cs-239-		surface.BlurFull(GuiElement.scaled(4.0));
+Vintagestory.API.Client/GuiElementStatbar.cs-240-		ctx.Fill();
+Vintagestory.API.Client/GuiElementStatbar.cs-241-		surface.BlurFull(GuiElement.scaled(2.0));
+Vintagestory.API.Client/GuiElementStatbar.cs-242-		GuiElement.RoundRectangle(ctx, (int)GuiElement.scaled(15.0), (int)GuiElement.scaled(15.0), Bounds.OuterWidthInt - 2, Bounds.OuterHeightInt - 2, 1.0);
+Vintagestory.API.Client/GuiElementStatbar.cs-243-		ctx.Operator = Operator.Clear;
+Vintagestory.API.Client/GuiElementStatbar.cs-244-		ctx.SetSourceRGBA(0.0, 0.0, 0.0, 0.0);
+Vintagestory.API.Client/GuiElementStatbar.cs-245-		ctx.Fill();
+Vintagestory.API.Client/GuiElementStatbar.cs:246:		api.Event.EnqueueMainThreadTask(() =>
+Vintagestory.API.Client/GuiElementStatbar.cs-247-		{
+Vintagestory.API.Client/GuiElementStatbar.cs-248-			generateTexture(surface, ref flashTexture);
+Vintagestory.API.Client/GuiElementStatbar.cs-249-			ctx.Dispose();
+Vintagestory.API.Client/GuiElementStatbar.cs-250-			surface.Dispose();
+Vintagestory.API.Client/GuiElementStatbar.cs-251-		}, "recompstatbar");
+Vintagestory.API.Client/GuiElementStatbar.cs-252-	}
+Vintagestory.API.Client/GuiElementStatbar.cs-253-
+Vintagestory.API.Client/GuiElementStatbar.cs-254-	public override void RenderInteractiveElements(float deltaTime)
+Vintagestory.API.Client/GuiElementStatbar.cs-255-	{
+Vintagestory.API.Client/GuiElementStatbar.cs-256-		double renderX = Bounds.renderX;
+Vintagestory.API.Client/GuiElementStatbar.cs-257-		double renderY = Bounds.renderY;
+Vintagestory.API.Client/GuiElementStatbar.cs-258-		if (value == maxValue && HideWhenFull)
+Vintagestory.API.Client/GuiElementStatbar.cs-259-		{
+Vintagestory.API.Client/GuiElementStatbar.cs-260-			return;
+Vintagestory.API.Client/GuiElementStatbar.cs-261-		}
+Vintagestory.API.Client/GuiElementStatbar.cs-262-		float num = 0f;
+Vintagestory.API.Client/GuiElementStatbar.cs-263-		if (ShouldFlash)
+Vintagestory.API.Client/GuiElementStatbar.cs-264-		{
+Vintagestory.API.Client/GuiElementStatbar.cs-265-			FlashTime += 6f * deltaTime;
+Vintagestory.API.Client/GuiElementStatbar.cs-266-			num = GameMath.Sin(FlashTime);
+Vintagestory.API.Client/GuiElementStatbar.cs-267-			if (num < 0f)
+Vintagestory.API.Client/GuiElementStatbar.cs-268-			{
+Vintagestory.API.Client/GuiElementStatbar.cs-269-				ShouldFlash = false;
+Vintagestory.API.Client/GuiElementStatbar.cs-270-				FlashTime = 0f;
+Vintagestory.API.Client/GuiElementStatbar.cs-271-			}
+--
+Vintagestory.API.Client/GuiElementItemstackInfo.cs-138-			context.SetSourceRGBA(GuiStyle.DialogSlotFrontColor);
+Vintagestory.API.Client/GuiElementItemstackInfo.cs-139-			context.LineWidth = 5.0;
+Vintagestory.API.Client/GuiElementItemstackInfo.cs-140-			context.Stroke();
+Vintagestory.API.Client/GuiElementItemstackInfo.cs-141-			imageSurface.BlurFull(7.0);
+Vintagestory.API.Client/GuiElementItemstackInfo.cs-142-			imageSurface.BlurFull(7.0);
+Vintagestory.API.Client/GuiElementItemstackInfo.cs-143-			imageSurface.BlurFull(7.0);
+Vintagestory.API.Client/GuiElementItemstackInfo.cs-144-			EmbossRoundRectangleElement(context, 0.0, 0.0, num, num2, inverse: true);
+Vintagestory.API.Client/GuiElementItemstackInfo.cs-145-			ctx.SetSourceSurface(imageSurface, (int)textBounds.drawX, (int)(textBounds.drawY + GuiElement.scaled(MarginTop)));
+Vintagestory.API.Client/GuiElementItemstackInfo.cs-146-			ctx.Rectangle(textBounds.drawX, textBounds.drawY + GuiElement.scaled(MarginTop), num, num2);
+Vintagestory.API.Client/GuiElementItemstackInfo.cs-147-			ctx.Fill();
+Vintagestory.API.Client/GuiElementItemstackInfo.cs-148-			context.Dispose();
+Vintagestory.API.Client/GuiElementItemstackInfo.cs-149-			imageSurface.Dispose();
+Vintagestory.API.Client/GuiElementItemstackInfo.cs:150:			api.Event.EnqueueMainThreadTask(() =>
+Vintagestory.API.Client/GuiElementItemstackInfo.cs-151-			{
+Vintagestory.API.Client/GuiElementItemstackInfo.cs-152-				titleElement.Compose();
+Vintagestory.API.Client/GuiElementItemstackInfo.cs-153-				descriptionElement.Compose();
+Vintagestory.API.Client/GuiElementItemstackInfo.cs-154-				generateTexture(surface, ref texture);
+Vintagestory.API.Client/GuiElementItemstackInfo.cs-155-				ctx.Dispose();
+Vintagestory.API.Client/GuiElementItemstackInfo.cs-156-				surface.Dispose();
+Vintagestory.API.Client/GuiElementItemstackInfo.cs-157-				double num3 = (int)(30.0 + ItemStackSize / 2.0);
+Vintagestory.API.Client/GuiElementItemstackInfo.cs-158-				scissorBounds = ElementBounds.Fixed(2.75 + num3 - ItemStackSize, 2.75 + num3 + (double)MarginTop - ItemStackSize, ItemStackSize + 38.0, ItemStackSize + 38.0).WithParent(Bounds);
+Vintagestory.API.Client/GuiElementItemstackInfo.cs-159-				scissorBounds.CalcWorldBounds();
+Vintagestory.API.Client/GuiElementItemstackInfo.cs-160-				Dirty = false;
+Vintagestory.API.Client/GuiElementItemstackInfo.cs-161-			}, "genstackinfotexture");
+Vintagestory.API.Client/GuiElementItemstackInfo.cs-162-		}, "genstackinfotexture");
+Vintagestory.API.Client/GuiElementItemstackInfo.cs-163-	}
+Vintagestory.API.Client/GuiElementItemstackInfo.cs-164-
+Vintagestory.API.Client/GuiElementItemstackInfo.cs-165-	public override void RenderInteractiveElements(float deltaTime)
+Vintagestory.API.Client/GuiElementItemstackInfo.cs-166-	{
+Vintagestory.API.Client/GuiElementItemstackInfo.cs-167-		if (curSlot?.Itemstack != null && !Dirty && Render)
+Vintagestory.API.Client/GuiElementItemstackInfo.cs-168-		{
+Vintagestory.API.Client/GuiElementItemstackInfo.cs-169-			api.Render.Render2DTexturePremultipliedAlpha(texture.TextureId, Bounds, 1000f);
+Vintagestory.API.Client/GuiElementItemstackInfo.cs-170-			titleElement.RenderInteractiveElements(deltaTime);
+Vintagestory.API.Client/GuiElementItemstackInfo.cs-171-			descriptionElement.RenderInteractiveElements(deltaTime);
+Vintagestory.API.Client/GuiElementItemstackInfo.cs-172-			api.Render.PushScissor(scissorBounds);
+Vintagestory.API.Client/GuiElementItemstackInfo.cs-173-			onRenderStack();
+Vintagestory.API.Client/GuiElementItemstackInfo.cs-174-			api.Render.PopScissor();
+Vintagestory.API.Client/GuiElementItemstackInfo.cs-175-		}
+--
+Vintagestory.API.Common/Block.cs-1650-			{
+Vintagestory.API.Common/Block.cs-1651-				entityAgent.Pos.Motion.Y = 0.04;
+Vintagestory.API.Common/Block.cs-1652-			}
+Vintagestory.API.Common/Block.cs-1653-		}
+Vintagestory.API.Common/Block.cs-1654-		if (!(api is ICoreServerAPI coreServerAPI))
+Vintagestory.API.Common/Block.cs-1655-		{
+Vintagestory.API.Common/Block.cs-1656-			return;
+Vintagestory.API.Common/Block.cs-1657-		}
+Vintagestory.API.Common/Block.cs-1658-		float impactBlockUpdateChance = entity.ImpactBlockUpdateChance;
+Vintagestory.API.Common/Block.cs-1659-		if (isImpact && collideSpeed.Y < -0.05 && world.Rand.NextDouble() < (double)impactBlockUpdateChance)
+Vintagestory.API.Common/Block.cs-1660-		{
+Vintagestory.API.Common/Block.cs-1661-			BlockPos updatePos = pos.Copy();
+Vintagestory.API.Common/Block.cs:1662:			coreServerAPI.Event.EnqueueMainThreadTask(() =>
+Vintagestory.API.Common/Block.cs-1663-			{
+Vintagestory.API.Common/Block.cs-1664-				OnNeighbourBlockChange(world, updatePos, updatePos.UpCopy());
+Vintagestory.API.Common/Block.cs-1665-			}, "entityBlockImpact");
+Vintagestory.API.Common/Block.cs-1666-		}
+Vintagestory.API.Common/Block.cs-1667-	}
+Vintagestory.API.Common/Block.cs-1668-
+Vintagestory.API.Common/Block.cs-1669-	/// <summary>
+Vintagestory.API.Common/Block.cs-1670-	/// Called when a falling block falls onto this one. Return true to cancel default behavior.
+Vintagestory.API.Common/Block.cs-1671-	/// <br />Note: From game version 1.20.4, if overriding this you should also override <see cref="M:Vintagestory.API.Common.Block.CanAcceptFallOnto(Vintagestory.API.Common.IWorldAccessor,Vintagestory.API.MathTools.BlockPos,Vintagestory.API.Common.Block,Vintagestory.API.Datastructures.TreeAttribute)" />(). See BlockCoalPile for an example. If CanAcceptFallOnto(
+Vintagestory.API.Common/Block.cs-1672-	/// </summary>
+Vintagestory.API.Common/Block.cs-1673-	/// <param name="world"></param>
+Vintagestory.API.Common/Block.cs-1674-	/// <param name="pos"></param>
+Vintagestory.API.Common/Block.cs-1675-	/// <param name="block"></param>
+Vintagestory.API.Common/Block.cs-1676-	/// <param name="blockEntityAttributes"></param>
+Vintagestory.API.Common/Block.cs-1677-	/// <returns></returns>
+Vintagestory.API.Common/Block.cs-1678-	public virtual bool OnFallOnto(IWorldAccessor world, BlockPos pos, Block block, TreeAttribute blockEntityAttributes)
+Vintagestory.API.Common/Block.cs-1679-	{
+Vintagestory.API.Common/Block.cs-1680-		return false;
+Vintagestory.API.Common/Block.cs-1681-	}
+Vintagestory.API.Common/Block.cs-1682-
+Vintagestory.API.Common/Block.cs-1683-	/// <summary>
+Vintagestory.API.Common/Block.cs-1684-	/// Called on the main main thread or, potentially, on a separate thread if multiple physics threads is enabled. Return true to have <see cref="M:Vintagestory.API.Common.Block.OnFallOnto(Vintagestory.API.Common.IWorldAccessor,Vintagestory.API.MathTools.BlockPos,Vintagestory.API.Common.Block,Vintagestory.API.Datastructures.TreeAttribute)" />() called, which wi
+Vintagestory.API.Common/Block.cs-1685-	/// </summary>
+Vintagestory.API.Common/Block.cs-1686-	/// <param name="world"></param>
+Vintagestory.API.Common/Block.cs-1687-	/// <param name="pos"></param>
+--
+Vintagestory.API.Common/IEventAPI.cs-184-
+Vintagestory.API.Common/IEventAPI.cs-185-	/// <summary>
+Vintagestory.API.Common/IEventAPI.cs-186-	/// Removes a game tick listener
+Vintagestory.API.Common/IEventAPI.cs-187-	/// </summary>
+Vintagestory.API.Common/IEventAPI.cs-188-	/// <param name="listenerId"></param>
+Vintagestory.API.Common/IEventAPI.cs-189-	void UnregisterGameTickListener(long listenerId);
+Vintagestory.API.Common/IEventAPI.cs-190-
+Vintagestory.API.Common/IEventAPI.cs-191-	/// <summary>
+Vintagestory.API.Common/IEventAPI.cs-192-	/// Can be used to execute supplied method a frame later or can be called from a seperate thread to ensure some code is executed in the main thread. Calling this method is thread safe.
+Vintagestory.API.Common/IEventAPI.cs-193-	/// </summary>
+Vintagestory.API.Common/IEventAPI.cs-194-	/// <param name="action"></param>
+Vintagestory.API.Common/IEventAPI.cs-195-	/// <param name="code">Task category identifier for the frame profiler</param>
+Vintagestory.API.Common/IEventAPI.cs:196:	void EnqueueMainThreadTask(Action action, string code);
+Vintagestory.API.Common/IEventAPI.cs-197-
+Vintagestory.API.Common/IEventAPI.cs-198-	void TriggerPlayerDimensionChanged(IPlayer player);
+Vintagestory.API.Common/IEventAPI.cs-199-
+Vintagestory.API.Common/IEventAPI.cs-200-	void TriggerEntityDeath(Entity entity, DamageSource damageSourceForDeath);
+Vintagestory.API.Common/IEventAPI.cs-201-
+Vintagestory.API.Common/IEventAPI.cs-202-	bool TriggerMatchesRecipe(IPlayer forPlayer, GridRecipe gridRecipe, ItemSlot[] ingredients, int gridWidth);
+Vintagestory.API.Common/IEventAPI.cs-203-
+Vintagestory.API.Common/IEventAPI.cs-204-	bool TriggerMatchesRecipe(IPlayer forPlayer, IRecipeBase recipe, ItemSlot[] ingredients);
+Vintagestory.API.Common/IEventAPI.cs-205-
+Vintagestory.API.Common/IEventAPI.cs-206-	void TriggerEntityMounted(EntityAgent entityAgent, IMountableSeat entityRideableSeat);
+Vintagestory.API.Common/IEventAPI.cs-207-
+Vintagestory.API.Common/IEventAPI.cs-208-	void TriggerEntityUnmounted(EntityAgent entityAgent, IMountableSeat entityRideableSeat);
+Vintagestory.API.Common/IEventAPI.cs-209-}
+--
+Vintagestory.API.Common/AnimatableRenderer.cs-68-		this.animator = animator;
+Vintagestory.API.Common/AnimatableRenderer.cs-69-		this.activeAnimationsByAnimCode = activeAnimationsByAnimCode;
+Vintagestory.API.Common/AnimatableRenderer.cs-70-		this.rotationDeg = rotationDeg;
+Vintagestory.API.Common/AnimatableRenderer.cs-71-		if (rotationDeg == null)
+Vintagestory.API.Common/AnimatableRenderer.cs-72-		{
+Vintagestory.API.Common/AnimatableRenderer.cs-73-			this.rotationDeg = new Vec3f();
+Vintagestory.API.Common/AnimatableRenderer.cs-74-		}
+Vintagestory.API.Common/AnimatableRenderer.cs-75-		if (RuntimeEnv.MainThreadId == Environment.CurrentManagedThreadId)
+Vintagestory.API.Common/AnimatableRenderer.cs-76-		{
+Vintagestory.API.Common/AnimatableRenderer.cs-77-			mainThreadInit(capi, meshdata, renderStage);
+Vintagestory.API.Common/AnimatableRenderer.cs-78-			return;
+Vintagestory.API.Common/AnimatableRenderer.cs-79-		}
+Vintagestory.API.Common/AnimatableRenderer.cs:80:		capi.Event.EnqueueMainThreadTask(() =>
+Vintagestory.API.Common/AnimatableRenderer.cs-81-		{
+Vintagestory.API.Common/AnimatableRenderer.cs-82-			animatableRenderer.mainThreadInit(capi, meshdata, renderStage);
+Vintagestory.API.Common/AnimatableRenderer.cs-83-		}, "animatableRendererInit");
+Vintagestory.API.Common/AnimatableRenderer.cs-84-	}
+Vintagestory.API.Common/AnimatableRenderer.cs-85-
+Vintagestory.API.Common/AnimatableRenderer.cs-86-	private void mainThreadInit(ICoreClientAPI capi, MeshData meshdata, EnumRenderStage renderStage)
+Vintagestory.API.Common/AnimatableRenderer.cs-87-	{
+Vintagestory.API.Common/AnimatableRenderer.cs-88-		if (meshdata.NeedsRenderPass(EnumChunkRenderPass.Transparent))
+Vintagestory.API.Common/AnimatableRenderer.cs-89-		{
+Vintagestory.API.Common/AnimatableRenderer.cs-90-			int tpPassInt = 3;
+Vintagestory.API.Common/AnimatableRenderer.cs-91-			MeshData meshData = meshdata.EmptyClone();
+Vintagestory.API.Common/AnimatableRenderer.cs-92-			meshData.AddMeshData(meshdata, (int i) => meshdata.RenderPassesAndExtraBits[i] == tpPassInt);
+Vintagestory.API.Common/AnimatableRenderer.cs-93-			mtmeshrefTransparent = capi.Render.UploadMultiTextureMesh(meshData);
+Vintagestory.API.Common/AnimatableRenderer.cs-94-			meshData.Clear();
+Vintagestory.API.Common/AnimatableRenderer.cs-95-			meshData.AddMeshData(meshdata, (int i) => meshdata.RenderPassesAndExtraBits[i] != tpPassInt);
+Vintagestory.API.Common/AnimatableRenderer.cs-96-			mtmeshrefOpaque = capi.Render.UploadMultiTextureMesh(meshData);
+Vintagestory.API.Common/AnimatableRenderer.cs-97-			capi.Event.RegisterRenderer(this, EnumRenderStage.OIT, "animatable");
+Vintagestory.API.Common/AnimatableRenderer.cs-98-		}
+Vintagestory.API.Common/AnimatableRenderer.cs-99-		else
+Vintagestory.API.Common/AnimatableRenderer.cs-100-		{
+Vintagestory.API.Common/AnimatableRenderer.cs-101-			mtmeshrefOpaque = capi.Render.UploadMultiTextureMesh(meshdata);
+Vintagestory.API.Common/AnimatableRenderer.cs-102-		}
+Vintagestory.API.Common/AnimatableRenderer.cs-103-		capi.Event.RegisterRenderer(this, renderStage, "animatable");
+Vintagestory.API.Common/AnimatableRenderer.cs-104-		capi.Event.RegisterRenderer(this, EnumRenderStage.ShadowFar, "animatable");
+Vintagestory.API.Common/AnimatableRenderer.cs-105-		capi.Event.RegisterRenderer(this, EnumRenderStage.ShadowNear, "animatable");
+--
+Vintagestory.API.Common/AnimatableRenderer.cs-196-		engineShader.Stop();
+Vintagestory.API.Common/AnimatableRenderer.cs-197-		currentActiveShader?.Use();
+Vintagestory.API.Common/AnimatableRenderer.cs-198-	}
+Vintagestory.API.Common/AnimatableRenderer.cs-199-
+Vintagestory.API.Common/AnimatableRenderer.cs-200-	public void Dispose()
+Vintagestory.API.Common/AnimatableRenderer.cs-201-	{
+Vintagestory.API.Common/AnimatableRenderer.cs-202-		if (RuntimeEnv.MainThreadId == Environment.CurrentManagedThreadId)
+Vintagestory.API.Common/AnimatableRenderer.cs-203-		{
+Vintagestory.API.Common/AnimatableRenderer.cs-204-			disposeInternal();
+Vintagestory.API.Common/AnimatableRenderer.cs-205-		}
+Vintagestory.API.Common/AnimatableRenderer.cs-206-		else
+Vintagestory.API.Common/AnimatableRenderer.cs-207-		{
+Vintagestory.API.Common/AnimatableRenderer.cs:208:			capi.Event.EnqueueMainThreadTask(disposeInternal, "animatableRendererDispose");
+Vintagestory.API.Common/AnimatableRenderer.cs-209-		}
+Vintagestory.API.Common/AnimatableRenderer.cs-210-	}
+Vintagestory.API.Common/AnimatableRenderer.cs-211-
+Vintagestory.API.Common/AnimatableRenderer.cs-212-	private void disposeInternal()
+Vintagestory.API.Common/AnimatableRenderer.cs-213-	{
+Vintagestory.API.Common/AnimatableRenderer.cs-214-		capi.Event.UnregisterRenderer(this, EnumRenderStage.Opaque);
+Vintagestory.API.Common/AnimatableRenderer.cs-215-		capi.Event.UnregisterRenderer(this, EnumRenderStage.OIT);
+Vintagestory.API.Common/AnimatableRenderer.cs-216-		capi.Event.UnregisterRenderer(this, EnumRenderStage.ShadowFar);
+Vintagestory.API.Common/AnimatableRenderer.cs-217-		capi.Event.UnregisterRenderer(this, EnumRenderStage.ShadowNear);
+Vintagestory.API.Common/AnimatableRenderer.cs-218-		mtmeshrefOpaque?.Dispose();
+Vintagestory.API.Common/AnimatableRenderer.cs-219-		mtmeshrefTransparent?.Dispose();
+Vintagestory.API.Common/AnimatableRenderer.cs-220-	}
+Vintagestory.API.Common/AnimatableRenderer.cs-221-}

@@ -1,0 +1,989 @@
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-67-		{
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-68-			ElementBounds elementBounds = ElementBounds.Fixed(0, 0).WithFixedPadding(6.0, 3.0).WithParent(baseBounds);
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-69-			restartButton = new GuiElementTextButton(capi, Lang.Get("Restart"), CairoFont.WhiteSmallText(), CairoFont.WhiteSmallText(), onRestartTutorial, elementBounds);
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-70-			compose(restartButton);
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-71-			elementBounds.fixedX -= restartButton.Bounds.OuterWidth / (double)RuntimeEnv.GUIScale + 5.0;
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-72-			elementBounds.CalcWorldBounds();
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-73-		}
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-74-	}
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-75-
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-76-	private bool onRestartTutorial()
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-77-	{
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-78-		modsys.StartTutorial(pageCode.Substring("tutorial-".Length), restart: true);
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs:79:		capi.Event.EnqueueMainThreadTask(() =>
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-80-		{
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-81-			capi.Gui.LoadedGuis.FirstOrDefault((GuiDialog dlg) => dlg is GuiDialogSurvivalHandbook)?.TryClose();
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-82-		}, "closehandbook");
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-83-		recomposeButton();
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-84-		return true;
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-85-	}
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-86-
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-87-	private void compose(GuiElementTextButton button)
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-88-	{
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-89-		ImageSurface imageSurface = new ImageSurface(Format.Argb32, 1, 1);
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-90-		Context context = new Context(imageSurface);
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-91-		button.BeforeCalcBounds();
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-92-		button.ComposeElements(context, imageSurface);
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-93-		context.Dispose();
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-94-		imageSurface.Dispose();
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-95-	}
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-96-
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-97-	private bool onStartStopTutorial()
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-98-	{
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-99-		if (!tutorialActive)
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-100-		{
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-101-			tutorialActive = true;
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-102-			modsys.StartTutorial(pageCode.Substring("tutorial-".Length));
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs:103:			capi.Event.EnqueueMainThreadTask(() =>
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-104-			{
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-105-				capi.Gui.LoadedGuis.FirstOrDefault((GuiDialog dlg) => dlg is GuiDialogSurvivalHandbook)?.TryClose();
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-106-			}, "closehandbook");
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-107-		}
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-108-		else
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-109-		{
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-110-			tutorialActive = false;
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-111-			modsys.StopActiveTutorial();
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-112-			recomposeButton();
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-113-		}
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-114-		return true;
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-115-	}
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-116-
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-117-	public override void RenderListEntryTo(ICoreClientAPI capi, float dt, double x, double y, double cellWdith, double cellHeight)
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-118-	{
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-119-		base.RenderListEntryTo(capi, dt, x, y, cellWdith, cellHeight);
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-120-		if (startStopButton == null && restartButton == null)
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-121-		{
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-122-			recomposeButton();
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-123-		}
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-124-		if (modsys.GetTutorialProgress(pageCode.Substring("tutorial-".Length)) != prevProgress)
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-125-		{
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-126-			recomposeButton();
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-127-		}
+Vintagestory.GameContent/GuiHandbookTutorialPage.cs-128-		baseBounds.absFixedX = x + cellWdith - (startStopButton?.Bounds.OuterWidth ?? 0.0) - 10.0;
+--
+Vintagestory.GameContent/CharacterSystem.cs-433-		if (!(byPlayer.PlayerUID == capi.World.Player.PlayerUID))
+Vintagestory.GameContent/CharacterSystem.cs-434-		{
+Vintagestory.GameContent/CharacterSystem.cs-435-			return;
+Vintagestory.GameContent/CharacterSystem.cs-436-		}
+Vintagestory.GameContent/CharacterSystem.cs-437-		if (!didSelect)
+Vintagestory.GameContent/CharacterSystem.cs-438-		{
+Vintagestory.GameContent/CharacterSystem.cs-439-			createCharDlg = new GuiDialogCreateCharacter(capi, this);
+Vintagestory.GameContent/CharacterSystem.cs-440-			createCharDlg.PrepAndOpen();
+Vintagestory.GameContent/CharacterSystem.cs-441-			createCharDlg.OnClosed += () =>
+Vintagestory.GameContent/CharacterSystem.cs-442-			{
+Vintagestory.GameContent/CharacterSystem.cs-443-				capi.PauseGame(paused: false);
+Vintagestory.GameContent/CharacterSystem.cs-444-			};
+Vintagestory.GameContent/CharacterSystem.cs:445:			capi.Event.EnqueueMainThreadTask(() =>
+Vintagestory.GameContent/CharacterSystem.cs-446-			{
+Vintagestory.GameContent/CharacterSystem.cs-447-				capi.PauseGame(paused: true);
+Vintagestory.GameContent/CharacterSystem.cs-448-			}, "pausegame");
+Vintagestory.GameContent/CharacterSystem.cs-449-			capi.Event.PushEvent("begincharacterselection");
+Vintagestory.GameContent/CharacterSystem.cs-450-		}
+Vintagestory.GameContent/CharacterSystem.cs-451-		else
+Vintagestory.GameContent/CharacterSystem.cs-452-		{
+Vintagestory.GameContent/CharacterSystem.cs-453-			capi.Event.PushEvent("skipcharacterselection");
+Vintagestory.GameContent/CharacterSystem.cs-454-		}
+Vintagestory.GameContent/CharacterSystem.cs-455-	}
+Vintagestory.GameContent/CharacterSystem.cs-456-
+Vintagestory.GameContent/CharacterSystem.cs-457-	private bool Event_IsPlayerReady(ref EnumHandling handling)
+Vintagestory.GameContent/CharacterSystem.cs-458-	{
+Vintagestory.GameContent/CharacterSystem.cs-459-		if (didSelect)
+Vintagestory.GameContent/CharacterSystem.cs-460-		{
+Vintagestory.GameContent/CharacterSystem.cs-461-			return true;
+Vintagestory.GameContent/CharacterSystem.cs-462-		}
+Vintagestory.GameContent/CharacterSystem.cs-463-		handling = EnumHandling.PreventDefault;
+Vintagestory.GameContent/CharacterSystem.cs-464-		return false;
+Vintagestory.GameContent/CharacterSystem.cs-465-	}
+Vintagestory.GameContent/CharacterSystem.cs-466-
+Vintagestory.GameContent/CharacterSystem.cs-467-	private bool Event_MatchesGridRecipe(IPlayer player, GridRecipe recipe, ItemSlot[] ingredients, int gridWidth)
+Vintagestory.GameContent/CharacterSystem.cs-468-	{
+Vintagestory.GameContent/CharacterSystem.cs-469-		if (recipe.RequiresTrait == null)
+Vintagestory.GameContent/CharacterSystem.cs-470-		{
+--
+Vintagestory.GameContent/BlockEntityResonator.cs-138-	{
+Vintagestory.GameContent/BlockEntityResonator.cs-139-		if (track == null)
+Vintagestory.GameContent/BlockEntityResonator.cs-140-		{
+Vintagestory.GameContent/BlockEntityResonator.cs-141-			sound?.Dispose();
+Vintagestory.GameContent/BlockEntityResonator.cs-142-		}
+Vintagestory.GameContent/BlockEntityResonator.cs-143-		else
+Vintagestory.GameContent/BlockEntityResonator.cs-144-		{
+Vintagestory.GameContent/BlockEntityResonator.cs-145-			if (sound == null)
+Vintagestory.GameContent/BlockEntityResonator.cs-146-			{
+Vintagestory.GameContent/BlockEntityResonator.cs-147-				return;
+Vintagestory.GameContent/BlockEntityResonator.cs-148-			}
+Vintagestory.GameContent/BlockEntityResonator.cs-149-			track.Sound = sound;
+Vintagestory.GameContent/BlockEntityResonator.cs:150:			Api.Event.EnqueueMainThreadTask(() =>
+Vintagestory.GameContent/BlockEntityResonator.cs-151-			{
+Vintagestory.GameContent/BlockEntityResonator.cs-152-				track.loading = true;
+Vintagestory.GameContent/BlockEntityResonator.cs-153-			}, "settrackloading");
+Vintagestory.GameContent/BlockEntityResonator.cs-154-			long num = Api.World.ElapsedMilliseconds - startLoadingMs;
+Vintagestory.GameContent/BlockEntityResonator.cs-155-			handlerId = RegisterDelayedCallback((float dt) =>
+Vintagestory.GameContent/BlockEntityResonator.cs-156-			{
+Vintagestory.GameContent/BlockEntityResonator.cs-157-				if (sound.IsDisposed)
+Vintagestory.GameContent/BlockEntityResonator.cs-158-				{
+Vintagestory.GameContent/BlockEntityResonator.cs-159-					Api.World.Logger.Notification("Resonator track is diposed? o.O");
+Vintagestory.GameContent/BlockEntityResonator.cs-160-				}
+Vintagestory.GameContent/BlockEntityResonator.cs-161-				if (!wasStopped)
+Vintagestory.GameContent/BlockEntityResonator.cs-162-				{
+Vintagestory.GameContent/BlockEntityResonator.cs-163-					sound.Start();
+Vintagestory.GameContent/BlockEntityResonator.cs-164-				}
+Vintagestory.GameContent/BlockEntityResonator.cs-165-				track.loading = false;
+Vintagestory.GameContent/BlockEntityResonator.cs-166-			}, (int)Math.Max(0L, 500 - num));
+Vintagestory.GameContent/BlockEntityResonator.cs-167-		}
+Vintagestory.GameContent/BlockEntityResonator.cs-168-	}
+Vintagestory.GameContent/BlockEntityResonator.cs-169-
+Vintagestory.GameContent/BlockEntityResonator.cs-170-	private void updateMeshesAndRenderer(ICoreClientAPI capi)
+Vintagestory.GameContent/BlockEntityResonator.cs-171-	{
+Vintagestory.GameContent/BlockEntityResonator.cs-172-		if (HasDisc)
+Vintagestory.GameContent/BlockEntityResonator.cs-173-		{
+Vintagestory.GameContent/BlockEntityResonator.cs-174-			if (cylinderMesh == null)
+Vintagestory.GameContent/BlockEntityResonator.cs-175-			{
+--
+Vintagestory.GameContent/EntityBehaviorConversable.cs-261-			spawnentity.Pos.SetPos(vec3d);
+Vintagestory.GameContent/EntityBehaviorConversable.cs-262-			entity.World.SpawnEntity(spawnentity);
+Vintagestory.GameContent/EntityBehaviorConversable.cs-263-			entity.World.Logger.Audit($"Spawned {entityCode} at {vec3d} ({range}/{cfg.MinDistance}) by {entity.Code} for {forplayer.PlayerName}");
+Vintagestory.GameContent/EntityBehaviorConversable.cs-264-			if (cfg.GiveStacks == null)
+Vintagestory.GameContent/EntityBehaviorConversable.cs-265-			{
+Vintagestory.GameContent/EntityBehaviorConversable.cs-266-				return;
+Vintagestory.GameContent/EntityBehaviorConversable.cs-267-			}
+Vintagestory.GameContent/EntityBehaviorConversable.cs-268-			JsonItemStack[] giveStacks = cfg.GiveStacks;
+Vintagestory.GameContent/EntityBehaviorConversable.cs-269-			foreach (JsonItemStack stack in giveStacks)
+Vintagestory.GameContent/EntityBehaviorConversable.cs-270-			{
+Vintagestory.GameContent/EntityBehaviorConversable.cs-271-				if (stack.Resolve(entity.World, "spawn entity give stack"))
+Vintagestory.GameContent/EntityBehaviorConversable.cs-272-				{
+Vintagestory.GameContent/EntityBehaviorConversable.cs:273:					entity.Api.Event.EnqueueMainThreadTask(() =>
+Vintagestory.GameContent/EntityBehaviorConversable.cs-274-					{
+Vintagestory.GameContent/EntityBehaviorConversable.cs-275-						spawnentity.TryGiveItemStack(stack.ResolvedItemstack.Clone());
+Vintagestory.GameContent/EntityBehaviorConversable.cs-276-					}, "tradedlggivestack");
+Vintagestory.GameContent/EntityBehaviorConversable.cs-277-				}
+Vintagestory.GameContent/EntityBehaviorConversable.cs-278-			}
+Vintagestory.GameContent/EntityBehaviorConversable.cs-279-		}
+Vintagestory.GameContent/EntityBehaviorConversable.cs-280-		else
+Vintagestory.GameContent/EntityBehaviorConversable.cs-281-		{
+Vintagestory.GameContent/EntityBehaviorConversable.cs-282-			entity.World.Logger.Audit($"Failed to spawn {entityCode} at {pos.X}, {pos.Y}, {pos.Z} ({range}/{cfg.MinDistance}) by {entity.Code} for {forplayer.PlayerName}");
+Vintagestory.GameContent/EntityBehaviorConversable.cs-283-		}
+Vintagestory.GameContent/EntityBehaviorConversable.cs-284-	}
+Vintagestory.GameContent/EntityBehaviorConversable.cs-285-
+Vintagestory.GameContent/EntityBehaviorConversable.cs-286-	private Vec3d findSpawnPos(IPlayer forplayer, EntityProperties etype, BlockPos minpos, BlockPos maxpos, bool rainheightmap, int mindistance)
+Vintagestory.GameContent/EntityBehaviorConversable.cs-287-	{
+Vintagestory.GameContent/EntityBehaviorConversable.cs-288-		bool spawned = false;
+Vintagestory.GameContent/EntityBehaviorConversable.cs-289-		BlockPos tmp = new BlockPos(minpos.dimension);
+Vintagestory.GameContent/EntityBehaviorConversable.cs-290-		IBlockAccessor ba = entity.World.BlockAccessor;
+Vintagestory.GameContent/EntityBehaviorConversable.cs-291-		CollisionTester collisionTester = entity.World.CollisionTester;
+Vintagestory.GameContent/EntityBehaviorConversable.cs-292-		ICoreServerAPI sapi = entity.Api as ICoreServerAPI;
+Vintagestory.GameContent/EntityBehaviorConversable.cs-293-		Vec3d okspawnpos = null;
+Vintagestory.GameContent/EntityBehaviorConversable.cs-294-		Vec3d epos = entity.Pos.XYZ;
+Vintagestory.GameContent/EntityBehaviorConversable.cs-295-		ba.WalkBlocks(minpos, maxpos, (Block block, int x, int y, int z) =>
+Vintagestory.GameContent/EntityBehaviorConversable.cs-296-		{
+Vintagestory.GameContent/EntityBehaviorConversable.cs-297-			if (!spawned && !(epos.DistanceTo(x, y, z) < (float)mindistance))
+Vintagestory.GameContent/EntityBehaviorConversable.cs-298-			{
+--
+Vintagestory.GameContent/BlockBehaviorUnstableFalling.cs-132-		if (!fallSideways && IsAttached(world.BlockAccessor, pos))
+Vintagestory.GameContent/BlockBehaviorUnstableFalling.cs-133-		{
+Vintagestory.GameContent/BlockBehaviorUnstableFalling.cs-134-			return false;
+Vintagestory.GameContent/BlockBehaviorUnstableFalling.cs-135-		}
+Vintagestory.GameContent/BlockBehaviorUnstableFalling.cs-136-		ICoreServerAPI coreServerAPI = (world as IServerWorldAccessor).Api as ICoreServerAPI;
+Vintagestory.GameContent/BlockBehaviorUnstableFalling.cs-137-		if (!coreServerAPI.World.Config.GetBool("allowFallingBlocks"))
+Vintagestory.GameContent/BlockBehaviorUnstableFalling.cs-138-		{
+Vintagestory.GameContent/BlockBehaviorUnstableFalling.cs-139-			return false;
+Vintagestory.GameContent/BlockBehaviorUnstableFalling.cs-140-		}
+Vintagestory.GameContent/BlockBehaviorUnstableFalling.cs-141-		if (IsReplacableBeneath(world, pos) || (fallSideways && world.Rand.NextDouble() < (double)fallSidewaysChance && IsReplacableBeneathAndSideways(world, pos)))
+Vintagestory.GameContent/BlockBehaviorUnstableFalling.cs-142-		{
+Vintagestory.GameContent/BlockBehaviorUnstableFalling.cs-143-			BlockPos ourPos = pos.Copy();
+Vintagestory.GameContent/BlockBehaviorUnstableFalling.cs:144:			coreServerAPI.Event.EnqueueMainThreadTask(() =>
+Vintagestory.GameContent/BlockBehaviorUnstableFalling.cs-145-			{
+Vintagestory.GameContent/BlockBehaviorUnstableFalling.cs-146-				createFallingBlock(world, ourPos);
+Vintagestory.GameContent/BlockBehaviorUnstableFalling.cs-147-			}, "falling");
+Vintagestory.GameContent/BlockBehaviorUnstableFalling.cs-148-			handling = EnumHandling.PreventSubsequent;
+Vintagestory.GameContent/BlockBehaviorUnstableFalling.cs-149-			return true;
+Vintagestory.GameContent/BlockBehaviorUnstableFalling.cs-150-		}
+Vintagestory.GameContent/BlockBehaviorUnstableFalling.cs-151-		handling = EnumHandling.PassThrough;
+Vintagestory.GameContent/BlockBehaviorUnstableFalling.cs-152-		return false;
+Vintagestory.GameContent/BlockBehaviorUnstableFalling.cs-153-	}
+Vintagestory.GameContent/BlockBehaviorUnstableFalling.cs-154-
+Vintagestory.GameContent/BlockBehaviorUnstableFalling.cs-155-	public void createFallingBlock(IWorldAccessor world, BlockPos ourPos)
+Vintagestory.GameContent/BlockBehaviorUnstableFalling.cs-156-	{
+Vintagestory.GameContent/BlockBehaviorUnstableFalling.cs-157-		Block block = world.BlockAccessor.GetBlock(ourPos);
+Vintagestory.GameContent/BlockBehaviorUnstableFalling.cs-158-		if (base.block == block && !FallingEntityAlreadyExists(world, ourPos))
+Vintagestory.GameContent/BlockBehaviorUnstableFalling.cs-159-		{
+Vintagestory.GameContent/BlockBehaviorUnstableFalling.cs-160-			if (variantAfterFalling != null)
+Vintagestory.GameContent/BlockBehaviorUnstableFalling.cs-161-			{
+Vintagestory.GameContent/BlockBehaviorUnstableFalling.cs-162-				block = world.BlockAccessor.GetBlock(variantAfterFalling);
+Vintagestory.GameContent/BlockBehaviorUnstableFalling.cs-163-			}
+Vintagestory.GameContent/BlockBehaviorUnstableFalling.cs-164-			BlockEntity blockEntity = world.BlockAccessor.GetBlockEntity(ourPos);
+Vintagestory.GameContent/BlockBehaviorUnstableFalling.cs-165-			EntityBlockFalling entity = new EntityBlockFalling(block, blockEntity, ourPos, fallSound, impactDamageMul, canFallSideways: true, dustIntensity);
+Vintagestory.GameContent/BlockBehaviorUnstableFalling.cs-166-			world.SpawnEntity(entity);
+Vintagestory.GameContent/BlockBehaviorUnstableFalling.cs-167-		}
+Vintagestory.GameContent/BlockBehaviorUnstableFalling.cs-168-	}
+Vintagestory.GameContent/BlockBehaviorUnstableFalling.cs-169-
+--
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-550-		}
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-551-		if (!findNextChunk && FullyRepaired && !canTeleport && tpLocation == null)
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-552-		{
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-553-			findNextChunk = true;
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-554-		}
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-555-		if (worldAccessForResolve == null || worldAccessForResolve.Side != EnumAppSide.Client)
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-556-		{
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-557-			return;
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-558-		}
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-559-		somebodyIsTeleportingReceivedTotalMs = worldAccessForResolve.ElapsedMilliseconds;
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-560-		if (tree.GetBool("somebodyDidTeleport"))
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-561-		{
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs:562:			worldAccessForResolve.Api.Event.EnqueueMainThreadTask(() =>
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-563-			{
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-564-				worldAccessForResolve.PlaySoundAt(new AssetLocation("sounds/effect/translocate-breakdimension"), Pos, 0.0, null, randomizePitch: false, 16f);
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-565-			}, "playtelesound");
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-566-		}
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-567-	}
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-568-
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-569-	public override void ToTreeAttributes(ITreeAttribute tree)
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-570-	{
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-571-		base.ToTreeAttributes(tree);
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-572-		tree.SetBool("canTele", canTeleport);
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-573-		tree.SetInt("repairState", repairState);
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-574-		tree.SetBool("findNextChunk", findNextChunk);
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-575-		tree.SetBool("activated", activated);
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-576-		tree.SetBool("tpLocationIsOffset", tpLocationIsOffset);
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-577-		if (tpLocation != null)
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-578-		{
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-579-			tree.SetInt("teleX", tpLocation.X);
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-580-			tree.SetInt("teleY", tpLocation.Y);
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-581-			tree.SetInt("teleZ", tpLocation.Z);
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-582-		}
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-583-	}
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-584-
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-585-	public override bool OnTesselation(ITerrainMeshPool mesher, ITesselatorAPI tessThreadTesselator)
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-586-	{
+Vintagestory.GameContent/BlockEntityStaticTranslocator.cs-587-		if (animUtil.animator == null)
+--
+Vintagestory.GameContent/GuiDialogBlockEntityFirepit.cs-31-		if (!IsDuplicate)
+Vintagestory.GameContent/GuiDialogBlockEntityFirepit.cs-32-		{
+Vintagestory.GameContent/GuiDialogBlockEntityFirepit.cs-33-			tree.OnModified.Add(new TreeModifiedListener
+Vintagestory.GameContent/GuiDialogBlockEntityFirepit.cs-34-			{
+Vintagestory.GameContent/GuiDialogBlockEntityFirepit.cs-35-				listener = OnAttributesModified
+Vintagestory.GameContent/GuiDialogBlockEntityFirepit.cs-36-			});
+Vintagestory.GameContent/GuiDialogBlockEntityFirepit.cs-37-			Attributes = tree;
+Vintagestory.GameContent/GuiDialogBlockEntityFirepit.cs-38-		}
+Vintagestory.GameContent/GuiDialogBlockEntityFirepit.cs-39-	}
+Vintagestory.GameContent/GuiDialogBlockEntityFirepit.cs-40-
+Vintagestory.GameContent/GuiDialogBlockEntityFirepit.cs-41-	private void OnInventorySlotModified(int slotid)
+Vintagestory.GameContent/GuiDialogBlockEntityFirepit.cs-42-	{
+Vintagestory.GameContent/GuiDialogBlockEntityFirepit.cs:43:		capi.Event.EnqueueMainThreadTask(SetupDialog, "setupfirepitdlg");
+Vintagestory.GameContent/GuiDialogBlockEntityFirepit.cs-44-	}
+Vintagestory.GameContent/GuiDialogBlockEntityFirepit.cs-45-
+Vintagestory.GameContent/GuiDialogBlockEntityFirepit.cs-46-	private void SetupDialog()
+Vintagestory.GameContent/GuiDialogBlockEntityFirepit.cs-47-	{
+Vintagestory.GameContent/GuiDialogBlockEntityFirepit.cs-48-		ItemSlot itemSlot = capi.World.Player.InventoryManager.CurrentHoveredSlot;
+Vintagestory.GameContent/GuiDialogBlockEntityFirepit.cs-49-		if (itemSlot != null && itemSlot.Inventory?.InventoryID != Inventory?.InventoryID)
+Vintagestory.GameContent/GuiDialogBlockEntityFirepit.cs-50-		{
+Vintagestory.GameContent/GuiDialogBlockEntityFirepit.cs-51-			itemSlot = null;
+Vintagestory.GameContent/GuiDialogBlockEntityFirepit.cs-52-		}
+Vintagestory.GameContent/GuiDialogBlockEntityFirepit.cs-53-		string text = Attributes.GetString("outputText", "");
+Vintagestory.GameContent/GuiDialogBlockEntityFirepit.cs-54-		bool flag = Attributes.GetInt("haveCookingContainer") > 0;
+Vintagestory.GameContent/GuiDialogBlockEntityFirepit.cs-55-		GuiElementDynamicText dynamicText;
+Vintagestory.GameContent/GuiDialogBlockEntityFirepit.cs-56-		if (haveCookingContainer == flag && SingleComposer != null)
+Vintagestory.GameContent/GuiDialogBlockEntityFirepit.cs-57-		{
+Vintagestory.GameContent/GuiDialogBlockEntityFirepit.cs-58-			dynamicText = SingleComposer.GetDynamicText("outputText");
+Vintagestory.GameContent/GuiDialogBlockEntityFirepit.cs-59-			dynamicText.Font.WithFontSize(14f);
+Vintagestory.GameContent/GuiDialogBlockEntityFirepit.cs-60-			dynamicText.SetNewText(text, autoHeight: true);
+Vintagestory.GameContent/GuiDialogBlockEntityFirepit.cs-61-			SingleComposer.GetCustomDraw("symbolDrawer").Redraw();
+Vintagestory.GameContent/GuiDialogBlockEntityFirepit.cs-62-			haveCookingContainer = flag;
+Vintagestory.GameContent/GuiDialogBlockEntityFirepit.cs-63-			currentOutputText = text;
+Vintagestory.GameContent/GuiDialogBlockEntityFirepit.cs-64-			dynamicText.Bounds.fixedOffsetY = 0.0;
+Vintagestory.GameContent/GuiDialogBlockEntityFirepit.cs-65-			if (dynamicText.QuantityTextLines > 2)
+Vintagestory.GameContent/GuiDialogBlockEntityFirepit.cs-66-			{
+Vintagestory.GameContent/GuiDialogBlockEntityFirepit.cs-67-				dynamicText.Bounds.fixedOffsetY = (0.0 - dynamicText.Font.GetFontExtents().Height) / (double)RuntimeEnv.GUIScale * 0.65;
+Vintagestory.GameContent/GuiDialogBlockEntityFirepit.cs-68-				dynamicText.Font.WithFontSize(12f);
+--
+Vintagestory.GameContent/GuiDialogBlockEntityQuern.cs-18-	public GuiDialogBlockEntityQuern(string DialogTitle, InventoryBase Inventory, BlockPos BlockEntityPosition, ICoreClientAPI capi)
+Vintagestory.GameContent/GuiDialogBlockEntityQuern.cs-19-		: base(DialogTitle, Inventory, BlockEntityPosition, capi)
+Vintagestory.GameContent/GuiDialogBlockEntityQuern.cs-20-	{
+Vintagestory.GameContent/GuiDialogBlockEntityQuern.cs-21-		if (!IsDuplicate)
+Vintagestory.GameContent/GuiDialogBlockEntityQuern.cs-22-		{
+Vintagestory.GameContent/GuiDialogBlockEntityQuern.cs-23-			capi.World.Player.InventoryManager.OpenInventory(Inventory);
+Vintagestory.GameContent/GuiDialogBlockEntityQuern.cs-24-			SetupDialog();
+Vintagestory.GameContent/GuiDialogBlockEntityQuern.cs-25-		}
+Vintagestory.GameContent/GuiDialogBlockEntityQuern.cs-26-	}
+Vintagestory.GameContent/GuiDialogBlockEntityQuern.cs-27-
+Vintagestory.GameContent/GuiDialogBlockEntityQuern.cs-28-	private void OnInventorySlotModified(int slotid)
+Vintagestory.GameContent/GuiDialogBlockEntityQuern.cs-29-	{
+Vintagestory.GameContent/GuiDialogBlockEntityQuern.cs:30:		capi.Event.EnqueueMainThreadTask(SetupDialog, "setupquerndlg");
+Vintagestory.GameContent/GuiDialogBlockEntityQuern.cs-31-	}
+Vintagestory.GameContent/GuiDialogBlockEntityQuern.cs-32-
+Vintagestory.GameContent/GuiDialogBlockEntityQuern.cs-33-	private void SetupDialog()
+Vintagestory.GameContent/GuiDialogBlockEntityQuern.cs-34-	{
+Vintagestory.GameContent/GuiDialogBlockEntityQuern.cs-35-		ItemSlot itemSlot = capi.World.Player.InventoryManager.CurrentHoveredSlot;
+Vintagestory.GameContent/GuiDialogBlockEntityQuern.cs-36-		if (itemSlot != null && itemSlot.Inventory == Inventory)
+Vintagestory.GameContent/GuiDialogBlockEntityQuern.cs-37-		{
+Vintagestory.GameContent/GuiDialogBlockEntityQuern.cs-38-			capi.Input.TriggerOnMouseLeaveSlot(itemSlot);
+Vintagestory.GameContent/GuiDialogBlockEntityQuern.cs-39-		}
+Vintagestory.GameContent/GuiDialogBlockEntityQuern.cs-40-		else
+Vintagestory.GameContent/GuiDialogBlockEntityQuern.cs-41-		{
+Vintagestory.GameContent/GuiDialogBlockEntityQuern.cs-42-			itemSlot = null;
+Vintagestory.GameContent/GuiDialogBlockEntityQuern.cs-43-		}
+Vintagestory.GameContent/GuiDialogBlockEntityQuern.cs-44-		ElementBounds elementBounds = ElementBounds.Fixed(0.0, 0.0, 200.0, 90.0);
+Vintagestory.GameContent/GuiDialogBlockEntityQuern.cs-45-		ElementBounds bounds = ElementStdBounds.SlotGrid(EnumDialogArea.None, 0.0, 30.0, 1, 1);
+Vintagestory.GameContent/GuiDialogBlockEntityQuern.cs-46-		ElementBounds bounds2 = ElementStdBounds.SlotGrid(EnumDialogArea.None, 153.0, 30.0, 1, 1);
+Vintagestory.GameContent/GuiDialogBlockEntityQuern.cs-47-		ElementBounds elementBounds2 = ElementBounds.Fill.WithFixedPadding(GuiStyle.ElementToDialogPadding);
+Vintagestory.GameContent/GuiDialogBlockEntityQuern.cs-48-		elementBounds2.BothSizing = ElementSizing.FitToChildren;
+Vintagestory.GameContent/GuiDialogBlockEntityQuern.cs-49-		elementBounds2.WithChildren(elementBounds);
+Vintagestory.GameContent/GuiDialogBlockEntityQuern.cs-50-		ElementBounds bounds3 = ElementStdBounds.AutosizedMainDialog.WithAlignment(EnumDialogArea.RightMiddle).WithFixedAlignmentOffset(0.0 - GuiStyle.DialogToScreenPadding, 0.0);
+Vintagestory.GameContent/GuiDialogBlockEntityQuern.cs-51-		ClearComposers();
+Vintagestory.GameContent/GuiDialogBlockEntityQuern.cs-52-		SingleComposer = capi.Gui.CreateCompo("blockentitymillstone" + BlockEntityPosition, bounds3).AddShadedDialogBG(elementBounds2).AddDialogTitleBar(DialogTitle, OnTitleBarClose)
+Vintagestory.GameContent/GuiDialogBlockEntityQuern.cs-53-			.BeginChildElements(elementBounds2)
+Vintagestory.GameContent/GuiDialogBlockEntityQuern.cs-54-			.AddDynamicCustomDraw(elementBounds, OnBgDraw, "symbolDrawer")
+Vintagestory.GameContent/GuiDialogBlockEntityQuern.cs-55-			.AddItemSlotGrid(Inventory, SendInvPacket, 1, new int[1], bounds, "inputSlot")
+--
+Vintagestory.GameContent/BlockEntityBed.cs-279-			{
+Vintagestory.GameContent/BlockEntityBed.cs-280-				if (restingListener == 0L)
+Vintagestory.GameContent/BlockEntityBed.cs-281-				{
+Vintagestory.GameContent/BlockEntityBed.cs-282-					ICoreAPI api2 = Api;
+Vintagestory.GameContent/BlockEntityBed.cs-283-					Api = entityAgent.Api;
+Vintagestory.GameContent/BlockEntityBed.cs-284-					restingListener = RegisterGameTickListener(RestPlayer, 200);
+Vintagestory.GameContent/BlockEntityBed.cs-285-					Api = api2;
+Vintagestory.GameContent/BlockEntityBed.cs-286-				}
+Vintagestory.GameContent/BlockEntityBed.cs-287-				hoursTotal = entityAgent.Api.World.Calendar.TotalHours;
+Vintagestory.GameContent/BlockEntityBed.cs-288-			}
+Vintagestory.GameContent/BlockEntityBed.cs-289-			if (MountedBy != null)
+Vintagestory.GameContent/BlockEntityBed.cs-290-			{
+Vintagestory.GameContent/BlockEntityBed.cs:291:				entityAgent.Api.Event.EnqueueMainThreadTask(() =>
+Vintagestory.GameContent/BlockEntityBed.cs-292-				{
+Vintagestory.GameContent/BlockEntityBed.cs-293-					if (MountedBy != null && MountedBy.GetBehavior("tiredness") is EntityBehaviorTiredness entityBehaviorTiredness)
+Vintagestory.GameContent/BlockEntityBed.cs-294-					{
+Vintagestory.GameContent/BlockEntityBed.cs-295-						entityBehaviorTiredness.IsSleeping = true;
+Vintagestory.GameContent/BlockEntityBed.cs-296-					}
+Vintagestory.GameContent/BlockEntityBed.cs-297-				}, "issleeping");
+Vintagestory.GameContent/BlockEntityBed.cs-298-			}
+Vintagestory.GameContent/BlockEntityBed.cs-299-			MarkDirty();
+Vintagestory.GameContent/BlockEntityBed.cs-300-		}
+Vintagestory.GameContent/BlockEntityBed.cs-301-	}
+Vintagestory.GameContent/BlockEntityBed.cs-302-
+Vintagestory.GameContent/BlockEntityBed.cs-303-	public bool IsMountedBy(Entity entity)
+Vintagestory.GameContent/BlockEntityBed.cs-304-	{
+Vintagestory.GameContent/BlockEntityBed.cs-305-		return MountedBy == entity;
+Vintagestory.GameContent/BlockEntityBed.cs-306-	}
+Vintagestory.GameContent/BlockEntityBed.cs-307-
+Vintagestory.GameContent/BlockEntityBed.cs-308-	public bool IsBeingControlled()
+Vintagestory.GameContent/BlockEntityBed.cs-309-	{
+Vintagestory.GameContent/BlockEntityBed.cs-310-		return false;
+Vintagestory.GameContent/BlockEntityBed.cs-311-	}
+Vintagestory.GameContent/BlockEntityBed.cs-312-
+Vintagestory.GameContent/BlockEntityBed.cs-313-	public bool CanUnmount(EntityAgent entityAgent)
+Vintagestory.GameContent/BlockEntityBed.cs-314-	{
+Vintagestory.GameContent/BlockEntityBed.cs-315-		return true;
+Vintagestory.GameContent/BlockEntityBed.cs-316-	}
+--
+Vintagestory.GameContent/BlockEntityCorpseReturnTeleporter.cs-235-			base.OnEntityCollide(entity);
+Vintagestory.GameContent/BlockEntityCorpseReturnTeleporter.cs-236-		}
+Vintagestory.GameContent/BlockEntityCorpseReturnTeleporter.cs-237-	}
+Vintagestory.GameContent/BlockEntityCorpseReturnTeleporter.cs-238-
+Vintagestory.GameContent/BlockEntityCorpseReturnTeleporter.cs-239-	public override void FromTreeAttributes(ITreeAttribute tree, IWorldAccessor worldAccessForResolve)
+Vintagestory.GameContent/BlockEntityCorpseReturnTeleporter.cs-240-	{
+Vintagestory.GameContent/BlockEntityCorpseReturnTeleporter.cs-241-		base.FromTreeAttributes(tree, worldAccessForResolve);
+Vintagestory.GameContent/BlockEntityCorpseReturnTeleporter.cs-242-		if (worldAccessForResolve != null && worldAccessForResolve.Side == EnumAppSide.Client)
+Vintagestory.GameContent/BlockEntityCorpseReturnTeleporter.cs-243-		{
+Vintagestory.GameContent/BlockEntityCorpseReturnTeleporter.cs-244-			somebodyIsTeleportingReceivedTotalMs = worldAccessForResolve.ElapsedMilliseconds;
+Vintagestory.GameContent/BlockEntityCorpseReturnTeleporter.cs-245-			if (tree.GetBool("somebodyDidTeleport"))
+Vintagestory.GameContent/BlockEntityCorpseReturnTeleporter.cs-246-			{
+Vintagestory.GameContent/BlockEntityCorpseReturnTeleporter.cs:247:				worldAccessForResolve.Api.Event.EnqueueMainThreadTask(() =>
+Vintagestory.GameContent/BlockEntityCorpseReturnTeleporter.cs-248-				{
+Vintagestory.GameContent/BlockEntityCorpseReturnTeleporter.cs-249-					worldAccessForResolve.PlaySoundAt(new AssetLocation("sounds/effect/translocate-breakdimension"), Pos, 0.0, null, randomizePitch: false, 16f);
+Vintagestory.GameContent/BlockEntityCorpseReturnTeleporter.cs-250-				}, "playtelesound");
+Vintagestory.GameContent/BlockEntityCorpseReturnTeleporter.cs-251-			}
+Vintagestory.GameContent/BlockEntityCorpseReturnTeleporter.cs-252-		}
+Vintagestory.GameContent/BlockEntityCorpseReturnTeleporter.cs-253-		HasFuel = tree.GetBool("hasFuel");
+Vintagestory.GameContent/BlockEntityCorpseReturnTeleporter.cs-254-	}
+Vintagestory.GameContent/BlockEntityCorpseReturnTeleporter.cs-255-
+Vintagestory.GameContent/BlockEntityCorpseReturnTeleporter.cs-256-	public override void ToTreeAttributes(ITreeAttribute tree)
+Vintagestory.GameContent/BlockEntityCorpseReturnTeleporter.cs-257-	{
+Vintagestory.GameContent/BlockEntityCorpseReturnTeleporter.cs-258-		base.ToTreeAttributes(tree);
+Vintagestory.GameContent/BlockEntityCorpseReturnTeleporter.cs-259-		tree.SetBool("hasFuel", HasFuel);
+Vintagestory.GameContent/BlockEntityCorpseReturnTeleporter.cs-260-	}
+Vintagestory.GameContent/BlockEntityCorpseReturnTeleporter.cs-261-
+Vintagestory.GameContent/BlockEntityCorpseReturnTeleporter.cs-262-	public bool OnInteract(IPlayer byPlayer)
+Vintagestory.GameContent/BlockEntityCorpseReturnTeleporter.cs-263-	{
+Vintagestory.GameContent/BlockEntityCorpseReturnTeleporter.cs-264-		ItemSlot activeHotbarSlot = byPlayer.InventoryManager.ActiveHotbarSlot;
+Vintagestory.GameContent/BlockEntityCorpseReturnTeleporter.cs-265-		if (!HasFuel && !activeHotbarSlot.Empty)
+Vintagestory.GameContent/BlockEntityCorpseReturnTeleporter.cs-266-		{
+Vintagestory.GameContent/BlockEntityCorpseReturnTeleporter.cs-267-			JsonObject itemAttributes = activeHotbarSlot.Itemstack.ItemAttributes;
+Vintagestory.GameContent/BlockEntityCorpseReturnTeleporter.cs-268-			if (itemAttributes != null && itemAttributes.IsTrue("corpseReturnFuel"))
+Vintagestory.GameContent/BlockEntityCorpseReturnTeleporter.cs-269-			{
+Vintagestory.GameContent/BlockEntityCorpseReturnTeleporter.cs-270-				HasFuel = true;
+Vintagestory.GameContent/BlockEntityCorpseReturnTeleporter.cs-271-				if (Api.Side == EnumAppSide.Server)
+Vintagestory.GameContent/BlockEntityCorpseReturnTeleporter.cs-272-				{
+--
+Vintagestory.GameContent/MealMeshCache.cs-261-		if (contentStacks == null)
+Vintagestory.GameContent/MealMeshCache.cs-262-		{
+Vintagestory.GameContent/MealMeshCache.cs-263-			return null;
+Vintagestory.GameContent/MealMeshCache.cs-264-		}
+Vintagestory.GameContent/MealMeshCache.cs-265-		int mealHashCode = GetMealHashCode(containerBlock, contentStacks, foodTranslate);
+Vintagestory.GameContent/MealMeshCache.cs-266-		Dictionary<int, MultiTextureMeshRef> cookedMeshRefs = GetCookedMeshRefs();
+Vintagestory.GameContent/MealMeshCache.cs-267-		if (!cookedMeshRefs.TryGetValue(mealHashCode, out var value))
+Vintagestory.GameContent/MealMeshCache.cs-268-		{
+Vintagestory.GameContent/MealMeshCache.cs-269-			if (Environment.CurrentManagedThreadId != RuntimeEnv.MainThreadId)
+Vintagestory.GameContent/MealMeshCache.cs-270-			{
+Vintagestory.GameContent/MealMeshCache.cs-271-				if (capi != null && Environment.CurrentManagedThreadId == capi.TesselationThreadId)
+Vintagestory.GameContent/MealMeshCache.cs-272-				{
+Vintagestory.GameContent/MealMeshCache.cs:273:					capi.Event.EnqueueMainThreadTask(() =>
+Vintagestory.GameContent/MealMeshCache.cs-274-					{
+Vintagestory.GameContent/MealMeshCache.cs-275-						GetOrCreateMealInContainerMeshRef(containerBlock, forRecipe, contentStacks, foodTranslate);
+Vintagestory.GameContent/MealMeshCache.cs-276-					}, "createmealmesh");
+Vintagestory.GameContent/MealMeshCache.cs-277-				}
+Vintagestory.GameContent/MealMeshCache.cs-278-				throw new RetryTesselationException("Attempting to upload a new meal mesh outside of the main thread. If this occurs during tesselation, it should automatically retry. If not during tesselation, please only call this on the main thread!");
+Vintagestory.GameContent/MealMeshCache.cs-279-			}
+Vintagestory.GameContent/MealMeshCache.cs-280-			MeshData data = GenMealInContainerMesh(containerBlock, forRecipe, contentStacks, foodTranslate);
+Vintagestory.GameContent/MealMeshCache.cs-281-			value = (cookedMeshRefs[mealHashCode] = capi.Render.UploadMultiTextureMesh(data));
+Vintagestory.GameContent/MealMeshCache.cs-282-		}
+Vintagestory.GameContent/MealMeshCache.cs-283-		return value;
+Vintagestory.GameContent/MealMeshCache.cs-284-	}
+Vintagestory.GameContent/MealMeshCache.cs-285-
+Vintagestory.GameContent/MealMeshCache.cs-286-	public MeshData GenMealInContainerMesh(Block containerBlock, CookingRecipe? forRecipe, ItemStack?[] contentStacks, Vec3f? foodTranslate = null)
+Vintagestory.GameContent/MealMeshCache.cs-287-	{
+Vintagestory.GameContent/MealMeshCache.cs-288-		CompositeShape shape = containerBlock.Shape;
+Vintagestory.GameContent/MealMeshCache.cs-289-		AssetLocation shapePath = shape.Base.Clone().WithPathPrefixOnce("shapes/").WithPathAppendixOnce(".json");
+Vintagestory.GameContent/MealMeshCache.cs-290-		Shape shapeBase = Shape.TryGet(capi, shapePath);
+Vintagestory.GameContent/MealMeshCache.cs-291-		capi.Tesselator.TesselateShape("meal", shapeBase, out var modeldata, capi.Tesselator.GetTextureSource(containerBlock), new Vec3f(shape.rotateX, shape.rotateY, shape.rotateZ), 0, 0, 0);
+Vintagestory.GameContent/MealMeshCache.cs-292-		MeshData meshData = GenMealMesh(forRecipe, contentStacks, foodTranslate);
+Vintagestory.GameContent/MealMeshCache.cs-293-		if (meshData != null)
+Vintagestory.GameContent/MealMeshCache.cs-294-		{
+Vintagestory.GameContent/MealMeshCache.cs-295-			modeldata.AddMeshData(meshData);
+Vintagestory.GameContent/MealMeshCache.cs-296-		}
+Vintagestory.GameContent/MealMeshCache.cs-297-		return modeldata;
+Vintagestory.GameContent/MealMeshCache.cs-298-	}
+--
+Vintagestory.GameContent/ModSystemLabelMeshCache.cs-70-				capi.BlockTextureAtlas.FreeTextureSpace(texSubid);
+Vintagestory.GameContent/ModSystemLabelMeshCache.cs-71-			}
+Vintagestory.GameContent/ModSystemLabelMeshCache.cs-72-		}, ColorUtil.ColorOverlay(labelColor, -1, 0.65f), 0.5f);
+Vintagestory.GameContent/ModSystemLabelMeshCache.cs-73-	}
+Vintagestory.GameContent/ModSystemLabelMeshCache.cs-74-
+Vintagestory.GameContent/ModSystemLabelMeshCache.cs-75-	private void regenMipMapsOnce(int atlasNumber)
+Vintagestory.GameContent/ModSystemLabelMeshCache.cs-76-	{
+Vintagestory.GameContent/ModSystemLabelMeshCache.cs-77-		if (mipmapRegenQueued.ContainsKey(atlasNumber))
+Vintagestory.GameContent/ModSystemLabelMeshCache.cs-78-		{
+Vintagestory.GameContent/ModSystemLabelMeshCache.cs-79-			return;
+Vintagestory.GameContent/ModSystemLabelMeshCache.cs-80-		}
+Vintagestory.GameContent/ModSystemLabelMeshCache.cs-81-		mipmapRegenQueued[atlasNumber] = true;
+Vintagestory.GameContent/ModSystemLabelMeshCache.cs:82:		capi.Event.EnqueueMainThreadTask(() =>
+Vintagestory.GameContent/ModSystemLabelMeshCache.cs-83-		{
+Vintagestory.GameContent/ModSystemLabelMeshCache.cs:84:			capi.Event.EnqueueMainThreadTask(() =>
+Vintagestory.GameContent/ModSystemLabelMeshCache.cs-85-			{
+Vintagestory.GameContent/ModSystemLabelMeshCache.cs-86-				capi.BlockTextureAtlas.RegenMipMaps(atlasNumber);
+Vintagestory.GameContent/ModSystemLabelMeshCache.cs-87-				mipmapRegenQueued.Remove(atlasNumber);
+Vintagestory.GameContent/ModSystemLabelMeshCache.cs-88-			}, "genmipmaps");
+Vintagestory.GameContent/ModSystemLabelMeshCache.cs-89-		}, "genmipmaps");
+Vintagestory.GameContent/ModSystemLabelMeshCache.cs-90-	}
+Vintagestory.GameContent/ModSystemLabelMeshCache.cs-91-
+Vintagestory.GameContent/ModSystemLabelMeshCache.cs-92-	public void FreeLabelTexture(ItemStack labelStack, int labelColor, BlockPos pos)
+Vintagestory.GameContent/ModSystemLabelMeshCache.cs-93-	{
+Vintagestory.GameContent/ModSystemLabelMeshCache.cs-94-		if (labelStack == null)
+Vintagestory.GameContent/ModSystemLabelMeshCache.cs-95-		{
+Vintagestory.GameContent/ModSystemLabelMeshCache.cs-96-			return;
+Vintagestory.GameContent/ModSystemLabelMeshCache.cs-97-		}
+Vintagestory.GameContent/ModSystemLabelMeshCache.cs-98-		int key = labelStack.GetHashCode(GlobalConstants.IgnoredStackAttributes) + 23 * labelColor.GetHashCode();
+Vintagestory.GameContent/ModSystemLabelMeshCache.cs-99-		if (itemStackRenders.TryGetValue(key, out var value))
+Vintagestory.GameContent/ModSystemLabelMeshCache.cs-100-		{
+Vintagestory.GameContent/ModSystemLabelMeshCache.cs-101-			value.UsedCounter.Remove(pos.GetHashCode());
+Vintagestory.GameContent/ModSystemLabelMeshCache.cs-102-			if (value.UsedCounter.Count == 0)
+Vintagestory.GameContent/ModSystemLabelMeshCache.cs-103-			{
+Vintagestory.GameContent/ModSystemLabelMeshCache.cs-104-				capi.BlockTextureAtlas.FreeTextureSpace(value.TextureSubId);
+Vintagestory.GameContent/ModSystemLabelMeshCache.cs-105-				value.TextureSubId = 0;
+Vintagestory.GameContent/ModSystemLabelMeshCache.cs-106-				itemStackRenders.Remove(key);
+Vintagestory.GameContent/ModSystemLabelMeshCache.cs-107-			}
+Vintagestory.GameContent/ModSystemLabelMeshCache.cs-108-		}
+Vintagestory.GameContent/ModSystemLabelMeshCache.cs-109-	}
+--
+Vintagestory.GameContent/GuiDialogueDialog.cs-137-	private void OnNewScrollbarValue(float value)
+Vintagestory.GameContent/GuiDialogueDialog.cs-138-	{
+Vintagestory.GameContent/GuiDialogueDialog.cs-139-		textElem.Bounds.fixedY = 0f - value;
+Vintagestory.GameContent/GuiDialogueDialog.cs-140-		textElem.Bounds.CalcWorldBounds();
+Vintagestory.GameContent/GuiDialogueDialog.cs-141-	}
+Vintagestory.GameContent/GuiDialogueDialog.cs-142-
+Vintagestory.GameContent/GuiDialogueDialog.cs-143-	public override void OnFinalizeFrame(float dt)
+Vintagestory.GameContent/GuiDialogueDialog.cs-144-	{
+Vintagestory.GameContent/GuiDialogueDialog.cs-145-		base.OnFinalizeFrame(dt);
+Vintagestory.GameContent/GuiDialogueDialog.cs-146-		EntityPos pos = capi.World.Player.Entity.Pos;
+Vintagestory.GameContent/GuiDialogueDialog.cs-147-		if (IsOpened() && pos.SquareDistanceTo(npcEntity.Pos) > 25f)
+Vintagestory.GameContent/GuiDialogueDialog.cs-148-		{
+Vintagestory.GameContent/GuiDialogueDialog.cs:149:			capi.Event.EnqueueMainThreadTask(() =>
+Vintagestory.GameContent/GuiDialogueDialog.cs-150-			{
+Vintagestory.GameContent/GuiDialogueDialog.cs-151-				TryClose();
+Vintagestory.GameContent/GuiDialogueDialog.cs-152-			}, "closedlg");
+Vintagestory.GameContent/GuiDialogueDialog.cs-153-		}
+Vintagestory.GameContent/GuiDialogueDialog.cs-154-	}
+Vintagestory.GameContent/GuiDialogueDialog.cs-155-}
+--
+Vintagestory.GameContent/BlockEntityAnimalTrap.cs-200-		}
+Vintagestory.GameContent/BlockEntityAnimalTrap.cs-201-		if (inv[0]?.Itemstack == null || diet == null)
+Vintagestory.GameContent/BlockEntityAnimalTrap.cs-202-		{
+Vintagestory.GameContent/BlockEntityAnimalTrap.cs-203-			return false;
+Vintagestory.GameContent/BlockEntityAnimalTrap.cs-204-		}
+Vintagestory.GameContent/BlockEntityAnimalTrap.cs-205-		bool flag = TrapChances.IsTrappable(entity, traptype);
+Vintagestory.GameContent/BlockEntityAnimalTrap.cs-206-		bool flag2 = diet.Matches(inv[0].Itemstack, checkCategory: false, foodTagMinWeight);
+Vintagestory.GameContent/BlockEntityAnimalTrap.cs-207-		return flag & flag2;
+Vintagestory.GameContent/BlockEntityAnimalTrap.cs-208-	}
+Vintagestory.GameContent/BlockEntityAnimalTrap.cs-209-
+Vintagestory.GameContent/BlockEntityAnimalTrap.cs-210-	public float ConsumeOnePortion(Entity entity)
+Vintagestory.GameContent/BlockEntityAnimalTrap.cs-211-	{
+Vintagestory.GameContent/BlockEntityAnimalTrap.cs:212:		sapi.Event.EnqueueMainThreadTask(() =>
+Vintagestory.GameContent/BlockEntityAnimalTrap.cs-213-		{
+Vintagestory.GameContent/BlockEntityAnimalTrap.cs-214-			TrapAnimal(entity);
+Vintagestory.GameContent/BlockEntityAnimalTrap.cs-215-		}, "trapanimal");
+Vintagestory.GameContent/BlockEntityAnimalTrap.cs-216-		return 1f;
+Vintagestory.GameContent/BlockEntityAnimalTrap.cs-217-	}
+Vintagestory.GameContent/BlockEntityAnimalTrap.cs-218-
+Vintagestory.GameContent/BlockEntityAnimalTrap.cs-219-	private void TrapAnimal(Entity entity)
+Vintagestory.GameContent/BlockEntityAnimalTrap.cs-220-	{
+Vintagestory.GameContent/BlockEntityAnimalTrap.cs-221-		animUtil?.StartAnimation(new AnimationMetaData
+Vintagestory.GameContent/BlockEntityAnimalTrap.cs-222-		{
+Vintagestory.GameContent/BlockEntityAnimalTrap.cs-223-			Animation = "triggered",
+Vintagestory.GameContent/BlockEntityAnimalTrap.cs-224-			Code = "triggered"
+Vintagestory.GameContent/BlockEntityAnimalTrap.cs-225-		});
+Vintagestory.GameContent/BlockEntityAnimalTrap.cs-226-		if (!TrapChances.FromEntityAttr(entity).TryGetValue(traptype, out var value))
+Vintagestory.GameContent/BlockEntityAnimalTrap.cs-227-		{
+Vintagestory.GameContent/BlockEntityAnimalTrap.cs-228-			return;
+Vintagestory.GameContent/BlockEntityAnimalTrap.cs-229-		}
+Vintagestory.GameContent/BlockEntityAnimalTrap.cs-230-		if (Api.World.Rand.NextDouble() < (double)value.TrapChance)
+Vintagestory.GameContent/BlockEntityAnimalTrap.cs-231-		{
+Vintagestory.GameContent/BlockEntityAnimalTrap.cs-232-			JsonItemStack jsonItemStack = Block.Attributes["creatureContainer"].AsObject<JsonItemStack>();
+Vintagestory.GameContent/BlockEntityAnimalTrap.cs-233-			jsonItemStack.Resolve(Api.World, "creature container of " + Block.Code);
+Vintagestory.GameContent/BlockEntityAnimalTrap.cs-234-			inv[0].Itemstack = jsonItemStack.ResolvedItemstack;
+Vintagestory.GameContent/BlockEntityAnimalTrap.cs-235-			BlockBehaviorCreatureContainer.CatchCreature(inv[0], entity);
+Vintagestory.GameContent/BlockEntityAnimalTrap.cs-236-		}
+Vintagestory.GameContent/BlockEntityAnimalTrap.cs-237-		else
+--
+Vintagestory.GameContent/BlockEntityCrate.cs-534-		if (LabelProps?.EditableShape == null || labelStack == null || requested)
+Vintagestory.GameContent/BlockEntityCrate.cs-535-		{
+Vintagestory.GameContent/BlockEntityCrate.cs-536-			return;
+Vintagestory.GameContent/BlockEntityCrate.cs-537-		}
+Vintagestory.GameContent/BlockEntityCrate.cs-538-		if (labelCacheSys == null)
+Vintagestory.GameContent/BlockEntityCrate.cs-539-		{
+Vintagestory.GameContent/BlockEntityCrate.cs-540-			labelCacheSys = Api.ModLoader.GetModSystem<ModSystemLabelMeshCache>();
+Vintagestory.GameContent/BlockEntityCrate.cs-541-		}
+Vintagestory.GameContent/BlockEntityCrate.cs-542-		requested = true;
+Vintagestory.GameContent/BlockEntityCrate.cs-543-		labelCacheSys.RequestLabelTexture(labelColor, Pos, labelStack, (int texSubId) =>
+Vintagestory.GameContent/BlockEntityCrate.cs-544-		{
+Vintagestory.GameContent/BlockEntityCrate.cs-545-			GenLabelMeshWithItemStack(texSubId);
+Vintagestory.GameContent/BlockEntityCrate.cs:546:			((ICoreClientAPI)Api).Event.EnqueueMainThreadTask(() =>
+Vintagestory.GameContent/BlockEntityCrate.cs-547-			{
+Vintagestory.GameContent/BlockEntityCrate.cs-548-				MarkDirty(redrawOnClient: true);
+Vintagestory.GameContent/BlockEntityCrate.cs-549-			}, "markcratedirty");
+Vintagestory.GameContent/BlockEntityCrate.cs-550-			requested = false;
+Vintagestory.GameContent/BlockEntityCrate.cs-551-		});
+Vintagestory.GameContent/BlockEntityCrate.cs-552-	}
+Vintagestory.GameContent/BlockEntityCrate.cs-553-
+Vintagestory.GameContent/BlockEntityCrate.cs-554-	private void GenLabelMeshWithItemStack(int textureSubId)
+Vintagestory.GameContent/BlockEntityCrate.cs-555-	{
+Vintagestory.GameContent/BlockEntityCrate.cs-556-		ICoreClientAPI coreClientAPI = (ICoreClientAPI)Api;
+Vintagestory.GameContent/BlockEntityCrate.cs-557-		TextureAtlasPosition texPos = coreClientAPI.BlockTextureAtlas.Positions[textureSubId];
+Vintagestory.GameContent/BlockEntityCrate.cs-558-		labelMesh = ownBlock.GenLabelMesh(coreClientAPI, label, texPos, editableVariant: true);
+Vintagestory.GameContent/BlockEntityCrate.cs-559-		labelMesh.Rotate(origin, 0f, rotAngleY + (float)Math.PI, 0f).Scale(origin, rndScale, rndScale, rndScale);
+Vintagestory.GameContent/BlockEntityCrate.cs-560-	}
+Vintagestory.GameContent/BlockEntityCrate.cs-561-
+Vintagestory.GameContent/BlockEntityCrate.cs-562-	public override bool OnTesselation(ITerrainMeshPool mesher, ITesselatorAPI tesselator)
+Vintagestory.GameContent/BlockEntityCrate.cs-563-	{
+Vintagestory.GameContent/BlockEntityCrate.cs-564-		if (base.OnTesselation(mesher, tesselator))
+Vintagestory.GameContent/BlockEntityCrate.cs-565-		{
+Vintagestory.GameContent/BlockEntityCrate.cs-566-			return true;
+Vintagestory.GameContent/BlockEntityCrate.cs-567-		}
+Vintagestory.GameContent/BlockEntityCrate.cs-568-		if (ownMesh == null)
+Vintagestory.GameContent/BlockEntityCrate.cs-569-		{
+Vintagestory.GameContent/BlockEntityCrate.cs-570-			loadOrCreateMesh();
+Vintagestory.GameContent/BlockEntityCrate.cs-571-			if (ownMesh == null)
+--
+Vintagestory.GameContent/EntityVillager.cs-145-		if (track == null)
+Vintagestory.GameContent/EntityVillager.cs-146-		{
+Vintagestory.GameContent/EntityVillager.cs-147-			sound?.Dispose();
+Vintagestory.GameContent/EntityVillager.cs-148-		}
+Vintagestory.GameContent/EntityVillager.cs-149-		else
+Vintagestory.GameContent/EntityVillager.cs-150-		{
+Vintagestory.GameContent/EntityVillager.cs-151-			if (sound == null)
+Vintagestory.GameContent/EntityVillager.cs-152-			{
+Vintagestory.GameContent/EntityVillager.cs-153-				return;
+Vintagestory.GameContent/EntityVillager.cs-154-			}
+Vintagestory.GameContent/EntityVillager.cs-155-			track.Sound = sound;
+Vintagestory.GameContent/EntityVillager.cs-156-			TalkUtil.ShouldDoIdleTalk = false;
+Vintagestory.GameContent/EntityVillager.cs:157:			Api.Event.EnqueueMainThreadTask(() =>
+Vintagestory.GameContent/EntityVillager.cs-158-			{
+Vintagestory.GameContent/EntityVillager.cs-159-				if (track != null)
+Vintagestory.GameContent/EntityVillager.cs-160-				{
+Vintagestory.GameContent/EntityVillager.cs-161-					track.loading = true;
+Vintagestory.GameContent/EntityVillager.cs-162-				}
+Vintagestory.GameContent/EntityVillager.cs-163-			}, "settrackloading");
+Vintagestory.GameContent/EntityVillager.cs-164-			long num = Api.World.ElapsedMilliseconds - startLoadingMs;
+Vintagestory.GameContent/EntityVillager.cs-165-			handlerId = Api.Event.RegisterCallback((float dt) =>
+Vintagestory.GameContent/EntityVillager.cs-166-			{
+Vintagestory.GameContent/EntityVillager.cs-167-				if (sound.IsDisposed)
+Vintagestory.GameContent/EntityVillager.cs-168-				{
+Vintagestory.GameContent/EntityVillager.cs-169-					handlerId = 0L;
+Vintagestory.GameContent/EntityVillager.cs-170-					track = null;
+Vintagestory.GameContent/EntityVillager.cs-171-				}
+Vintagestory.GameContent/EntityVillager.cs-172-				else
+Vintagestory.GameContent/EntityVillager.cs-173-				{
+Vintagestory.GameContent/EntityVillager.cs-174-					if (!wasStopped)
+Vintagestory.GameContent/EntityVillager.cs-175-					{
+Vintagestory.GameContent/EntityVillager.cs-176-						sound.Start();
+Vintagestory.GameContent/EntityVillager.cs-177-						sound.PlaybackPosition = secondsPassed;
+Vintagestory.GameContent/EntityVillager.cs-178-					}
+Vintagestory.GameContent/EntityVillager.cs-179-					track.loading = false;
+Vintagestory.GameContent/EntityVillager.cs-180-				}
+Vintagestory.GameContent/EntityVillager.cs-181-			}, (int)Math.Max(0L, 500 - num));
+Vintagestory.GameContent/EntityVillager.cs-182-		}
+--
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1119-	{
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1120-		float num = 0f;
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1121-		if (!Inventory.Empty)
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1122-		{
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1123-			foreach (ItemSlot item in Inventory)
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1124-			{
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1125-				num = Math.Max(num, item.Itemstack?.Collectible.GetTemperature(capi.World, item.Itemstack) ?? 0f);
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1126-			}
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1127-		}
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1128-		UseRenderer = num >= 500f;
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1129-		if (renderer == null && num >= 450f)
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1130-		{
+Vintagestory.GameContent/BlockEntityGroundStorage.cs:1131:			capi.Event.EnqueueMainThreadTask(() =>
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1132-			{
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1133-				if (renderer == null)
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1134-				{
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1135-					renderer = new GroundStorageRenderer(capi, this);
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1136-				}
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1137-			}, "groundStorageRendererE");
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1138-		}
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1139-		if (UseRenderer)
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1140-		{
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1141-			updateMeshes();
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1142-			return true;
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1143-		}
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1144-		if (renderer != null && num < 450f)
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1145-		{
+Vintagestory.GameContent/BlockEntityGroundStorage.cs:1146:			capi.Event.EnqueueMainThreadTask(() =>
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1147-			{
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1148-				if (renderer != null)
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1149-				{
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1150-					renderer.Dispose();
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1151-					renderer = null;
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1152-				}
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1153-			}, "groundStorageRendererD");
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1154-		}
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1155-		NeedsRetesselation = false;
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1156-		lock (inventoryLock)
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1157-		{
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1158-			return base.OnTesselation(mesher, tesselator);
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1159-		}
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1160-	}
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1161-
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1162-	protected Vec3f rotatedOffset(Vec3f offset, float radY)
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1163-	{
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1164-		Matrixf matrixf = new Matrixf();
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1165-		matrixf.Translate(0.5f, 0.5f, 0.5f).RotateY(radY).Translate(-0.5f, -0.5f, -0.5f);
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1166-		return matrixf.TransformVector(new Vec4f(offset.X, offset.Y, offset.Z, 1f)).XYZ;
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1167-	}
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1168-
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1169-	protected override float[][] genTransformationMatrices()
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1170-	{
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1171-		float[][] array = new float[DisplayedItems][];
+--
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1276-					capi.Logger.Error(string.Concat("Stacking model shape for collectible ", itemstack.Collectible.Code, " not found. Block will be invisible!"));
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1277-					return null;
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1278-				}
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1279-				capi.Tesselator.TesselateShape("storagePile", nowTesselatingShape, out mesh2, this, null, 0, 0, 0, StorageProps.CuboidsPerModel * ItemModelCount);
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1280-			}
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1281-			MeshCache[key] = mesh2;
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1282-			if (UploadedMeshCache.TryGetValue(key, out var value))
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1283-			{
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1284-				value.Dispose();
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1285-			}
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1286-			if (Environment.CurrentManagedThreadId != RuntimeEnv.MainThreadId)
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1287-			{
+Vintagestory.GameContent/BlockEntityGroundStorage.cs:1288:				Api.Event.EnqueueMainThreadTask(() =>
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1289-				{
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1290-					MultiTextureMeshRef multiTextureMeshRef2 = capi.Render.UploadMultiTextureMesh(mesh2);
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1291-					UploadedMeshCache[key] = multiTextureMeshRef2;
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1292-					MeshRefs[index] = multiTextureMeshRef2;
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1293-					Api.World.BlockAccessor.MarkBlockDirty(Pos);
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1294-				}, "groundstoragemeshupload");
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1295-				return null;
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1296-			}
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1297-			MultiTextureMeshRef multiTextureMeshRef = capi.Render.UploadMultiTextureMesh(mesh2);
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1298-			UploadedMeshCache[key] = multiTextureMeshRef;
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1299-			MeshRefs[index] = multiTextureMeshRef;
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1300-			return mesh2;
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1301-		}
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1302-		MeshData orCreateMesh = base.getOrCreateMesh(slot, index);
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1303-		JsonObject attributes = itemstack.Collectible.Attributes;
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1304-		if (attributes != null && attributes[AttributeTransformCode].Exists)
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1305-		{
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1306-			ModelTransform modelTransform2 = itemstack.Collectible.Attributes?[AttributeTransformCode].AsObject<ModelTransform>();
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1307-			ModelTransformsRenderer[index] = modelTransform2;
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1308-			return orCreateMesh;
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1309-		}
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1310-		ModelTransformsRenderer[index] = null;
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1311-		return orCreateMesh;
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1312-	}
+Vintagestory.GameContent/BlockEntityGroundStorage.cs-1313-
+--
+Vintagestory.GameContent/BlockHopper.cs-15-	{
+Vintagestory.GameContent/BlockHopper.cs-16-		base.OnEntityCollide(world, entity, pos, facing, collideSpeed, isImpact);
+Vintagestory.GameContent/BlockHopper.cs-17-		if (facing != BlockFacing.UP)
+Vintagestory.GameContent/BlockHopper.cs-18-		{
+Vintagestory.GameContent/BlockHopper.cs-19-			return;
+Vintagestory.GameContent/BlockHopper.cs-20-		}
+Vintagestory.GameContent/BlockHopper.cs-21-		EntityItem inWorldItem = entity as EntityItem;
+Vintagestory.GameContent/BlockHopper.cs-22-		if (inWorldItem == null || world.Side != EnumAppSide.Server || world.Rand.NextDouble() < 0.9)
+Vintagestory.GameContent/BlockHopper.cs-23-		{
+Vintagestory.GameContent/BlockHopper.cs-24-			return;
+Vintagestory.GameContent/BlockHopper.cs-25-		}
+Vintagestory.GameContent/BlockHopper.cs-26-		BlockPos tmpPos = pos.Copy();
+Vintagestory.GameContent/BlockHopper.cs:27:		api.Event.EnqueueMainThreadTask(() =>
+Vintagestory.GameContent/BlockHopper.cs-28-		{
+Vintagestory.GameContent/BlockHopper.cs-29-			BlockEntity blockEntity = world.BlockAccessor.GetBlockEntity(tmpPos);
+Vintagestory.GameContent/BlockHopper.cs-30-			if (inWorldItem.Alive && blockEntity is BlockEntityItemFlow blockEntityItemFlow)
+Vintagestory.GameContent/BlockHopper.cs-31-			{
+Vintagestory.GameContent/BlockHopper.cs-32-				WeightedSlot bestSuitedSlot = blockEntityItemFlow.inventory.GetBestSuitedSlot(inWorldItem.Slot);
+Vintagestory.GameContent/BlockHopper.cs-33-				if (bestSuitedSlot.slot != null)
+Vintagestory.GameContent/BlockHopper.cs-34-				{
+Vintagestory.GameContent/BlockHopper.cs-35-					inWorldItem.Slot.TryPutInto(api.World, bestSuitedSlot.slot);
+Vintagestory.GameContent/BlockHopper.cs-36-					if (inWorldItem.Slot.StackSize <= 0)
+Vintagestory.GameContent/BlockHopper.cs-37-					{
+Vintagestory.GameContent/BlockHopper.cs-38-						inWorldItem.Itemstack = null;
+Vintagestory.GameContent/BlockHopper.cs-39-						inWorldItem.Alive = false;
+Vintagestory.GameContent/BlockHopper.cs-40-					}
+Vintagestory.GameContent/BlockHopper.cs-41-				}
+Vintagestory.GameContent/BlockHopper.cs-42-			}
+Vintagestory.GameContent/BlockHopper.cs-43-		}, "hopperitempickup");
+Vintagestory.GameContent/BlockHopper.cs-44-	}
+Vintagestory.GameContent/BlockHopper.cs-45-}
+--
+Vintagestory.GameContent/BlockFruitPress.cs-14-
+Vintagestory.GameContent/BlockFruitPress.cs-15-	public bool RightMouseDown;
+Vintagestory.GameContent/BlockFruitPress.cs-16-
+Vintagestory.GameContent/BlockFruitPress.cs-17-	public override void OnLoaded(ICoreAPI api)
+Vintagestory.GameContent/BlockFruitPress.cs-18-	{
+Vintagestory.GameContent/BlockFruitPress.cs-19-		particleCollBoxes = new Cuboidf[1] { CollisionBoxes[0].Clone() };
+Vintagestory.GameContent/BlockFruitPress.cs-20-		particleCollBoxes[0].Y1 = 0.6875f;
+Vintagestory.GameContent/BlockFruitPress.cs-21-		base.OnLoaded(api);
+Vintagestory.GameContent/BlockFruitPress.cs-22-		if (api.Side == EnumAppSide.Client)
+Vintagestory.GameContent/BlockFruitPress.cs-23-		{
+Vintagestory.GameContent/BlockFruitPress.cs-24-			(api as ICoreClientAPI).Input.InWorldAction += Input_InWorldAction;
+Vintagestory.GameContent/BlockFruitPress.cs-25-		}
+Vintagestory.GameContent/BlockFruitPress.cs:26:		api.Event.EnqueueMainThreadTask(() =>
+Vintagestory.GameContent/BlockFruitPress.cs-27-		{
+Vintagestory.GameContent/BlockFruitPress.cs-28-			interactions = ObjectCacheUtil.GetOrCreate(api, "fruitPressInteractions", () =>
+Vintagestory.GameContent/BlockFruitPress.cs-29-			{
+Vintagestory.GameContent/BlockFruitPress.cs-30-				List<ItemStack> list = new List<ItemStack>();
+Vintagestory.GameContent/BlockFruitPress.cs-31-				foreach (CollectibleObject collectible in api.World.Collectibles)
+Vintagestory.GameContent/BlockFruitPress.cs-32-				{
+Vintagestory.GameContent/BlockFruitPress.cs-33-					if (collectible is BlockLiquidContainerBase { IsTopOpened: not false, AllowHeldLiquidTransfer: not false, CapacityLitres: <20f })
+Vintagestory.GameContent/BlockFruitPress.cs-34-					{
+Vintagestory.GameContent/BlockFruitPress.cs-35-						list.Add(new ItemStack(collectible));
+Vintagestory.GameContent/BlockFruitPress.cs-36-					}
+Vintagestory.GameContent/BlockFruitPress.cs-37-				}
+Vintagestory.GameContent/BlockFruitPress.cs-38-				return new WorldInteraction[1]
+Vintagestory.GameContent/BlockFruitPress.cs-39-				{
+Vintagestory.GameContent/BlockFruitPress.cs-40-					new WorldInteraction
+Vintagestory.GameContent/BlockFruitPress.cs-41-					{
+Vintagestory.GameContent/BlockFruitPress.cs-42-						ActionLangCode = "blockhelp-fruitpress-putremovebucket",
+Vintagestory.GameContent/BlockFruitPress.cs-43-						MouseButton = EnumMouseButton.Right,
+Vintagestory.GameContent/BlockFruitPress.cs-44-						Itemstacks = list.ToArray(),
+Vintagestory.GameContent/BlockFruitPress.cs-45-						ShouldApply = (WorldInteraction wi, BlockSelection bs, EntitySelection es) => bs.SelectionBoxIndex == 0
+Vintagestory.GameContent/BlockFruitPress.cs-46-					}
+Vintagestory.GameContent/BlockFruitPress.cs-47-				};
+Vintagestory.GameContent/BlockFruitPress.cs-48-			});
+Vintagestory.GameContent/BlockFruitPress.cs-49-		}, "initFruitPressInteractions");
+Vintagestory.GameContent/BlockFruitPress.cs-50-	}
+Vintagestory.GameContent/BlockFruitPress.cs-51-
+--
+Vintagestory.GameContent/BlockBehaviorCreatureContainer.cs-295-			}
+Vintagestory.GameContent/BlockBehaviorCreatureContainer.cs-296-			entity.Pos.X = (float)(blockSel.Position.X + ((!blockSel.DidOffset) ? blockSel.Face.Normali.X : 0)) + 0.5f;
+Vintagestory.GameContent/BlockBehaviorCreatureContainer.cs-297-			entity.Pos.Y = blockSel.Position.Y + ((!blockSel.DidOffset) ? blockSel.Face.Normali.Y : 0);
+Vintagestory.GameContent/BlockBehaviorCreatureContainer.cs-298-			entity.Pos.Z = (float)(blockSel.Position.Z + ((!blockSel.DidOffset) ? blockSel.Face.Normali.Z : 0)) + 0.5f;
+Vintagestory.GameContent/BlockBehaviorCreatureContainer.cs-299-			entity.Pos.Yaw = (float)world.Rand.NextDouble() * 2f * (float)Math.PI;
+Vintagestory.GameContent/BlockBehaviorCreatureContainer.cs-300-			entity.PositionBeforeFalling.Set(entity.Pos.X, entity.Pos.Y, entity.Pos.Z);
+Vintagestory.GameContent/BlockBehaviorCreatureContainer.cs-301-			entity.Attributes.SetString("origin", "playerplaced");
+Vintagestory.GameContent/BlockBehaviorCreatureContainer.cs-302-			entity.Attributes.SetDouble("totalDaysCaught", itemstack.Attributes.GetDouble("totalDaysCaught"));
+Vintagestory.GameContent/BlockBehaviorCreatureContainer.cs-303-			entity.Attributes.SetDouble("totalDaysReleased", world.Calendar.TotalDays);
+Vintagestory.GameContent/BlockBehaviorCreatureContainer.cs-304-			world.SpawnEntity(entity);
+Vintagestory.GameContent/BlockBehaviorCreatureContainer.cs-305-			if (GetStillAliveDays(world, slot.Itemstack) < 0.0)
+Vintagestory.GameContent/BlockBehaviorCreatureContainer.cs-306-			{
+Vintagestory.GameContent/BlockBehaviorCreatureContainer.cs:307:				(world.Api as ICoreServerAPI).Event.EnqueueMainThreadTask(() =>
+Vintagestory.GameContent/BlockBehaviorCreatureContainer.cs-308-				{
+Vintagestory.GameContent/BlockBehaviorCreatureContainer.cs-309-					entity.Die(EnumDespawnReason.Death, new DamageSource
+Vintagestory.GameContent/BlockBehaviorCreatureContainer.cs-310-					{
+Vintagestory.GameContent/BlockBehaviorCreatureContainer.cs-311-						CauseEntity = byEntity,
+Vintagestory.GameContent/BlockBehaviorCreatureContainer.cs-312-						Type = EnumDamageType.Hunger
+Vintagestory.GameContent/BlockBehaviorCreatureContainer.cs-313-					});
+Vintagestory.GameContent/BlockBehaviorCreatureContainer.cs-314-					entity.Properties.ResolvedSounds = null;
+Vintagestory.GameContent/BlockBehaviorCreatureContainer.cs-315-				}, "die");
+Vintagestory.GameContent/BlockBehaviorCreatureContainer.cs-316-			}
+Vintagestory.GameContent/BlockBehaviorCreatureContainer.cs-317-			itemstack.Attributes.RemoveAttribute("classname");
+Vintagestory.GameContent/BlockBehaviorCreatureContainer.cs-318-			itemstack.Attributes.RemoveAttribute("creaturecode");
+Vintagestory.GameContent/BlockBehaviorCreatureContainer.cs-319-			itemstack.Attributes.RemoveAttribute("animalSerialized");
+Vintagestory.GameContent/BlockBehaviorCreatureContainer.cs-320-			itemstack.Attributes.RemoveAttribute("totalDaysCaught");
+Vintagestory.GameContent/BlockBehaviorCreatureContainer.cs-321-		}
+Vintagestory.GameContent/BlockBehaviorCreatureContainer.cs-322-		return true;
+Vintagestory.GameContent/BlockBehaviorCreatureContainer.cs-323-	}
+Vintagestory.GameContent/BlockBehaviorCreatureContainer.cs-324-
+Vintagestory.GameContent/BlockBehaviorCreatureContainer.cs-325-	public override void GetHeldItemInfo(ItemSlot inSlot, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo)
+Vintagestory.GameContent/BlockBehaviorCreatureContainer.cs-326-	{
+Vintagestory.GameContent/BlockBehaviorCreatureContainer.cs-327-		base.GetHeldItemInfo(inSlot, dsc, world, withDebugInfo);
+Vintagestory.GameContent/BlockBehaviorCreatureContainer.cs-328-		AddCreatureInfo(inSlot.Itemstack, dsc, world);
+Vintagestory.GameContent/BlockBehaviorCreatureContainer.cs-329-	}
+Vintagestory.GameContent/BlockBehaviorCreatureContainer.cs-330-
+Vintagestory.GameContent/BlockBehaviorCreatureContainer.cs-331-	public void AddCreatureInfo(ItemStack stack, StringBuilder dsc, IWorldAccessor world)
+Vintagestory.GameContent/BlockBehaviorCreatureContainer.cs-332-	{
+--
+Vintagestory.GameContent/BlockEntityMycelium.cs-34-	public override void Initialize(ICoreAPI api)
+Vintagestory.GameContent/BlockEntityMycelium.cs-35-	{
+Vintagestory.GameContent/BlockEntityMycelium.cs-36-		base.Initialize(api);
+Vintagestory.GameContent/BlockEntityMycelium.cs-37-		if (api.Side != EnumAppSide.Server)
+Vintagestory.GameContent/BlockEntityMycelium.cs-38-		{
+Vintagestory.GameContent/BlockEntityMycelium.cs-39-			return;
+Vintagestory.GameContent/BlockEntityMycelium.cs-40-		}
+Vintagestory.GameContent/BlockEntityMycelium.cs-41-		int num = 10000;
+Vintagestory.GameContent/BlockEntityMycelium.cs-42-		RegisterGameTickListener(onServerTick, num, -api.World.Rand.Next(num));
+Vintagestory.GameContent/BlockEntityMycelium.cs-43-		if (mushroomBlockCode != null && !setMushroomBlock(Api.World.GetBlock(mushroomBlockCode)))
+Vintagestory.GameContent/BlockEntityMycelium.cs-44-		{
+Vintagestory.GameContent/BlockEntityMycelium.cs-45-			api.Logger.Error("Invalid mycelium mushroom type '{0}' at {1}. Will delete block entity.", mushroomBlockCode, Pos);
+Vintagestory.GameContent/BlockEntityMycelium.cs:46:			Api.Event.EnqueueMainThreadTask(() =>
+Vintagestory.GameContent/BlockEntityMycelium.cs-47-			{
+Vintagestory.GameContent/BlockEntityMycelium.cs-48-				Api.World.BlockAccessor.RemoveBlockEntity(Pos);
+Vintagestory.GameContent/BlockEntityMycelium.cs-49-			}, "deletemyceliumBE");
+Vintagestory.GameContent/BlockEntityMycelium.cs-50-		}
+Vintagestory.GameContent/BlockEntityMycelium.cs-51-	}
+Vintagestory.GameContent/BlockEntityMycelium.cs-52-
+Vintagestory.GameContent/BlockEntityMycelium.cs-53-	private void onServerTick(float dt)
+Vintagestory.GameContent/BlockEntityMycelium.cs-54-	{
+Vintagestory.GameContent/BlockEntityMycelium.cs-55-		bool flag = grownMushroomOffsets.Length != 0;
+Vintagestory.GameContent/BlockEntityMycelium.cs-56-		if (flag && props.DieWhenTempBelow > -99f && Api.World.BlockAccessor.GetClimateAt(Pos, EnumGetClimateMode.ForSuppliedDate_TemperatureOnly, Api.World.Calendar.TotalDays).Temperature < props.DieWhenTempBelow)
+Vintagestory.GameContent/BlockEntityMycelium.cs-57-		{
+Vintagestory.GameContent/BlockEntityMycelium.cs-58-			DestroyGrownMushrooms();
+Vintagestory.GameContent/BlockEntityMycelium.cs-59-		}
+Vintagestory.GameContent/BlockEntityMycelium.cs-60-		else if ((props.DieAfterFruiting & flag) && mushroomsGrownTotalDays + fruitingDays < Api.World.Calendar.TotalDays)
+Vintagestory.GameContent/BlockEntityMycelium.cs-61-		{
+Vintagestory.GameContent/BlockEntityMycelium.cs-62-			DestroyGrownMushrooms();
+Vintagestory.GameContent/BlockEntityMycelium.cs-63-		}
+Vintagestory.GameContent/BlockEntityMycelium.cs-64-		else if (!flag)
+Vintagestory.GameContent/BlockEntityMycelium.cs-65-		{
+Vintagestory.GameContent/BlockEntityMycelium.cs-66-			lastUpdateTotalDays = Math.Max(lastUpdateTotalDays, Api.World.Calendar.TotalDays - 50.0);
+Vintagestory.GameContent/BlockEntityMycelium.cs-67-			while (Api.World.Calendar.TotalDays - lastUpdateTotalDays > 1.0)
+Vintagestory.GameContent/BlockEntityMycelium.cs-68-			{
+Vintagestory.GameContent/BlockEntityMycelium.cs-69-				if (Api.World.BlockAccessor.GetClimateAt(Pos, EnumGetClimateMode.ForSuppliedDate_TemperatureOnly, lastUpdateTotalDays + 0.5).Temperature > 5f)
+Vintagestory.GameContent/BlockEntityMycelium.cs-70-				{
+Vintagestory.GameContent/BlockEntityMycelium.cs-71-					mushroomsGrowingDays += Api.World.Calendar.TotalDays - lastUpdateTotalDays;
+--
+Vintagestory.GameContent/BEBehaviorFirepitAmbient.cs-138-	{
+Vintagestory.GameContent/BEBehaviorFirepitAmbient.cs-139-		if (track == null)
+Vintagestory.GameContent/BEBehaviorFirepitAmbient.cs-140-		{
+Vintagestory.GameContent/BEBehaviorFirepitAmbient.cs-141-			sound?.Dispose();
+Vintagestory.GameContent/BEBehaviorFirepitAmbient.cs-142-		}
+Vintagestory.GameContent/BEBehaviorFirepitAmbient.cs-143-		else
+Vintagestory.GameContent/BEBehaviorFirepitAmbient.cs-144-		{
+Vintagestory.GameContent/BEBehaviorFirepitAmbient.cs-145-			if (sound == null)
+Vintagestory.GameContent/BEBehaviorFirepitAmbient.cs-146-			{
+Vintagestory.GameContent/BEBehaviorFirepitAmbient.cs-147-				return;
+Vintagestory.GameContent/BEBehaviorFirepitAmbient.cs-148-			}
+Vintagestory.GameContent/BEBehaviorFirepitAmbient.cs-149-			track.Sound = sound;
+Vintagestory.GameContent/BEBehaviorFirepitAmbient.cs:150:			Api.Event.EnqueueMainThreadTask(() =>
+Vintagestory.GameContent/BEBehaviorFirepitAmbient.cs-151-			{
+Vintagestory.GameContent/BEBehaviorFirepitAmbient.cs-152-				track.loading = true;
+Vintagestory.GameContent/BEBehaviorFirepitAmbient.cs-153-			}, "settrackloading");
+Vintagestory.GameContent/BEBehaviorFirepitAmbient.cs-154-			long num = Api.World.ElapsedMilliseconds - startLoadingMs;
+Vintagestory.GameContent/BEBehaviorFirepitAmbient.cs-155-			handlerId = Blockentity.RegisterDelayedCallback((float dt) =>
+Vintagestory.GameContent/BEBehaviorFirepitAmbient.cs-156-			{
+Vintagestory.GameContent/BEBehaviorFirepitAmbient.cs-157-				if (sound.IsDisposed)
+Vintagestory.GameContent/BEBehaviorFirepitAmbient.cs-158-				{
+Vintagestory.GameContent/BEBehaviorFirepitAmbient.cs-159-					Api.World.Logger.Notification("firepit track is diposed? o.O");
+Vintagestory.GameContent/BEBehaviorFirepitAmbient.cs-160-				}
+Vintagestory.GameContent/BEBehaviorFirepitAmbient.cs-161-				if (!wasStopped)
+Vintagestory.GameContent/BEBehaviorFirepitAmbient.cs-162-				{
+Vintagestory.GameContent/BEBehaviorFirepitAmbient.cs-163-					sound.Start();
+Vintagestory.GameContent/BEBehaviorFirepitAmbient.cs-164-				}
+Vintagestory.GameContent/BEBehaviorFirepitAmbient.cs-165-				track.loading = false;
+Vintagestory.GameContent/BEBehaviorFirepitAmbient.cs-166-			}, (int)Math.Max(0L, 500 - num));
+Vintagestory.GameContent/BEBehaviorFirepitAmbient.cs-167-		}
+Vintagestory.GameContent/BEBehaviorFirepitAmbient.cs-168-	}
+Vintagestory.GameContent/BEBehaviorFirepitAmbient.cs-169-
+Vintagestory.GameContent/BEBehaviorFirepitAmbient.cs-170-	private void StopMusic()
+Vintagestory.GameContent/BEBehaviorFirepitAmbient.cs-171-	{
+Vintagestory.GameContent/BEBehaviorFirepitAmbient.cs-172-		ICoreAPI api = Api;
+Vintagestory.GameContent/BEBehaviorFirepitAmbient.cs-173-		if (api != null && api.Side == EnumAppSide.Client)
+Vintagestory.GameContent/BEBehaviorFirepitAmbient.cs-174-		{
+Vintagestory.GameContent/BEBehaviorFirepitAmbient.cs-175-			if (track != null && track.IsActive)
+--
+Vintagestory.GameContent.Mechanics/BEBehaviorMPWaterWheel.cs-246-		return false;
+Vintagestory.GameContent.Mechanics/BEBehaviorMPWaterWheel.cs-247-	}
+Vintagestory.GameContent.Mechanics/BEBehaviorMPWaterWheel.cs-248-
+Vintagestory.GameContent.Mechanics/BEBehaviorMPWaterWheel.cs-249-	public override MechanicalNetwork CreateJoinAndDiscoverNetwork(BlockFacing powerOutFacing)
+Vintagestory.GameContent.Mechanics/BEBehaviorMPWaterWheel.cs-250-	{
+Vintagestory.GameContent.Mechanics/BEBehaviorMPWaterWheel.cs-251-		MechanicalNetwork mechanicalNetwork = base.CreateJoinAndDiscoverNetwork(powerOutFacing);
+Vintagestory.GameContent.Mechanics/BEBehaviorMPWaterWheel.cs-252-		if (powerOutFacing == facing && mechanicalNetwork != null)
+Vintagestory.GameContent.Mechanics/BEBehaviorMPWaterWheel.cs-253-		{
+Vintagestory.GameContent.Mechanics/BEBehaviorMPWaterWheel.cs-254-			BlockPos neibPos = Position.AddCopy(powerOutFacing.Opposite);
+Vintagestory.GameContent.Mechanics/BEBehaviorMPWaterWheel.cs-255-			BEBehaviorMPBase beMechBase = Api.World.BlockAccessor.GetBlockEntity(neibPos)?.GetBehavior<BEBehaviorMPBase>();
+Vintagestory.GameContent.Mechanics/BEBehaviorMPWaterWheel.cs-256-			if (beMechBase != null)
+Vintagestory.GameContent.Mechanics/BEBehaviorMPWaterWheel.cs-257-			{
+Vintagestory.GameContent.Mechanics/BEBehaviorMPWaterWheel.cs:258:				Api.Event.EnqueueMainThreadTask(() =>
+Vintagestory.GameContent.Mechanics/BEBehaviorMPWaterWheel.cs-259-				{
+Vintagestory.GameContent.Mechanics/BEBehaviorMPWaterWheel.cs-260-					if (Api.World.BlockAccessor.GetBlock(neibPos) is IMechanicalPowerBlock mechanicalPowerBlock && mechanicalPowerBlock.HasMechPowerConnectorAt(Api.World, neibPos, facing, Block as BlockMPBase))
+Vintagestory.GameContent.Mechanics/BEBehaviorMPWaterWheel.cs-261-					{
+Vintagestory.GameContent.Mechanics/BEBehaviorMPWaterWheel.cs-262-						beMechBase.tryConnect(facing);
+Vintagestory.GameContent.Mechanics/BEBehaviorMPWaterWheel.cs-263-					}
+Vintagestory.GameContent.Mechanics/BEBehaviorMPWaterWheel.cs-264-				}, "waterwheel 2nd axis");
+Vintagestory.GameContent.Mechanics/BEBehaviorMPWaterWheel.cs-265-			}
+Vintagestory.GameContent.Mechanics/BEBehaviorMPWaterWheel.cs-266-		}
+Vintagestory.GameContent.Mechanics/BEBehaviorMPWaterWheel.cs-267-		return mechanicalNetwork;
+Vintagestory.GameContent.Mechanics/BEBehaviorMPWaterWheel.cs-268-	}
+Vintagestory.GameContent.Mechanics/BEBehaviorMPWaterWheel.cs-269-
+Vintagestory.GameContent.Mechanics/BEBehaviorMPWaterWheel.cs-270-	private float getFlowSpeed(Block block)
+Vintagestory.GameContent.Mechanics/BEBehaviorMPWaterWheel.cs-271-	{
+Vintagestory.GameContent.Mechanics/BEBehaviorMPWaterWheel.cs-272-		return block.Attributes?["flowspeed"].AsFloat() ?? 0f;
+Vintagestory.GameContent.Mechanics/BEBehaviorMPWaterWheel.cs-273-	}
+Vintagestory.GameContent.Mechanics/BEBehaviorMPWaterWheel.cs-274-
+Vintagestory.GameContent.Mechanics/BEBehaviorMPWaterWheel.cs-275-	protected bool blockedBy(Block block, BlockPos pos, BlockFacing face)
+Vintagestory.GameContent.Mechanics/BEBehaviorMPWaterWheel.cs-276-	{
+Vintagestory.GameContent.Mechanics/BEBehaviorMPWaterWheel.cs-277-		if (block.SideIsSolid(pos, face.Index))
+Vintagestory.GameContent.Mechanics/BEBehaviorMPWaterWheel.cs-278-		{
+Vintagestory.GameContent.Mechanics/BEBehaviorMPWaterWheel.cs-279-			blocked = true;
+Vintagestory.GameContent.Mechanics/BEBehaviorMPWaterWheel.cs-280-			flowRate = 0f;
+Vintagestory.GameContent.Mechanics/BEBehaviorMPWaterWheel.cs-281-			return true;
+Vintagestory.GameContent.Mechanics/BEBehaviorMPWaterWheel.cs-282-		}
+Vintagestory.GameContent.Mechanics/BEBehaviorMPWaterWheel.cs-283-		return false;
+--
+Vintagestory.ServerMods/ModSystemTiledDungeons.cs-112-		{
+Vintagestory.ServerMods/ModSystemTiledDungeons.cs-113-			return TextCommandResult.Success("Debug connector placing is currently: " + (placeDebugConnectors ? "on" : "off"));
+Vintagestory.ServerMods/ModSystemTiledDungeons.cs-114-		}
+Vintagestory.ServerMods/ModSystemTiledDungeons.cs-115-		placeDebugConnectors = (bool)args[0];
+Vintagestory.ServerMods/ModSystemTiledDungeons.cs-116-		return TextCommandResult.Success("Debug connector placing is now: " + (placeDebugConnectors ? "on" : "off"));
+Vintagestory.ServerMods/ModSystemTiledDungeons.cs-117-	}
+Vintagestory.ServerMods/ModSystemTiledDungeons.cs-118-
+Vintagestory.ServerMods/ModSystemTiledDungeons.cs-119-	private void onEvent(string eventName, ref EnumHandling handling, IAttribute data)
+Vintagestory.ServerMods/ModSystemTiledDungeons.cs-120-	{
+Vintagestory.ServerMods/ModSystemTiledDungeons.cs-121-		if (dungeonGenRequest != null)
+Vintagestory.ServerMods/ModSystemTiledDungeons.cs-122-		{
+Vintagestory.ServerMods/ModSystemTiledDungeons.cs-123-			TextCommandCallingArgs req = dungeonGenRequest;
+Vintagestory.ServerMods/ModSystemTiledDungeons.cs:124:			sapi.Event.EnqueueMainThreadTask(() =>
+Vintagestory.ServerMods/ModSystemTiledDungeons.cs-125-			{
+Vintagestory.ServerMods/ModSystemTiledDungeons.cs-126-				OnCmdTiledCungeonCode(req, 1);
+Vintagestory.ServerMods/ModSystemTiledDungeons.cs-127-			}, "gendungeon");
+Vintagestory.ServerMods/ModSystemTiledDungeons.cs-128-			dungeonGenRequest = null;
+Vintagestory.ServerMods/ModSystemTiledDungeons.cs-129-		}
+Vintagestory.ServerMods/ModSystemTiledDungeons.cs-130-	}
+Vintagestory.ServerMods/ModSystemTiledDungeons.cs-131-
+Vintagestory.ServerMods/ModSystemTiledDungeons.cs-132-	private TextCommandResult OnCmdTiledDungeonTest(TextCommandCallingArgs args)
+Vintagestory.ServerMods/ModSystemTiledDungeons.cs-133-	{
+Vintagestory.ServerMods/ModSystemTiledDungeons.cs-134-		sapi.Assets.Reload(AssetCategory.worldgen);
+Vintagestory.ServerMods/ModSystemTiledDungeons.cs-135-		Init();
+Vintagestory.ServerMods/ModSystemTiledDungeons.cs-136-		string code = (string)args[0];
+Vintagestory.ServerMods/ModSystemTiledDungeons.cs-137-		TiledDungeon tiledDungeon = Tcfg.Dungeons.FirstOrDefault((TiledDungeon td) => td.Code == code);
+Vintagestory.ServerMods/ModSystemTiledDungeons.cs-138-		if (tiledDungeon == null)
+Vintagestory.ServerMods/ModSystemTiledDungeons.cs-139-		{
+Vintagestory.ServerMods/ModSystemTiledDungeons.cs-140-			return TextCommandResult.Error("No such dungeon defined");
+Vintagestory.ServerMods/ModSystemTiledDungeons.cs-141-		}
+Vintagestory.ServerMods/ModSystemTiledDungeons.cs-142-		int num = ((!(bool)args[1]) ? 1 : 4);
+Vintagestory.ServerMods/ModSystemTiledDungeons.cs-143-		BlockPos asBlockPos = args.Caller.Pos.AsBlockPos;
+Vintagestory.ServerMods/ModSystemTiledDungeons.cs-144-		asBlockPos.Y = sapi.World.BlockAccessor.GetRainMapHeightAt(asBlockPos) + 5;
+Vintagestory.ServerMods/ModSystemTiledDungeons.cs-145-		IBlockAccessor blockAccessor = sapi.World.BlockAccessor;
+Vintagestory.ServerMods/ModSystemTiledDungeons.cs-146-		int num2 = asBlockPos.X;
+Vintagestory.ServerMods/ModSystemTiledDungeons.cs-147-		int z = asBlockPos.Z;
+Vintagestory.ServerMods/ModSystemTiledDungeons.cs-148-		int num3 = 0;
+Vintagestory.ServerMods/ModSystemTiledDungeons.cs-149-		Block block = sapi.World.GetBlock("sign-ground-north");

@@ -1,0 +1,1500 @@
+Vintagestory.Client.NoObf/HudElementCoordinates.cs-23-			.Compose();
+Vintagestory.Client.NoObf/HudElementCoordinates.cs-24-		if (ClientSettings.ShowCoordinateHud)
+Vintagestory.Client.NoObf/HudElementCoordinates.cs-25-		{
+Vintagestory.Client.NoObf/HudElementCoordinates.cs-26-			TryOpen();
+Vintagestory.Client.NoObf/HudElementCoordinates.cs-27-		}
+Vintagestory.Client.NoObf/HudElementCoordinates.cs-28-	}
+Vintagestory.Client.NoObf/HudElementCoordinates.cs-29-
+Vintagestory.Client.NoObf/HudElementCoordinates.cs-30-	public override void OnBlockTexturesLoaded()
+Vintagestory.Client.NoObf/HudElementCoordinates.cs-31-	{
+Vintagestory.Client.NoObf/HudElementCoordinates.cs-32-		base.OnBlockTexturesLoaded();
+Vintagestory.Client.NoObf/HudElementCoordinates.cs-33-		if (!capi.World.Config.GetBool("allowCoordinateHud", defaultValue: true))
+Vintagestory.Client.NoObf/HudElementCoordinates.cs-34-		{
+Vintagestory.Client.NoObf/HudElementCoordinates.cs:35:			(capi.World as ClientMain).EnqueueMainThreadTask(() =>
+Vintagestory.Client.NoObf/HudElementCoordinates.cs-36-			{
+Vintagestory.Client.NoObf/HudElementCoordinates.cs-37-				(capi.World as ClientMain).UnregisterDialog(this);
+Vintagestory.Client.NoObf/HudElementCoordinates.cs-38-				capi.Input.SetHotKeyHandler("coordinateshud", null);
+Vintagestory.Client.NoObf/HudElementCoordinates.cs-39-				Dispose();
+Vintagestory.Client.NoObf/HudElementCoordinates.cs-40-			}, "unreg");
+Vintagestory.Client.NoObf/HudElementCoordinates.cs-41-			return;
+Vintagestory.Client.NoObf/HudElementCoordinates.cs-42-		}
+Vintagestory.Client.NoObf/HudElementCoordinates.cs-43-		capi.Event.RegisterGameTickListener(Every250ms, 250);
+Vintagestory.Client.NoObf/HudElementCoordinates.cs-44-		ClientSettings.Inst.AddWatcher("showCoordinateHud", (bool on) =>
+Vintagestory.Client.NoObf/HudElementCoordinates.cs-45-		{
+Vintagestory.Client.NoObf/HudElementCoordinates.cs-46-			if (on)
+Vintagestory.Client.NoObf/HudElementCoordinates.cs-47-			{
+Vintagestory.Client.NoObf/HudElementCoordinates.cs-48-				TryOpen();
+Vintagestory.Client.NoObf/HudElementCoordinates.cs-49-			}
+Vintagestory.Client.NoObf/HudElementCoordinates.cs-50-			else
+Vintagestory.Client.NoObf/HudElementCoordinates.cs-51-			{
+Vintagestory.Client.NoObf/HudElementCoordinates.cs-52-				TryClose();
+Vintagestory.Client.NoObf/HudElementCoordinates.cs-53-			}
+Vintagestory.Client.NoObf/HudElementCoordinates.cs-54-		});
+Vintagestory.Client.NoObf/HudElementCoordinates.cs-55-	}
+Vintagestory.Client.NoObf/HudElementCoordinates.cs-56-
+Vintagestory.Client.NoObf/HudElementCoordinates.cs-57-	private void Every250ms(float dt)
+Vintagestory.Client.NoObf/HudElementCoordinates.cs-58-	{
+Vintagestory.Client.NoObf/HudElementCoordinates.cs-59-		if (!IsOpened())
+Vintagestory.Client.NoObf/HudElementCoordinates.cs-60-		{
+--
+Vintagestory.Client.NoObf/ClientMain.cs-1605-	private void OnDisconnected(Exception caughtException)
+Vintagestory.Client.NoObf/ClientMain.cs-1606-	{
+Vintagestory.Client.NoObf/ClientMain.cs-1607-		Compression.Reset();
+Vintagestory.Client.NoObf/ClientMain.cs-1608-		if (exitToDisconnectScreen)
+Vintagestory.Client.NoObf/ClientMain.cs-1609-		{
+Vintagestory.Client.NoObf/ClientMain.cs-1610-			return;
+Vintagestory.Client.NoObf/ClientMain.cs-1611-		}
+Vintagestory.Client.NoObf/ClientMain.cs-1612-		MainNetClient.Dispose();
+Vintagestory.Client.NoObf/ClientMain.cs-1613-		UdpNetClient.Dispose();
+Vintagestory.Client.NoObf/ClientMain.cs-1614-		TyronThreadPool.QueueTask(async () =>
+Vintagestory.Client.NoObf/ClientMain.cs-1615-		{
+Vintagestory.Client.NoObf/ClientMain.cs-1616-			await Task.Delay(1000);
+Vintagestory.Client.NoObf/ClientMain.cs:1617:			EnqueueMainThreadTask(() =>
+Vintagestory.Client.NoObf/ClientMain.cs-1618-			{
+Vintagestory.Client.NoObf/ClientMain.cs-1619-				Compression.Reset();
+Vintagestory.Client.NoObf/ClientMain.cs-1620-				if (!exitToMainMenu && !exitToDisconnectScreen)
+Vintagestory.Client.NoObf/ClientMain.cs-1621-				{
+Vintagestory.Client.NoObf/ClientMain.cs-1622-					disconnectReason = "The connection closed unexpectedly: " + caughtException.Message;
+Vintagestory.Client.NoObf/ClientMain.cs-1623-					Logger.Error("The connection closed unexpectedly.");
+Vintagestory.Client.NoObf/ClientMain.cs-1624-					Logger.Error(caughtException);
+Vintagestory.Client.NoObf/ClientMain.cs-1625-					DestroyGameSession(gotDisconnected: true, EnumExitMode.SoftExit);
+Vintagestory.Client.NoObf/ClientMain.cs-1626-				}
+Vintagestory.Client.NoObf/ClientMain.cs-1627-			}, "disconnect");
+Vintagestory.Client.NoObf/ClientMain.cs-1628-		}, "ClientOnDisconnected");
+Vintagestory.Client.NoObf/ClientMain.cs-1629-	}
+Vintagestory.Client.NoObf/ClientMain.cs-1630-
+Vintagestory.Client.NoObf/ClientMain.cs-1631-	private void OnConnectionResult(ConnectionResult result)
+Vintagestory.Client.NoObf/ClientMain.cs-1632-	{
+Vintagestory.Client.NoObf/ClientMain.cs-1633-		Connectdata.Connected = result.connected;
+Vintagestory.Client.NoObf/ClientMain.cs-1634-		Connectdata.ErrorMessage = result.errorMessage;
+Vintagestory.Client.NoObf/ClientMain.cs-1635-		if (result.exception != null)
+Vintagestory.Client.NoObf/ClientMain.cs-1636-		{
+Vintagestory.Client.NoObf/ClientMain.cs-1637-			Logger.Warning("Error while connecting to server: {0}", result.errorMessage);
+Vintagestory.Client.NoObf/ClientMain.cs-1638-			Logger.Warning(LoggerBase.CleanStackTrace(result.exception.ToString()));
+Vintagestory.Client.NoObf/ClientMain.cs-1639-		}
+Vintagestory.Client.NoObf/ClientMain.cs-1640-	}
+Vintagestory.Client.NoObf/ClientMain.cs-1641-
+Vintagestory.Client.NoObf/ClientMain.cs-1642-	public void SendRequestJoin()
+--
+Vintagestory.Client.NoObf/ClientMain.cs-2607-	}
+Vintagestory.Client.NoObf/ClientMain.cs-2608-
+Vintagestory.Client.NoObf/ClientMain.cs-2609-	private void UpdateResize()
+Vintagestory.Client.NoObf/ClientMain.cs-2610-	{
+Vintagestory.Client.NoObf/ClientMain.cs-2611-		if (lastWidth != Platform.WindowSize.Width || lastHeight != Platform.WindowSize.Height)
+Vintagestory.Client.NoObf/ClientMain.cs-2612-		{
+Vintagestory.Client.NoObf/ClientMain.cs-2613-			lastWidth = Platform.WindowSize.Width;
+Vintagestory.Client.NoObf/ClientMain.cs-2614-			lastHeight = Platform.WindowSize.Height;
+Vintagestory.Client.NoObf/ClientMain.cs-2615-			OnResize();
+Vintagestory.Client.NoObf/ClientMain.cs-2616-		}
+Vintagestory.Client.NoObf/ClientMain.cs-2617-	}
+Vintagestory.Client.NoObf/ClientMain.cs-2618-
+Vintagestory.Client.NoObf/ClientMain.cs:2619:	public void EnqueueMainThreadTask(Action action, string code)
+Vintagestory.Client.NoObf/ClientMain.cs-2620-	{
+Vintagestory.Client.NoObf/ClientMain.cs-2621-		lock (MainThreadTasksLock)
+Vintagestory.Client.NoObf/ClientMain.cs-2622-		{
+Vintagestory.Client.NoObf/ClientMain.cs-2623-			MainThreadTasks.Enqueue(new ClientTask
+Vintagestory.Client.NoObf/ClientMain.cs-2624-			{
+Vintagestory.Client.NoObf/ClientMain.cs-2625-				Action = action,
+Vintagestory.Client.NoObf/ClientMain.cs-2626-				Code = code
+Vintagestory.Client.NoObf/ClientMain.cs-2627-			});
+Vintagestory.Client.NoObf/ClientMain.cs-2628-		}
+Vintagestory.Client.NoObf/ClientMain.cs-2629-	}
+Vintagestory.Client.NoObf/ClientMain.cs-2630-
+Vintagestory.Client.NoObf/ClientMain.cs-2631-	public void EnqueueGameLaunchTask(Action action, string code)
+Vintagestory.Client.NoObf/ClientMain.cs-2632-	{
+Vintagestory.Client.NoObf/ClientMain.cs-2633-		if (!disposed)
+Vintagestory.Client.NoObf/ClientMain.cs-2634-		{
+Vintagestory.Client.NoObf/ClientMain.cs-2635-			GameLaunchTasks.Enqueue(new ClientTask
+Vintagestory.Client.NoObf/ClientMain.cs-2636-			{
+Vintagestory.Client.NoObf/ClientMain.cs-2637-				Action = action,
+Vintagestory.Client.NoObf/ClientMain.cs-2638-				Code = code
+Vintagestory.Client.NoObf/ClientMain.cs-2639-			});
+Vintagestory.Client.NoObf/ClientMain.cs-2640-		}
+Vintagestory.Client.NoObf/ClientMain.cs-2641-	}
+Vintagestory.Client.NoObf/ClientMain.cs-2642-
+Vintagestory.Client.NoObf/ClientMain.cs-2643-	public void Dispose()
+Vintagestory.Client.NoObf/ClientMain.cs-2644-	{
+--
+Vintagestory.Client.NoObf/MainThreadAction.cs-10-
+Vintagestory.Client.NoObf/MainThreadAction.cs-11-	private string label;
+Vintagestory.Client.NoObf/MainThreadAction.cs-12-
+Vintagestory.Client.NoObf/MainThreadAction.cs-13-	public MainThreadAction(ClientMain game, Func<int> action, string label)
+Vintagestory.Client.NoObf/MainThreadAction.cs-14-	{
+Vintagestory.Client.NoObf/MainThreadAction.cs-15-		this.game = game;
+Vintagestory.Client.NoObf/MainThreadAction.cs-16-		this.action = action;
+Vintagestory.Client.NoObf/MainThreadAction.cs-17-		this.label = label;
+Vintagestory.Client.NoObf/MainThreadAction.cs-18-	}
+Vintagestory.Client.NoObf/MainThreadAction.cs-19-
+Vintagestory.Client.NoObf/MainThreadAction.cs-20-	public void Enqueue()
+Vintagestory.Client.NoObf/MainThreadAction.cs-21-	{
+Vintagestory.Client.NoObf/MainThreadAction.cs:22:		game.EnqueueMainThreadTask(() =>
+Vintagestory.Client.NoObf/MainThreadAction.cs-23-		{
+Vintagestory.Client.NoObf/MainThreadAction.cs-24-			action();
+Vintagestory.Client.NoObf/MainThreadAction.cs-25-		}, label);
+Vintagestory.Client.NoObf/MainThreadAction.cs-26-	}
+Vintagestory.Client.NoObf/MainThreadAction.cs-27-
+Vintagestory.Client.NoObf/MainThreadAction.cs-28-	public void Enqueue(Action otherAction)
+Vintagestory.Client.NoObf/MainThreadAction.cs-29-	{
+Vintagestory.Client.NoObf/MainThreadAction.cs:30:		game.EnqueueMainThreadTask(otherAction, label);
+Vintagestory.Client.NoObf/MainThreadAction.cs-31-	}
+Vintagestory.Client.NoObf/MainThreadAction.cs-32-
+Vintagestory.Client.NoObf/MainThreadAction.cs-33-	public int Invoke()
+Vintagestory.Client.NoObf/MainThreadAction.cs-34-	{
+Vintagestory.Client.NoObf/MainThreadAction.cs-35-		return action();
+Vintagestory.Client.NoObf/MainThreadAction.cs-36-	}
+Vintagestory.Client.NoObf/MainThreadAction.cs-37-}
+--
+Vintagestory.Client.NoObf/GuiScreenPublicServers.cs-200-	{
+Vintagestory.Client.NoObf/GuiScreenPublicServers.cs-201-		LoadServerEntries();
+Vintagestory.Client.NoObf/GuiScreenPublicServers.cs-202-		InitGui();
+Vintagestory.Client.NoObf/GuiScreenPublicServers.cs-203-	}
+Vintagestory.Client.NoObf/GuiScreenPublicServers.cs-204-
+Vintagestory.Client.NoObf/GuiScreenPublicServers.cs-205-	private void LoadServerEntries()
+Vintagestory.Client.NoObf/GuiScreenPublicServers.cs-206-	{
+Vintagestory.Client.NoObf/GuiScreenPublicServers.cs-207-		isLoading = true;
+Vintagestory.Client.NoObf/GuiScreenPublicServers.cs-208-		getServersAsync(ClientSettings.MasterserverUrl + "list", (ResponsePacket packet) =>
+Vintagestory.Client.NoObf/GuiScreenPublicServers.cs-209-		{
+Vintagestory.Client.NoObf/GuiScreenPublicServers.cs-210-			isLoading = false;
+Vintagestory.Client.NoObf/GuiScreenPublicServers.cs-211-			this.packet = packet;
+Vintagestory.Client.NoObf/GuiScreenPublicServers.cs:212:			ScreenManager.EnqueueMainThreadTask(() =>
+Vintagestory.Client.NoObf/GuiScreenPublicServers.cs-213-			{
+Vintagestory.Client.NoObf/GuiScreenPublicServers.cs-214-				popCells();
+Vintagestory.Client.NoObf/GuiScreenPublicServers.cs-215-			});
+Vintagestory.Client.NoObf/GuiScreenPublicServers.cs-216-		});
+Vintagestory.Client.NoObf/GuiScreenPublicServers.cs-217-	}
+Vintagestory.Client.NoObf/GuiScreenPublicServers.cs-218-
+Vintagestory.Client.NoObf/GuiScreenPublicServers.cs-219-	private void popCells()
+Vintagestory.Client.NoObf/GuiScreenPublicServers.cs-220-	{
+Vintagestory.Client.NoObf/GuiScreenPublicServers.cs-221-		cells.Clear();
+Vintagestory.Client.NoObf/GuiScreenPublicServers.cs-222-		if (packet?.status != "ok")
+Vintagestory.Client.NoObf/GuiScreenPublicServers.cs-223-		{
+Vintagestory.Client.NoObf/GuiScreenPublicServers.cs-224-			ServerListEntry item = new ServerListEntry
+Vintagestory.Client.NoObf/GuiScreenPublicServers.cs-225-			{
+Vintagestory.Client.NoObf/GuiScreenPublicServers.cs-226-				Title = "Could not connect to master server",
+Vintagestory.Client.NoObf/GuiScreenPublicServers.cs-227-				TitleFont = CairoFont.WhiteSmallishText().WithColor(GuiStyle.ErrorTextColor)
+Vintagestory.Client.NoObf/GuiScreenPublicServers.cs-228-			};
+Vintagestory.Client.NoObf/GuiScreenPublicServers.cs-229-			cells.Add(item);
+Vintagestory.Client.NoObf/GuiScreenPublicServers.cs-230-		}
+Vintagestory.Client.NoObf/GuiScreenPublicServers.cs-231-		else
+Vintagestory.Client.NoObf/GuiScreenPublicServers.cs-232-		{
+Vintagestory.Client.NoObf/GuiScreenPublicServers.cs-233-			IOrderedEnumerable<ServerListEntry> orderedEnumerable = packet.data.OrderByDescending((ServerListEntry elem) => elem.players + ((elem.players == 0 && elem.serverName == "Vintage Story Server") ? (-1) : 0));
+Vintagestory.Client.NoObf/GuiScreenPublicServers.cs-234-			serversTotal = 0;
+Vintagestory.Client.NoObf/GuiScreenPublicServers.cs-235-			playersTotal = 0;
+Vintagestory.Client.NoObf/GuiScreenPublicServers.cs-236-			foreach (ServerListEntry item2 in orderedEnumerable)
+Vintagestory.Client.NoObf/GuiScreenPublicServers.cs-237-			{
+--
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-142-		addCommonTextures();
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-143-		Atlasses.Add(currentAtlas);
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-144-		return currentAtlas;
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-145-	}
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-146-
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-147-	public virtual TextureAtlas RuntimeCreateNewAtlas(string itemclass)
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-148-	{
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-149-		if (Environment.CurrentManagedThreadId != RuntimeEnv.MainThreadId)
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-150-		{
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-151-			if (!atlasCreationQueued && Environment.CurrentManagedThreadId == game.TesselationThreadId)
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-152-			{
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-153-				atlasCreationQueued = true;
+Vintagestory.Client.NoObf/TextureAtlasManager.cs:154:				game.EnqueueMainThreadTask(() =>
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-155-				{
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-156-					RuntimeCreateNewAtlas(itemclass);
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-157-				}, "createnewatlas");
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-158-				game.Logger.VerboseDebug("queuing new " + itemclass + " atlas creation");
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-159-			}
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-160-			throw new RetryTesselationException("Attempting to create an additional texture atlas outside of the main thread. This is not possible as we have only one OpenGL context!");
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-161-		}
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-162-		game.Logger.VerboseDebug("creating new " + itemclass + " atlas");
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-163-		TextureAtlas textureAtlas = CreateNewAtlas(itemclass);
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-164-		LoadedTexture item = textureAtlas.Upload(game);
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-165-		AtlasTextures.Add(item);
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-166-		atlasCreationQueued = false;
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-167-		return textureAtlas;
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-168-	}
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-169-
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-170-	private void addCommonTextures()
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-171-	{
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-172-		foreach (KeyValuePair<AssetLocation, int> item in textureNamesDict)
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-173-		{
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-174-			AssetLocationAndSource assetLocationAndSource = item.Key as AssetLocationAndSource;
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-175-			if (assetLocationAndSource.AddToAllAtlasses)
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-176-			{
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-177-				IAsset asset = game.AssetManager.TryGet(assetLocationAndSource);
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-178-				currentAtlas.InsertTexture(item.Value, game.api, asset);
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-179-			}
+--
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-281-			return false;
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-282-		}
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-283-		bool flag = InsertTexture(bitmap2, out textureSubId, out texPos, alphaTest);
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-284-		if (flag)
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-285-		{
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-286-			if (Environment.CurrentManagedThreadId == RuntimeEnv.MainThreadId)
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-287-			{
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-288-				textureNamesDict[loc] = textureSubId;
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-289-				return flag;
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-290-			}
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-291-			offthreadTextureNamesDict[loc] = textureSubId;
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-292-			int textureSubIdMT = textureSubId;
+Vintagestory.Client.NoObf/TextureAtlasManager.cs:293:			game.EnqueueMainThreadTask(() =>
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-294-			{
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-295-				textureNamesDict[loc] = textureSubIdMT;
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-296-			}, "updateTextureNamesDict");
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-297-		}
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-298-		return flag;
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-299-	}
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-300-
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-301-	[Obsolete("Use GetOrInsertTexture() instead. It's more efficient to load the bmp only if the texture was not found in the cache")]
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-302-	public bool InsertTextureCached(AssetLocation path, IBitmap bmp, out int textureSubId, out TextureAtlasPosition texPos, float alphaTest = 0f)
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-303-	{
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-304-		AssetLocationAndSource key = new AssetLocationAndSource(path);
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-305-		if (textureNamesDict.TryGetValue(key, out textureSubId))
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-306-		{
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-307-			texPos = TextureAtlasPositionsByTextureSubId[textureSubId];
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-308-			if (texPos.reloadIteration != reloadIteration)
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-309-			{
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-310-				runtimeUpdateTexture(bmp, texPos, alphaTest);
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-311-			}
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-312-			return true;
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-313-		}
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-314-		bool flag = InsertTexture(bmp, out textureSubId, out texPos, alphaTest);
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-315-		if (flag)
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-316-		{
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-317-			textureNamesDict[key] = textureSubId;
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-318-		}
+--
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-347-			RenderTextureIntoAtlas(texPos.atlasTextureId, loadedTexture, 0f, 0f, bmp.Width, bmp.Height, texPos.x1 * (float)Size.Width, texPos.y1 * (float)Size.Height, alphaTest);
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-348-			loadedTexture.Dispose();
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-349-			if (glScissorFlagEnabled)
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-350-			{
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-351-				game.Platform.GlScissorFlag(enable: true);
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-352-			}
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-353-		}
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-354-		if (!autoRegenMipMaps || genMipmapsQueued)
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-355-		{
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-356-			return;
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-357-		}
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-358-		genMipmapsQueued = true;
+Vintagestory.Client.NoObf/TextureAtlasManager.cs:359:		game.EnqueueMainThreadTask(() =>
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-360-		{
+Vintagestory.Client.NoObf/TextureAtlasManager.cs:361:			game.EnqueueMainThreadTask(() =>
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-362-			{
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-363-				RegenMipMaps(texPos.atlasNumber);
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-364-				genMipmapsQueued = false;
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-365-			}, "genmipmaps");
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-366-		}, "genmipmaps");
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-367-	}
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-368-
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-369-	private void runtimeUpdateTexture(IBitmap bmp, TextureAtlasPosition texPos, float alphaTest = 0f)
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-370-	{
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-371-		if (Environment.CurrentManagedThreadId != RuntimeEnv.MainThreadId)
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-372-		{
+Vintagestory.Client.NoObf/TextureAtlasManager.cs:373:			game.EnqueueMainThreadTask(() =>
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-374-			{
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-375-				RuntimeUploadTextureToPos(bmp, texPos, alphaTest);
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-376-			}, "textureupload");
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-377-		}
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-378-		else
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-379-		{
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-380-			RuntimeUploadTextureToPos(bmp, texPos, alphaTest);
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-381-		}
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-382-		int width = bmp.Width;
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-383-		int height = bmp.Height;
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-384-		if (pixelsTmp == null)
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-385-		{
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-386-			pixelsTmp = new int[4];
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-387-		}
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-388-		pixelsTmp[0] = bmp.GetPixel((int)(0.35f * (float)width), (int)(0.35f * (float)height)).ToArgb();
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-389-		pixelsTmp[1] = bmp.GetPixel((int)(0.65f * (float)width), (int)(0.35f * (float)height)).ToArgb();
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-390-		pixelsTmp[2] = bmp.GetPixel((int)(0.35f * (float)width), (int)(0.65f * (float)height)).ToArgb();
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-391-		pixelsTmp[3] = bmp.GetPixel((int)(0.65f * (float)width), (int)(0.65f * (float)height)).ToArgb();
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-392-		texPos.AvgColor = ColorUtil.ReverseColorBytes(ColorUtil.ColorAverage(pixelsTmp, equalWeight));
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-393-		int[] array = GC.AllocateUninitializedArray<int>(30);
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-394-		for (int num = 0; num < array.Length; num++)
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-395-		{
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-396-			int num2 = 0;
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-397-			for (int num3 = 0; num3 < 15; num3++)
+Vintagestory.Client.NoObf/TextureAtlasManager.cs-398-			{
+--
+Vintagestory.Client.NoObf/ClientEventAPI.cs-4-using Vintagestory.API.Client;
+Vintagestory.Client.NoObf/ClientEventAPI.cs-5-using Vintagestory.API.Common;
+Vintagestory.Client.NoObf/ClientEventAPI.cs-6-using Vintagestory.API.Common.Entities;
+Vintagestory.Client.NoObf/ClientEventAPI.cs-7-using Vintagestory.API.Config;
+Vintagestory.Client.NoObf/ClientEventAPI.cs-8-using Vintagestory.API.Datastructures;
+Vintagestory.Client.NoObf/ClientEventAPI.cs-9-using Vintagestory.API.MathTools;
+Vintagestory.Client.NoObf/ClientEventAPI.cs-10-using Vintagestory.Common;
+Vintagestory.Client.NoObf/ClientEventAPI.cs-11-
+Vintagestory.Client.NoObf/ClientEventAPI.cs-12-namespace Vintagestory.Client.NoObf;
+Vintagestory.Client.NoObf/ClientEventAPI.cs-13-
+Vintagestory.Client.NoObf/ClientEventAPI.cs-14-public class ClientEventAPI : IClientEventAPI, IEventAPI
+Vintagestory.Client.NoObf/ClientEventAPI.cs-15-{
+Vintagestory.Client.NoObf/ClientEventAPI.cs:16:	private static string strThreadException = "Cannot call this method outside the main thread. Not thread safe to do so. You can use the thread safe method .EnqueueMainThreadTask() to queue up the register on the main thread instead.";
+Vintagestory.Client.NoObf/ClientEventAPI.cs-17-
+Vintagestory.Client.NoObf/ClientEventAPI.cs-18-	private ClientMain game;
+Vintagestory.Client.NoObf/ClientEventAPI.cs-19-
+Vintagestory.Client.NoObf/ClientEventAPI.cs-20-	internal Dictionary<int, ItemRenderDelegate>[][] itemStackRenderersByTarget;
+Vintagestory.Client.NoObf/ClientEventAPI.cs-21-
+Vintagestory.Client.NoObf/ClientEventAPI.cs-22-	public event MouseEventDelegate MouseDown;
+Vintagestory.Client.NoObf/ClientEventAPI.cs-23-
+Vintagestory.Client.NoObf/ClientEventAPI.cs-24-	public event MouseEventDelegate MouseUp;
+Vintagestory.Client.NoObf/ClientEventAPI.cs-25-
+Vintagestory.Client.NoObf/ClientEventAPI.cs-26-	public event MouseEventDelegate MouseMove;
+Vintagestory.Client.NoObf/ClientEventAPI.cs-27-
+Vintagestory.Client.NoObf/ClientEventAPI.cs-28-	public event MouseWheelEventDelegate MouseWheelMove;
+Vintagestory.Client.NoObf/ClientEventAPI.cs-29-
+Vintagestory.Client.NoObf/ClientEventAPI.cs-30-	public event KeyEventDelegate KeyDown;
+Vintagestory.Client.NoObf/ClientEventAPI.cs-31-
+Vintagestory.Client.NoObf/ClientEventAPI.cs-32-	public event KeyEventDelegate KeyUp;
+Vintagestory.Client.NoObf/ClientEventAPI.cs-33-
+Vintagestory.Client.NoObf/ClientEventAPI.cs-34-	public event FileDropDelegate FileDrop;
+Vintagestory.Client.NoObf/ClientEventAPI.cs-35-
+Vintagestory.Client.NoObf/ClientEventAPI.cs-36-	public event PlayerEventDelegate PlayerJoin;
+Vintagestory.Client.NoObf/ClientEventAPI.cs-37-
+Vintagestory.Client.NoObf/ClientEventAPI.cs-38-	public event PlayerEventDelegate PlayerLeave;
+Vintagestory.Client.NoObf/ClientEventAPI.cs-39-
+Vintagestory.Client.NoObf/ClientEventAPI.cs-40-	public event PlayerEventDelegate PlayerEntitySpawn;
+Vintagestory.Client.NoObf/ClientEventAPI.cs-41-
+--
+Vintagestory.Client.NoObf/ClientEventAPI.cs-960-		game.UnregisterCallback(listenerId);
+Vintagestory.Client.NoObf/ClientEventAPI.cs-961-	}
+Vintagestory.Client.NoObf/ClientEventAPI.cs-962-
+Vintagestory.Client.NoObf/ClientEventAPI.cs-963-	public void UnregisterGameTickListener(long listenerId)
+Vintagestory.Client.NoObf/ClientEventAPI.cs-964-	{
+Vintagestory.Client.NoObf/ClientEventAPI.cs-965-		if (Environment.CurrentManagedThreadId != RuntimeEnv.MainThreadId)
+Vintagestory.Client.NoObf/ClientEventAPI.cs-966-		{
+Vintagestory.Client.NoObf/ClientEventAPI.cs-967-			throw new InvalidOperationException(strThreadException);
+Vintagestory.Client.NoObf/ClientEventAPI.cs-968-		}
+Vintagestory.Client.NoObf/ClientEventAPI.cs-969-		game.UnregisterGameTickListener(listenerId);
+Vintagestory.Client.NoObf/ClientEventAPI.cs-970-	}
+Vintagestory.Client.NoObf/ClientEventAPI.cs-971-
+Vintagestory.Client.NoObf/ClientEventAPI.cs:972:	public void EnqueueMainThreadTask(Action action, string code)
+Vintagestory.Client.NoObf/ClientEventAPI.cs-973-	{
+Vintagestory.Client.NoObf/ClientEventAPI.cs:974:		game.EnqueueMainThreadTask(action, code);
+Vintagestory.Client.NoObf/ClientEventAPI.cs-975-	}
+Vintagestory.Client.NoObf/ClientEventAPI.cs-976-
+Vintagestory.Client.NoObf/ClientEventAPI.cs-977-	internal void TriggerSendChatMessage(int groupId, ref string message, ref EnumHandling handling)
+Vintagestory.Client.NoObf/ClientEventAPI.cs-978-	{
+Vintagestory.Client.NoObf/ClientEventAPI.cs-979-		if (OnSendChatMessage == null)
+Vintagestory.Client.NoObf/ClientEventAPI.cs-980-		{
+Vintagestory.Client.NoObf/ClientEventAPI.cs-981-			return;
+Vintagestory.Client.NoObf/ClientEventAPI.cs-982-		}
+Vintagestory.Client.NoObf/ClientEventAPI.cs-983-		Delegate[] invocationList = OnSendChatMessage.GetInvocationList();
+Vintagestory.Client.NoObf/ClientEventAPI.cs-984-		for (int i = 0; i < invocationList.Length; i++)
+Vintagestory.Client.NoObf/ClientEventAPI.cs-985-		{
+Vintagestory.Client.NoObf/ClientEventAPI.cs-986-			ClientChatLineDelegate clientChatLineDelegate = (ClientChatLineDelegate)invocationList[i];
+Vintagestory.Client.NoObf/ClientEventAPI.cs-987-			try
+Vintagestory.Client.NoObf/ClientEventAPI.cs-988-			{
+Vintagestory.Client.NoObf/ClientEventAPI.cs-989-				clientChatLineDelegate(groupId, ref message, ref handling);
+Vintagestory.Client.NoObf/ClientEventAPI.cs-990-				if (handling == EnumHandling.PreventSubsequent)
+Vintagestory.Client.NoObf/ClientEventAPI.cs-991-				{
+Vintagestory.Client.NoObf/ClientEventAPI.cs-992-					break;
+Vintagestory.Client.NoObf/ClientEventAPI.cs-993-				}
+Vintagestory.Client.NoObf/ClientEventAPI.cs-994-			}
+Vintagestory.Client.NoObf/ClientEventAPI.cs-995-			catch (Exception e)
+Vintagestory.Client.NoObf/ClientEventAPI.cs-996-			{
+Vintagestory.Client.NoObf/ClientEventAPI.cs-997-				game.Logger.Error("Mod exception during event OnSendChatMessage. Will skip to next event");
+Vintagestory.Client.NoObf/ClientEventAPI.cs-998-				game.Logger.Error(e);
+Vintagestory.Client.NoObf/ClientEventAPI.cs-999-			}
+--
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-251-			return;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-252-		}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-253-		IEnumerable<Packet_UdpPacket> enumerable = game.UdpNetClient.ReadMessage();
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-254-		if (enumerable == null)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-255-		{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-256-			return;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-257-		}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-258-		foreach (Packet_UdpPacket packet in enumerable)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-259-		{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-260-			int udpByteCount = packet.Length;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-261-			if (packetDebug)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-262-			{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs:263:				ScreenManager.EnqueueMainThreadTask(() =>
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-264-				{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-265-					game.Logger.VerboseDebug("Received UDP packet id {0}, dataLength {1}", packet.Id, udpByteCount);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-266-				});
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-267-			}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-268-			UpdateUdpStatsAndBenchmark(packet, udpByteCount);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-269-			switch (packet.Id)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-270-			{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-271-			case 4:
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-272-				HandleBulkPacket(packet.BulkPositions);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-273-				break;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-274-			case 5:
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-275-				HandleSinglePacket(packet.EntityPosition);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-276-				break;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-277-			case 6:
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-278-				game.HandleCustomUdpPackets(packet.ChannelPacket);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-279-				break;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-280-			}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-281-		}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-282-	}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-283-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-284-	private void UpdateUdpStatsAndBenchmark(Packet_UdpPacket packet, int udpByteCount)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-285-	{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-286-		if (doBenchmark)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-287-		{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-288-			if (udpPacketBenchmark.TryGetValue(packet.Id, out var value))
+--
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-357-	}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-358-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-359-	public void TryReadPacket(byte[] data, int dataLength)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-360-	{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-361-		Packet_Server packet = new Packet_Server();
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-362-		Packet_ServerSerializer.DeserializeBuffer(data, dataLength, packet);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-363-		if (game.disposed)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-364-		{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-365-			return;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-366-		}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-367-		if (packetDebug)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-368-		{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs:369:			ScreenManager.EnqueueMainThreadTask(() =>
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-370-			{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-371-				game.Logger.VerboseDebug("Received packet id {0}, dataLength {1}", packet.Id, dataLength);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-372-			});
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-373-		}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-374-		if (doBenchmark)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-375-		{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-376-			if (packetBenchmark.TryGetValue(packet.Id, out var value))
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-377-			{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-378-				packetBenchmark[packet.Id] = value + data.Length;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-379-			}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-380-			else
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-381-			{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-382-				packetBenchmark[packet.Id] = data.Length;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-383-			}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-384-		}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-385-		if (ProcessInBackground(packet))
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-386-		{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-387-			return;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-388-		}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-389-		ProcessPacketTask task = new ProcessPacketTask
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-390-		{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-391-			game = game,
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-392-			packet = packet
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-393-		};
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-394-		if (packet.Id == 73)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-395-		{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-396-			game.ServerReady = true;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-397-			if (game.IsSingleplayer && game.GameLaunchTasks.Count > 0)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-398-			{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-399-				game.Logger.VerboseDebug("ServerIdentification packet received; will wait until block tesselation is complete to handle it");
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-400-			}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-401-		}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-402-		if (false)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-403-		{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-404-			string taskId = "readpacket" + packet.Id;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs:405:			game.EnqueueMainThreadTask(() =>
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-406-			{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs:407:				game.EnqueueMainThreadTask(() =>
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-408-				{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs:409:					game.EnqueueMainThreadTask(() =>
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-410-					{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs:411:						game.EnqueueMainThreadTask(() =>
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-412-						{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs:413:							game.EnqueueMainThreadTask(task.Run, taskId);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-414-						}, taskId);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-415-					}, taskId);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-416-				}, taskId);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-417-			}, taskId);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-418-		}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-419-		else
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-420-		{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs:421:			game.EnqueueMainThreadTask(task.Run, "readpacket" + packet.Id);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-422-		}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-423-		game.LastReceivedMilliseconds = game.Platform.EllapsedMs;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-424-	}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-425-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-426-	public override int SeperateThreadTickIntervalMs()
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-427-	{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-428-		return 1;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-429-	}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-430-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-431-	private bool ProcessInBackground(Packet_Server packet)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-432-	{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-433-		switch (packet.Id)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-434-		{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-435-		case 4:
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-436-			game.WorldMap.ServerChunkSize = packet.LevelInitialize.ServerChunkSize;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-437-			game.WorldMap.MapChunkSize = packet.LevelInitialize.ServerMapChunkSize;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-438-			game.WorldMap.regionSize = packet.LevelInitialize.ServerMapRegionSize;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-439-			game.WorldMap.MaxViewDistance = packet.LevelInitialize.MaxViewDistance;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-440-			return false;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-441-		case 10:
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-442-		{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-443-			if (!game.BlocksReceivedAndLoaded)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-444-			{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-445-				for (int num3 = 0; num3 < packet.Chunks.ChunksCount; num3++)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-446-				{
+--
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-484-			return true;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-485-		}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-486-		case 42:
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-487-		{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-488-			long key3 = game.WorldMap.MapRegionIndex2D(packet.MapRegion.RegionX, packet.MapRegion.RegionZ);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-489-			game.WorldMap.MapRegions.TryGetValue(key3, out var region);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-490-			if (region == null)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-491-			{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-492-				region = new ClientMapRegion();
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-493-			}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-494-			region.UpdateFromPacket(packet);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-495-			game.WorldMap.MapRegions[key3] = region;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs:496:			game.EnqueueMainThreadTask(() =>
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-497-			{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-498-				game.api.eventapi.TriggerMapregionLoaded(new Vec2i(packet.MapRegion.RegionX, packet.MapRegion.RegionZ), region);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-499-			}, "mapregionloadedevent");
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-500-			return true;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-501-		}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-502-		case 47:
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-503-		{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-504-			if (!game.Spawned)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-505-			{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-506-				return true;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-507-			}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-508-			KeyValuePair<BlockPos[], int[]> pair2 = BlockTypeNet.UnpackSetBlocks(packet.SetBlocks.SetBlocks, out var liquidLayer2);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs:509:			game.EnqueueMainThreadTask(() =>
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-510-			{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-511-				BlockPos[] key4 = pair2.Key;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-512-				int[] value3 = pair2.Value;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-513-				for (int i = 0; i < key4.Length; i++)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-514-				{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-515-					game.WorldMap.BulkBlockAccess.SetBlock(value3[i], key4[i]);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-516-					game.eventManager?.TriggerBlockChanged(game, key4[i], null);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-517-				}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-518-				if (liquidLayer2 != null)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-519-				{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-520-					for (int j = 0; j < key4.Length; j++)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-521-					{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-522-						game.WorldMap.BulkBlockAccess.SetBlock(liquidLayer2[j], key4[j], 2);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-523-					}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-524-					game.WorldMap.BulkBlockAccess.Commit();
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-525-				}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-526-			}, "setblocks");
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-527-			return true;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-528-		}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-529-		case 63:
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-530-		{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-531-			KeyValuePair<BlockPos[], int[]> pair = BlockTypeNet.UnpackSetBlocks(packet.SetBlocks.SetBlocks, out var liquidLayer);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs:532:			game.EnqueueMainThreadTask(() =>
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-533-			{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-534-				BlockPos[] key4 = pair.Key;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-535-				int[] value3 = pair.Value;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-536-				if (game.BlocksReceivedAndLoaded)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-537-				{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-538-					for (int i = 0; i < key4.Length; i++)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-539-					{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-540-						game.WorldMap.NoRelightBulkBlockAccess.SetBlock(value3[i], key4[i]);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-541-						game.eventManager?.TriggerBlockChanged(game, key4[i], null);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-542-					}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-543-				}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-544-				else
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-545-				{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-546-					for (int j = 0; j < key4.Length; j++)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-547-					{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-548-						game.WorldMap.NoRelightBulkBlockAccess.SetBlock(value3[j], key4[j]);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-549-					}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-550-				}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-551-				game.WorldMap.NoRelightBulkBlockAccess.Commit();
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-552-				if (liquidLayer != null)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-553-				{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-554-					for (int k = 0; k < key4.Length; k++)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-555-					{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-556-						game.WorldMap.NoRelightBulkBlockAccess.SetBlock(liquidLayer[k], key4[k], 2);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-557-					}
+--
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-576-				{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-577-					game.WorldMap.BulkMinimalBlockAccess.SetBlock(value2[num], pos);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-578-				}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-579-			}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-580-			if (liquidsLayer != null)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-581-			{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-582-				for (int num2 = 0; num2 < key2.Length; num2++)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-583-				{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-584-					game.WorldMap.BulkMinimalBlockAccess.SetBlock(liquidsLayer[num2], key2[num2], 2);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-585-				}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-586-			}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-587-			commitingMinimalUpdate = true;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs:588:			game.EnqueueMainThreadTask(() =>
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-589-			{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-590-				game.WorldMap.BulkMinimalBlockAccess.Commit();
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-591-				commitingMinimalUpdate = false;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-592-			}, "setblocksminimal");
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-593-			return true;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-594-		}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-595-		case 71:
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-596-		{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-597-			if (!game.Spawned)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-598-			{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-599-				return true;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-600-			}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-601-			Dictionary<int, Block> newDecors = BlockTypeNet.UnpackSetDecors(packet.SetDecors.SetDecors, game.WorldMap.World, out var chunkIndex);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs:602:			game.EnqueueMainThreadTask(() =>
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-603-			{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-604-				game.WorldMap.BulkBlockAccess.SetDecorsBulk(chunkIndex, newDecors);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-605-			}, "setdecors");
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-606-			return true;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-607-		}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-608-		case 74:
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-609-			if (!game.Spawned)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-610-			{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-611-				return true;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-612-			}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs:613:			game.EnqueueMainThreadTask(() =>
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-614-			{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-615-				game.WorldMap.UnloadMapRegion(packet.UnloadMapRegion.RegionX, packet.UnloadMapRegion.RegionZ);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-616-			}, "unloadmapregion");
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-617-			return true;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-618-		default:
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-619-			return false;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-620-		}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-621-	}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-622-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-623-	public override EnumClientSystemType GetSystemType()
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-624-	{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-625-		return EnumClientSystemType.Misc;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-626-	}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-627-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-628-	public void HandleSinglePacket(Packet_EntityPosition packet)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-629-	{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-630-		if (packet == null)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-631-		{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-632-			return;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-633-		}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-634-		Entity entityById = game.GetEntityById(packet.EntityId);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-635-		if (entityById == null)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-636-		{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-637-			return;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-638-		}
+--
+Vintagestory.Client.NoObf/GuiDialogSelboxEditor.cs-44-	{
+Vintagestory.Client.NoObf/GuiDialogSelboxEditor.cs-45-		TryOpen();
+Vintagestory.Client.NoObf/GuiDialogSelboxEditor.cs-46-		return TextCommandResult.Success();
+Vintagestory.Client.NoObf/GuiDialogSelboxEditor.cs-47-	}
+Vintagestory.Client.NoObf/GuiDialogSelboxEditor.cs-48-
+Vintagestory.Client.NoObf/GuiDialogSelboxEditor.cs-49-	public override void OnGuiOpened()
+Vintagestory.Client.NoObf/GuiDialogSelboxEditor.cs-50-	{
+Vintagestory.Client.NoObf/GuiDialogSelboxEditor.cs-51-		BlockSelection currentBlockSelection = capi.World.Player.CurrentBlockSelection;
+Vintagestory.Client.NoObf/GuiDialogSelboxEditor.cs-52-		boxIndex = 0;
+Vintagestory.Client.NoObf/GuiDialogSelboxEditor.cs-53-		if (currentBlockSelection == null)
+Vintagestory.Client.NoObf/GuiDialogSelboxEditor.cs-54-		{
+Vintagestory.Client.NoObf/GuiDialogSelboxEditor.cs-55-			capi.World.Player.ShowChatNotification("Look at a block first");
+Vintagestory.Client.NoObf/GuiDialogSelboxEditor.cs:56:			capi.Event.EnqueueMainThreadTask(() =>
+Vintagestory.Client.NoObf/GuiDialogSelboxEditor.cs-57-			{
+Vintagestory.Client.NoObf/GuiDialogSelboxEditor.cs-58-				TryClose();
+Vintagestory.Client.NoObf/GuiDialogSelboxEditor.cs-59-			}, "closegui");
+Vintagestory.Client.NoObf/GuiDialogSelboxEditor.cs-60-			return;
+Vintagestory.Client.NoObf/GuiDialogSelboxEditor.cs-61-		}
+Vintagestory.Client.NoObf/GuiDialogSelboxEditor.cs-62-		nowPos = currentBlockSelection.Position.Copy();
+Vintagestory.Client.NoObf/GuiDialogSelboxEditor.cs-63-		nowBlock = capi.World.BlockAccessor.GetBlock(currentBlockSelection.Position);
+Vintagestory.Client.NoObf/GuiDialogSelboxEditor.cs-64-		TreeAttribute treeAttribute = new TreeAttribute();
+Vintagestory.Client.NoObf/GuiDialogSelboxEditor.cs-65-		treeAttribute.SetInt("nowblockid", nowBlock.Id);
+Vintagestory.Client.NoObf/GuiDialogSelboxEditor.cs-66-		treeAttribute.SetBlockPos("pos", currentBlockSelection.Position);
+Vintagestory.Client.NoObf/GuiDialogSelboxEditor.cs-67-		capi.Event.PushEvent("oneditselboxes", treeAttribute);
+Vintagestory.Client.NoObf/GuiDialogSelboxEditor.cs-68-		if (nowBlock.SelectionBoxes != null)
+Vintagestory.Client.NoObf/GuiDialogSelboxEditor.cs-69-		{
+Vintagestory.Client.NoObf/GuiDialogSelboxEditor.cs-70-			originalSelBoxes = new Cuboidf[nowBlock.SelectionBoxes.Length];
+Vintagestory.Client.NoObf/GuiDialogSelboxEditor.cs-71-			for (int num = 0; num < originalSelBoxes.Length; num++)
+Vintagestory.Client.NoObf/GuiDialogSelboxEditor.cs-72-			{
+Vintagestory.Client.NoObf/GuiDialogSelboxEditor.cs-73-				originalSelBoxes[num] = nowBlock.SelectionBoxes[num].Clone();
+Vintagestory.Client.NoObf/GuiDialogSelboxEditor.cs-74-			}
+Vintagestory.Client.NoObf/GuiDialogSelboxEditor.cs-75-		}
+Vintagestory.Client.NoObf/GuiDialogSelboxEditor.cs-76-		currentSelBoxes = nowBlock.SelectionBoxes;
+Vintagestory.Client.NoObf/GuiDialogSelboxEditor.cs-77-		ComposeDialog();
+Vintagestory.Client.NoObf/GuiDialogSelboxEditor.cs-78-	}
+Vintagestory.Client.NoObf/GuiDialogSelboxEditor.cs-79-
+Vintagestory.Client.NoObf/GuiDialogSelboxEditor.cs-80-	private void ComposeDialog()
+Vintagestory.Client.NoObf/GuiDialogSelboxEditor.cs-81-	{
+--
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-151-		if (game.PlayerByUid((entity as EntityPlayer)?.PlayerUID) is ClientPlayer clientPlayer)
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-152-		{
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-153-			game.api.eventapi.TriggerPlayerEntityDespawn(clientPlayer);
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-154-			clientPlayer.worlddata.EntityPlayer = null;
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-155-		}
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-156-	}
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-157-
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-158-	private void HandleEntityLoadedPacket(Packet_Server serverpacket)
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-159-	{
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-160-		Packet_Entity packet = serverpacket.Entity;
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-161-		if (packet != null)
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-162-		{
+Vintagestory.Client.NoObf/ClientSystemEntities.cs:163:			game.EnqueueMainThreadTask(() =>
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-164-			{
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-165-				Entity entity = createOrUpdateEntityFromPacket(packet, game);
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-166-				game.LoadedEntities[entity.EntityId] = entity;
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-167-				game.eventManager?.TriggerEntityLoaded(entity);
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-168-			}, "entityloadedpacket");
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-169-		}
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-170-	}
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-171-
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-172-	private void HandleEntitiesPacket(Packet_Server serverpacket)
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-173-	{
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-174-		Packet_Entity[] entities = serverpacket.Entities.Entities;
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-175-		if (game.ClassRegistryInt.entityClassNameToTypeMapping.Count == 0)
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-176-		{
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-177-			game.Logger.Error(string.Format("Server sent me one or emore entity packets, but I cannot instantiate/update it, I don't have the entity class to type mapping (yet). Maybe server sent a packet too early? Will ignore.", default(ReadOnlySpan<object>)));
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-178-			return;
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-179-		}
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-180-		for (int i = 0; i < entities.Length && entities[i] != null; i++)
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-181-		{
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-182-			Entity entity = createOrUpdateEntityFromPacket(entities[i], game);
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-183-			if (entity == null)
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-184-			{
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-185-				throw new InvalidOperationException($"Server sent me an entity packet for entity {entities[i].EntityType}, but I cannot instantiate/update it, entity is null");
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-186-			}
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-187-			game.LoadedEntities[entity.EntityId] = entity;
+Vintagestory.Client.NoObf/ClientSystemEntities.cs-188-			game.eventManager?.TriggerEntityLoaded(entity);
+--
+Vintagestory.Client.NoObf/InventoryItemRenderer.cs-67-		AtlasRenderTask task = new AtlasRenderTask
+Vintagestory.Client.NoObf/InventoryItemRenderer.cs-68-		{
+Vintagestory.Client.NoObf/InventoryItemRenderer.cs-69-			Stack = stack,
+Vintagestory.Client.NoObf/InventoryItemRenderer.cs-70-			Atlas = atlas,
+Vintagestory.Client.NoObf/InventoryItemRenderer.cs-71-			Size = size,
+Vintagestory.Client.NoObf/InventoryItemRenderer.cs-72-			Color = color,
+Vintagestory.Client.NoObf/InventoryItemRenderer.cs-73-			SepiaLevel = sepiaLevel,
+Vintagestory.Client.NoObf/InventoryItemRenderer.cs-74-			OnComplete = onComplete,
+Vintagestory.Client.NoObf/InventoryItemRenderer.cs-75-			Scale = scale
+Vintagestory.Client.NoObf/InventoryItemRenderer.cs-76-		};
+Vintagestory.Client.NoObf/InventoryItemRenderer.cs-77-		if (Environment.CurrentManagedThreadId != RuntimeEnv.MainThreadId)
+Vintagestory.Client.NoObf/InventoryItemRenderer.cs-78-		{
+Vintagestory.Client.NoObf/InventoryItemRenderer.cs:79:			game.EnqueueMainThreadTask(() =>
+Vintagestory.Client.NoObf/InventoryItemRenderer.cs-80-			{
+Vintagestory.Client.NoObf/InventoryItemRenderer.cs-81-				queue.Enqueue(task);
+Vintagestory.Client.NoObf/InventoryItemRenderer.cs-82-			}, "enqueueRenderTask");
+Vintagestory.Client.NoObf/InventoryItemRenderer.cs-83-			return false;
+Vintagestory.Client.NoObf/InventoryItemRenderer.cs-84-		}
+Vintagestory.Client.NoObf/InventoryItemRenderer.cs-85-		if (game.currentRenderStage != EnumRenderStage.Ortho)
+Vintagestory.Client.NoObf/InventoryItemRenderer.cs-86-		{
+Vintagestory.Client.NoObf/InventoryItemRenderer.cs-87-			queue.Enqueue(task);
+Vintagestory.Client.NoObf/InventoryItemRenderer.cs-88-			return false;
+Vintagestory.Client.NoObf/InventoryItemRenderer.cs-89-		}
+Vintagestory.Client.NoObf/InventoryItemRenderer.cs-90-		int atlasTextureId = CreatePositionInAtlas(atlas, task);
+Vintagestory.Client.NoObf/InventoryItemRenderer.cs-91-		FrameBufferRef fb = CreateFrameBuffer(atlas.Size, atlasTextureId);
+Vintagestory.Client.NoObf/InventoryItemRenderer.cs-92-		RenderItemStackToFrameBuffer(atlas.Size, task, new DummySlot(stack));
+Vintagestory.Client.NoObf/InventoryItemRenderer.cs-93-		DisposeFrameBuffer(fb);
+Vintagestory.Client.NoObf/InventoryItemRenderer.cs-94-		onComplete(task.SubId);
+Vintagestory.Client.NoObf/InventoryItemRenderer.cs-95-		return true;
+Vintagestory.Client.NoObf/InventoryItemRenderer.cs-96-	}
+Vintagestory.Client.NoObf/InventoryItemRenderer.cs-97-
+Vintagestory.Client.NoObf/InventoryItemRenderer.cs-98-	public void OnRenderFrame(float deltaTime, EnumRenderStage stage)
+Vintagestory.Client.NoObf/InventoryItemRenderer.cs-99-	{
+Vintagestory.Client.NoObf/InventoryItemRenderer.cs-100-		ITextureAtlasAPI textureAtlasAPI = null;
+Vintagestory.Client.NoObf/InventoryItemRenderer.cs-101-		int num = 512;
+Vintagestory.Client.NoObf/InventoryItemRenderer.cs-102-		while (queue.Count > 0 && num-- > 0)
+Vintagestory.Client.NoObf/InventoryItemRenderer.cs-103-		{
+Vintagestory.Client.NoObf/InventoryItemRenderer.cs-104-			AtlasRenderTask atlasRenderTask = queue.Dequeue();
+--
+Vintagestory.Client.NoObf/SystemClientTickingBlocks.cs-397-					IsWindAffected = isWindAffected,
+Vintagestory.Client.NoObf/SystemClientTickingBlocks.cs-398-					WindAffectedNess = (isWindAffected ? SearchWindAffectedNess(blockPos, searchBlockAccessor) : 0f)
+Vintagestory.Client.NoObf/SystemClientTickingBlocks.cs-399-				});
+Vintagestory.Client.NoObf/SystemClientTickingBlocks.cs-400-			}
+Vintagestory.Client.NoObf/SystemClientTickingBlocks.cs-401-			scanPosition++;
+Vintagestory.Client.NoObf/SystemClientTickingBlocks.cs-402-			if (scanPosition < finalScanPosition)
+Vintagestory.Client.NoObf/SystemClientTickingBlocks.cs-403-			{
+Vintagestory.Client.NoObf/SystemClientTickingBlocks.cs-404-				continue;
+Vintagestory.Client.NoObf/SystemClientTickingBlocks.cs-405-			}
+Vintagestory.Client.NoObf/SystemClientTickingBlocks.cs-406-			if (scanState == BlockScanState.Scanning)
+Vintagestory.Client.NoObf/SystemClientTickingBlocks.cs-407-			{
+Vintagestory.Client.NoObf/SystemClientTickingBlocks.cs-408-				scanState = BlockScanState.Done;
+Vintagestory.Client.NoObf/SystemClientTickingBlocks.cs:409:				game.EnqueueMainThreadTask(() =>
+Vintagestory.Client.NoObf/SystemClientTickingBlocks.cs-410-				{
+Vintagestory.Client.NoObf/SystemClientTickingBlocks.cs-411-					CommitScan();
+Vintagestory.Client.NoObf/SystemClientTickingBlocks.cs-412-					GlobalConstants.CurrentNearbyRelLeavesCountClient = (float)currentLeavesCount / (float)finalScanPosition;
+Vintagestory.Client.NoObf/SystemClientTickingBlocks.cs-413-					scanState = BlockScanState.Idle;
+Vintagestory.Client.NoObf/SystemClientTickingBlocks.cs-414-				}, "commitscan");
+Vintagestory.Client.NoObf/SystemClientTickingBlocks.cs-415-			}
+Vintagestory.Client.NoObf/SystemClientTickingBlocks.cs-416-			break;
+Vintagestory.Client.NoObf/SystemClientTickingBlocks.cs-417-		}
+Vintagestory.Client.NoObf/SystemClientTickingBlocks.cs-418-	}
+Vintagestory.Client.NoObf/SystemClientTickingBlocks.cs-419-
+Vintagestory.Client.NoObf/SystemClientTickingBlocks.cs-420-	private float SearchWindAffectedNess(BlockPos pos, IBlockAccessor blockAccess)
+Vintagestory.Client.NoObf/SystemClientTickingBlocks.cs-421-	{
+Vintagestory.Client.NoObf/SystemClientTickingBlocks.cs-422-		return Math.Max(0f, 1f - (float)blockAccess.GetDistanceToRainFall(pos) / 5f);
+Vintagestory.Client.NoObf/SystemClientTickingBlocks.cs-423-	}
+Vintagestory.Client.NoObf/SystemClientTickingBlocks.cs-424-
+Vintagestory.Client.NoObf/SystemClientTickingBlocks.cs-425-	public override EnumClientSystemType GetSystemType()
+Vintagestory.Client.NoObf/SystemClientTickingBlocks.cs-426-	{
+Vintagestory.Client.NoObf/SystemClientTickingBlocks.cs-427-		return EnumClientSystemType.Misc;
+Vintagestory.Client.NoObf/SystemClientTickingBlocks.cs-428-	}
+Vintagestory.Client.NoObf/SystemClientTickingBlocks.cs-429-}
+--
+Vintagestory.Client.NoObf/GuiAPI.cs-144-			{
+Vintagestory.Client.NoObf/GuiAPI.cs-145-				if (value.Bounds.Alignment == area)
+Vintagestory.Client.NoObf/GuiAPI.cs-146-				{
+Vintagestory.Client.NoObf/GuiAPI.cs-147-					list.Add(value.Bounds);
+Vintagestory.Client.NoObf/GuiAPI.cs-148-				}
+Vintagestory.Client.NoObf/GuiAPI.cs-149-			}
+Vintagestory.Client.NoObf/GuiAPI.cs-150-		}
+Vintagestory.Client.NoObf/GuiAPI.cs-151-		return list;
+Vintagestory.Client.NoObf/GuiAPI.cs-152-	}
+Vintagestory.Client.NoObf/GuiAPI.cs-153-
+Vintagestory.Client.NoObf/GuiAPI.cs-154-	public void OpenLink(string href)
+Vintagestory.Client.NoObf/GuiAPI.cs-155-	{
+Vintagestory.Client.NoObf/GuiAPI.cs:156:		game.EnqueueMainThreadTask(() =>
+Vintagestory.Client.NoObf/GuiAPI.cs-157-		{
+Vintagestory.Client.NoObf/GuiAPI.cs-158-			new GuiDialogConfirm(game.api, Lang.Get("Open below external link in a browser?") + "\n\n\n" + href, (bool val) =>
+Vintagestory.Client.NoObf/GuiAPI.cs-159-			{
+Vintagestory.Client.NoObf/GuiAPI.cs-160-				if (val)
+Vintagestory.Client.NoObf/GuiAPI.cs-161-				{
+Vintagestory.Client.NoObf/GuiAPI.cs-162-					NetUtil.OpenUrlInBrowser(href);
+Vintagestory.Client.NoObf/GuiAPI.cs-163-				}
+Vintagestory.Client.NoObf/GuiAPI.cs-164-			}).TryOpen();
+Vintagestory.Client.NoObf/GuiAPI.cs-165-		}, "openlink");
+Vintagestory.Client.NoObf/GuiAPI.cs-166-	}
+Vintagestory.Client.NoObf/GuiAPI.cs-167-}
+--
+Vintagestory.Client.NoObf/ClientWorldMap.cs-552-		if (p.DecorsPos != null && p.DecorsIds != null)
+Vintagestory.Client.NoObf/ClientWorldMap.cs-553-		{
+Vintagestory.Client.NoObf/ClientWorldMap.cs-554-			if (p.DecorsIdsCount < p.DecorsPosCount)
+Vintagestory.Client.NoObf/ClientWorldMap.cs-555-			{
+Vintagestory.Client.NoObf/ClientWorldMap.cs-556-				p.DecorsPosCount = p.DecorsIdsCount;
+Vintagestory.Client.NoObf/ClientWorldMap.cs-557-			}
+Vintagestory.Client.NoObf/ClientWorldMap.cs-558-			chunk.Decors = new Dictionary<int, Block>(p.DecorsPosCount);
+Vintagestory.Client.NoObf/ClientWorldMap.cs-559-			for (int j = 0; j < p.DecorsPosCount; j++)
+Vintagestory.Client.NoObf/ClientWorldMap.cs-560-			{
+Vintagestory.Client.NoObf/ClientWorldMap.cs-561-				chunk.Decors[p.DecorsPos[j]] = game.GetBlock(p.DecorsIds[j]);
+Vintagestory.Client.NoObf/ClientWorldMap.cs-562-			}
+Vintagestory.Client.NoObf/ClientWorldMap.cs-563-		}
+Vintagestory.Client.NoObf/ClientWorldMap.cs:564:		game.EnqueueMainThreadTask(() =>
+Vintagestory.Client.NoObf/ClientWorldMap.cs-565-		{
+Vintagestory.Client.NoObf/ClientWorldMap.cs-566-			bool flag = false;
+Vintagestory.Client.NoObf/ClientWorldMap.cs-567-			lock (chunksLock)
+Vintagestory.Client.NoObf/ClientWorldMap.cs-568-			{
+Vintagestory.Client.NoObf/ClientWorldMap.cs-569-				flag = chunks.ContainsKey(chunkIndex3d);
+Vintagestory.Client.NoObf/ClientWorldMap.cs-570-			}
+Vintagestory.Client.NoObf/ClientWorldMap.cs-571-			if (flag)
+Vintagestory.Client.NoObf/ClientWorldMap.cs-572-			{
+Vintagestory.Client.NoObf/ClientWorldMap.cs-573-				OverloadChunkMT(p, chunk);
+Vintagestory.Client.NoObf/ClientWorldMap.cs-574-			}
+Vintagestory.Client.NoObf/ClientWorldMap.cs-575-			else
+Vintagestory.Client.NoObf/ClientWorldMap.cs-576-			{
+Vintagestory.Client.NoObf/ClientWorldMap.cs-577-				loadChunkMT(p, chunk);
+Vintagestory.Client.NoObf/ClientWorldMap.cs-578-			}
+Vintagestory.Client.NoObf/ClientWorldMap.cs-579-		}, "loadchunk");
+Vintagestory.Client.NoObf/ClientWorldMap.cs-580-	}
+Vintagestory.Client.NoObf/ClientWorldMap.cs-581-
+Vintagestory.Client.NoObf/ClientWorldMap.cs-582-	private void loadChunkMT(Packet_ServerChunk p, ClientChunk chunk)
+Vintagestory.Client.NoObf/ClientWorldMap.cs-583-	{
+Vintagestory.Client.NoObf/ClientWorldMap.cs-584-		int x = p.X;
+Vintagestory.Client.NoObf/ClientWorldMap.cs-585-		int y = p.Y;
+Vintagestory.Client.NoObf/ClientWorldMap.cs-586-		int z = p.Z;
+Vintagestory.Client.NoObf/ClientWorldMap.cs-587-		long num = MapUtil.Index3dL(x, y, z, index3dMulX, index3dMulZ);
+Vintagestory.Client.NoObf/ClientWorldMap.cs-588-		lock (chunksLock)
+Vintagestory.Client.NoObf/ClientWorldMap.cs-589-		{
+--
+Vintagestory.Client.NoObf/ClientWorldMap.cs-634-		lock (chunksLock)
+Vintagestory.Client.NoObf/ClientWorldMap.cs-635-		{
+Vintagestory.Client.NoObf/ClientWorldMap.cs-636-			chunks.TryGetValue(num, out prevchunk);
+Vintagestory.Client.NoObf/ClientWorldMap.cs-637-		}
+Vintagestory.Client.NoObf/ClientWorldMap.cs-638-		if (prevchunk == null)
+Vintagestory.Client.NoObf/ClientWorldMap.cs-639-		{
+Vintagestory.Client.NoObf/ClientWorldMap.cs-640-			loadChunkMT(p, newchunk);
+Vintagestory.Client.NoObf/ClientWorldMap.cs-641-			return;
+Vintagestory.Client.NoObf/ClientWorldMap.cs-642-		}
+Vintagestory.Client.NoObf/ClientWorldMap.cs-643-		prevchunk.loadedFromServer = false;
+Vintagestory.Client.NoObf/ClientWorldMap.cs-644-		if (game.Platform.EllapsedMs - prevchunk.lastTesselationMs < 500)
+Vintagestory.Client.NoObf/ClientWorldMap.cs-645-		{
+Vintagestory.Client.NoObf/ClientWorldMap.cs:646:			game.EnqueueMainThreadTask(() =>
+Vintagestory.Client.NoObf/ClientWorldMap.cs-647-			{
+Vintagestory.Client.NoObf/ClientWorldMap.cs-648-				OverloadChunkMT(p, newchunk);
+Vintagestory.Client.NoObf/ClientWorldMap.cs-649-			}, "overloadchunkrequeue");
+Vintagestory.Client.NoObf/ClientWorldMap.cs-650-			return;
+Vintagestory.Client.NoObf/ClientWorldMap.cs-651-		}
+Vintagestory.Client.NoObf/ClientWorldMap.cs-652-		lock (chunksLock)
+Vintagestory.Client.NoObf/ClientWorldMap.cs-653-		{
+Vintagestory.Client.NoObf/ClientWorldMap.cs-654-			prevchunk.RemoveDataPoolLocations(game.chunkRenderer);
+Vintagestory.Client.NoObf/ClientWorldMap.cs-655-			foreach (KeyValuePair<BlockPos, BlockEntity> blockEntity in prevchunk.BlockEntities)
+Vintagestory.Client.NoObf/ClientWorldMap.cs-656-			{
+Vintagestory.Client.NoObf/ClientWorldMap.cs-657-				blockEntity.Value?.OnBlockUnloaded();
+Vintagestory.Client.NoObf/ClientWorldMap.cs-658-			}
+Vintagestory.Client.NoObf/ClientWorldMap.cs-659-			chunks[num] = newchunk;
+Vintagestory.Client.NoObf/ClientWorldMap.cs-660-			newchunk.Entities = prevchunk.Entities;
+Vintagestory.Client.NoObf/ClientWorldMap.cs-661-			newchunk.EntitiesCount = prevchunk.EntitiesCount;
+Vintagestory.Client.NoObf/ClientWorldMap.cs-662-			newchunk.InitBlockEntitiesFromPacket(game);
+Vintagestory.Client.NoObf/ClientWorldMap.cs-663-			newchunk.loadedFromServer = true;
+Vintagestory.Client.NoObf/ClientWorldMap.cs-664-			newchunk.quantityOverloads++;
+Vintagestory.Client.NoObf/ClientWorldMap.cs-665-		}
+Vintagestory.Client.NoObf/ClientWorldMap.cs-666-		if (!game.IsPaused)
+Vintagestory.Client.NoObf/ClientWorldMap.cs-667-		{
+Vintagestory.Client.NoObf/ClientWorldMap.cs-668-			game.RegisterCallback((float dt) =>
+Vintagestory.Client.NoObf/ClientWorldMap.cs-669-			{
+Vintagestory.Client.NoObf/ClientWorldMap.cs-670-				prevchunk.TryPackAndCommit();
+Vintagestory.Client.NoObf/ClientWorldMap.cs-671-			}, 5000);
+--
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-214-	private void ProcessTrackQueue()
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-215-	{
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-216-		try
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-217-		{
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-218-			while (!_token.IsCancellationRequested)
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-219-			{
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-220-				if (TracksToLoad.TryDequeue(out var trackToLoad))
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-221-				{
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-222-					IAsset asset = game.Platform.AssetManager.TryGet(trackToLoad.Location);
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-223-					if (asset != null)
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-224-					{
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-225-						(ScreenManager.LoadMusicTrack(asset) as AudioMetaData).AutoUnload = true;
+Vintagestory.Client.NoObf/SystemMusicEngine.cs:226:						game.EnqueueMainThreadTask(() =>
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-227-						{
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-228-							ILoadedSound obj = game.LoadSound(new SoundParams
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-229-							{
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-230-								Location = trackToLoad.Location,
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-231-								SoundType = trackToLoad.SoundType,
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-232-								Volume = trackToLoad.volume,
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-233-								Pitch = trackToLoad.pitch,
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-234-								DisposeOnFinish = false
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-235-							});
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-236-							trackToLoad.OnLoaded(obj);
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-237-						}, "loadtrack");
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-238-					}
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-239-					else
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-240-					{
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-241-						game.Logger.Warning("Music File not found: {0}", trackToLoad.Location);
+Vintagestory.Client.NoObf/SystemMusicEngine.cs:242:						game.EnqueueMainThreadTask(() =>
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-243-						{
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-244-							trackToLoad.OnLoaded(null);
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-245-						}, "loadtrack");
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-246-					}
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-247-				}
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-248-				if (!debugSimulation)
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-249-				{
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-250-					Thread.Sleep(75);
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-251-					continue;
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-252-				}
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-253-				break;
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-254-			}
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-255-		}
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-256-		catch (TaskCanceledException)
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-257-		{
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-258-		}
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-259-	}
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-260-
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-261-	private TextCommandResult OnCmdSimstop(TextCommandCallingArgs args)
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-262-	{
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-263-		totalHoursStop = 0.0;
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-264-		return TextCommandResult.Success("Ok, sim stopped");
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-265-	}
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-266-
+Vintagestory.Client.NoObf/SystemMusicEngine.cs-267-	private TextCommandResult OnCmdStop(TextCommandCallingArgs args)
+--
+Vintagestory.Client.NoObf/HudHotbar.cs-456-		if (newSlot < 10 + num)
+Vintagestory.Client.NoObf/HudHotbar.cs-457-		{
+Vintagestory.Client.NoObf/HudHotbar.cs-458-			hotbarSlotGrid.HighlightSlot(newSlot);
+Vintagestory.Client.NoObf/HudHotbar.cs-459-			backpackGrid.HighlightSlot(-1);
+Vintagestory.Client.NoObf/HudHotbar.cs-460-		}
+Vintagestory.Client.NoObf/HudHotbar.cs-461-		else
+Vintagestory.Client.NoObf/HudHotbar.cs-462-		{
+Vintagestory.Client.NoObf/HudHotbar.cs-463-			hotbarSlotGrid.HighlightSlot(-1);
+Vintagestory.Client.NoObf/HudHotbar.cs-464-			backpackGrid.HighlightSlot(newSlot - 10 - num);
+Vintagestory.Client.NoObf/HudHotbar.cs-465-		}
+Vintagestory.Client.NoObf/HudHotbar.cs-466-		if (triggerUpdate)
+Vintagestory.Client.NoObf/HudHotbar.cs-467-		{
+Vintagestory.Client.NoObf/HudHotbar.cs:468:			(capi.World as ClientMain).EnqueueMainThreadTask(() =>
+Vintagestory.Client.NoObf/HudHotbar.cs-469-			{
+Vintagestory.Client.NoObf/HudHotbar.cs-470-				RecomposeActiveSlotHoverText(newSlot);
+Vintagestory.Client.NoObf/HudHotbar.cs-471-			}, "recomposeslothovertext");
+Vintagestory.Client.NoObf/HudHotbar.cs-472-			UpdateCurrentToolMode(newSlot);
+Vintagestory.Client.NoObf/HudHotbar.cs-473-		}
+Vintagestory.Client.NoObf/HudHotbar.cs-474-		updateHotbarSounds();
+Vintagestory.Client.NoObf/HudHotbar.cs-475-		(activeHotbarSlot.Inventory as InventoryPlayerHotbar)?.updateSlotStatMods(activeHotbarSlot);
+Vintagestory.Client.NoObf/HudHotbar.cs-476-	}
+Vintagestory.Client.NoObf/HudHotbar.cs-477-
+Vintagestory.Client.NoObf/HudHotbar.cs-478-	private void OnHotbarSlotModified(int slotId)
+Vintagestory.Client.NoObf/HudHotbar.cs-479-	{
+Vintagestory.Client.NoObf/HudHotbar.cs-480-		UpdateCurrentToolMode(slotId);
+Vintagestory.Client.NoObf/HudHotbar.cs-481-		updateHotbarSounds();
+Vintagestory.Client.NoObf/HudHotbar.cs-482-		IPlayer plr = capi.World.Player;
+Vintagestory.Client.NoObf/HudHotbar.cs-483-		if (slotId != plr.InventoryManager.ActiveHotbarSlotNumber)
+Vintagestory.Client.NoObf/HudHotbar.cs-484-		{
+Vintagestory.Client.NoObf/HudHotbar.cs-485-			return;
+Vintagestory.Client.NoObf/HudHotbar.cs-486-		}
+Vintagestory.Client.NoObf/HudHotbar.cs-487-		IItemStack itemstack = plr.InventoryManager.ActiveHotbarSlot.Itemstack;
+Vintagestory.Client.NoObf/HudHotbar.cs-488-		if (itemstack != null && (itemstack.StackSize != lastActiveSlotStacksize || itemstack.Id != lastActiveSlotItemId || itemstack.Class != lastActiveClassItemClass))
+Vintagestory.Client.NoObf/HudHotbar.cs-489-		{
+Vintagestory.Client.NoObf/HudHotbar.cs:490:			(capi.World as ClientMain).EnqueueMainThreadTask(() =>
+Vintagestory.Client.NoObf/HudHotbar.cs-491-			{
+Vintagestory.Client.NoObf/HudHotbar.cs-492-				RecomposeActiveSlotHoverText(plr.InventoryManager.ActiveHotbarSlotNumber);
+Vintagestory.Client.NoObf/HudHotbar.cs-493-			}, "recomposeslothovertext");
+Vintagestory.Client.NoObf/HudHotbar.cs-494-			lastActiveClassItemClass = itemstack.Class;
+Vintagestory.Client.NoObf/HudHotbar.cs-495-			lastActiveSlotItemId = itemstack.Id;
+Vintagestory.Client.NoObf/HudHotbar.cs-496-			lastActiveSlotStacksize = itemstack.StackSize;
+Vintagestory.Client.NoObf/HudHotbar.cs-497-		}
+Vintagestory.Client.NoObf/HudHotbar.cs-498-	}
+Vintagestory.Client.NoObf/HudHotbar.cs-499-
+Vintagestory.Client.NoObf/HudHotbar.cs-500-	private void RecomposeActiveSlotHoverText(int newSlotIndex)
+Vintagestory.Client.NoObf/HudHotbar.cs-501-	{
+Vintagestory.Client.NoObf/HudHotbar.cs-502-		IPlayer player = capi.World.Player;
+Vintagestory.Client.NoObf/HudHotbar.cs-503-		int num = ((!hotbarInv[10].Empty) ? 1 : 0);
+Vintagestory.Client.NoObf/HudHotbar.cs-504-		ItemSlot itemSlot = ((newSlotIndex < 10 + num) ? player?.InventoryManager?.GetHotbarInventory()[newSlotIndex] : backpackInv[newSlotIndex - 10 - num]);
+Vintagestory.Client.NoObf/HudHotbar.cs-505-		if (itemSlot?.Itemstack != null)
+Vintagestory.Client.NoObf/HudHotbar.cs-506-		{
+Vintagestory.Client.NoObf/HudHotbar.cs-507-			if (prevIndex != newSlotIndex)
+Vintagestory.Client.NoObf/HudHotbar.cs-508-			{
+Vintagestory.Client.NoObf/HudHotbar.cs-509-				prevIndex = newSlotIndex;
+Vintagestory.Client.NoObf/HudHotbar.cs-510-				itemInfoTextActiveMs = capi.ElapsedMilliseconds;
+Vintagestory.Client.NoObf/HudHotbar.cs-511-				GuiElementHoverText guiElementHoverText = Composers["hotbar"]?.GetHoverText("iteminfoHover");
+Vintagestory.Client.NoObf/HudHotbar.cs-512-				if (guiElementHoverText != null)
+Vintagestory.Client.NoObf/HudHotbar.cs-513-				{
+Vintagestory.Client.NoObf/HudHotbar.cs-514-					guiElementHoverText.SetNewText(itemSlot.Itemstack.GetName());
+Vintagestory.Client.NoObf/HudHotbar.cs-515-					guiElementHoverText.SetVisible(on: true);
+--
+Vintagestory.Client.NoObf/ClientSystemStartup.cs-1098-		{
+Vintagestory.Client.NoObf/ClientSystemStartup.cs-1099-			return false;
+Vintagestory.Client.NoObf/ClientSystemStartup.cs-1100-		}
+Vintagestory.Client.NoObf/ClientSystemStartup.cs-1101-		ServerPacketHandler<Packet_Server> handler = instance.game.PacketHandlers[packet.Id];
+Vintagestory.Client.NoObf/ClientSystemStartup.cs-1102-		if (handler == null)
+Vintagestory.Client.NoObf/ClientSystemStartup.cs-1103-		{
+Vintagestory.Client.NoObf/ClientSystemStartup.cs-1104-			return false;
+Vintagestory.Client.NoObf/ClientSystemStartup.cs-1105-		}
+Vintagestory.Client.NoObf/ClientSystemStartup.cs-1106-		if (packet.Id == 73)
+Vintagestory.Client.NoObf/ClientSystemStartup.cs-1107-		{
+Vintagestory.Client.NoObf/ClientSystemStartup.cs-1108-			instance.game.ServerReady = true;
+Vintagestory.Client.NoObf/ClientSystemStartup.cs-1109-		}
+Vintagestory.Client.NoObf/ClientSystemStartup.cs:1110:		instance.game.EnqueueMainThreadTask(() =>
+Vintagestory.Client.NoObf/ClientSystemStartup.cs-1111-		{
+Vintagestory.Client.NoObf/ClientSystemStartup.cs-1112-			handler(packet);
+Vintagestory.Client.NoObf/ClientSystemStartup.cs-1113-		}, "readpacket" + packet.Id);
+Vintagestory.Client.NoObf/ClientSystemStartup.cs-1114-		return true;
+Vintagestory.Client.NoObf/ClientSystemStartup.cs-1115-	}
+Vintagestory.Client.NoObf/ClientSystemStartup.cs-1116-
+Vintagestory.Client.NoObf/ClientSystemStartup.cs-1117-	internal void WaitFor(ref bool flag, int timeOut, string logMessage, string logError)
+Vintagestory.Client.NoObf/ClientSystemStartup.cs-1118-	{
+Vintagestory.Client.NoObf/ClientSystemStartup.cs-1119-		bool flag2 = false;
+Vintagestory.Client.NoObf/ClientSystemStartup.cs-1120-		while (!flag && timeOut-- > 0 && !game.disposed)
+Vintagestory.Client.NoObf/ClientSystemStartup.cs-1121-		{
+Vintagestory.Client.NoObf/ClientSystemStartup.cs-1122-			if (!flag2)
+Vintagestory.Client.NoObf/ClientSystemStartup.cs-1123-			{
+Vintagestory.Client.NoObf/ClientSystemStartup.cs-1124-				logger.VerboseDebug("Waiting for " + logMessage);
+Vintagestory.Client.NoObf/ClientSystemStartup.cs-1125-				flag2 = true;
+Vintagestory.Client.NoObf/ClientSystemStartup.cs-1126-			}
+Vintagestory.Client.NoObf/ClientSystemStartup.cs-1127-			Thread.Sleep(10);
+Vintagestory.Client.NoObf/ClientSystemStartup.cs-1128-		}
+Vintagestory.Client.NoObf/ClientSystemStartup.cs-1129-		if (!game.disposed && (timeOut <= 0 || !flag))
+Vintagestory.Client.NoObf/ClientSystemStartup.cs-1130-		{
+Vintagestory.Client.NoObf/ClientSystemStartup.cs-1131-			logger.Fatal("The game probably cannot continue to launch.  There was a problem " + logError);
+Vintagestory.Client.NoObf/ClientSystemStartup.cs-1132-		}
+Vintagestory.Client.NoObf/ClientSystemStartup.cs-1133-		else if (flag2 && flag)
+Vintagestory.Client.NoObf/ClientSystemStartup.cs-1134-		{
+Vintagestory.Client.NoObf/ClientSystemStartup.cs-1135-			logger.VerboseDebug("Done " + logMessage);
+--
+Vintagestory.Client.NoObf/BlendedTextureManager.cs-159-		{
+Vintagestory.Client.NoObf/BlendedTextureManager.cs-160-			return baseSubId;
+Vintagestory.Client.NoObf/BlendedTextureManager.cs-161-		}
+Vintagestory.Client.NoObf/BlendedTextureManager.cs-162-		if (!atlasManager.AllocateTextureSpace(num, num2, out var textureSubId, out var newTexPos))
+Vintagestory.Client.NoObf/BlendedTextureManager.cs-163-		{
+Vintagestory.Client.NoObf/BlendedTextureManager.cs-164-			return baseSubId;
+Vintagestory.Client.NoObf/BlendedTextureManager.cs-165-		}
+Vintagestory.Client.NoObf/BlendedTextureManager.cs-166-		newTexPos.AvgColor = basePos.AvgColor;
+Vintagestory.Client.NoObf/BlendedTextureManager.cs-167-		newTexPos.RndColors = basePos.RndColors;
+Vintagestory.Client.NoObf/BlendedTextureManager.cs-168-		blendedSubIds.Add(textureSubId);
+Vintagestory.Client.NoObf/BlendedTextureManager.cs-169-		cache[key] = textureSubId;
+Vintagestory.Client.NoObf/BlendedTextureManager.cs-170-		List<(int dir, int priority)> activeBlends = CollectActiveOverlayBlends(bleedSubIds, priorities, overlaySubIds);
+Vintagestory.Client.NoObf/BlendedTextureManager.cs:171:		game.EnqueueMainThreadTask(() =>
+Vintagestory.Client.NoObf/BlendedTextureManager.cs-172-		{
+Vintagestory.Client.NoObf/BlendedTextureManager.cs-173-			ComposeOnGPU(atlasManager, basePos, newTexPos, activeBlends, overlaySubIds, rotationSteps);
+Vintagestory.Client.NoObf/BlendedTextureManager.cs-174-		}, "blendedtexture-compose");
+Vintagestory.Client.NoObf/BlendedTextureManager.cs-175-		ScheduleChunkRefresh();
+Vintagestory.Client.NoObf/BlendedTextureManager.cs-176-		return textureSubId;
+Vintagestory.Client.NoObf/BlendedTextureManager.cs-177-	}
+Vintagestory.Client.NoObf/BlendedTextureManager.cs-178-
+Vintagestory.Client.NoObf/BlendedTextureManager.cs-179-	private void ComposeOnGPU(TextureAtlasManager atlasManager, TextureAtlasPosition basePos, TextureAtlasPosition targetPos, List<(int dir, int priority)> activeBlends, int[] overlaySubIds, int rotationSteps)
+Vintagestory.Client.NoObf/BlendedTextureManager.cs-180-	{
+Vintagestory.Client.NoObf/BlendedTextureManager.cs-181-		if (game.disposed)
+Vintagestory.Client.NoObf/BlendedTextureManager.cs-182-		{
+Vintagestory.Client.NoObf/BlendedTextureManager.cs-183-			return;
+Vintagestory.Client.NoObf/BlendedTextureManager.cs-184-		}
+Vintagestory.Client.NoObf/BlendedTextureManager.cs-185-		TextureAtlasPosition[] textureAtlasPositionsByTextureSubId = atlasManager.TextureAtlasPositionsByTextureSubId;
+Vintagestory.Client.NoObf/BlendedTextureManager.cs-186-		int width = atlasManager.Size.Width;
+Vintagestory.Client.NoObf/BlendedTextureManager.cs-187-		int height = atlasManager.Size.Height;
+Vintagestory.Client.NoObf/BlendedTextureManager.cs-188-		float num = targetPos.x1 * (float)width;
+Vintagestory.Client.NoObf/BlendedTextureManager.cs-189-		float num2 = targetPos.y1 * (float)height;
+Vintagestory.Client.NoObf/BlendedTextureManager.cs-190-		float num3 = (targetPos.x2 - targetPos.x1) * (float)width;
+Vintagestory.Client.NoObf/BlendedTextureManager.cs-191-		float num4 = (targetPos.y2 - targetPos.y1) * (float)height;
+Vintagestory.Client.NoObf/BlendedTextureManager.cs-192-		ShaderProgramBase currentShaderProgram = ShaderProgramBase.CurrentShaderProgram;
+Vintagestory.Client.NoObf/BlendedTextureManager.cs-193-		currentShaderProgram?.Stop();
+Vintagestory.Client.NoObf/BlendedTextureManager.cs-194-		bool glScissorFlagEnabled = game.Platform.GlScissorFlagEnabled;
+Vintagestory.Client.NoObf/BlendedTextureManager.cs-195-		if (glScissorFlagEnabled)
+Vintagestory.Client.NoObf/BlendedTextureManager.cs-196-		{
+--
+Vintagestory.Client.NoObf/ClientEventManager.cs-211-		OnReloadShaders.Add(handler);
+Vintagestory.Client.NoObf/ClientEventManager.cs-212-	}
+Vintagestory.Client.NoObf/ClientEventManager.cs-213-
+Vintagestory.Client.NoObf/ClientEventManager.cs-214-	public void UnregisterReloadShaders(ActionBoolReturn handler)
+Vintagestory.Client.NoObf/ClientEventManager.cs-215-	{
+Vintagestory.Client.NoObf/ClientEventManager.cs-216-		OnReloadShaders.Remove(handler);
+Vintagestory.Client.NoObf/ClientEventManager.cs-217-	}
+Vintagestory.Client.NoObf/ClientEventManager.cs-218-
+Vintagestory.Client.NoObf/ClientEventManager.cs-219-	public void RegisterOnChunkRetesselated(Vec3i chunkPos, int atQuantityDrawn, Action listener)
+Vintagestory.Client.NoObf/ClientEventManager.cs-220-	{
+Vintagestory.Client.NoObf/ClientEventManager.cs-221-		if (Environment.CurrentManagedThreadId != RuntimeEnv.MainThreadId)
+Vintagestory.Client.NoObf/ClientEventManager.cs-222-		{
+Vintagestory.Client.NoObf/ClientEventManager.cs:223:			game.EnqueueMainThreadTask(() =>
+Vintagestory.Client.NoObf/ClientEventManager.cs-224-			{
+Vintagestory.Client.NoObf/ClientEventManager.cs-225-				if (!OnChunkRetesselated.TryGetValue(chunkPos, out var value2))
+Vintagestory.Client.NoObf/ClientEventManager.cs-226-				{
+Vintagestory.Client.NoObf/ClientEventManager.cs-227-					value2 = new List<RetesselationListener>();
+Vintagestory.Client.NoObf/ClientEventManager.cs-228-					OnChunkRetesselated[chunkPos] = value2;
+Vintagestory.Client.NoObf/ClientEventManager.cs-229-				}
+Vintagestory.Client.NoObf/ClientEventManager.cs-230-				if (listener == null)
+Vintagestory.Client.NoObf/ClientEventManager.cs-231-				{
+Vintagestory.Client.NoObf/ClientEventManager.cs-232-					throw new ArgumentNullException("Listener cannot be null");
+Vintagestory.Client.NoObf/ClientEventManager.cs-233-				}
+Vintagestory.Client.NoObf/ClientEventManager.cs-234-				value2.Add(new RetesselationListener
+Vintagestory.Client.NoObf/ClientEventManager.cs-235-				{
+Vintagestory.Client.NoObf/ClientEventManager.cs-236-					AtDrawCount = atQuantityDrawn,
+Vintagestory.Client.NoObf/ClientEventManager.cs-237-					Handler = listener
+Vintagestory.Client.NoObf/ClientEventManager.cs-238-				});
+Vintagestory.Client.NoObf/ClientEventManager.cs-239-			}, "reg-chunkretess");
+Vintagestory.Client.NoObf/ClientEventManager.cs-240-		}
+Vintagestory.Client.NoObf/ClientEventManager.cs-241-		else
+Vintagestory.Client.NoObf/ClientEventManager.cs-242-		{
+Vintagestory.Client.NoObf/ClientEventManager.cs-243-			if (!OnChunkRetesselated.TryGetValue(chunkPos, out var value))
+Vintagestory.Client.NoObf/ClientEventManager.cs-244-			{
+Vintagestory.Client.NoObf/ClientEventManager.cs-245-				value = new List<RetesselationListener>();
+Vintagestory.Client.NoObf/ClientEventManager.cs-246-				OnChunkRetesselated[chunkPos] = value;
+Vintagestory.Client.NoObf/ClientEventManager.cs-247-			}
+Vintagestory.Client.NoObf/ClientEventManager.cs-248-			if (listener == null)
+--
+Vintagestory.Client/GuiScreenGetUpdate.cs-63-				onReleasesDownloadComplete(errorExc);
+Vintagestory.Client/GuiScreenGetUpdate.cs-64-			}
+Vintagestory.Client/GuiScreenGetUpdate.cs-65-		}, "DownloadGameUpdate");
+Vintagestory.Client/GuiScreenGetUpdate.cs-66-	}
+Vintagestory.Client/GuiScreenGetUpdate.cs-67-
+Vintagestory.Client/GuiScreenGetUpdate.cs-68-	private void onReleasesDownloadComplete(Exception errorExc)
+Vintagestory.Client/GuiScreenGetUpdate.cs-69-	{
+Vintagestory.Client/GuiScreenGetUpdate.cs-70-		if (errorExc == null)
+Vintagestory.Client/GuiScreenGetUpdate.cs-71-		{
+Vintagestory.Client/GuiScreenGetUpdate.cs-72-			downloadInstaller(releases[versionnumber]);
+Vintagestory.Client/GuiScreenGetUpdate.cs-73-			return;
+Vintagestory.Client/GuiScreenGetUpdate.cs-74-		}
+Vintagestory.Client/GuiScreenGetUpdate.cs:75:		ScreenManager.EnqueueMainThreadTask(() =>
+Vintagestory.Client/GuiScreenGetUpdate.cs-76-		{
+Vintagestory.Client/GuiScreenGetUpdate.cs-77-			ElementComposer.GetDynamicText("status").SetNewText("Download failed: " + errorExc);
+Vintagestory.Client/GuiScreenGetUpdate.cs-78-		});
+Vintagestory.Client/GuiScreenGetUpdate.cs-79-	}
+Vintagestory.Client/GuiScreenGetUpdate.cs-80-
+Vintagestory.Client/GuiScreenGetUpdate.cs-81-	private void downloadInstaller(GameReleaseVersion release)
+Vintagestory.Client/GuiScreenGetUpdate.cs-82-	{
+Vintagestory.Client/GuiScreenGetUpdate.cs-83-		if (release == null)
+Vintagestory.Client/GuiScreenGetUpdate.cs-84-		{
+Vintagestory.Client/GuiScreenGetUpdate.cs-85-			ElementComposer.GetDynamicText("status").SetNewText(Lang.Get("Download failed. Release {0} not found, possibly programming error. Please send us a bug report", ScreenManager.newestVersion));
+Vintagestory.Client/GuiScreenGetUpdate.cs-86-			return;
+Vintagestory.Client/GuiScreenGetUpdate.cs-87-		}
+Vintagestory.Client/GuiScreenGetUpdate.cs-88-		GameBuild build = release.WindowsUpdate ?? release.Windows;
+Vintagestory.Client/GuiScreenGetUpdate.cs-89-		string dstPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), build.filename);
+Vintagestory.Client/GuiScreenGetUpdate.cs-90-		FileStream fileStream = File.Create(dstPath);
+Vintagestory.Client/GuiScreenGetUpdate.cs-91-		_gameReleaseDownloadCts = new CancellationTokenSource();
+Vintagestory.Client/GuiScreenGetUpdate.cs-92-		Progress<Tuple<int, long>> progress = new Progress<Tuple<int, long>>();
+Vintagestory.Client/GuiScreenGetUpdate.cs-93-		progress.ProgressChanged += onProgress;
+Vintagestory.Client/GuiScreenGetUpdate.cs-94-		TyronThreadPool.QueueTask(async () =>
+Vintagestory.Client/GuiScreenGetUpdate.cs-95-		{
+Vintagestory.Client/GuiScreenGetUpdate.cs-96-			try
+Vintagestory.Client/GuiScreenGetUpdate.cs-97-			{
+Vintagestory.Client/GuiScreenGetUpdate.cs-98-				await VSWebClient.Inst.DownloadAsync(build.urls["cdn"], fileStream, progress, _gameReleaseDownloadCts.Token);
+Vintagestory.Client/GuiScreenGetUpdate.cs-99-				fileStream.Close();
+Vintagestory.Client/GuiScreenGetUpdate.cs-100-				string directoryName = System.IO.Path.GetDirectoryName(Environment.ProcessPath);
+Vintagestory.Client/GuiScreenGetUpdate.cs-101-				Process.Start(dstPath, "/SILENT /DIR=\"" + directoryName + "\"");
+Vintagestory.Client/GuiScreenGetUpdate.cs-102-				ScreenManager.GamePlatform.WindowExit("Installing update", EnumExitMode.SoftExit);
+Vintagestory.Client/GuiScreenGetUpdate.cs-103-			}
+Vintagestory.Client/GuiScreenGetUpdate.cs-104-			catch (Exception ex)
+Vintagestory.Client/GuiScreenGetUpdate.cs-105-			{
+Vintagestory.Client/GuiScreenGetUpdate.cs-106-				Exception ex2 = ex;
+Vintagestory.Client/GuiScreenGetUpdate.cs-107-				Exception e = ex2;
+Vintagestory.Client/GuiScreenGetUpdate.cs-108-				ScreenManager.Platform.Logger.Error(e);
+Vintagestory.Client/GuiScreenGetUpdate.cs:109:				ScreenManager.EnqueueMainThreadTask(() =>
+Vintagestory.Client/GuiScreenGetUpdate.cs-110-				{
+Vintagestory.Client/GuiScreenGetUpdate.cs-111-					ElementComposer.GetDynamicText("status").SetNewText("Download failed: " + e.Message);
+Vintagestory.Client/GuiScreenGetUpdate.cs-112-				});
+Vintagestory.Client/GuiScreenGetUpdate.cs-113-			}
+Vintagestory.Client/GuiScreenGetUpdate.cs-114-		}, "InstallGameUpdate");
+Vintagestory.Client/GuiScreenGetUpdate.cs-115-	}
+Vintagestory.Client/GuiScreenGetUpdate.cs-116-
+Vintagestory.Client/GuiScreenGetUpdate.cs-117-	private void onProgress(object sender, Tuple<int, long> progress)
+Vintagestory.Client/GuiScreenGetUpdate.cs-118-	{
+Vintagestory.Client/GuiScreenGetUpdate.cs:119:		ScreenManager.EnqueueMainThreadTask(() =>
+Vintagestory.Client/GuiScreenGetUpdate.cs-120-		{
+Vintagestory.Client/GuiScreenGetUpdate.cs-121-			ElementComposer.GetDynamicText("status").SetNewText(Lang.Get("{0:0.#}% complete ({1:0.0} of {2:0.#} MB)", (int)(100.0 * (double)progress.Item1 / (double)progress.Item2), (double)progress.Item1 / 1024.0 / 1024.0, (double)progress.Item2 / 1024.0 / 1024.0));
+Vintagestory.Client/GuiScreenGetUpdate.cs-122-		});
+Vintagestory.Client/GuiScreenGetUpdate.cs-123-	}
+Vintagestory.Client/GuiScreenGetUpdate.cs-124-}
+--
+Vintagestory.Client/GuiScreenRunningGame.cs-72-		{
+Vintagestory.Client/GuiScreenRunningGame.cs-73-			float volume = ScreenManager.IntroMusic.Params.Volume;
+Vintagestory.Client/GuiScreenRunningGame.cs-74-			TyronThreadPool.QueueTask(async () =>
+Vintagestory.Client/GuiScreenRunningGame.cs-75-			{
+Vintagestory.Client/GuiScreenRunningGame.cs-76-				while ((double)ScreenManager.IntroMusic.Params.Volume > 0.01)
+Vintagestory.Client/GuiScreenRunningGame.cs-77-				{
+Vintagestory.Client/GuiScreenRunningGame.cs-78-					await Task.Delay(40);
+Vintagestory.Client/GuiScreenRunningGame.cs-79-					ScreenManager.IntroMusic.SetVolume(volume *= 0.98f);
+Vintagestory.Client/GuiScreenRunningGame.cs-80-				}
+Vintagestory.Client/GuiScreenRunningGame.cs-81-				ScreenManager.IntroMusic.Stop();
+Vintagestory.Client/GuiScreenRunningGame.cs-82-			}, "handOverRenderingToRunningGame");
+Vintagestory.Client/GuiScreenRunningGame.cs-83-		}
+Vintagestory.Client/GuiScreenRunningGame.cs:84:		ScreenManager.EnqueueMainThreadTask(printWarningsAndEndCapture);
+Vintagestory.Client/GuiScreenRunningGame.cs-85-	}
+Vintagestory.Client/GuiScreenRunningGame.cs-86-
+Vintagestory.Client/GuiScreenRunningGame.cs-87-	public override bool OnEvent(string eventCode, object arg)
+Vintagestory.Client/GuiScreenRunningGame.cs-88-	{
+Vintagestory.Client/GuiScreenRunningGame.cs-89-		if (eventCode == "maploaded")
+Vintagestory.Client/GuiScreenRunningGame.cs-90-		{
+Vintagestory.Client/GuiScreenRunningGame.cs-91-			handOverRenderingToRunningGame();
+Vintagestory.Client/GuiScreenRunningGame.cs-92-			return true;
+Vintagestory.Client/GuiScreenRunningGame.cs-93-		}
+Vintagestory.Client/GuiScreenRunningGame.cs-94-		return false;
+Vintagestory.Client/GuiScreenRunningGame.cs-95-	}
+Vintagestory.Client/GuiScreenRunningGame.cs-96-
+Vintagestory.Client/GuiScreenRunningGame.cs-97-	public void Start(bool singleplayer, StartServerArgs serverargs, ServerConnectData connectData)
+Vintagestory.Client/GuiScreenRunningGame.cs-98-	{
+Vintagestory.Client/GuiScreenRunningGame.cs-99-		this.singleplayer = singleplayer;
+Vintagestory.Client/GuiScreenRunningGame.cs-100-		this.serverargs = serverargs;
+Vintagestory.Client/GuiScreenRunningGame.cs-101-		this.connectData = connectData;
+Vintagestory.Client/GuiScreenRunningGame.cs-102-		runningGame.IsSingleplayer = singleplayer;
+Vintagestory.Client/GuiScreenRunningGame.cs-103-		runningGame.Start();
+Vintagestory.Client/GuiScreenRunningGame.cs-104-		if (this.connectData?.ErrorMessage == null)
+Vintagestory.Client/GuiScreenRunningGame.cs-105-		{
+Vintagestory.Client/GuiScreenRunningGame.cs-106-			Connect();
+Vintagestory.Client/GuiScreenRunningGame.cs-107-		}
+Vintagestory.Client/GuiScreenRunningGame.cs-108-	}
+Vintagestory.Client/GuiScreenRunningGame.cs-109-
+--
+Vintagestory.Client/ScreenManager.cs-376-			ClientIsOffline = true;
+Vintagestory.Client/ScreenManager.cs-377-			DoGameInitStage4();
+Vintagestory.Client/ScreenManager.cs-378-		}
+Vintagestory.Client/ScreenManager.cs-379-	}
+Vintagestory.Client/ScreenManager.cs-380-
+Vintagestory.Client/ScreenManager.cs-381-	internal void DoGameInitStage4()
+Vintagestory.Client/ScreenManager.cs-382-	{
+Vintagestory.Client/ScreenManager.cs-383-		validationResponse = null;
+Vintagestory.Client/ScreenManager.cs-384-		loadingText = "Loading mod meta infos";
+Vintagestory.Client/ScreenManager.cs-385-		TyronThreadPool.QueueTask(() =>
+Vintagestory.Client/ScreenManager.cs-386-		{
+Vintagestory.Client/ScreenManager.cs-387-			loadMods();
+Vintagestory.Client/ScreenManager.cs:388:			EnqueueMainThreadTask(DoGameInitStage5);
+Vintagestory.Client/ScreenManager.cs-389-		}, "DoGameInitStage4.loadMods");
+Vintagestory.Client/ScreenManager.cs-390-	}
+Vintagestory.Client/ScreenManager.cs-391-
+Vintagestory.Client/ScreenManager.cs-392-	private void DoGameInitStage5()
+Vintagestory.Client/ScreenManager.cs-393-	{
+Vintagestory.Client/ScreenManager.cs-394-		StartMainMenu();
+Vintagestory.Client/ScreenManager.cs-395-		HandleArgs();
+Vintagestory.Client/ScreenManager.cs-396-	}
+Vintagestory.Client/ScreenManager.cs-397-
+Vintagestory.Client/ScreenManager.cs-398-	public static void CatalogSounds(Action onCompleted)
+Vintagestory.Client/ScreenManager.cs-399-	{
+Vintagestory.Client/ScreenManager.cs-400-		AsyncSoundLoadComplete = false;
+Vintagestory.Client/ScreenManager.cs-401-		soundAudioData.Clear();
+Vintagestory.Client/ScreenManager.cs-402-		new LoadSoundsThread(Platform.Logger, null, onCompleted).Process();
+Vintagestory.Client/ScreenManager.cs-403-	}
+Vintagestory.Client/ScreenManager.cs-404-
+Vintagestory.Client/ScreenManager.cs-405-	public static void LoadSoundsSlow_Async(ClientMain game)
+Vintagestory.Client/ScreenManager.cs-406-	{
+Vintagestory.Client/ScreenManager.cs-407-		Thread thread = new Thread(new LoadSoundsThread(Platform.Logger, game, null).ProcessSlow);
+Vintagestory.Client/ScreenManager.cs-408-		thread.IsBackground = true;
+Vintagestory.Client/ScreenManager.cs-409-		thread.Priority = ThreadPriority.BelowNormal;
+Vintagestory.Client/ScreenManager.cs-410-		thread.Name = "LoadSounds async";
+Vintagestory.Client/ScreenManager.cs-411-		thread.Start();
+Vintagestory.Client/ScreenManager.cs-412-	}
+Vintagestory.Client/ScreenManager.cs-413-
+--
+Vintagestory.Client/ScreenManager.cs-574-				{
+Vintagestory.Client/ScreenManager.cs-575-					string name = new DirectoryInfo(directories[i]).Name;
+Vintagestory.Client/ScreenManager.cs-576-					Platform.AssetManager.CustomAppOrigins.Add(new PathOrigin(name, directories[i], "textures"));
+Vintagestory.Client/ScreenManager.cs-577-				}
+Vintagestory.Client/ScreenManager.cs-578-			}
+Vintagestory.Client/ScreenManager.cs-579-		}
+Vintagestory.Client/ScreenManager.cs-580-		if (ParsedArgs.ConnectServerAddress != null)
+Vintagestory.Client/ScreenManager.cs-581-		{
+Vintagestory.Client/ScreenManager.cs-582-			ConnectToMultiplayer(ParsedArgs.ConnectServerAddress, ParsedArgs.Password);
+Vintagestory.Client/ScreenManager.cs-583-		}
+Vintagestory.Client/ScreenManager.cs-584-		else if (ParsedArgs.InstallModId != null)
+Vintagestory.Client/ScreenManager.cs-585-		{
+Vintagestory.Client/ScreenManager.cs:586:			EnqueueMainThreadTask(() =>
+Vintagestory.Client/ScreenManager.cs-587-			{
+Vintagestory.Client/ScreenManager.cs-588-				GamePlatform.XPlatInterface.FocusWindow();
+Vintagestory.Client/ScreenManager.cs-589-				InstallMod(ParsedArgs.InstallModId);
+Vintagestory.Client/ScreenManager.cs-590-			});
+Vintagestory.Client/ScreenManager.cs-591-		}
+Vintagestory.Client/ScreenManager.cs-592-		else if (ParsedArgs.OpenWorldName != null || ParsedArgs.CreateRndWorld)
+Vintagestory.Client/ScreenManager.cs-593-		{
+Vintagestory.Client/ScreenManager.cs:594:			EnqueueMainThreadTask(openWorldFromArgs);
+Vintagestory.Client/ScreenManager.cs-595-		}
+Vintagestory.Client/ScreenManager.cs-596-	}
+Vintagestory.Client/ScreenManager.cs-597-
+Vintagestory.Client/ScreenManager.cs-598-	private void openWorldFromArgs()
+Vintagestory.Client/ScreenManager.cs-599-	{
+Vintagestory.Client/ScreenManager.cs-600-		string playStyle = ParsedArgs.PlayStyle;
+Vintagestory.Client/ScreenManager.cs-601-		string text = ParsedArgs.OpenWorldName;
+Vintagestory.Client/ScreenManager.cs-602-		if (text == null)
+Vintagestory.Client/ScreenManager.cs-603-		{
+Vintagestory.Client/ScreenManager.cs-604-			int num = 0;
+Vintagestory.Client/ScreenManager.cs-605-			while (File.Exists(GamePaths.Saves + System.IO.Path.DirectorySeparatorChar + "world" + num + ".vcdbs"))
+Vintagestory.Client/ScreenManager.cs-606-			{
+Vintagestory.Client/ScreenManager.cs-607-				num++;
+Vintagestory.Client/ScreenManager.cs-608-			}
+Vintagestory.Client/ScreenManager.cs-609-			text = "world" + num + ".vcdbs";
+Vintagestory.Client/ScreenManager.cs-610-		}
+Vintagestory.Client/ScreenManager.cs-611-		foreach (ModContainer verifiedMod in verifiedMods)
+Vintagestory.Client/ScreenManager.cs-612-		{
+Vintagestory.Client/ScreenManager.cs-613-			if (verifiedMod.WorldConfig?.PlayStyles == null)
+Vintagestory.Client/ScreenManager.cs-614-			{
+Vintagestory.Client/ScreenManager.cs-615-				continue;
+Vintagestory.Client/ScreenManager.cs-616-			}
+Vintagestory.Client/ScreenManager.cs-617-			PlayStyle[] playStyles = verifiedMod.WorldConfig.PlayStyles;
+Vintagestory.Client/ScreenManager.cs-618-			foreach (PlayStyle playStyle2 in playStyles)
+Vintagestory.Client/ScreenManager.cs-619-			{
+--
+Vintagestory.Client/ScreenManager.cs-677-				MainThreadTasks.Dequeue()();
+Vintagestory.Client/ScreenManager.cs-678-			}
+Vintagestory.Client/ScreenManager.cs-679-		}
+Vintagestory.Client/ScreenManager.cs-680-		Render(dt);
+Vintagestory.Client/ScreenManager.cs-681-		FrameProfiler.Mark("rendered");
+Vintagestory.Client/ScreenManager.cs-682-		if (debugDrawCallNextFrame)
+Vintagestory.Client/ScreenManager.cs-683-		{
+Vintagestory.Client/ScreenManager.cs-684-			Platform.DebugDrawCalls = false;
+Vintagestory.Client/ScreenManager.cs-685-			debugDrawCallNextFrame = false;
+Vintagestory.Client/ScreenManager.cs-686-		}
+Vintagestory.Client/ScreenManager.cs-687-	}
+Vintagestory.Client/ScreenManager.cs-688-
+Vintagestory.Client/ScreenManager.cs:689:	public static void EnqueueMainThreadTask(Action a)
+Vintagestory.Client/ScreenManager.cs-690-	{
+Vintagestory.Client/ScreenManager.cs-691-		lock (MainThreadTasks)
+Vintagestory.Client/ScreenManager.cs-692-		{
+Vintagestory.Client/ScreenManager.cs-693-			MainThreadTasks.Enqueue(a);
+Vintagestory.Client/ScreenManager.cs-694-		}
+Vintagestory.Client/ScreenManager.cs-695-	}
+Vintagestory.Client/ScreenManager.cs-696-
+Vintagestory.Client/ScreenManager.cs-697-	public static void EnqueueCallBack(Action a, int msdelay, string code)
+Vintagestory.Client/ScreenManager.cs-698-	{
+Vintagestory.Client/ScreenManager.cs-699-		TyronThreadPool.QueueTask(async () =>
+Vintagestory.Client/ScreenManager.cs-700-		{
+Vintagestory.Client/ScreenManager.cs-701-			await Task.Delay(msdelay);
+Vintagestory.Client/ScreenManager.cs:702:			EnqueueMainThreadTask(a);
+Vintagestory.Client/ScreenManager.cs-703-		}, code);
+Vintagestory.Client/ScreenManager.cs-704-	}
+Vintagestory.Client/ScreenManager.cs-705-
+Vintagestory.Client/ScreenManager.cs-706-	internal void Render(float dt)
+Vintagestory.Client/ScreenManager.cs-707-	{
+Vintagestory.Client/ScreenManager.cs-708-		int width = Platform.WindowSize.Width;
+Vintagestory.Client/ScreenManager.cs-709-		int height = Platform.WindowSize.Height;
+Vintagestory.Client/ScreenManager.cs-710-		Platform.GlViewport(0, 0, width, height);
+Vintagestory.Client/ScreenManager.cs-711-		Platform.ClearFrameBuffer(EnumFrameBuffer.Default);
+Vintagestory.Client/ScreenManager.cs-712-		Platform.ClearFrameBuffer(EnumFrameBuffer.Primary);
+Vintagestory.Client/ScreenManager.cs-713-		Platform.GlDisableDepthTest();
+Vintagestory.Client/ScreenManager.cs-714-		Platform.GlDisableCullFace();
+Vintagestory.Client/ScreenManager.cs-715-		Platform.CheckGlError();
+Vintagestory.Client/ScreenManager.cs-716-		Platform.DoPostProcessingEffects = false;
+Vintagestory.Client/ScreenManager.cs-717-		Platform.LoadFrameBuffer(EnumFrameBuffer.Primary);
+Vintagestory.Client/ScreenManager.cs-718-		CurrentScreen.RenderToPrimary(dt);
+Vintagestory.Client/ScreenManager.cs-719-		FrameProfiler.Mark("doneRend");
+Vintagestory.Client/ScreenManager.cs-720-		float[] projectMatrix = null;
+Vintagestory.Client/ScreenManager.cs-721-		if (CurrentScreen is GuiScreenRunningGame guiScreenRunningGame)
+Vintagestory.Client/ScreenManager.cs-722-		{
+Vintagestory.Client/ScreenManager.cs-723-			projectMatrix = guiScreenRunningGame.runningGame.CurrentProjectionMatrix;
+Vintagestory.Client/ScreenManager.cs-724-		}
+Vintagestory.Client/ScreenManager.cs-725-		Platform.RenderPostprocessingEffects(projectMatrix);
+Vintagestory.Client/ScreenManager.cs-726-		CurrentScreen.RenderAfterPostProcessing(dt);
+Vintagestory.Client/ScreenManager.cs-727-		Platform.RenderFinalComposition();
+--
+Vintagestory.Client/ScreenManager.cs-962-	public void InstallMod(string modid)
+Vintagestory.Client/ScreenManager.cs-963-	{
+Vintagestory.Client/ScreenManager.cs-964-		if (CurrentScreen is GuiScreenRunningGame guiScreenRunningGame)
+Vintagestory.Client/ScreenManager.cs-965-		{
+Vintagestory.Client/ScreenManager.cs-966-			guiScreenRunningGame.ExitOrRedirect(isDisconnect: false, "modinstall request");
+Vintagestory.Client/ScreenManager.cs-967-			TyronThreadPool.QueueTask(async () =>
+Vintagestory.Client/ScreenManager.cs-968-			{
+Vintagestory.Client/ScreenManager.cs-969-				int i = 0;
+Vintagestory.Client/ScreenManager.cs-970-				while (i++ < 1000 && !(CurrentScreen is GuiScreenMainRight))
+Vintagestory.Client/ScreenManager.cs-971-				{
+Vintagestory.Client/ScreenManager.cs-972-					await Task.Delay(100);
+Vintagestory.Client/ScreenManager.cs-973-				}
+Vintagestory.Client/ScreenManager.cs:974:				EnqueueMainThreadTask(() =>
+Vintagestory.Client/ScreenManager.cs-975-				{
+Vintagestory.Client/ScreenManager.cs-976-					InstallMod(modid);
+Vintagestory.Client/ScreenManager.cs-977-				});
+Vintagestory.Client/ScreenManager.cs-978-			}, "mod install");
+Vintagestory.Client/ScreenManager.cs-979-		}
+Vintagestory.Client/ScreenManager.cs-980-		else
+Vintagestory.Client/ScreenManager.cs-981-		{
+Vintagestory.Client/ScreenManager.cs-982-			modid = modid.Replace("vintagestorymodinstall://", "").TrimEnd('/');
+Vintagestory.Client/ScreenManager.cs-983-			LoadScreen(GuiScreenDownloadMods.ForInstallRequest(modid, this, mainScreen));
+Vintagestory.Client/ScreenManager.cs-984-			if (ClientSettings.FocusWindowOnModInstallRequest)
+Vintagestory.Client/ScreenManager.cs-985-			{
+Vintagestory.Client/ScreenManager.cs-986-				Platform.WindowFocus();
+Vintagestory.Client/ScreenManager.cs-987-			}
+Vintagestory.Client/ScreenManager.cs-988-		}
+Vintagestory.Client/ScreenManager.cs-989-	}
+Vintagestory.Client/ScreenManager.cs-990-
+Vintagestory.Client/ScreenManager.cs-991-	public void ConnectToMultiplayer(string host, string password)
+Vintagestory.Client/ScreenManager.cs-992-	{
+Vintagestory.Client/ScreenManager.cs-993-		if (host.Contains("vintagestoryjoin://"))
+Vintagestory.Client/ScreenManager.cs-994-		{
+Vintagestory.Client/ScreenManager.cs-995-			GuiScreen curScreen = CurrentScreen;
+Vintagestory.Client/ScreenManager.cs-996-			LoadScreen(new GuiScreenConfirmAction(Lang.Get("confirm-joinserver", host.Replace("vintagestoryjoin://", "").TrimEnd('/')), (bool ok) =>
+Vintagestory.Client/ScreenManager.cs-997-			{
+Vintagestory.Client/ScreenManager.cs-998-				if (ok)
+Vintagestory.Client/ScreenManager.cs-999-				{
+--
+Vintagestory.Client/ScreenManager.cs-1094-		CurrentScreen.OnFileDrop(filename);
+Vintagestory.Client/ScreenManager.cs-1095-	}
+Vintagestory.Client/ScreenManager.cs-1096-
+Vintagestory.Client/ScreenManager.cs-1097-	internal void TryRedirect(MultiplayerServerEntry entry)
+Vintagestory.Client/ScreenManager.cs-1098-	{
+Vintagestory.Client/ScreenManager.cs-1099-		Platform.Logger.Notification("Redirecting to new server");
+Vintagestory.Client/ScreenManager.cs-1100-		ConnectToMultiplayer(entry.host, entry.password);
+Vintagestory.Client/ScreenManager.cs-1101-	}
+Vintagestory.Client/ScreenManager.cs-1102-
+Vintagestory.Client/ScreenManager.cs-1103-	internal void OfferRestart(string message)
+Vintagestory.Client/ScreenManager.cs-1104-	{
+Vintagestory.Client/ScreenManager.cs-1105-		GuiScreen currentScreen = CurrentScreen;
+Vintagestory.Client/ScreenManager.cs:1106:		EnqueueMainThreadTask(() =>
+Vintagestory.Client/ScreenManager.cs-1107-		{
+Vintagestory.Client/ScreenManager.cs-1108-			LoadScreen(new GuiScreenConfirmAction("restart-title", message, "general-cancel", "game-exit", (bool val) =>
+Vintagestory.Client/ScreenManager.cs-1109-			{
+Vintagestory.Client/ScreenManager.cs-1110-				if (val)
+Vintagestory.Client/ScreenManager.cs-1111-				{
+Vintagestory.Client/ScreenManager.cs-1112-					Platform.WindowExit("requires restart", EnumExitMode.SoftExit);
+Vintagestory.Client/ScreenManager.cs-1113-				}
+Vintagestory.Client/ScreenManager.cs-1114-				else if (currentScreen is GuiScreenConnectingToServer guiScreenConnectingToServer)
+Vintagestory.Client/ScreenManager.cs-1115-				{
+Vintagestory.Client/ScreenManager.cs-1116-					guiScreenConnectingToServer.exitToMainMenu();
+Vintagestory.Client/ScreenManager.cs-1117-				}
+Vintagestory.Client/ScreenManager.cs-1118-				else
+Vintagestory.Client/ScreenManager.cs-1119-				{
+Vintagestory.Client/ScreenManager.cs-1120-					StartMainMenu();
+Vintagestory.Client/ScreenManager.cs-1121-				}
+Vintagestory.Client/ScreenManager.cs-1122-			}, this, currentScreen, "restart-confirmation"));
+Vintagestory.Client/ScreenManager.cs-1123-		});
+Vintagestory.Client/ScreenManager.cs-1124-	}
+Vintagestory.Client/ScreenManager.cs-1125-}
+--
+Vintagestory.Client/GuiScreenDisconnected.cs-11-		ScreenManager.GuiComposers.ClearCache();
+Vintagestory.Client/GuiScreenDisconnected.cs-12-		ElementComposer = ScreenManager.GuiComposers.Create("mainmenu-disconnected", ElementBounds.Fixed(EnumDialogArea.CenterTop, 0.0, 20.0, 710.0, 330.0).WithAlignment(EnumDialogArea.CenterMiddle).WithFixedMargin(5.0)).AddShadedDialogBG(ElementBounds.Fill, withTitleBar: false, 5.0, 1f).AddRichtext(Lang.Get(title), CairoFont.WhiteSmallishText().WithOrient
+Vintagestory.Client/GuiScreenDisconnected.cs-13-			.AddRichtext(reason, CairoFont.WhiteSmallText().WithOrientation(EnumTextOrientation.Center), ElementBounds.Fixed(EnumDialogArea.CenterTop, 0.0, 65.0, 690.0, 450.0), didClickLink, "centertextreason")
+Vintagestory.Client/GuiScreenDisconnected.cs-14-			.AddButton(Lang.Get("Back to main menu"), OnBack, ElementStdBounds.MenuButton(4.5f).WithFixedPadding(5.0, 3.0).WithFixedMargin(5.0))
+Vintagestory.Client/GuiScreenDisconnected.cs-15-			.EndChildElements();
+Vintagestory.Client/GuiScreenDisconnected.cs-16-		ElementComposer.GetRichtext("centertextreason").MaxHeight = 450;
+Vintagestory.Client/GuiScreenDisconnected.cs-17-		ElementComposer.Compose();
+Vintagestory.Client/GuiScreenDisconnected.cs-18-	}
+Vintagestory.Client/GuiScreenDisconnected.cs-19-
+Vintagestory.Client/GuiScreenDisconnected.cs-20-	private void didClickLink(LinkTextComponent link)
+Vintagestory.Client/GuiScreenDisconnected.cs-21-	{
+Vintagestory.Client/GuiScreenDisconnected.cs-22-		ScreenManager.StartMainMenu();
+Vintagestory.Client/GuiScreenDisconnected.cs:23:		ScreenManager.EnqueueMainThreadTask(() =>
+Vintagestory.Client/GuiScreenDisconnected.cs-24-		{
+Vintagestory.Client/GuiScreenDisconnected.cs-25-			ScreenManager.api.Gui.OpenLink(link.Href);
+Vintagestory.Client/GuiScreenDisconnected.cs-26-		});
+Vintagestory.Client/GuiScreenDisconnected.cs-27-	}
+Vintagestory.Client/GuiScreenDisconnected.cs-28-
+Vintagestory.Client/GuiScreenDisconnected.cs-29-	private bool OnBack()
+Vintagestory.Client/GuiScreenDisconnected.cs-30-	{
+Vintagestory.Client/GuiScreenDisconnected.cs-31-		ScreenManager.StartMainMenu();
+Vintagestory.Client/GuiScreenDisconnected.cs-32-		return true;
+Vintagestory.Client/GuiScreenDisconnected.cs-33-	}
+Vintagestory.Client/GuiScreenDisconnected.cs-34-
+Vintagestory.Client/GuiScreenDisconnected.cs-35-	public override void RenderToDefaultFramebuffer(float dt)
+Vintagestory.Client/GuiScreenDisconnected.cs-36-	{
+Vintagestory.Client/GuiScreenDisconnected.cs-37-		if (ScreenManager.KeyboardKeyState[50])
+Vintagestory.Client/GuiScreenDisconnected.cs-38-		{
+Vintagestory.Client/GuiScreenDisconnected.cs-39-			ScreenManager.StartMainMenu();
+Vintagestory.Client/GuiScreenDisconnected.cs-40-			return;
+Vintagestory.Client/GuiScreenDisconnected.cs-41-		}
+Vintagestory.Client/GuiScreenDisconnected.cs-42-		ElementComposer.Render(dt);
+Vintagestory.Client/GuiScreenDisconnected.cs-43-		ScreenManager.RenderMainMenuParts(dt, ElementComposer.Bounds, withMainMenu: false);
+Vintagestory.Client/GuiScreenDisconnected.cs-44-		if (ScreenManager.mainMenuComposer.MouseOverCursor != null)
+Vintagestory.Client/GuiScreenDisconnected.cs-45-		{
+Vintagestory.Client/GuiScreenDisconnected.cs-46-			FocusedMouseCursor = ScreenManager.mainMenuComposer.MouseOverCursor;

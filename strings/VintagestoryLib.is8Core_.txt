@@ -1,0 +1,70 @@
+Vintagestory.Server/ServerSystemSupplyChunks.cs-11-using Vintagestory.API.Util;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-12-using Vintagestory.Common;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-13-using Vintagestory.Common.Database;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-14-
+Vintagestory.Server/ServerSystemSupplyChunks.cs-15-namespace Vintagestory.Server;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-16-
+Vintagestory.Server/ServerSystemSupplyChunks.cs-17-internal class ServerSystemSupplyChunks : ServerSystem
+Vintagestory.Server/ServerSystemSupplyChunks.cs-18-{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-19-	private WorldGenHandler worldgenHandler;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-20-
+Vintagestory.Server/ServerSystemSupplyChunks.cs-21-	private ChunkServerThread chunkthread;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-22-
+Vintagestory.Server/ServerSystemSupplyChunks.cs:23:	private bool is8Core = Environment.ProcessorCount >= 8;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-24-
+Vintagestory.Server/ServerSystemSupplyChunks.cs-25-	private bool requiresChunkBorderSmoothing;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-26-
+Vintagestory.Server/ServerSystemSupplyChunks.cs-27-	private bool requiresSetEmptyFlag;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-28-
+Vintagestory.Server/ServerSystemSupplyChunks.cs-29-	private volatile int pauseAllWorldgenThreads;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-30-
+Vintagestory.Server/ServerSystemSupplyChunks.cs-31-	[ThreadStatic]
+Vintagestory.Server/ServerSystemSupplyChunks.cs-32-	private static FastMemoryStream saveChunksStream;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-33-
+Vintagestory.Server/ServerSystemSupplyChunks.cs-34-	private List<long> entitiesToRemove = new List<long>();
+Vintagestory.Server/ServerSystemSupplyChunks.cs-35-
+Vintagestory.Server/ServerSystemSupplyChunks.cs-36-	private int storyEventPrints;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-37-
+Vintagestory.Server/ServerSystemSupplyChunks.cs-38-	private string[] storyChunkSpawnEvents;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-39-
+Vintagestory.Server/ServerSystemSupplyChunks.cs-40-	private int blockingRequestsRemaining;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-41-
+Vintagestory.Server/ServerSystemSupplyChunks.cs-42-	public ServerSystemSupplyChunks(ServerMain server, ChunkServerThread chunkthread)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-43-		: base(server)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-44-	{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-45-		this.chunkthread = chunkthread;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-46-		chunkthread.loadsavechunks = this;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-47-		server.RegisterGameTickListener((float dt) =>
+Vintagestory.Server/ServerSystemSupplyChunks.cs-48-		{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-49-			server.serverChunkDataPool.SlowDispose();
+Vintagestory.Server/ServerSystemSupplyChunks.cs-50-		}, 1000);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-51-	}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-52-
+Vintagestory.Server/ServerSystemSupplyChunks.cs-53-	public override int GetUpdateInterval()
+Vintagestory.Server/ServerSystemSupplyChunks.cs-54-	{
+Vintagestory.Server/ServerSystemSupplyChunks.cs:55:		if (chunkthread.requestedChunkColumns.Count == 0 || !is8Core)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-56-		{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-57-			return MagicNum.ChunkThreadTickTime;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-58-		}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-59-		return chunkthread.additionalWorldGenThreadsCount - 1;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-60-	}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-61-
+Vintagestory.Server/ServerSystemSupplyChunks.cs-62-	public override void OnBeginGameReady(SaveGame savegame)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-63-	{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-64-		requiresChunkBorderSmoothing = savegame.CreatedWorldGenVersion != 3;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-65-		requiresSetEmptyFlag = GameVersion.IsLowerVersionThan(server.SaveGameData.LastSavedGameVersion, "1.12-dev.1");
+Vintagestory.Server/ServerSystemSupplyChunks.cs-66-		if (chunkthread.additionalWorldGenThreadsCount > 0)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-67-		{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-68-			int num = 1;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-69-			for (int i = 0; i < chunkthread.additionalWorldGenThreadsCount; i++)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-70-			{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-71-				CreateAdditionalWorldGenThread(num, num + 1, i + 1);
+Vintagestory.Server/ServerSystemSupplyChunks.cs-72-				num++;
+Vintagestory.Server/ServerSystemSupplyChunks.cs-73-			}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-74-		}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-75-	}
+Vintagestory.Server/ServerSystemSupplyChunks.cs-76-
+Vintagestory.Server/ServerSystemSupplyChunks.cs-77-	public override void OnSeparateThreadTick()
+Vintagestory.Server/ServerSystemSupplyChunks.cs-78-	{
+Vintagestory.Server/ServerSystemSupplyChunks.cs-79-		if (server.RunPhase != EnumServerRunPhase.RunGame)
+Vintagestory.Server/ServerSystemSupplyChunks.cs-80-		{
