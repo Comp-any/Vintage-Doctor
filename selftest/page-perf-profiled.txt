@@ -1,0 +1,22 @@
+== Is the server keeping up? ==
+✓ The server keeps up: a tick every 40.8 ms (25 a second).
+  Last minute: average 40.8 ms, 95% under 34 ms, worst 1901 ms (344 ticks).
+  Measure where the time goes (20 seconds) (/doctor fix doctor:profile 20) The whole performance page (/doctor perf)
+✓ 1 creatures and things loaded (0 items on the ground), 112 chunks, 0 player(s).
+  Most of: game:goat 1
+  112 chunks loaded for 0 player(s).
+✓ Memory: the game holds 1.4 GB of the 7.7 GB it can use.
+  767 MB in the game's own objects; 13 full clean-ups so far; 2 processor threads.
+
+== Where the server's time goes ==
+• Measured for 5 seconds (129 ticks): 6.34 ms of work per tick, at 2026-11-24 06:55
+  The parts that took the most time, per tick. The name in square brackets is the mod the code belongs to; (N×) is how many of them ran each tick.
+  6.05 ms  96%  garbagecollector (no clients online)
+  0.07 ms  1%  Ticking: BlockEntityGenericTypedContainer
+  0.04 ms  1%  despawned-1-hare-european-adult-male
+  0.03 ms  0%  Ticking: VintageDoctorSystem [Vintage Doctor]
+• By mod: Vintage Doctor 0.03 ms, Doctor Example 0.01 ms
+  0.03 ms  0%  Vintage Doctor its page (/doctor mod vintagedoctor)
+  0.01 ms  0%  Doctor Example its page (/doctor mod doctorexample)
+  Only the work the game can tell apart by its code (things that tick, windows, timers) is counted against a mod; what a mod adds to creatures or to the world's generation isn't. A mod with many machines running is not broken for being first here.
+  Measure again (20 seconds) (/doctor fix doctor:profile 20)

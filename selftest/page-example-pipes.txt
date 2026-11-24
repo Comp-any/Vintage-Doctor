@@ -1,0 +1,3 @@
+== The example pipes ==
+✓ Doctor Example: No example pipe leaks
+The pumps (/doctor example-pumps) The tanks (/doctor example-tanks) Restart the pumps (/doctor fix doctorexample:unjam all)

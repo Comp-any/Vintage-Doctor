@@ -1,0 +1,48 @@
+Vintage Doctor 1.6.2 on Vintage Story v1.22.7 (Stable), dedicated server, 2026-11-24 06:55
+Linux (Ubuntu 26.04.1 LTS) [Kernel 7.0.0.1020]; INTEL(R) XEON(R) PLATINUM 8573C; 7930 MB RAM; .net 10.0.15
+
+== Mods (5) ==
+carryon 1.14.3, doctorexample 1.0.0, doctorexamplejson 1.0.0, primitivesurvival 5.1.4, vintagedoctor 1.6.2
+
+== Findings ==
+✓ No crash reports: the game hasn't crashed on this side.
+⚠ 1 mod(s) were left out because something they need is missing: configlib (needs vsimgui@1.2.0)
+⚠ Doctor Example: An example pump jammed
+  [doctorexample] pump 3 jammed (a made-up warning from the example mod)
+✓ No errors in the log this session (3 kind(s) of warnings, 5 line(s)).
+✓ 6 mod file(s) in 2 folder(s), nothing wrong with them.
+  Every file in 4 zip(s) was read to the end.
+✓ 5 config file(s) read without a problem.
+✓ The server keeps up: a tick every 33.1 ms (30 a second).
+  Last minute: average 33.1 ms, 95% under 34 ms, worst 34 ms (124 ticks).
+✓ 7 creatures and things loaded (0 items on the ground), 392 chunks, 0 player(s).
+  Most of: game:hare 6, game:goat 1
+  392 chunks loaded for 0 player(s).
+✓ Memory: the game holds 1.4 GB of the 7.7 GB it can use.
+  1.1 GB in the game's own objects; 12 full clean-ups so far; 2 processor threads.
+✓ 14.0 GB free where the world is saved.
+  The save file is 4 KB.
+• Doctor Example (JSON) and Doctor Example don't get on
+  Nothing is really wrong: the two example mods say they clash so the doctor has a clash to show.
+✓ 33 JSON patches in 85 files, no two mods replacing the same thing.
+✓ Every mod's blocks and items have names.
+• 2 mod(s) change the game's code in 2 place(s)
+  Carry On (1), Doctor Example (1)
+• Doctor Example: 1 kind(s) of messages from the example mod this session
+⚠ Doctor Example: 3 example pumps are jammed
+  pump at 10 5 10
+  1 message(s) from this mod in the log
+• Doctor Example: 2 example tanks are half empty
+  tank at 10 3 10
+  tank at 12 3 10
+• Doctor Example: The example mod started
+  reported with ReportIncident
+  Last at 2026-11-24 06:55.
+
+== Errors and warnings in server-main.log (most frequent first) ==
+×2 [Warning] [doctorselftest] Its check 'doctorselftest:throws' for Vintage Doctor failed: System.InvalidOperationException: the check's own bug  {doctorselftest}
+    at VintageDoctor.SelfTest.<>c.<Api>b__16_1(IDoctorContext ctx)
+    at VintageDoctor.Checks.RunChecks(DoctorContext x, List`1 checks)
+×2 [Warning] [vintagedoctor] guestmod said it would deliver 'guest-notes' later and didn't in time.  {vintagedoctor}
+[Warning] [doctorexample] pump 3 jammed (a made-up warning from the example mod)  {doctorexample}
+[Warning] [vintagedoctor] A mod offered a page with the id 'crash', which is taken by the doctor itself or has characters other than a-z, 0-9 and '-'. It was left out.  {vintagedoctor}

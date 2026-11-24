@@ -1,0 +1,244 @@
+PASS versions: 1.10.0 is newer than 1.9.2
+PASS versions: 1.0.0 is newer than 1.0.0-rc.1
+PASS versions: rc.2 is newer than rc.1
+PASS versions: v1.2 equals 1.2.0
+PASS addresses and user folders are taken out (from <address> at /home/<user>/data and C:\Users\<user> One\x, Version=1.2.3.4)
+PASS messages that differ only in a code or a number count as one
+PASS a page as text names the commands behind its buttons (✓ fine / ✖ bad Do it (/doctor fix doctor:x a/b(c)) /   Carry On's page (/doctor mod carryon))
+PASS a page counts its problems
+PASS a page survives being sent
+PASS so do the check-up's sections and their headings
+PASS a card that is under two mods counts once
+PASS check-up: a card is filed under the mods its words name: a name as whole words, a log tag, a file of the mod's, and for a mod that wasn't loaded its bare id
+PASS font: a page's marks are written in ordinary characters where the game draws them ([ok] fine / [!] careful / [x] broken / • to know /   -> do this)
+PASS font: arrows, triangles, signs and pictures too (Esc -> Settings <- back > open v shut, a <= b != c, Fix it, 5 000, done here *)
+PASS font: letters of any language and ordinary punctuation are left alone
+PASS font: chat gets the same, with its own markup signs written out ([!] &lt;b&gt;1 &lt; 2&lt;/b&gt; -&gt; go)
+PASS log: read without error
+PASS log: the game version (v1.22.7 (Stable))
+PASS log: a mod left out for missing dependencies, with both reasons (1 skipped)
+PASS log: a blocked mod (badmod@1.0.0: known to corrupt saves)
+PASS log: a mod id installed twice (twice: 'twice_1.0.0.zip', 'twice_1.1.0.zip', loaded: v1.1.0)
+PASS log: mods found and disabled (9/1)
+PASS log: a mod that threw while starting, with its error, trace and system (Method not found: 'Void Vintagestory.API.Common.Something.Gone()'. / 2 frames / Crashy.CrashySystem)
+PASS log: a file that isn't a mod (broken.zip;crashy)
+PASS log: failed JSON patches by mod (patchy=2;oldpatchy=1)
+PASS log: recipes naming things that don't exist, once each (armory=1)
+PASS log: a patch for a mod that isn't installed is noted, not counted as failed (patchy=selftestabsentmod:itemtypes/thing.json;oldpatchy=game:itemtypes/removed.json)
+PASS log: a patch for a file the game no longer has counts as failed
+PASS log: blocks and items whose code is missing (block ghosty:machine-north GhostMachine;entity ghosty:machine-north GhostMachineEntity;item ghosty:wand GhostWand;behavior ghosty:wand GhostGlow;behavior ghosty:machine-north GhostHum;behavior ghosty:machine-north GhostPower)
+PASS log: files of a mod the game couldn't read, in the words of two game versions (ghosty=itemtypes/broken.json,recipes/grid/cutshort.json)
+PASS log: blocks and items the game refused to add (item ghosty:wand;block ghosty:machine-north)
+PASS log: code in a mod that calls itself a content mod (ghosty)
+PASS log: a slow tick
+PASS log: the same warning twice is one entry with a count (2)
+PASS log: an exception keeps its stack trace and count (2x, 2 frames)
+PASS log: start-up lines aren't counted as errors of their own (13 issues)
+PASS an error is explained in plain words
+PASS more errors explained: a name taken twice, a library for another system, a mod packed wrong
+PASS memory that keeps growing is told from memory that is only large (35.00001666666667 min, 1150 to 1900 MB)
+PASS a known problem is recognised by its pattern and counted against its mod (tester)
+PASS ignored messages are left out
+PASS crash: two reports read (2)
+PASS crash: the mod the game named, and its version then (crashy@0.9.0)
+PASS crash: the error and its trace (System.NullReferenceException / 2)
+PASS crash: the Harmony ids involved
+PASS crash: when it happened is kept as written (11/20/2026 9:15:01 PM)
+PASS crash: one with no mod named (System.IO.FileNotFoundException)
+PASS crash: the latest is the last in the file
+PASS crash: a server's report with an empty mod list (System.NullReferenceException / Object reference not set to an instance of an object.)
+PASS folder: every mod file found, a text file left alone (16: twice_1.10.0.zip,libs_1.0.0.zip,future.zip,badinfo.zip,nested.zip,half.zip.crdownload,corrupt.zip,twice_1.0.0.zip,foldermod,backslash.zip,good_1.0.0.zip,packed.rar,wrapped-download.zip,source.zip,stray.zip,notamod.zip)
+PASS folder: a good zip
+PASS folder: backslashes in file names
+PASS folder: modinfo one folder down
+PASS folder: a zip that isn't a mod
+PASS folder: source code instead of a release
+PASS folder: a broken modinfo.json
+PASS folder: a zip inside a zip
+PASS folder: a damaged zip
+PASS folder: an archive the game can't read, and a download that didn't finish
+PASS folder: a mod in a folder
+PASS folder: what a mod brings: its libraries, its own files, and what it puts into the game's and other mods' folders (libs.dll,0Harmony.dll / itemtypes/thing.json / game:recipes/grid/x.json,game:textures/block/z.png,othermod:itemtypes/y.json / )
+PASS folder: the same for a mod kept as a folder (game:recipes/grid/x.json)
+PASS folder: a .dll in a subfolder, which the game refuses to load
+PASS folder: a mod installed twice, newest first (1 duplicates)
+PASS folder: reading a damaged zip to the end fails, a good one doesn't
+PASS folder: every zip that opens is read to its end as part of the look, and the whole ones pass
+PASS fix: backslashes repacked, the original kept (changed 1)
+PASS fix: the outer folder taken away, the original kept
+PASS fix: a library the game already has taken out of a mod, the rest and the original kept (dropped 1, 9 entries)
+PASS fix: a zip that can't be made right is left as it was
+PASS fix: a file and a folder moved aside, not deleted
+PASS fix: a second file of the same name doesn't overwrite the first backup
+PASS config: a good file with a comment passes
+PASS config: a broken file fails with where (Unexpected character encountered while parsing value: }. Path 'b[1]', line 3, position 0.)
+PASS config: an empty file and one full of zeros
+PASS config: a file cut short fails
+PASS config: a folder is read, and a declared owner kept (5 files)
+PASS json: known problems read, the incomplete one refused (3 read, errors: test.json: a known problem needs "match" and "title" | test.json: unknown fix type "format-disk" (resetConfig, command or url))
+PASS json: fixes read, an unknown kind refused (2)
+PASS json: conflicts, recommendations and config files
+PASS json: a pattern matches on its side only
+PASS api: other mods can find the doctor
+PASS api: a registered check shows in the check-up with its details and fix
+PASS api: a check marked Deep runs in the check-up like any other (there is no second, slower round since 1.3.0)
+PASS api: a check that throws is reported, and the rest still runs
+PASS api: an incident reported twice is shown once with a count
+PASS api: findings handed over on the event bus show too
+PASS api: a registered fix runs and reports (Reconnected 3 pipes)
+PASS api: a fix can say it failed
+PASS api: an unknown fix is refused
+PASS api: a fix over the event bus runs
+PASS api: a fix nobody answers on the event bus is reported
+PASS api: a registered page opens with its argument (== My pipes aren't moving anything == / ✓ doctorselftest: page built with north)
+PASS api: a page can't take one of the doctor's own names
+PASS check-up: every card has a section, and the page begins with the game's (== The game (Vintage Story 1.22.7) ==)
+PASS check-up: a mod's cards are under that mod's heading, not the game's (⚠ doctorselftest: 3 pipes aren't connected /   at 10 5 10 /   pipes need a neighbour /   → connect them /   Reconnect them (/doctor fix doctorselftest:reconnect all) / ✓ doctorselftest: pumps are fine / • doctorselftest: a deeper look / ⚠ doctorselftest's own check 'doctorselftest:throws' stopped with an error: InvalidOperationException: the check's own bug /   That is a bug in the mod's check, not in your game; the mod's author will want to know. / ⚠ doctorselftest: A pump jammed (×2) /   at 4 5 6 /   Last at 2026-11-24 06:55. / My pipes aren't moving anything (/doctor selftest-pipes) /  / )
+PASS check-up: findings handed over on the event bus are under their mod too (⚠ busmod: 2 tanks are leaking /   tank at 1 1 1 /   tank at 2 2 2 /   Seal them (/doctor fix bus:busmod:seal) /  / )
+PASS check-up: a page a mod added is a button in that mod's section
+PASS check-up: the doctor's own pages are buttons in the game's section
+PASS check-up: every line that is shown is in one section, so the window can show one mod alone
+PASS check-up: two halves make one list: what both found alike is said once, and what only the server found comes under a line saying so (40 cards from two halves, 39 from one; the note at 1839, the server's card at 1856)
+PASS check-up: the game first, then the mods with something to say, then the rest in one card (0, 5827, 6821)
+PASS check-up: nothing in it needs a character the game's font may lack once it is made drawable
+PASS check-up: a check that found nothing says so too (✓ Every mod's blocks and items have names. / ✓ No two mods replace the same file, and none replaces the game's own.)
+PASS api: a registered known problem matches
+PASS api: unregistering takes everything of that mod away
+PASS guests: a page offered on the event bus is known, one with a name the doctor uses isn't (example-pipes,example-pumps,example-tanks,guest-keyed,guest-notes)
+PASS guests: it is a button on the check-up, in its mod's section (My guest notes are missing (/doctor guest-notes))
+PASS guests: a question given as a lang key is shown in words, here and for a player's game (== guest-keyed (not loaded) ==)
+PASS guests: what mods send along from the player's game is gathered, packed and unpacked; too much and the wrong kind are left out (2 entries)
+PASS guests: the mod's own lines make the page, at once, under its own heading (== Guest notes == / ⚠ 1 note is unread /   note 7 /   Read it (/doctor fix bus:guestmod:read 7) Show it (.doctor fix bus:guestmod:show 7) All notes (/doctor guest-notes all) / argument: all)
+PASS guests: its buttons: a fix for the event bus on this side, one for the player's side, a link (Read it (/doctor fix bus:guestmod:read 7) Show it (.doctor fix bus:guestmod:show 7) All notes (/doctor guest-notes all))
+PASS guests: what the player's game sent along and what they hold reach the mod (table 5 for guest-notes all / item:game:ingot-copper)
+PASS guests: a page that comes later isn't handed on yet, and how long it may take is passed on (told 30, waiting s-4)
+PASS guests: it is handed on when the mod delivers
+PASS guests: a second delivery for the same page is ignored
+PASS guests: a mod that never delivers leaves a warning, not a page that hangs (⚠ guestmod said it needed a moment and then didn't answer. Its part is missing here; the log may say why.)
+PASS guests: where nothing can wait, the page says the mod is still working (guestmod is still putting its part together. Open the page again in a moment.)
+PASS guests: a fix over the event bus answers at once when it can (Read note 7)
+PASS guests: a fix that needs time is waited for (Read note 8, slowly, told 60)
+PASS guests: a fix that is never finished says so (⚠ guestmod said it needed a moment and then didn't answer. Its part is missing here; the log may say why.)
+PASS guests: where nothing can wait, the fix says the mod is working on it
+PASS guests: a mod's card on an item's page, with a link to its own page (item item:game:ingot-copper / • guestmod: Worth 3 guest notes)
+PASS guests: a check registered for the item page runs there, with the thing and the facts (• guestmod: typed check about game:ingot-copper with facts)
+PASS guests: and on the crafting page (• guestmod: typed check about game:ingot-copper)
+PASS guests: but not on the check-up
+PASS guests: a page in code with its own heading, buttons on one line and the block looked at (== My own heading == /   Plain line notes (/doctor guest-notes all) do it (/doctor fix guestmod:x 1) / • guestmod: looked at 1,2,3)
+PASS guests: a page only the other side has gets nothing from this side (0 lines, only-on-the-client|x)
+PASS guests: opening the window for a player who isn't there says it couldn't
+PASS guests: when the mod stops answering, its page is gone
+PASS real: the server's log was read (274 lines, 4 kinds of errors and warnings, read in 2 ms)
+PASS real: the Mods folders were looked through (2 folders, 6 files)
+PASS real: the doctor knows its own mod
+PASS real: the doctor's own list of known problems was read from its assets (16 known, sources: doctorexamplejson:config/vintagedoctor.json, vintagedoctor:config/vintagedoctor.json)
+PASS real: no known-problem list failed to load
+PASS real: page-overview (6501 chars)
+PASS real: page-deep (6501 chars)
+PASS real: page-crash (146 chars)
+PASS real: page-startup (414 chars)
+PASS real: page-log (1322 chars)
+PASS real: page-log-carryon (88 chars)
+PASS real: page-mods (608 chars)
+PASS real: page-mod-vintagedoctor (1686 chars)
+PASS real: page-mod-carryon (1357 chars)
+PASS real: page-mod-nosuchmod (211 chars)
+PASS real: page-perf (879 chars)
+PASS real: page-files (283 chars)
+PASS real: page-patches (484 chars)
+PASS real: page-clashes (1397 chars)
+PASS real: page-changes (225 chars)
+PASS real: page-world (189 chars)
+PASS real: page-item-game_ingot-copper (642 chars)
+PASS real: page-item-game_nosuchitem (200 chars)
+PASS real: page-item (215 chars)
+PASS real: page-block (82 chars)
+PASS real: page-craft-game_axe-copper (180 chars)
+PASS real: page-craft-game_ingot-copper (577 chars)
+PASS real: page-bugreport (3119 chars)
+PASS real: page-bugreport-carryon (1145 chars)
+PASS real: page-api (1029 chars)
+PASS real: page-example-tanks (296 chars)
+PASS real: page-example-pipes (187 chars)
+PASS real: page-nosuchpage (6576 chars)
+PASS real: page-carryon (1357 chars)
+PASS real: page-game_ingot-copper (642 chars)
+PASS real: the check-up has cards and buttons
+PASS real: what used to be the deeper checks is in it (patches of two mods on one thing, things without a name, every zip read to its end) (✓ Every mod's blocks and items have names. / ✓ No two mods replace the same file, and none replaces the game's own. / 4 zips read to the end)
+PASS real: the bug report has the mod list and no addresses
+PASS real: the bug report was saved
+PASS logs: only a plain log or text file's name is ever opened
+PASS logs: the log's own page has one button for its file, under its heading, however often the page names it (server-main.log)
+PASS logs: a card that speaks of the log gets a button that opens it, next to the buttons it has (server-main.log)
+PASS logs: where it is the logs as a whole, or a file that may not be there, the button opens the Logs folder (folder)
+PASS logs: a log named by its file gets a button whoever wrote the line, and a wooden log gets none (client-main.log+server-debug.log / )
+PASS logs: a card about a mod's crashes and its errors opens the crash reports and the log (server-crash.log+server-main.log)
+PASS logs: a card that has the button already keeps the one (server-main.log)
+PASS logs: looking twice adds nothing
+PASS logs: a server that is another computer offers no buttons for its files
+PASS logs: the player's game opens its own log, and not a server's by name when that server is elsewhere (client-main.log / client-main.log / client-crash.log+client-main.log)
+PASS logs: a log that was never written (no crash yet) isn't offered: the folder is, or the file that is there (server-main.log / folder / server-main.log)
+PASS logs: the real page of the log has the button for server-main.log at its top (server-main.log)
+PASS logs: the real page of crash reports has the one for server-crash.log, or for the folder when there never was a crash (folder / folder / (no line says 'The game crashed'))
+PASS logs: the real page of the start-up, which is read from the log, has it too (server-main.log)
+PASS logs: on the real check-up every card that speaks of the log or of crash reports has a button for it (3 such card(s); without: )
+PASS logs: on this server, which is another computer to its players, the real pages offer none either
+PASS logs: what both sides found alike is one card with a button for each side's log (1 card(s): {{folder|logs|client-main.log|Open client-main.log}} {{folder|logs|server-main.log|Open server-main.log}})
+PASS patches: how many mods change the game's code, and in how many places (• 3 mod(s) change the game's code in 4 place(s))
+PASS patches: a place two mods change is named, with the mods and what each does there (• 3 mod(s) change the game's code in 4 place(s) /   alpha (3), beta (3), gamma (2) /   Mods patch the game's own code where it offers no other way in. It is normal, but it is also what breaks first when the game updates, and two mods patching the same place can get in each other's way. / ⚠ alpha and beta change the same 2 place(s) in the game's code /   BlockEntityChest.OnTick: alpha (rewrites it), beta (rewrites it, runs after it) /   EntityPlayer.OnHurt: alpha (runs before it), beta (runs after it) /   Each line is one piece of the game's code and what each mod does to it. Where two mods rewrite the same piece, each expects to find it as the game shipped it: the second may not find what it looks for, so one of them can stop working, or the game can crash there. / • alpha, beta and gamma change the same 1 place(s) in the game's code /   Thing.Done: alpha (runs after it), beta (steps in when it ends or fails), gamma (runs after it) /   Each line is one piece of the game's code and what each mod does to it. Mods that only run something before or after the game's code usually get along. It goes wrong when one of them stops the game's code from running, which the other counted on, or when both rewrite it. If something these mods have to do with misbehaves, these are the places to tell their authors about.)
+PASS patches: three mods at one place are named too (Thing.Done: alpha (runs after it), beta (steps in when it ends or fails), gamma (runs after it))
+PASS patches: two mods rewriting the same piece of code is a warning, the rest is to know
+PASS patches: when no two mods meet, the check-up says so (• 1 mod(s) change the game's code in 1 place(s) /   gamma (1) /   Mods patch the game's own code where it offers no other way in. It is normal, but it is also what breaks first when the game updates, and two mods patching the same place can get in each other's way. /   All code patches (/doctor patches) / ✓ No two mods change the same place in the game's code.)
+PASS tags: a > on its own is found where the game finds it, in the game's words (Found closing tag char > but no tag was opened at 16. Use &gt;/&lt; if you want to display them as plain characters. See debug log for full text.)
+PASS tags: a closing tag that doesn't match the one open (Found closing tag <font> at position 18 but <strong> should be closed first. See debug log for full text.)
+PASS tags: a closing tag never opened (Found closing tag <i> at position 7 but it was never opened. See debug log for full text.)
+PASS tags: what the game reads fine is fine
+PASS tags: as in the game, a > on its own then counts as a tag left open (Found closing tag char > but no tag was opened at 2. Use &gt;/&lt; if you want to display them as plain characters. See debug log for full text. | Found closing tag <x> at position 9 but <> should be closed first. See debug log for full text.)
+PASS tags: an error's kind and place are read back from its words
+PASS tags: the log reader sets the game's tag errors aside, each time, and doesn't count them among the errors (2 / 1)
+PASS tags: errors that fit one mod's text word for word are that mod's, with the text's key and what is wrong (⚠ alpha's texts have formatting tags out of place: 2 error(s) about them in the log this session /   ×2 alpha:help: a > with no < before it, at character 10: Press it -> done /   Also alpha:other: </i> while <b> is still open, at character 9: a <b>x</i> /   The game reads < and > in texts (chat, item descriptions, tooltips, the handbook) as formatting tags. A > on its own, or a closing tag that doesn't match, makes it write an error every time the text is shown; the text is usually still shown. The error never says whose text it was, so the doctor reads every mod's texts the way the game does and finds the ones that make that very error. The whole text is also in server-debug.log, on the line after each error. /   → Tell alpha's author which texts these are (the names above are their keys in the mod's lang file): a > that isn't part of a tag has to be written &gt;, and a < as &lt;.)
+PASS tags: the same mistake at another place (something was put in front) is that mod's too, as likely (⚠ alpha's texts are the likely cause of 1 error(s) about formatting tags in the log this session /   alpha:help: a > with no < before it, at character 16: Press it -> done (likely: the same mistake, at another place) /   The game reads < and > in texts (chat, item descriptions, tooltips, the handbook) as formatting tags. A > on its own, or a closing tag that doesn't match, makes it write an error every time the text is shown; the text is usually still shown. The error never says whose text it was, so the doctor reads every mod's texts the way the game does and finds the ones that make that very error. The whole text is also in server-debug.log, on the line after each error. /   → Tell alpha's author which texts these are (the names above are their keys in the mod's lang file): a > that isn't part of a tag has to be written &gt;, and a < as &lt;.)
+PASS tags: with the text the debug log held, the one text it is decides (⚠ alpha's texts have formatting tags out of place: 1 error(s) about them in the log this session /   alpha:help: a > with no < before it, at character 10: Press it -> done /   The game reads < and > in texts (chat, item descriptions, tooltips, the handbook) as formatting tags. A > on its own, or a closing tag that doesn't match, makes it write an error every time the text is shown; the text is usually still shown. The error never says whose text it was, so the doctor reads every mod's texts the way the game does and finds the ones that make that very error. The whole text is also in server-debug.log, on the line after each error. /   → Tell alpha's author which texts these are (the names above are their keys in the mod's lang file): a > that isn't part of a tag has to be written &gt;, and a < as &lt;. / • gamma: 1 of its texts have formatting tags out of place /   Also gamma:same: a > with no < before it, at character 10: Press it -> done! /   Nothing in this session's errors was traced to these texts, but each would make the game write an error when it shows it: the game reads < and > in texts as formatting tags. /   → Tell gamma's author which texts these are (the names above are their keys in the mod's lang file): a > that isn't part of a tag has to be written &gt;, and a < as &lt;.)
+PASS tags: an error no mod's text fits is said as such, with the text shown and where to find it (⚠ 1 error(s) about formatting tags in the log this session that no mod could be named for /   a > with no < before it, at character 10: Press it -> done /     The text shown: Press it -> done /   The game reads < and > in texts (chat, item descriptions, tooltips, the handbook) as formatting tags. A > on its own, or a closing tag that doesn't match, makes it write an error every time the text is shown; the text is usually still shown. The error never says whose text it was, so the doctor reads every mod's texts the way the game does and finds the ones that make that very error. The whole text is also in server-debug.log, on the line after each error. /   → The whole text of each is in server-debug.log, on the line after the error: it usually shows whose it is.)
+PASS tags: a mod's texts that would make the error, with none in the log, are something to know (• alpha: 1 of its texts have formatting tags out of place /   Also alpha:help: a > with no < before it, at character 10: Press it -> done /   Nothing in this session's errors was traced to these texts, but each would make the game write an error when it shows it: the game reads < and > in texts as formatting tags. /   → Tell alpha's author which texts these are (the names above are their keys in the mod's lang file): a > that isn't part of a tag has to be written &gt;, and a < as &lt;.)
+PASS tags: nothing out of place, and the check-up says so (✓ No formatting tags out of place: no errors about them in the log, and none in the mods' texts.)
+PASS tags: a tag left open is found
+PASS tags: an error from a command's help is traced to that command (⚠ 1 error(s) about formatting tags in the log this session that no mod could be named for /   the help of the command /doctortagtest: <id> is opened and never closed, so it clashes with the formatting the game puts around the text: ...est command: /doctortagtest mod <id> (likely: the same mistake, at another place) /   The game reads < and > in texts (chat, item descriptions, tooltips, the handbook) as formatting tags. A > on its own, or a closing tag that doesn't match, makes it write an error every time the text is shown; the text is usually still shown. The error never says whose text it was, so the doctor reads every mod's texts the way the game does and finds the ones that make that very error. The whole text is also in server-debug.log, on the line after each error. /   → The whole text of each is in server-debug.log, on the line after the error: it usually shows whose it is.)
+PASS tags: the doctor's own commands' help has no tag left open (/doctortagtest)
+PASS tags: every text of the game and its mods was read (0 text(s) with tags out of place, by domain: )
+PASS window: a mod's key or command with nothing more said opens the check-up, not the mod's page
+PASS window: asked for something in particular, it opens that
+PASS window: a mod's section starts folded when nothing in it needs attention, and open when something does; the game's starts open
+PASS window: a section is coloured, and marked in the list of mods, by the worst in it
+PASS closing: a mod's word that it is closing the game is noted in this session's record at once (vintageautoupdate / restarting to install 3 mod update(s))
+PASS closing: at the next start it is said as on purpose, by whom and why, and not as the game not closing properly (• vintageautoupdate closed the game last time (2026-11-24 17:00), on purpose: restarting to install 3 mod update(s))
+PASS closing: taken back, the record is as it was
+PASS example: on the check-up the mod has a section of its own: its cards without its name in front, the buttons for its two pages, and one for everything about it (⚠ 3 example pumps are jammed / My example tanks are empty (/doctor example-tanks))
+PASS example: a mod's check, registered without the doctor being a requirement
+PASS example: the check can read the log through the doctor
+PASS example: a finding over the event bus, and an incident
+PASS example: a known problem and a clash from a JSON file, with no code
+PASS example: the mod's own page has its check, its event-bus finding and its log lines
+PASS example: a recommended mod that isn't installed shows on the mod's page
+PASS example: the mod's own page of the doctor
+PASS example: the mod's fix runs
+PASS example: after the fix the check passes
+PASS example: the fix over the event bus runs
+PASS example: the fix described in JSON runs (Moved doctorexample.json to ModData/vintagedoctor/backups/2026-11-24_06-55-36/doctorexample.json. A fresh one is written the next time its mod starts (restart the game or the server).)
+PASS example: a whole page written by the mod over the event bus (== The example tanks == / ⚠ 2 example tanks are half empty /   tank at 10 3 10 /   → Fill them from a pump. /   Fill the example tanks (/doctor fix bus:doctorexample:fill) Fill them slowly (/doctor fix bus:doctorexample:slowfill) The same page, slowly (/doctor example-tanks slow) / This page came at once.)
+PASS example: the mod's cards on an item's page, over the event bus and from code (The example pumps (/doctor example-pumps) / • Doctor Example: The example mod uses Copper ingot (game:ingot-copper) for its pipes)
+PASS example: a page in code with its own heading and three buttons on a line (== The example pipes == / ✓ Doctor Example: No example pipe leaks / The pumps (/doctor example-pumps) The tanks (/doctor example-tanks) Restart the pumps (/doctor fix doctorexample:unjam all))
+PASS example: a place in the code that two real mods patch is named, with both mods and what each does there (SelfTest.SharedPlace: Doctor Example (runs after it), Vintage Doctor (runs before it) / • Doctor Example and Vintage Doctor change the same 1 place(s) in the game's code)
+PASS example: the mod's own page says which of its places another mod is at (SelfTest.SharedPlace: runs after it; also changed by Vintage Doctor (runs before it))
+PASS example: on the check-up that card is under both mods, not the game's (• Doctor Example and Vintage Doctor change the same 1 place(s) in the game's code / • Doctor Example and Vintage Doctor change the same 1 place(s) in the game's code)
+PASS example: a mod's check asks for a button that opens the log ({{folder|logs|server-main.log|Open server-main.log}})
+PASS example: the page for mod authors lists what was handed over
+PASS real fix: a broken config file is found
+PASS real fix: it is moved aside (Moved doctor-selftest-broken.json to ModData/vintagedoctor/backups/2026-11-24_06-55-36/doctor-selftest-broken.json. A fresh one is written the next time its mod starts (restart the game or the server).)
+PASS real fix: a path outside ModConfig is refused
+PASS real fix: the doctor's own config is refused
+PASS real fix: removing dropped items runs (Removed 0 items from the ground.)
+PASS real fix: a loaded mod's file can't be moved by a made-up argument
+PASS real fix: switching a mod off on a dedicated server (Doctor Example (JSON) is switched off from the next server start (the world's list of disabled mods in serverconfig.json; take it out there to bring it back).)
+PASS real fix: the doctor won't switch itself off
+243 passed, 0 failed before the profiler
