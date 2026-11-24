@@ -1,0 +1,4 @@
+/home/runner/work/Vintage-Doctor/Vintage-Doctor/data-sick/Logs/server-main.log:122:24.11.2026 06:18:01 [Error] Found closing tag char > but no tag was opened at 16. Use &gt;/&lt; if you want to display them as plain characters. See debug log for full text.
+/home/runner/work/Vintage-Doctor/Vintage-Doctor/data-sick/Logs/server-main.log:123:24.11.2026 06:18:01 [Error] Found closing tag <font> at position 18 but <strong> should be closed first. See debug log for full text.
+/home/runner/work/Vintage-Doctor/Vintage-Doctor/data-sick/Logs/server-main.log-124-24.11.2026 06:18:01 [Error] [doctorcrashy] An exception was thrown when trying to start the mod:
+/home/runner/work/Vintage-Doctor/Vintage-Doctor/data-sick/Logs/server-main.log-125-24.11.2026 06:18:01 [Error] [doctorcrashy] Exception: Method not found: 'Void Vintagestory.API.Common.DoesNotExist.Gone()'.
