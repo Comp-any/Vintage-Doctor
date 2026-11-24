@@ -1084,7 +1084,7 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
                 Pages.LogButtons(x);
             }
             // Whether a log's file is there decides between the file and its folder: here, first, they all are.
-            Func<string, bool> real = Pages.LogFileExists;
+            System.Func<string, bool> real = Pages.LogFileExists;
             try
             {
                 Pages.LogFileExists = _ => true;

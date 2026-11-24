@@ -202,7 +202,7 @@ namespace VintageDoctor
         static bool IsCard(DoctorLine l) => l.Style == DoctorLineStyle.Check && l.Indent == 0;
 
         /// <summary>Whether a file of the Logs folder is there. (The self-test puts its own answer in.)</summary>
-        internal static Func<string, bool> LogFileExists = RealLogFile;
+        internal static System.Func<string, bool> LogFileExists = RealLogFile;
         static bool RealLogFile(string name)
         {
             try { return File.Exists(Path.Combine(GamePaths.Logs, name)); }
