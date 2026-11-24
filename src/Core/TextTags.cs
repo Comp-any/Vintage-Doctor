@@ -133,7 +133,9 @@ namespace VintageDoctor
                 entries = Vintagestory.API.Config.Lang.GetAllEntries();
             }
             catch { return new List<BrokenText>(); }
-            List<BrokenText> list = Scan(entries);
+            // The doctor's own texts are never read as formatting: its window draws them as they are, and chat
+            // gets them with < and > written out. ("a > with no < before it" is one of them.)
+            List<BrokenText> list = Scan(entries).Where(b => b.Domain != VintageDoctor.API.DoctorApi.ModId).ToList();
             lock (gate) { scannedFor = locale; scanned = list; }
             return list;
         }
