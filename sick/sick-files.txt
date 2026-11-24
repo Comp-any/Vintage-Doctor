@@ -1,0 +1,38 @@
+== The Mods folder ==
+⚠ doctor-sick-notamod.zip isn't a mod: it has no modinfo.json
+  The game tries to load everything in the Mods folder and reports an error for this at every start.
+  Move doctor-sick-notamod.zip out of the Mods folder (/doctor fix doctor:move-file 0/doctor-sick-notamod.zip)
+✖ doctor-sick-backslash.zip was packed with '\' in its file names, so nothing in it loads on this computer
+  Some Windows tools write folder separators the wrong way round into a zip. Windows reads them anyway; Linux and macOS see one long file name instead of folders, so the mod has no blocks, items or textures.
+  Repack doctor-sick-backslash.zip the right way (the original is kept) (/doctor fix doctor:repack 0/doctor-sick-backslash.zip)
+✖ doctor-sick-corrupt.zip can't be opened
+  End of Central Directory record could not be found.
+  The zip is damaged, most often a download that was cut short. The game can't load it.
+  → Download the mod again.
+  Move doctor-sick-corrupt.zip out of the Mods folder (/doctor fix doctor:move-file 0/doctor-sick-corrupt.zip)
+⚠ doctor-sick-packed.rar is an archive the game can't read
+  The game only loads .zip files (and folders).
+  → Unpack it and look inside: if there is a .zip, that is the mod; if there are loose files with a modinfo.json, put them in a folder of their own in Mods.
+  Move doctor-sick-packed.rar out of the Mods folder (/doctor fix doctor:move-file 0/doctor-sick-packed.rar)
+✖ doctor-sick-nested.zip has its files one folder down, in 'Nested-main', so the game can't see the mod
+  The game looks for modinfo.json at the top. This happens when a folder is zipped instead of what's in it.
+  Repack doctor-sick-nested.zip the right way (the original is kept) (/doctor fix doctor:repack 0/doctor-sick-nested.zip)
+✖ doctor-sick-straydll.zip has code where the game doesn't accept it (lib/Helper.dll), so the game won't load it
+  The game's rule: a mod's .dll files sit at the top of the zip (only libraries that aren't .NET go in a folder, native/), and .cs files sit in src/. One file elsewhere and the game refuses the whole mod.
+  → This is how the mod was packed: get it again from its page, and tell the author if the download is the same.
+  Move doctor-sick-straydll.zip out of the Mods folder (/doctor fix doctor:move-file 0/doctor-sick-straydll.zip)
+✖ doctor-sick-wrapped.zip holds nothing but another zip, doctorwrapped_1.0.0.zip
+  The mod was zipped twice (some sites and browsers do that). The game looks for modinfo.json at the top of the zip and doesn't find it.
+  Take doctorwrapped_1.0.0.zip out of it (/doctor fix doctor:unwrap 0/doctor-sick-wrapped.zip)
+⚠ doctordup is installed 2 times (1.1.0, 1.0.0)
+  doctordup_1.1.0.zip (1.1.0, loaded)
+  doctordup_1.0.0.zip (1.0.0)
+  The game loads only the newest. The game's own 1-click install leaves the old file next to the new one.
+  Move the 1 older one(s) out of the Mods folder (/doctor fix doctor:move-duplicates doctordup)
+
+== Config files ==
+✖ The config file doctorcrashy.json can't be read (most likely Doctor Crashy's)
+  Unexpected end when reading JSON. Path 'enabled', line 1, position 16.
+  The file isn't valid JSON any more (a missing comma or bracket after editing by hand, most often). The mod it belongs to then starts with its defaults, or fails to start.
+  → Open it in a text editor and fix the line the message names, or let the mod write a fresh one.
+  Move doctorcrashy.json aside so a fresh one is written (/doctor fix doctor:reset-config doctorcrashy.json)

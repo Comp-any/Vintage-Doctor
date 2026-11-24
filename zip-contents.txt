@@ -1,0 +1,16 @@
+Archive:  results/vintagedoctor_1.4.0.zip
+  Length      Date    Time    Name
+---------  ---------- -----   ----
+      669  2026-11-24 05:24   modinfo.json
+    16657  2026-11-24 05:24   modicon.png
+   464896  2026-11-24 05:25   VintageDoctor.dll
+   120616  2026-11-24 05:25   VintageDoctor.xml
+        0  2026-11-24 05:25   assets/
+        0  2026-11-24 05:25   assets/vintagedoctor/
+        0  2026-11-24 05:25   assets/vintagedoctor/config/
+     5240  2026-11-24 05:24   assets/vintagedoctor/config/vintagedoctor.json
+        0  2026-11-24 05:25   assets/vintagedoctor/lang/
+    52381  2026-11-24 05:24   assets/vintagedoctor/lang/en.json
+       18  2026-11-24 05:24   moddb.json
+---------                     -------
+   660477                     11 files

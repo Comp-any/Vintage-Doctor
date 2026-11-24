@@ -1,0 +1,9 @@
+  Determining projects to restore...
+  Restored /home/runner/work/Vintage-Doctor/Vintage-Doctor/tests/mods/DoctorCrashy/DoctorCrashy.csproj (in 7 ms).
+  DoctorCrashy -> /home/runner/work/Vintage-Doctor/Vintage-Doctor/tests/mods/DoctorCrashy/bin/Release/doctorcrashy/DoctorCrashy.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:00.41

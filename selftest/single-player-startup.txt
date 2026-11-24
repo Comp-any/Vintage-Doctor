@@ -1,0 +1,6 @@
+Start-up
+{{folder|logs|server-main.log|Open server-main.log}}
+⚠ 1 mod(s) were left out because something they need is missing: configlib (needs vsimgui@1.2.0)
+  The game doesn't load a mod whose requirements aren't met, so nothing of these mods is in the game.
+  → Install what they need (the name after 'needs' is a mod id, with the lowest version that will do), or remove them.
+  {{url|https://mods.vintagestory.at/list/mod?text=vsimgui||Find vsimgui on the Mod DB}}

@@ -1,0 +1,10 @@
+== Every mod at a glance ==
+5 mod(s) loaded; 2 have something against them. A mod's page shows everything the doctor knows about it.
+• Vintage Doctor 1.4.0: 2 kind(s) of warnings
+  Vintage Doctor's page (/doctor mod vintagedoctor)
+• Doctor Example 1.0.0: 1 kind(s) of warnings
+  Doctor Example's page (/doctor mod doctorexample)
+✓ 3 mod(s) have nothing against them
+  Carry On 1.14.3 (/doctor mod carryon) Doctor Example (JSON) 1.0.0 (/doctor mod doctorexamplejson) Primitive Survival 5.1.4 (/doctor mod primitivesurvival)
+⚠ 1 more left out by the game: configlib
+  Everything from start-up (/doctor startup)
