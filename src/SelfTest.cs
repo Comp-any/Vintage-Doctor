@@ -1262,6 +1262,22 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
                 t.Check("tags: an error from a command's help is traced to that command", page.Contains("the help of the command /doctortagtest: <id> is opened and never closed") && page.Contains("(likely"), page.Replace("\n", " / "));
                 t.Check("tags: the doctor's own commands' help has no tag left open", !TextTags.CommandProblems(sapi).Any(b => b.Command == "/doctor"), string.Join(" | ", TextTags.CommandProblems(sapi).Select(b => b.Command)));
             }
+            // The chat window (1.7.0): the game draws a tab's lines as one text, so one line with a tag left open or a
+            // stray closing tag upsets all of it. The lines here are made up; on the player's game they are the chat's own.
+            {
+                var lines = new List<(int, IList<string>)> { (0, new List<string> { "Hello there", "<strong>Bob:</strong> fine", "A mod says <font color=\"#f00\">red forever", "x -> y" }), (1, new List<string> { "<i>ok</i>" }) };
+                List<Checks.ChatBreak> breaks = Checks.ChatBreaks(lines);
+                t.Check("chat: the lines that break the chat are found (a tag left open, a stray >), and the fine ones aren't", breaks.Count == 2 && breaks.Any(b => b.Open.SequenceEqual(new[] { "font" })) && breaks.Any(b => b.Message != null && b.Text == "x -> y"),
+                    string.Join(" | ", breaks.Select(b => b.Text)));
+                var x = new DoctorContext { Doctor = doctor, Api = sapi, Side = EnumAppSide.Client, LanguageCode = "en", Topic = Pages.Overview, Ev = doctor.EvidenceNow(false), ListAll = true };
+                Checks.Chat(x, false, breaks);
+                string card = x.R.PlainText(sapi.World);
+                t.Check("chat: the card says how many lines, shows them, and offers to clear the chat and to copy the lines", card.Contains("2 line(s) in the chat have formatting tags out of place")
+                    && card.Contains("red forever") && card.Contains("Clear the chat") && card.Contains("doctor:clear-chat") && card.Contains("Copy the lines"), card.Replace("\n", " / "));
+                var none = new DoctorContext { Doctor = doctor, Api = sapi, Side = EnumAppSide.Client, LanguageCode = "en", Topic = Pages.Overview, Ev = doctor.EvidenceNow(false), ListAll = true };
+                Checks.Chat(none, false, Checks.ChatBreaks(new List<(int, IList<string>)> { (0, new List<string> { "<i>ok</i>", "plain" }) }));
+                t.Check("chat: a chat without such lines is said to be fine", none.R.PlainText(sapi.World).Contains("The chat's lines have no formatting tags out of place."));
+            }
             // The real texts of the mods on this server.
             List<BrokenText> real = TextTags.LangProblems();
             File.WriteAllText(Path.Combine(folder, "formatting-tags-in-lang.txt"), string.Join("\n", real.Select(b => b.Key + " | " + b.Message + " | " + b.Text.Replace("\n", "\\n"))));

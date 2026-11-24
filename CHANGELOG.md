@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.7.0
+
+- **Lines that break the chat, and a button that clears it.** The game draws all of a chat tab's lines as one formatted text, so a single line with a tag it never closes (say a mod's message with `<font ...>` and no `</font>`) changes every line after it, and a stray closing tag or `>` makes it write an error each time the chat is drawn, until the line is gone. The check-up now reads the chat's lines on your game and says which ones do this, with **Clear the chat** (the same as typing `.clearchat`) and **Copy the lines**, to send to whoever wrote them.
+- **Every card can be copied for a report.** Each card that isn't simply "passed" has a **Copy this for a report** button: the doctor's and the game's versions, the mod the card is under, and the card's lines with what was found, why, and what to do.
+
 ## 1.6.2
 
 - **The doctor's own command help caused a formatting error.** The help of `.doctor` and `/doctor` said `mod <id>`, and the game shows command help as formatted text, so it read `<id>` as a tag and wrote "Found closing tag <font> ... but <id> should be closed first" to the log (found by the doctor itself, in a real game). The help and the doctor's other usage texts now write `[mod id]`, and the doctor's texts are checked for this when it is built.

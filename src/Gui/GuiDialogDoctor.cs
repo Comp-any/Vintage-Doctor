@@ -236,10 +236,42 @@ namespace VintageDoctor
                 plain.Plain = DoctorReport.Plain(capi.World, plain.Title);
                 entries.Add(plain);
             }
+            // Every card that isn't simply "passed" gets a button that copies it whole, to paste into a report.
+            foreach (Entry e in entries)
+            {
+                if (e.Kind != Kind.Check || e.State == State.Ok || e.Actions.Any(a => a.kind == "copy") || e.Details.Any(d => d.Actions.Any(a => a.kind == "copy"))) continue;
+                e.Actions.Add(("copy", CardForReport(texts, e), "", Lang.Get("vintagedoctor:gui-copy-card")));
+            }
             // Levels: ✓ passed, • something to know, ⚠ may affect play, ✖ the mod isn't running properly or could crash.
             cachedFor = current;
             cached = entries;
             return entries;
+        }
+
+        /// <summary>
+        /// A card as text to paste into a report: which doctor and game, the mod it is under, then the card's lines as
+        /// the page has them (marks and all, buttons as their words and commands).
+        /// </summary>
+        string CardForReport(string[] texts, Entry e)
+        {
+            var sb = new StringBuilder();
+            string section = null;
+            if (!string.IsNullOrEmpty(e.Section) && current?.SectionTitles != null && current.Sections != null)
+            {
+                int at = Array.IndexOf(current.Sections, e.Section);
+                if (at >= 0 && at < current.SectionTitles.Length) section = current.SectionTitles[at];
+            }
+            sb.Append("Vintage Doctor ").Append(version).Append(", Vintage Story ").Append(GameVersion.ShortGameVersion);
+            if (!string.IsNullOrEmpty(section)) sb.Append(", about ").Append(section);
+            sb.Append('\n');
+            for (int i = e.Index; i < texts.Length; i++)
+            {
+                DoctorLineStyle style = current.Styles != null && i < current.Styles.Length ? (DoctorLineStyle)current.Styles[i] : DoctorLineStyle.Text;
+                int indent = current.Indents != null && i < current.Indents.Length ? current.Indents[i] : 0;
+                if (i > e.Index && !(indent > 0 || style == DoctorLineStyle.Note)) break;
+                sb.Append(new string(' ', indent * 2)).Append(DoctorReport.Plain(capi.World, texts[i] ?? "")).Append('\n');
+            }
+            return sb.ToString().TrimEnd();
         }
 
         /// <summary>

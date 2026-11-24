@@ -33,7 +33,19 @@ namespace VintageDoctor
             Add("doctor:disable-mod", DisableMod);
             Add("doctor:profile", Profile);
             if (api.Side == EnumAppSide.Server) Add("doctor:remove-items", RemoveItems);
-            else Add("doctor:setting", Setting);
+            else
+            {
+                Add("doctor:setting", Setting);
+                Add("doctor:clear-chat", ClearChat);
+            }
+        }
+
+        /// <summary>Clears every chat tab with the game's own .clearchat, which empties the lines and draws the chat again.</summary>
+        static string ClearChat(DoctorFixContext x)
+        {
+            if (!(x.Api is Vintagestory.API.Client.ICoreClientAPI capi)) return x.Failed(x.T("fix-clear-chat-failed"));
+            capi.TriggerChatMessage(".clearchat");
+            return x.T("fix-clear-chat-done");
         }
 
         static string Backups(DoctorFixContext x)

@@ -354,6 +354,7 @@ namespace VintageDoctor
             Checks.Guarded(x, "configs", () => Checks.Configs(x, false));
             Checks.Guarded(x, "performance", () => Checks.ClientPerformance(x, false));
             Checks.Guarded(x, "hotkeys", () => Checks.Hotkeys(x, false));
+            Checks.Guarded(x, "chat", () => Checks.Chat(x, false));
             Checks.Guarded(x, "versus", () => Checks.ModsVersusServer(x, false));
             Checks.Guarded(x, "clashes", () => Checks.Clashes(x, false));
             if (!x.Doctor.ServerAnswers)

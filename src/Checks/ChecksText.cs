@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Vintagestory.API.Common;
 using VintageDoctor.API;
 
 namespace VintageDoctor
@@ -139,6 +140,93 @@ namespace VintageDoctor
                 if (s.Shown != null && text == null) x.Detail(x.T("tags-shown", TextTags.Around(s.Shown, TextTags.Position(s.Message), 60, 60)), 2);
             }
             if (list.Count > (full ? 12 : 4)) x.Detail(x.T("more-lines", list.Count - (full ? 12 : 4)));
+        }
+
+        // ---------------------------------------------------------------- the chat window (1.7.0)
+
+        /// <summary>The tags that open and must be closed again; a line that leaves one open styles everything after it.</summary>
+        static readonly HashSet<string> PairTags = new HashSet<string>(StringComparer.Ordinal) { "font", "strong", "i", "a", "hk", "code" };
+
+        /// <summary>A line of the chat that upsets the chat window, and how.</summary>
+        internal sealed class ChatBreak
+        {
+            public int Group, Line;
+            public string Text, Message;
+            public List<string> Open = new List<string>();
+        }
+
+        /// <summary>
+        /// The chat's lines that break it. The game keeps each chat tab's lines as text with formatting tags and draws
+        /// them as ONE text, joined (ClientMain.ChatHistoryByPlayerGroup, HudDialogChat.UpdateText, 1.22.7): a line
+        /// with a tag it never closes changes every line after it, and a stray closing tag or '>' makes the game write
+        /// an error each time the chat is drawn, until the line scrolls away or the chat is cleared (.clearchat).
+        /// </summary>
+        internal static List<ChatBreak> ChatBreaks(IEnumerable<(int group, IList<string> lines)> history)
+        {
+            var found = new List<ChatBreak>();
+            foreach (var (group, lines) in history ?? Enumerable.Empty<(int, IList<string>)>())
+            {
+                for (int i = 0; i < (lines?.Count ?? 0); i++)
+                {
+                    string line = lines[i] ?? "";
+                    if (line.IndexOf('<') < 0 && line.IndexOf('>') < 0) continue;
+                    var errors = TextTags.Errors(line);
+                    List<string> open = TextTags.Unclosed(line).Where(PairTags.Contains).ToList();
+                    if (errors.Count == 0 && open.Count == 0) continue;
+                    found.Add(new ChatBreak { Group = group, Line = i, Text = line, Message = errors.Count > 0 ? errors[0].message : null, Open = open });
+                }
+            }
+            return found;
+        }
+
+        /// <summary>The chat's lines as the game keeps them, read from the game by reflection; null when they can't be read.</summary>
+        static List<(int group, IList<string> lines)> ChatHistory(ICoreAPI api)
+        {
+            try
+            {
+                object game = (api as Vintagestory.API.Client.ICoreClientAPI)?.World;
+                if (game == null) return null;
+                const System.Reflection.BindingFlags all = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+                object value = game.GetType().GetField("ChatHistoryByPlayerGroup", all)?.GetValue(game) ?? game.GetType().GetProperty("ChatHistoryByPlayerGroup", all)?.GetValue(game);
+                if (!(value is System.Collections.IDictionary dict)) return null;
+                var list = new List<(int, IList<string>)>();
+                foreach (System.Collections.DictionaryEntry kv in dict)
+                {
+                    if (!(kv.Value is System.Collections.IEnumerable lines)) continue;
+                    list.Add((kv.Key is int g ? g : 0, lines.Cast<object>().Select(o => o as string ?? "").ToList()));
+                }
+                return list;
+            }
+            catch { return null; }
+        }
+
+        /// <summary>On the player's game: lines in the chat whose tags break the chat window, with a button that clears the chat.</summary>
+        public static void Chat(DoctorContext x, bool full)
+        {
+            if (x.Side != EnumAppSide.Client) return;
+            List<(int group, IList<string> lines)> history = ChatHistory(x.Api);
+            if (history == null) return;
+            Chat(x, full, ChatBreaks(history));
+        }
+
+        internal static void Chat(DoctorContext x, bool full, List<ChatBreak> broken)
+        {
+            if (broken.Count == 0)
+            {
+                if (Listed(x, full)) x.Ok(x.T("chat-ok"));
+                return;
+            }
+            x.Warn(x.T("chat-broken", broken.Select(b => b.Text).Distinct().Count()));
+            x.About(DoctorReport.GameSection);
+            foreach (ChatBreak b in broken.GroupBy(b => b.Text).Select(g => g.First()).Take(full ? 12 : 4))
+            {
+                string what = b.Message != null ? TagWhat(x, b.Message, null) : x.T("tags-what-open", string.Join("> <", b.Open));
+                x.Detail(x.T("chat-line", what, TextTags.Around(b.Text, b.Message != null ? TextTags.Position(b.Message) : b.Text.IndexOf("<" + b.Open[0], StringComparison.Ordinal), 50, 50)));
+            }
+            x.Explain(x.T("chat-why"));
+            x.Advice(x.T("chat-advice"));
+            x.FixButton("doctor:clear-chat", "", x.T("btn-clear-chat"));
+            x.CopyButton(string.Join("\n", broken.Select(b => b.Text).Distinct()), x.T("btn-copy-chat"));
         }
     }
 }
