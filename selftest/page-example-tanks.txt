@@ -1,0 +1,6 @@
+== The example tanks ==
+⚠ 2 example tanks are half empty
+  tank at 10 3 10
+  → Fill them from a pump.
+  Fill the example tanks (/doctor fix bus:doctorexample:fill) Fill them slowly (/doctor fix bus:doctorexample:slowfill) The same page, slowly (/doctor example-tanks slow)
+This page came at once.

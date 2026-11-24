@@ -1,0 +1,52 @@
+43:24.11.2026 21:57:50 [Notification] Mods, sorted by dependency: configlib, primitivesurvival, game, carryon, doctorexample, doctorexamplejson, vintagedoctor, creative, survival
+48:24.11.2026 21:57:50 [Notification] External Origins in load order: modorigin@~/work/Vintage-Doctor/Vintage-Doctor/vs/assets/creative/, modorigin@~/work/Vintage-Doctor/Vintage-Doctor/vs/assets/survival/, mod@primitivesurvival_5.1.4.zip, mod@CarryOn-1.22.0_v1.14.3.zip, mod@doctorexamplejson, mod@vintagedoctor_1.7.0.zip
+91:24.11.2026 21:58:03 [Warning] [doctorexample] pump 3 jammed (a made-up warning from the example mod)
+221:24.11.2026 21:58:03 [Notification]     Mod 'vintagedoctor_1.7.0.zip' (vintagedoctor):
+228:24.11.2026 21:58:03 [Notification]     Mod 'doctorexample' (doctorexample):
+257:24.11.2026 21:58:20 [Notification] [vintagedoctor] Check-up after start-up: 0 problem(s), 3 warning(s). Type /doctor to see them.
+261:24.11.2026 21:58:21 [Notification] [vintagedoctor] Fix 'doctorselftest:reconnect' (all) asked for by the console: Reconnected 3 pipes
+262:24.11.2026 21:58:21 [Notification] [vintagedoctor] Fix 'doctorselftest:reconnect' () asked for by the console: ⚠ which?
+266:24.11.2026 21:58:21 [Warning] [vintagedoctor] A mod offered a page with the id 'crash', which is taken by the doctor itself or has characters other than a-z, 0-9 and '-'. It was left out.
+267:24.11.2026 21:58:21 [Warning] [vintagedoctor] guestmod said it would deliver 'guest-notes' later and didn't in time.
+268:24.11.2026 21:58:21 [Notification] [vintagedoctor] Fix 'bus:guestmod:read' (7) asked for by the console: Read note 7
+269:24.11.2026 21:58:21 [Notification] [vintagedoctor] Fix 'bus:guestmod:slowread' (8) asked for by the console: its mod is working on it.
+270:24.11.2026 21:58:21 [Notification] [vintagedoctor] Fix 'bus:guestmod:slowread' (9) asked for by the console: its mod is working on it.
+271:24.11.2026 21:58:21 [Warning] [vintagedoctor] guestmod said it would deliver 'guestmod:slowread' later and didn't in time.
+272:24.11.2026 21:58:21 [Notification] [vintagedoctor] vintageautoupdate says it is closing the game: restarting to install 3 mod update(s)
+273:24.11.2026 21:58:21 [Notification] [vintagedoctor] Fix 'doctorexample:unjam' (all) asked for by the console: Restarted 3 example pumps
+274:24.11.2026 21:58:21 [Notification] [vintagedoctor] Fix 'doctorexamplejson:pump-jammed/fix' () asked for by the console: Moved doctorexample.json to ModData/vintagedoctor/backups/2026-11-24_21-58-21/doctorexample.json. A fresh one is written the next time its mod starts (restart the game or the server).
+275:24.11.2026 21:58:21 [Notification] [vintagedoctor] Fix 'doctor:reset-config' (doctor-selftest-broken.json) asked for by the console: Moved doctor-selftest-broken.json to ModData/vintagedoctor/backups/2026-11-24_21-58-21/doctor-selftest-broken.json. A fresh one is written the next time its mod starts (restart the game or the server).
+276:24.11.2026 21:58:21 [Notification] [vintagedoctor] Fix 'doctor:reset-config' (../serverconfig.json) asked for by the console: ⚠ '../serverconfig.json' isn't a file the doctor may touch (it only moves files in ModConfig and the Mods folders it listed).
+277:24.11.2026 21:58:21 [Notification] [vintagedoctor] Fix 'doctor:reset-config' (vintagedoctor.json) asked for by the console: ⚠ The doctor leaves its own config file alone.
+278:24.11.2026 21:58:21 [Notification] [vintagedoctor] Fix 'doctor:remove-items' () asked for by the console: Removed 0 items from the ground.
+279:24.11.2026 21:58:21 [Notification] [vintagedoctor] Fix 'doctor:move-file' (9/whatever.zip) asked for by the console: ⚠ '9/whatever.zip' isn't a file the doctor may touch (it only moves files in ModConfig and the Mods folders it listed).
+280:24.11.2026 21:58:21 [Notification] [vintagedoctor] Fix 'doctor:disable-mod' (doctorexamplejson) asked for by the console: Doctor Example (JSON) is switched off from the next server start (the world's list of disabled mods in serverconfig.json; take it out there to bring it back).
+281:24.11.2026 21:58:21 [Notification] [vintagedoctor] Fix 'doctor:disable-mod' (vintagedoctor) asked for by the console: ⚠ Vintage Doctor isn't something the doctor switches off.
+282:24.11.2026 21:58:21 [Notification] [vintagedoctor] Fix 'bus:doctorexample:slowfill' () asked for by the console: its mod is working on it.
+287:24.11.2026 21:58:22 [Notification] [vintagedoctor] /doctor example-tanks slow
+292:  Fill the example tanks (/doctor fix bus:doctorexample:fill) Fill them slowly (/doctor fix bus:doctorexample:slowfill) The same page, slowly (/doctor example-tanks slow)
+294:Saved to ModData/vintagedoctor/last-report-server.txt
+297:24.11.2026 21:58:29 [Notification] [vintagedoctor self-test] Self-test: 255 passed, 0 failed
+356:  [doctorexample] pump 3 jammed (a made-up warning from the example mod)
+359:  Start the example's config afresh (/doctor fix doctorexamplejson:pump-jammed/fix)
+362:  Doctor Example (JSON) says so itself (in its vintagedoctor.json).
+363:  Doctor Example (JSON)'s page (/doctor mod doctorexamplejson) Doctor Example's page (/doctor mod doctorexample)
+364:Everything about Doctor Example (JSON) (/doctor mod doctorexamplejson)
+368:  [doctorexample] pump 3 jammed (a made-up warning from the example mod)
+371:  Start the example's config afresh (/doctor fix doctorexamplejson:pump-jammed/fix)
+373:  0.06 ms  1%  Vintage Doctor its page (/doctor mod vintagedoctor)
+374:  0.01 ms  0%  Doctor Example its page (/doctor mod doctorexample)
+380:  Doctor Example (JSON) says so itself (in its vintagedoctor.json).
+381:  Doctor Example (JSON)'s page (/doctor mod doctorexamplejson) Doctor Example's page (/doctor mod doctorexample)
+395:  Fill the example tanks (/doctor fix bus:doctorexample:fill)
+402:Everything about Doctor Example (/doctor mod doctorexample)
+413:  0.06 ms  1%  Vintage Doctor its page (/doctor mod vintagedoctor)
+414:  0.01 ms  0%  Doctor Example its page (/doctor mod doctorexample)
+432:  0.06 ms  1%  Vintage Doctor its page (/doctor mod vintagedoctor)
+433:  0.01 ms  0%  Doctor Example its page (/doctor mod doctorexample)
+444:Everything about Vintage Doctor (/doctor mod vintagedoctor)
+446:Saved to ModData/vintagedoctor/last-report-server.txt
+451:  Vintage Doctor's page (/doctor mod vintagedoctor)
+453:  Doctor Example's page (/doctor mod doctorexample)
+455:  Carry On 1.14.3 (/doctor mod carryon) Doctor Example (JSON) 1.0.0 (/doctor mod doctorexamplejson) Primitive Survival 5.1.4 (/doctor mod primitivesurvival)
+458:Saved to ModData/vintagedoctor/last-report-server.txt

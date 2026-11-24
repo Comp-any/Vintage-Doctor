@@ -1,0 +1,25 @@
+Doctor Crashy
+• Doctor Crashy 1.0.0, by demonic69
+  Mod id doctorcrashy; Code mod; runs on: Server; file doctorcrashy
+  Broken on purpose: Vintage Doctor's test checks that it is found and explained.
+  {{url|https://mods.vintagestory.at/list/mod?text=Doctor%20Crashy||Find Doctor Crashy on the Mod DB}}
+✓ Everything it needs is there (1).
+  The game: wants 1.20.0 or newer, this is 1.22.7
+✖ Doctor Crashy threw an error while starting: Method not found: 'Void Vintagestory.API.Common.DoesNotExist.Gone()'.
+  An exception was thrown when trying to start the mod:
+    at DoctorCrashy.DoctorCrashySystem.StartServerSide(ICoreServerAPI api) in /home/<user>/work/Vintage-Doctor/Vintage-Doctor/tests/mods/DoctorCrashy/DoctorCrashySystem.cs:line 21
+    at Vintagestory.Common.ModLoader.TryRunModPhase(Mod mod, ModSystem system, ICoreAPI api, ModRunPhase phase) in VintagestoryLib\Common\API\ModLoader.cs:line 680
+    Not started: DoctorCrashy.DoctorCrashySystem
+  The mod calls something that doesn't exist in this version of the game (or of another mod it uses): it was built for a different version. Update the mod, or use the game version it was made for.
+  → Look for an update of Doctor Crashy that fits this game version, check it has every mod it needs, or switch it off. Its author needs the lines above.
+✖ The config file doctorcrashy.json can't be read
+  Unexpected end when reading JSON. Path 'enabled', line 1, position 16.
+  The file isn't valid JSON any more (a missing comma or bracket after editing by hand, most often). The mod it belongs to then starts with its defaults, or fails to start.
+  {{fix|s:doctor:reset-config|doctorcrashy.json|Move doctorcrashy.json aside so a fresh one is written}}
+Errors and warnings from Doctor Crashy
+{{folder|logs|server-main.log|Open server-main.log}}
+1 kind(s) of errors (3 line(s)) and 0 kind(s) of warnings (0 line(s)) in server-main.log, most frequent first. The same message counts once however often it was written.
+⚠ Doctor Crashy: 1 kind(s) of errors, 0 kind(s) of warnings
+  ×3 [Error] [doctorcrashy] a made-up error from the broken test mod
+Next
+{{fix|c:doctor:disable-mod|doctorcrashy|Switch Doctor Crashy off}} {{open|bugreport|doctorcrashy|A report about Doctor Crashy}} {{open|mods||Every mod at a glance}} {{open|overview||Back to the check-up}}

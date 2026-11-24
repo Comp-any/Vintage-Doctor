@@ -1,0 +1,111 @@
+== A report to post ==
+Everything a mod's author or the game's forum needs, with addresses, player ids and user folders taken out. Read it over, then post it with what you were doing and what you expected.
+✓ Saved to ModData/vintagedoctor/bug-report-server.txt
+Copy this page (the button below) or attach the saved file.
+
+== The report ==
+Vintage Doctor 1.7.0 on Vintage Story v1.22.7 (Stable), dedicated server, 2026-11-24 21:59
+Linux (Ubuntu 26.04.1 LTS) [Kernel 7.0.0.1020]; AMD EPYC 9V45 96-Core Processor; 7931 MB RAM; .net 10.0.15
+
+Mods (8)
+doctorcrashy 1.0.0, doctordup 1.1.0, doctorsick 1.0.0, doctorsickbundled 1.0.0, doctorsickold 1.0.0
+doctorsickshared 1.0.0, doctorsickslash 1.0.0, vintagedoctor 1.7.0
+
+Findings
+⚠ The game crashed (11/21/2026 05:56:18): NullReferenceException
+  System.NullReferenceException: Object reference not set to an instance of an object.
+    at Vintagestory.API.Common.FrameProfilerUtil.End() in VintagestoryApi\Common\FrameProfilerUtil.cs:line 213
+    at Vintagestory.Server.ServerMain.Process() in VintagestoryLib\Server\ServerMain.cs:line 941
+    at Vintagestory.Server.ServerProgram.Main() in VintagestoryLib\Server\ServerProgram.cs:line 156
+    at Vintagestory.ClientNative.CrashReporter.Start(ThreadStart start) in VintagestoryLib\Client\ClientPlatform\ClientNative\CrashReporter.cs:line 95
+✖ 5 file(s) in the Mods folder aren't mods the game can load: doctor-sick-corrupt.zip, doctor-sick-nested.zip, doctor-sick-notamod.zip, doctor-sick-wrapped.zip, doctor-sick-straydll.zip
+  doctor-sick-corrupt.zip: the zip is damaged
+  doctor-sick-nested.zip: the mod sits one folder down inside it (in 'Nested-main')
+  doctor-sick-notamod.zip: it has no modinfo.json, so it isn't a mod
+  doctor-sick-wrapped.zip: it holds another zip (doctorwrapped_1.0.0.zip) instead of the mod
+  doctor-sick-straydll.zip: it has code in the wrong place (lib/Helper.dll)
+✖ Doctor Crashy threw an error while starting: Method not found: 'Void Vintagestory.API.Common.DoesNotExist.Gone()'.
+  An exception was thrown when trying to start the mod:
+    Method not found: 'Void Vintagestory.API.Common.DoesNotExist.Gone()'.
+    at DoctorCrashy.DoctorCrashySystem.StartServerSide(ICoreServerAPI api) in /home/<user>/work/Vintage-Doctor/Vintage-Doctor/tests/mods/DoctorCrashy/DoctorCrashySystem.cs:line 21
+    at Vintagestory.Common.ModLoader.TryRunModPhase(Mod mod, ModSystem system, ICoreAPI api, ModRunPhase phase) in VintagestoryLib\Common\API\ModLoader.cs:line 680
+    Not started: DoctorCrashy.DoctorCrashySystem
+⚠ 1 mod(s) are in the Mods folder more than once
+  doctordup: 'doctordup_1.0.0.zip', 'doctordup_1.1.0.zip', loaded: v1.1.0
+⚠ 2 JSON patch(es) didn't apply: Doctor Sick (2)
+    Patch 0 (target: game:itemtypes/resource/ingot.json) in doctorsick:patches/bad.json failed because supplied path /doesnotexist/deeper/still is invalid: The json path /doesnotexist/deeper/still was not found. No such element 'doesnotexist' at the root path
+• 1 recipe(s) or drop(s) name things that don't exist, by the mod of the missing thing: doctorsick (1)
+    doctorsick:doesnotexist
+⚠ 7 kind(s) of errors in the log this session (9 line(s)), and 1 kind(s) of warnings
+  Doctor Sick: 6 kind(s), 6 line(s) its page
+    Syntax error in json file 'doctorsick:itemtypes/broken.json': Failed deserializing broken.json: Unexpected end when reading token. Path ''.
+  Doctor Crashy: 1 kind(s), 3 line(s) its page
+    [doctorcrashy] a made-up error from the broken test mod
+⚠ doctor-sick-notamod.zip isn't a mod: it has no modinfo.json
+✖ doctor-sick-backslash.zip was packed with '\' in its file names, so nothing in it loads on this computer
+✖ doctor-sick-corrupt.zip can't be opened
+  End of Central Directory record could not be found.
+⚠ doctor-sick-packed.rar is an archive the game can't read
+✖ doctor-sick-nested.zip has its files one folder down, in 'Nested-main', so the game can't see the mod
+✖ doctor-sick-straydll.zip has code where the game doesn't accept it (lib/Helper.dll), so the game won't load it
+✖ doctor-sick-wrapped.zip holds nothing but another zip, doctorwrapped_1.0.0.zip
+⚠ doctordup is installed 2 times (1.1.0, 1.0.0)
+  doctordup_1.1.0.zip (1.1.0, loaded)
+  doctordup_1.0.0.zip (1.0.0)
+✖ The config file doctorcrashy.json can't be read (most likely Doctor Crashy's)
+  Unexpected end when reading JSON. Path 'enabled', line 1, position 16.
+✓ The server keeps up: a tick every 33.5 ms (30 a second).
+  Last minute: average 33.5 ms, 95% under 34 ms, worst 53 ms (121 ticks).
+✓ 33 creatures and things loaded (0 items on the ground), 392 chunks, 0 player(s).
+  Most of: game:raccoon 8, game:fox 7, game:wolf 5, game:pig 5, game:chicken 4
+  392 chunks loaded for 0 player(s).
+✓ Memory: the game holds 1.2 GB of the 7.7 GB it can use.
+  969.6 MB in the game's own objects; 11 full clean-ups so far; 2 processor threads.
+✓ 13.9 GB free where the world is saved.
+  The save file is 4 KB.
+✖ Doctor Sick: 2 block(s) or item(s) need code that isn't in the game (DoctorGhostItem, DoctorGhostBehavior, DoctorGhostBlock, DoctorGhostEntity)
+  doctorsick:ghost (its code: DoctorGhostItem)
+  doctorsick:ghost (a behaviour: DoctorGhostBehavior)
+  doctorsick:ghostblock (its code: DoctorGhostBlock)
+  doctorsick:ghostblock (its data code: DoctorGhostEntity)
+⚠ Doctor Sick: 1 block(s) or item(s) couldn't be added to the game
+  doctorsick:ghost
+⚠ Doctor Sick: 1 of its files couldn't be read, so what they describe isn't in the game
+  doctorsick:itemtypes/broken.json
+⚠ Doctor Sick tries to change 1 file(s) that aren't there
+  game:itemtypes/doctor-no-such-file.json
+⚠ doctorsickbundled has code in it (0Harmony.dll, SickShared.dll) but calls itself a content mod, so the game leaves the code out
+⚠ doctorsickshared has code in it (SickShared.dll) but calls itself a content mod, so the game leaves the code out
+⚠ doctorsickslash has 1 block and item file(s), but none of its blocks or items are in the game
+⚠ 2 file(s) are replaced by more than one mod: only one copy of each is used
+  doctorsick:config/note.json: doctorsickold, Doctor Sick
+  game:recipes/grid/anchor.json: Doctor Sick, doctorsickold
+⚠ 1 mod(s) made for an older game replace 1 of the game's own files (the game is 1.22.7)
+  doctorsickold (made for 1.19.0): 1 file(s)
+    game:recipes/grid/anchor.json
+⚠ 1 mod(s) with code were made for an older game than 1.22.7 and have errors now: Doctor Crashy (1.20.0)
+✓ 3 JSON patches in 2 files, no two mods replacing the same thing.
+✓ Every mod's blocks and items have names.
+⚠ Doctor Sick's texts have formatting tags out of place: 2 error(s) about them in the log this session
+  doctorsick:lever-help: a > with no < before it, at character 16: Pull the lever -> the gate opens
+  doctorsick:hot-warning: </font> while <strong> is still open, at character 18: <strong>Hot!</font> Don't touch
+✓ No mod changes the game's code.
+
+Errors and warnings in server-main.log (most frequent first)
+×3 [Error] [doctorcrashy] a made-up error from the broken test mod  (doctorcrashy)
+[Error] Syntax error in json file 'doctorsick:itemtypes/broken.json': Failed deserializing broken.json: Unexpected end when reading token. Path ''.  (doctorsick)
+[Error] Item with code doctorsick:ghost has defined an item class DoctorGhostItem, but no such class registered. Will ignore.  (doctorsick)
+[Error] Failed registering item doctorsick:ghost:  (doctorsick)
+[Error] Exception: Attempted to register Item with code doctorsick:ghost, but an item with such code already exists. Must use a unique code  (doctorsick)
+    at Vintagestory.Server.ServerMain.RegisterItem(Item item) in VintagestoryLib\Server\ServerMain.cs:line 1980
+    at Vintagestory.Server.ServerCoreAPI.RegisterItem(Item item) in VintagestoryLib\Server\API\ServerCoreAPI.cs:line 132
+[Error] Block with code doctorsick:ghostblock has defined a block class DoctorGhostBlock, no such class registered. Will ignore.  (doctorsick)
+[Error] Block with code doctorsick:ghostblock has defined a block entity class DoctorGhostEntity, no such class registered. Will ignore.  (doctorsick)
+[Warning] Collectible behavior DoctorGhostBehavior for item doctorsick:ghost not found  (doctorsick)
+
+Latest crash (11/21/2026 05:56:18)
+System.NullReferenceException: Object reference not set to an instance of an object.
+   at Vintagestory.API.Common.FrameProfilerUtil.End() in VintagestoryApi\Common\FrameProfilerUtil.cs:line 213
+   at Vintagestory.Server.ServerMain.Process() in VintagestoryLib\Server\ServerMain.cs:line 941
+   at Vintagestory.Server.ServerProgram.Main() in VintagestoryLib\Server\ServerProgram.cs:line 156
+   at Vintagestory.ClientNative.CrashReporter.Start(ThreadStart start) in VintagestoryLib\Client\ClientPlatform\ClientNative\CrashReporter.cs:line 95

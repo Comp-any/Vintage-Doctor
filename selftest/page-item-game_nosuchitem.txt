@@ -1,0 +1,3 @@
+== A block or item ==
+• There is no block or item 'game:nosuchitem' in this game.
+  A code looks like game:ingot-copper; the handbook and the creative inventory show it when extended debug info is on.

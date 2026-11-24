@@ -1,0 +1,9 @@
+total 2944
+drwxr-xr-x 4 runner runner    4096 Nov 24 21:57 .
+drwxr-xr-x 4 runner runner    4096 Nov 24 21:57 ..
+-rw-r--r-- 1 runner runner  263186 Nov 24 21:57 CarryOn-1.22.0_v1.14.3.zip
+-rw-r--r-- 1 runner runner  193299 Nov 24 21:57 configlib_1.13.2.zip
+drwxr-xr-x 2 runner runner    4096 Nov 24 21:57 doctorexample
+drwxr-xr-x 3 runner runner    4096 Nov 24 21:57 doctorexamplejson
+-rw-r--r-- 1 runner runner 2274231 Nov 24 21:57 primitivesurvival_5.1.4.zip
+-rw-r--r-- 1 runner runner  256774 Nov 24 21:57 vintagedoctor_1.7.0.zip

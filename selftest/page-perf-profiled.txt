@@ -1,0 +1,30 @@
+== Is the server keeping up? ==
+✓ The server keeps up: a tick every 39.7 ms (25 a second).
+  Last minute: average 39.7 ms, 95% under 35 ms, worst 1499 ms (341 ticks).
+  Measure where the time goes (20 seconds) (/doctor fix doctor:profile 20) The whole performance page (/doctor perf)
+✓ 15 creatures and things loaded (0 items on the ground), 152 chunks, 0 player(s).
+  Most of: game:chicken 6, game:pig 2, game:wolf 2, game:raccoon 2, game:armorstand 1, game:bear 1, game:trader 1
+  152 chunks loaded for 0 player(s).
+✓ Memory: the game holds 1.3 GB of the 7.7 GB it can use.
+  772.9 MB in the game's own objects; 16 full clean-ups so far; 2 processor threads.
+
+== Where the server's time goes ==
+• Measured for 5 seconds (131 ticks): 5.98 ms of work per tick, at 2026-11-24 21:58
+  The parts that took the most time, per tick. The name in square brackets is the mod the code belongs to; (N×) is how many of them ran each tick.
+  5.04 ms  84%  garbagecollector (no clients online)
+  0.11 ms  2%  Ticking: BlockEntityGenericTypedContainer
+  0.07 ms  1%  despawned-1-fox-red-baby-male
+  0.07 ms  1%  Timer: BlockBehaviorFiniteSpreadingLiquid  (2×)
+  0.06 ms  1%  Ticking: VintageDoctorSystem [Vintage Doctor]
+  0.05 ms  1%  Creatures (thinking and moving)  (28×)
+  0.04 ms  1%  ev-tick
+  0.04 ms  1%  Ticking: EntityPartitioning
+  0.02 ms  0%  Ticking: BlockEntityFirepit
+  0.02 ms  0%  Ticking: ServerSystemBlockSimulation
+  0.02 ms  0%  done-behavior-floatupwhenstuck  (26×)
+• By mod: Vintage Doctor 0.06 ms, Doctor Example 0.01 ms, Primitive Survival 0.00 ms
+  0.06 ms  1%  Vintage Doctor its page (/doctor mod vintagedoctor)
+  0.01 ms  0%  Doctor Example its page (/doctor mod doctorexample)
+  0.00 ms  0%  Primitive Survival its page (/doctor mod primitivesurvival)
+  Only the work the game can tell apart by its code (things that tick, windows, timers) is counted against a mod; what a mod adds to creatures or to the world's generation isn't. A mod with many machines running is not broken for being first here.
+  Measure again (20 seconds) (/doctor fix doctor:profile 20)
