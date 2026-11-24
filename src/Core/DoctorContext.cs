@@ -117,6 +117,18 @@ namespace VintageDoctor
         public void Detail(string text, int indent) => R.Add(text, DoctorLineStyle.Note, indent);
         public void Explain(string text) { if (!Compact && !string.IsNullOrEmpty(text)) R.Add(text, DoctorLineStyle.Note, 1); }
         public void Advice(string text) { if (!Compact && !string.IsNullOrEmpty(text)) R.Add(DoctorReport.AdviceMark + " " + text, DoctorLineStyle.Text, 1); }
+        /// <summary>
+        /// A note that stands by itself. Right under a card it is written as plain text instead: the window takes a
+        /// note under a card for one of the card's details.
+        /// </summary>
+        public void Aside(string text)
+        {
+            int i = R.Lines.Count - 1;
+            while (i >= 0 && R.Lines[i].Style != DoctorLineStyle.Heading && (R.Lines[i].Indent > 0 || R.Lines[i].Style == DoctorLineStyle.Note)) i--;
+            bool underCard = i >= 0 && R.Lines[i].Style == DoctorLineStyle.Check && R.Lines[i].Indent == 0;
+            R.Add(text, underCard ? DoctorLineStyle.Text : DoctorLineStyle.Note);
+        }
+
         /// <summary>A plain line that is not part of a card.</summary>
         public void Line(string text, DoctorLineStyle style = DoctorLineStyle.Text, int indent = 0) => R.Add(text, style, indent);
 

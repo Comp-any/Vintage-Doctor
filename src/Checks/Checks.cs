@@ -417,8 +417,9 @@ namespace VintageDoctor
             }
 
             if (unknown.Count == 0) { x.Ok(onlyMod == null ? x.T("log-clean") : x.T("log-clean-mod", x.ModName(onlyMod))); return; }
-            x.Line(x.T("log-summary", errorKinds, errorLines, warnKinds, warnLines, System.IO.Path.GetFileName(log.File)), DoctorLineStyle.Note);
-            if (log.Truncated) x.Line(x.T("log-truncated", Size(log.Bytes)), DoctorLineStyle.Note);
+            // (Cards for messages someone can explain may stand above this: a note there would be taken for the last one's detail.)
+            x.Aside(x.T("log-summary", errorKinds, errorLines, warnKinds, warnLines, System.IO.Path.GetFileName(log.File)));
+            if (log.Truncated) x.Aside(x.T("log-truncated", Size(log.Bytes)));
 
             int shown = 0;
             foreach (var g in unknown.GroupBy(i => i.Mod ?? "").OrderByDescending(g => g.Where(i => i.Bad).Sum(i => i.Count)).ThenByDescending(g => g.Sum(i => i.Count)))

@@ -201,6 +201,14 @@ namespace VintageDoctor
 
         static bool IsCard(DoctorLine l) => l.Style == DoctorLineStyle.Check && l.Indent == 0;
 
+        /// <summary>Whether a file of the Logs folder is there. (The self-test puts its own answer in.)</summary>
+        internal static Func<string, bool> LogFileExists = RealLogFile;
+        static bool RealLogFile(string name)
+        {
+            try { return File.Exists(Path.Combine(GamePaths.Logs, name)); }
+            catch { return true; }
+        }
+
         /// <summary>The files that a line's buttons for the Logs folder open ("" for the folder itself).</summary>
         static IEnumerable<(string file, string token)> LogTokens(string text)
         {
@@ -241,8 +249,6 @@ namespace VintageDoctor
             List<DoctorLine> lines = x.R.Lines;
             List<(Regex rx, char kind, bool heading)> patterns = LogPatterns(x);
             string side = x.Side == EnumAppSide.Client ? "client" : "server";
-            // A file that isn't there (no crash was ever written down) has nothing to show: its folder then.
-            string mainLog = x.Ev?.Log != null && !x.Ev.Log.Found ? "" : x.MainLogName, crashLog = x.Ev?.Crash != null && !x.Ev.Crash.Found ? "" : x.CrashLogName;
             // In single player both sides' logs are in the one Logs folder.
             bool bothHere = x.SameProcess || (x.Api as Vintagestory.API.Client.ICoreClientAPI)?.IsSinglePlayer == true;
 
@@ -281,10 +287,13 @@ namespace VintageDoctor
                     foreach (var (rx, kind, headingOnly) in patterns)
                     {
                         if (headingOnly != heading || !rx.IsMatch(text)) continue;
-                        string file = kind == 'm' ? mainLog : kind == 'c' ? crashLog : "";
+                        string file = kind == 'm' ? x.MainLogName : kind == 'c' ? x.CrashLogName : "";
                         if (!want.Contains(file)) want.Add(file);
                     }
                 }
+                // A file that isn't there (no crash was ever written down) has nothing to show: its folder then.
+                for (int w = 0; w < want.Count; w++) { if (want[w].Length > 0 && !LogFileExists(want[w])) want[w] = ""; }
+                want = want.Distinct().ToList();
                 // The folder says nothing next to a file from it.
                 if (want.Count > 1) want.Remove("");
                 var add = new List<string>();

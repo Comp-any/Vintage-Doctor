@@ -1083,33 +1083,45 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
                 x.LogButton();
                 Pages.LogButtons(x);
             }
-            DoctorContext here = New(EnumAppSide.Server, true, Checks.TopicLog);
-            Write(here);
-            File.WriteAllText(Path.Combine(folder, "log-buttons.txt"), string.Join("\n", here.R.Lines.Select(l => new string(' ', l.Indent * 2) + l.Text)));
-            t.Check("logs: the log's own page has one button for its file, under its heading, however often the page names it",
-                Of(here, x_("sec-log")) == "server-main.log" && here.R.Lines.Count > 1 && Opens(here.R.Lines[1]).SequenceEqual(new[] { "server-main.log" }), Of(here, x_("sec-log")));
-            t.Check("logs: a card that speaks of the log gets a button that opens it, next to the buttons it has",
-                Of(here, "kind(s) of errors in the log this session") == "server-main.log" && here.R.Lines.Any(l => l.Text.Contains("{{open|log|") && l.Text.Contains("{{folder|logs|server-main.log|Open server-main.log}}")),
-                Of(here, "kind(s) of errors in the log this session"));
-            t.Check("logs: where it is the logs as a whole, or a file that may not be there, the button opens the Logs folder", Of(here, "No crash reports") == "folder"
-                && here.R.Lines.Any(l => l.Text.Contains("{{folder|logs||Open the Logs folder}}")), Of(here, "No crash reports"));
-            t.Check("logs: a log named by its file gets a button whoever wrote the line, and a wooden log gets none", Of(here, "A mod's card") == "client-main.log+server-debug.log" && Of(here, "An oak log") == "",
-                Of(here, "A mod's card") + " / " + Of(here, "An oak log"));
-            // (The crash reports' file only where there is one: this server may never have crashed.)
-            bool crashed = ev.Crash == null || ev.Crash.Found;
-            t.Check("logs: a card about a mod's crashes and its errors opens the crash reports and the log", Of(here, "Some Mod 1.0") == (crashed ? "server-crash.log+server-main.log" : "server-main.log"), Of(here, "Some Mod 1.0") + (crashed ? "" : " (no crash reports here)"));
-            t.Check("logs: a card that has the button already keeps the one", Of(here, "A card that has its button already") == "server-main.log", Of(here, "A card that has its button already"));
-            string once = string.Join("\n", here.R.Lines.Select(l => l.Text));
-            Pages.LogButtons(here);
-            t.Check("logs: looking twice adds nothing", string.Join("\n", here.R.Lines.Select(l => l.Text)) == once);
-            DoctorContext away = New(EnumAppSide.Server, false, Checks.TopicLog);
-            Write(away);
-            t.Check("logs: a server that is another computer offers no buttons for its files", !Offers(away), string.Join(" | ", away.R.Lines.Where(l => l.Text.Contains("{{folder|")).Select(l => l.Text).Take(3)));
-            DoctorContext game = New(EnumAppSide.Client, false, Checks.TopicLog);
-            Write(game);
-            t.Check("logs: the player's game opens its own log, and not a server's by name when that server is elsewhere",
-                Of(game, "kind(s) of errors in the log this session") == "client-main.log" && Of(game, "A mod's card") == "client-main.log" && Of(game, "Some Mod 1.0") == (crashed ? "client-crash.log+client-main.log" : "client-main.log"),
-                Of(game, "kind(s) of errors in the log this session") + " / " + Of(game, "A mod's card") + " / " + Of(game, "Some Mod 1.0"));
+            // Whether a log's file is there decides between the file and its folder: here, first, they all are.
+            Func<string, bool> real = Pages.LogFileExists;
+            try
+            {
+                Pages.LogFileExists = _ => true;
+                DoctorContext here = New(EnumAppSide.Server, true, Checks.TopicLog);
+                Write(here);
+                File.WriteAllText(Path.Combine(folder, "log-buttons.txt"), string.Join("\n", here.R.Lines.Select(l => new string(' ', l.Indent * 2) + l.Text)));
+                t.Check("logs: the log's own page has one button for its file, under its heading, however often the page names it",
+                    Of(here, x_("sec-log")) == "server-main.log" && here.R.Lines.Count > 1 && Opens(here.R.Lines[1]).SequenceEqual(new[] { "server-main.log" }), Of(here, x_("sec-log")));
+                t.Check("logs: a card that speaks of the log gets a button that opens it, next to the buttons it has",
+                    Of(here, "kind(s) of errors in the log this session") == "server-main.log" && here.R.Lines.Any(l => l.Text.Contains("{{open|log|") && l.Text.Contains("{{folder|logs|server-main.log|Open server-main.log}}")),
+                    Of(here, "kind(s) of errors in the log this session"));
+                t.Check("logs: where it is the logs as a whole, or a file that may not be there, the button opens the Logs folder", Of(here, "No crash reports") == "folder"
+                    && here.R.Lines.Any(l => l.Text.Contains("{{folder|logs||Open the Logs folder}}")), Of(here, "No crash reports"));
+                t.Check("logs: a log named by its file gets a button whoever wrote the line, and a wooden log gets none", Of(here, "A mod's card") == "client-main.log+server-debug.log" && Of(here, "An oak log") == "",
+                    Of(here, "A mod's card") + " / " + Of(here, "An oak log"));
+                t.Check("logs: a card about a mod's crashes and its errors opens the crash reports and the log", Of(here, "Some Mod 1.0") == "server-crash.log+server-main.log", Of(here, "Some Mod 1.0"));
+                t.Check("logs: a card that has the button already keeps the one", Of(here, "A card that has its button already") == "server-main.log", Of(here, "A card that has its button already"));
+                string once = string.Join("\n", here.R.Lines.Select(l => l.Text));
+                Pages.LogButtons(here);
+                t.Check("logs: looking twice adds nothing", string.Join("\n", here.R.Lines.Select(l => l.Text)) == once);
+                DoctorContext away = New(EnumAppSide.Server, false, Checks.TopicLog);
+                Write(away);
+                t.Check("logs: a server that is another computer offers no buttons for its files", !Offers(away), string.Join(" | ", away.R.Lines.Where(l => l.Text.Contains("{{folder|")).Select(l => l.Text).Take(3)));
+                DoctorContext game = New(EnumAppSide.Client, false, Checks.TopicLog);
+                Write(game);
+                t.Check("logs: the player's game opens its own log, and not a server's by name when that server is elsewhere",
+                    Of(game, "kind(s) of errors in the log this session") == "client-main.log" && Of(game, "A mod's card") == "client-main.log" && Of(game, "Some Mod 1.0") == "client-crash.log+client-main.log",
+                    Of(game, "kind(s) of errors in the log this session") + " / " + Of(game, "A mod's card") + " / " + Of(game, "Some Mod 1.0"));
+                // A file that isn't there: its folder instead, and no button at all for it next to a file that is.
+                Pages.LogFileExists = name => name == "server-main.log";
+                DoctorContext some = New(EnumAppSide.Server, true, Checks.TopicLog);
+                Write(some);
+                t.Check("logs: a log that was never written (no crash yet) isn't offered: the folder is, or the file that is there", Of(some, "Some Mod 1.0") == "server-main.log" && Of(some, "A mod's card") == "folder"
+                    && Of(some, "kind(s) of errors in the log this session") == "server-main.log", Of(some, "Some Mod 1.0") + " / " + Of(some, "A mod's card") + " / " + Of(some, "kind(s) of errors in the log this session"));
+            }
+            finally { Pages.LogFileExists = real; }
+            bool crashed = File.Exists(Path.Combine(GamePaths.Logs, "server-crash.log"));
 
             // The real pages, as the world's side of a single-player game builds them, and as this server does.
             foreach (bool sp in new[] { true, false })
