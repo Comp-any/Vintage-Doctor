@@ -1,0 +1,9 @@
+Every mod at a glance
+8 mod(s) loaded; 2 have something against them. A mod's page shows everything the doctor knows about it.
+✖ Doctor Crashy 1.0.0: 1 error(s) while starting, 1 unreadable config file(s), 1 kind(s) of errors in the log
+  {{open|mod|doctorcrashy|Doctor Crashy's page}} {{fix|c:doctor:disable-mod|doctorcrashy|Switch Doctor Crashy off}} {{folder|logs|server-main.log|Open server-main.log}}
+⚠ Doctor Sick 1.0.0: 6 kind(s) of errors in the log, 2 patch(es) that didn't apply, 1 kind(s) of warnings
+  {{open|mod|doctorsick|Doctor Sick's page}} {{fix|c:doctor:disable-mod|doctorsick|Switch Doctor Sick off}} {{folder|logs|server-main.log|Open server-main.log}}
+✓ 6 mod(s) have nothing against them
+  {{open|mod|doctordup|doctordup 1.1.0}} {{open|mod|doctorsickbundled|doctorsickbundled 1.0.0}} {{open|mod|doctorsickold|doctorsickold 1.0.0}} {{open|mod|doctorsickshared|doctorsickshared 1.0.0}} {{open|mod|doctorsickslash|doctorsickslash 1.0.0}}
+  {{open|mod|vintagedoctor|Vintage Doctor 1.6.1}}

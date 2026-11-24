@@ -1,0 +1,13 @@
+total 292
+drwxr-xr-x  4 runner runner   4096 Nov 24 06:25 .
+drwxr-xr-x 13 runner runner   4096 Nov 24 06:25 ..
+-rw-r--r--  1 runner runner    568 Nov 24 06:25 doctor-sick-backslash.zip
+-rw-r--r--  1 runner runner    358 Nov 24 06:25 doctor-sick-bundled.zip
+-rw-r--r--  1 runner runner    387 Nov 24 06:25 doctor-sick-nested.zip
+-rw-r--r--  1 runner runner    817 Nov 24 06:25 doctor-sick-old.zip
+-rw-r--r--  1 runner runner    353 Nov 24 06:25 doctor-sick-shared.zip
+drwxr-xr-x  2 runner runner   4096 Nov 24 06:25 doctorcrashy
+-rw-r--r--  1 runner runner    228 Nov 24 06:25 doctordup_1.1.0.zip
+drwxr-xr-x  3 runner runner   4096 Nov 24 06:25 doctorsick
+-rw-r--r--  1 runner runner    231 Nov 24 06:25 doctorwrapped_1.0.0.zip
+-rw-r--r--  1 runner runner 252217 Nov 24 06:25 vintagedoctor_1.6.1.zip

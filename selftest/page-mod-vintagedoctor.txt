@@ -1,0 +1,19 @@
+== Vintage Doctor ==
+• Vintage Doctor 1.6.1, by demonic69
+  Mod id vintagedoctor; Code mod; runs on: Universal; file vintagedoctor_1.6.1.zip
+  Works out what's wrong with your game and your mods, and fixes what it can: crashes traced to the mod that caused them, mods that failed to start or were left out, errors in the log by mod, broken config files and mod zips, lag measured by mod, clashing keys …
+  Its website (https://github.com/Comp-any/Vintage-Doctor) Find Vintage Doctor on the Mod DB (https://mods.vintagestory.at/list/mod?text=Vintage%20Doctor)
+✓ Everything it needs is there (1).
+  The game: wants 1.22.0 or newer, this is 1.22.7
+✓ Its config file(s) read fine: vintagedoctor.json
+  If the mod acts oddly after an update, an old config is a common reason: starting it afresh puts every setting back to the mod's defaults (the old file is kept in the doctor's backups).
+  Start vintagedoctor.json afresh (the old one is kept) (/doctor fix doctor:reset-config vintagedoctor.json)
+
+== Errors and warnings from Vintage Doctor ==
+0 kind(s) of errors (0 line(s)) and 2 kind(s) of warnings (3 line(s)) in server-main.log, most frequent first. The same message counts once however often it was written.
+• Vintage Doctor: 0 kind(s) of errors, 2 kind(s) of warnings
+  ×2 [Warning] [vintagedoctor] guestmod said it would deliver 'guest-notes' later and didn't in time.
+  [Warning] [vintagedoctor] A mod offered a page with the id 'crash', which is taken by the doctor itself or has characters other than a-z, 0-9 and '-'. It was left out.
+
+== Next ==
+A report about Vintage Doctor (/doctor bugreport vintagedoctor) Every mod at a glance (/doctor mods) Back to the check-up (/doctor)
