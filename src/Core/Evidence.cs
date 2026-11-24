@@ -120,6 +120,8 @@ namespace VintageDoctor
         public Dictionary<string, string> Mods = new Dictionary<string, string>();
         /// <summary>The game closed the normal way (false: it crashed, was killed, or lost power).</summary>
         public bool CleanExit;
+        /// <summary>A mod said it was closing the game on purpose (1.6.0): which, and why. Then a missing clean exit is no surprise.</summary>
+        public string ClosedBy, ClosedWhy;
     }
 
     /// <summary>What the doctor remembers between sessions on one side (ModData/vintagedoctor/state-server.json, state-client.json).</summary>

@@ -65,7 +65,7 @@ def calls(source):
 
 WHY = ["why-sameassembly", "why-missingassembly", "why-version", "why-harmony", "why-format", "why-json", "why-memory", "why-diskfull",
        "why-savecorrupt", "why-fileaccess", "why-graphics", "why-network", "why-null", "why-bug", "why-native", "why-badimage", "why-duplicate", "why-packaging"]
-NOT_TEXTS = {"collect", "fix", "topics", "page", "deliver", "clientfacts", "open", "about"}  # event names such as "vintagedoctor:collect"
+NOT_TEXTS = {"collect", "fix", "topics", "page", "deliver", "clientfacts", "open", "about", "closing"}  # event names such as "vintagedoctor:collect"
 
 def log_texts():
     """The table in src/Checks/Pages.cs of the texts that speak of a log and which one a button should open: {key: kind}."""

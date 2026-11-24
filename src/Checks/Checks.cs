@@ -188,6 +188,16 @@ namespace VintageDoctor
         /// <summary>The game was killed or lost power last time, without writing a crash report.</summary>
         public static void Shutdown(DoctorContext x)
         {
+            SessionRecord last = x.Doctor.PreviousSession;
+            if (last != null && !last.CleanExit && !string.IsNullOrEmpty(last.ClosedBy))
+            {
+                // Closed on purpose by a mod that said so: something to know, not a fault.
+                string who = x.ModName(last.ClosedBy);
+                x.Info(string.IsNullOrEmpty(last.ClosedWhy) ? x.T("closedby-title", who, last.Time ?? "?") : x.T("closedby-title-why", who, last.Time ?? "?", last.ClosedWhy));
+                x.About(last.ClosedBy);
+                x.Explain(x.T("closedby-why", who));
+                return;
+            }
             if (!x.Doctor.PreviousUnclean) return;
             // A crash report from that session already says why.
             if (x.Doctor.NewCrashThisSession) return;

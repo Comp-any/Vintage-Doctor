@@ -29,7 +29,7 @@ namespace VintageDoctor
     public partial class VintageDoctorSystem
     {
         public const string TopicsEvent = "vintagedoctor:topics", PageEvent = "vintagedoctor:page", DeliverEvent = "vintagedoctor:deliver",
-            ClientFactsEvent = "vintagedoctor:clientfacts", OpenEvent = "vintagedoctor:open", AboutEvent = "vintagedoctor:about";
+            ClientFactsEvent = "vintagedoctor:clientfacts", OpenEvent = "vintagedoctor:open", AboutEvent = "vintagedoctor:about", ClosingEvent = "vintagedoctor:closing";
 
         const int MaxGuestLines = 3000, MaxFactBytes = 64 * 1024, MaxAllFactBytes = 256 * 1024;
 
@@ -54,6 +54,7 @@ namespace VintageDoctor
         {
             api.Event.RegisterEventBusListener(OnDeliver, 0.5, DeliverEvent);
             api.Event.RegisterEventBusListener(OnOpenAsked, 0.5, OpenEvent);
+            api.Event.RegisterEventBusListener(OnClosing, 0.5, ClosingEvent);
         }
 
         string NextRequest() => SideName[0] + "-" + (++requestCounter).ToString(System.Globalization.CultureInfo.InvariantCulture);
@@ -437,6 +438,20 @@ namespace VintageDoctor
             if (bytes == null || bytes.Length == 0 || bytes.Length > MaxAllFactBytes) return null;
             try { return TreeAttribute.CreateFromBytes(bytes); }
             catch { return null; }
+        }
+
+        // ---------------------------------------------------------------- a mod closing the game on purpose
+
+        /// <summary>"vintagedoctor:closing" {mod, reason}: the game is about to be closed on purpose. Answers "noted".</summary>
+        void OnClosing(string eventName, ref EnumHandling handling, IAttribute data)
+        {
+            if (!(data is ITreeAttribute tree)) return;
+            try
+            {
+                NoteClosing(tree.GetString("mod") ?? "?", tree.GetString("reason") ?? "");
+                tree.SetBool("noted", true);
+            }
+            catch (Exception e) { api.Logger.Warning("[vintagedoctor] A mod said it was closing the game and noting it failed: {0}", e.Message); }
         }
 
         // ---------------------------------------------------------------- opening the window from another mod

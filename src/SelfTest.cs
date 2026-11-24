@@ -133,6 +133,7 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             t.Guard("code patches", () => SharedPatches(t, doctor, sapi));
             t.Guard("formatting tags", () => FormattingTags(t, doctor, sapi, folder));
             t.Guard("where the window opens, and folded sections", () => WindowRules(t));
+            t.Guard("a mod closing the game on purpose", () => AnnouncedClose(t, doctor, sapi));
             t.Guard("the example mods", () => Examples(t, doctor, sapi, folder));
             if (ci) t.Guard("fixes on the real server", () => RealFixes(t, doctor, sapi));
             else t.Skip("fixes on the real server", "only with SelfTestOnStart");
@@ -1251,6 +1252,35 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             List<BrokenText> real = TextTags.LangProblems();
             File.WriteAllText(Path.Combine(folder, "formatting-tags-in-lang.txt"), string.Join("\n", real.Select(b => b.Key + " | " + b.Message + " | " + b.Text.Replace("\n", "\\n"))));
             t.Check("tags: every text of the game and its mods was read", real != null, real.Count + " text(s) with tags out of place, by domain: " + string.Join(", ", real.GroupBy(b => b.Domain).Select(g => g.Key + " " + g.Count())));
+        }
+
+        /// <summary>
+        /// A mod that closes the game on purpose says so first (1.6.0): the doctor notes it at once, and the next start
+        /// says who closed it and why instead of "didn't close properly". Undone afterwards, so this run's own record stays true.
+        /// </summary>
+        static void AnnouncedClose(Run_ t, VintageDoctorSystem doctor, ICoreServerAPI sapi)
+        {
+            string file = Path.Combine(doctor.DataFolder, "state-server.json");
+            var tree = new TreeAttribute();
+            tree.SetString("mod", "vintageautoupdate");
+            tree.SetString("reason", "restarting to install 3 mod update(s)");
+            sapi.Event.PushEvent(VintageDoctorSystem.ClosingEvent, tree);
+            SessionRecord now = DoctorState.Load(file).Sessions.LastOrDefault();
+            t.Check("closing: a mod's word that it is closing the game is noted in this session's record at once", tree.GetBool("noted") && now?.ClosedBy == "vintageautoupdate" && now.ClosedWhy == "restarting to install 3 mod update(s)" && !now.CleanExit,
+                now == null ? "no record" : now.ClosedBy + " / " + now.ClosedWhy);
+            SessionRecord before = doctor.PreviousSession;
+            try
+            {
+                doctor.PreviousSession = new SessionRecord { Time = "2026-11-24 17:00", CleanExit = false, ClosedBy = "vintageautoupdate", ClosedWhy = "restarting to install 3 mod update(s)" };
+                Evidence ev = doctor.EvidenceNow(false);
+                string crash = doctor.BuildPage(ev, null, "en", Checks.TopicCrash, "").PlainText(sapi.World);
+                t.Check("closing: at the next start it is said as on purpose, by whom and why, and not as the game not closing properly",
+                    crash.Contains("closed the game last time (2026-11-24 17:00), on purpose: restarting to install 3 mod update(s)") && !crash.Contains("didn't close properly"), First(crash, "closed the game"));
+            }
+            finally { doctor.PreviousSession = before; }
+            // This run isn't closing on purpose.
+            doctor.ForgetClosing();
+            t.Check("closing: taken back, the record is as it was", DoctorState.Load(file).Sessions.LastOrDefault()?.ClosedBy == null);
         }
 
         /// <summary>Where the window opens when another mod asks, and which sections of the check-up start folded (1.5.0).</summary>

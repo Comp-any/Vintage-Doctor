@@ -402,6 +402,20 @@ at its main page, where your mod's section has the button for your page. Give an
 (Vintage-E's Ctrl+H opens the check-up; `/emc diagnose machines` opens its machines page). The C# `OpenPage` opens
 exactly what it is given.
 
+**Closing the game on purpose (1.6.0).** A mod that closes or restarts the game itself (to install updates, say)
+tells the doctor first, so the next start doesn't report "The game didn't close properly":
+
+```csharp
+var tree = new TreeAttribute();
+tree.SetString("mod", "mymod");
+tree.SetString("reason", "restarting to install 3 mod update(s)");   // shown at the next start; may be left out
+api.Event.PushEvent("vintagedoctor:closing", tree);                    // tree.GetBool("noted"): a doctor heard it
+```
+
+Push it on the side that is closing, right before closing. It is written to disk at once. On the player's game it
+covers single player's built-in server too (they go down together). A doctor before 1.6.0 doesn't listen, and
+nothing happens.
+
 **Which side.** The server's doctor and the one in each player's game ask separately, and the window shows both
 halves. Offer your page on the side that knows (usually the server) and leave the other side silent: the doctor
 doesn't put anything in its place.

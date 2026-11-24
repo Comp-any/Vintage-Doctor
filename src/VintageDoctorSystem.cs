@@ -53,7 +53,7 @@ namespace VintageDoctor
         public int ApiVersion => 3;
 
         // What this session started from (read once per side at start).
-        public SessionRecord PreviousSession { get; private set; }
+        public SessionRecord PreviousSession { get; internal set; }
         public bool PreviousUnclean { get; private set; }
         public string PreviousSessionTime => PreviousSession?.Time;
         public bool NewCrashThisSession { get; private set; }
@@ -423,7 +423,8 @@ namespace VintageDoctor
                 statePath = Path.Combine(DataFolder, "state-" + (api.Side == EnumAppSide.Server ? "server" : "client") + ".json");
                 state = DoctorState.Load(statePath);
                 PreviousSession = state.Sessions.LastOrDefault();
-                PreviousUnclean = PreviousSession != null && !PreviousSession.CleanExit;
+                // A mod that closed the game on purpose (to install updates, say) said so first: not a surprise.
+                PreviousUnclean = PreviousSession != null && !PreviousSession.CleanExit && string.IsNullOrEmpty(PreviousSession.ClosedBy);
                 long crashBytes = 0;
                 try { var fi = new FileInfo(Evidence.CrashFile(api.Side)); if (fi.Exists) crashBytes = fi.Length; } catch { }
                 NewCrashThisSession = state.CrashLogBytes >= 0 && crashBytes > state.CrashLogBytes;
@@ -437,8 +438,43 @@ namespace VintageDoctor
                 state.Sessions.Add(thisSession);
                 while (state.Sessions.Count > 12) state.Sessions.RemoveAt(0);
                 state.Save(statePath);
+                lock (live) if (!live.Contains(this)) live.Add(this);
             }
             catch (Exception e) { api.Logger.Warning("[vintagedoctor] Could not keep the session notes: {0}", e.Message); }
+        }
+
+        /// <summary>Every doctor running in this program: the player's game and, in single player, its built-in server.</summary>
+        static readonly List<VintageDoctorSystem> live = new List<VintageDoctorSystem>();
+
+        /// <summary>
+        /// A mod is about to close the game on purpose (1.6.0, "vintagedoctor:closing"): noted at once in this
+        /// session's record, by every doctor in this program (the game going down takes a single player's server
+        /// with it), so the next start says who closed it and why instead of "didn't close properly".
+        /// </summary>
+        internal void NoteClosing(string modId, string reason)
+        {
+            List<VintageDoctorSystem> all;
+            lock (live) all = live.ToList();
+            foreach (VintageDoctorSystem d in all)
+            {
+                try
+                {
+                    if (d.thisSession == null || d.state == null) continue;
+                    d.thisSession.ClosedBy = string.IsNullOrWhiteSpace(modId) ? "?" : modId.Trim();
+                    d.thisSession.ClosedWhy = (reason ?? "").Trim();
+                    d.state.Save(d.statePath);
+                }
+                catch (Exception e) { d.api?.Logger.Warning("[vintagedoctor] Could not note that {0} is closing the game: {1}", modId, e.Message); }
+            }
+            api?.Logger.Notification("[vintagedoctor] {0} says it is closing the game{1}", modId, string.IsNullOrWhiteSpace(reason) ? "" : ": " + reason);
+        }
+
+        /// <summary>For the self-test: this session isn't being closed on purpose after all.</summary>
+        internal void ForgetClosing()
+        {
+            List<VintageDoctorSystem> all;
+            lock (live) all = live.ToList();
+            foreach (VintageDoctorSystem d in all) { if (d.thisSession != null) { d.thisSession.ClosedBy = null; d.thisSession.ClosedWhy = null; try { d.state.Save(d.statePath); } catch { } } }
         }
 
         void EndSession()
@@ -456,6 +492,7 @@ namespace VintageDoctor
         {
             try { Profile.Stop(); } catch { }
             EndSession();
+            lock (live) live.Remove(this);
             base.Dispose();
         }
     }

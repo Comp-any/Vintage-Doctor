@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.6.0
+
+- **A mod that closes the game on purpose can say so.** Vintage Auto Update restarts or quits the game to finish installing updates, and the doctor then reported "The game didn't close properly last time". A mod now tells the doctor just before (`vintagedoctor:closing`, with its name and why), and the next start says "Vintage Auto Update closed the game last time (time), on purpose: restarting to install 3 mod update(s)" as something to know, not a warning. Vintage Auto Update does this from its 0.9.1.
+- For mod authors: see "Closing the game on purpose" in [docs/api.md](docs/api.md).
+
 ## 1.5.0
 
 Whose texts make the game's "Found closing tag" errors, the doctor always opening at its main page, and folding sections.
