@@ -1,0 +1,77 @@
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-25-		}
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-26-		else
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-27-		{
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-28-			TryOpen();
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-29-		}
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-30-		return TextCommandResult.Success();
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-31-	}
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-32-
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-33-	private void Compose()
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-34-	{
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-35-		string vtmlCode = ((playstyle == "creativebuilding") ? Lang.Get("start-creativeintro") : Lang.Get("start-survivalintro"));
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-36-		CairoFont baseFont = CairoFont.WhiteSmallText().WithLineHeightMultiplier(1.149999976158142);
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs:37:		RichTextComponentBase[] components = VtmlUtil.Richtextify(capi, vtmlCode, baseFont, didClickLink);
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-38-		ElementBounds elementBounds = ElementBounds.Fixed(0.0, 0.0, 400.0, 300.0);
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-39-		elementBounds.ParentBounds = ElementBounds.Empty;
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-40-		GuiElementRichtext guiElementRichtext = new GuiElementRichtext(capi, components, elementBounds);
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-41-		guiElementRichtext.BeforeCalcBounds();
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-42-		elementBounds.ParentBounds = null;
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-43-		float num = (float)(guiElementRichtext.Bounds.fixedY + guiElementRichtext.Bounds.fixedHeight);
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-44-		ClearComposers();
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-45-		SingleComposer = capi.Gui.CreateCompo("helpdialog", ElementStdBounds.AutosizedMainDialog).AddShadedDialogBG(ElementStdBounds.DialogBackground().WithFixedPadding(GuiStyle.ElementToDialogPadding, GuiStyle.ElementToDialogPadding), withTitleBar: false).BeginChildElements()
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-46-			.AddInteractiveElement(guiElementRichtext)
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-47-			.AddSmallButton(Lang.Get("button-close"), OnClose, ElementStdBounds.MenuButton((num + 50f) / 80f).WithAlignment(EnumDialogArea.RightFixed).WithFixedPadding(6.0))
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-48-			.AddSmallButton(Lang.Get("button-close-noshow"), OnCloseAndDontShow, ElementStdBounds.MenuButton((num + 50f) / 80f).WithAlignment(EnumDialogArea.LeftFixed).WithFixedPadding(6.0))
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-49-			.EndChildElements()
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-50-			.Compose();
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-51-	}
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-52-
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-53-	private void didClickLink(LinkTextComponent component)
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-54-	{
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-55-		TryClose();
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-56-		component.HandleLink();
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-57-	}
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-58-
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-59-	public override void OnGuiOpened()
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-60-	{
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-61-		Compose();
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-62-		base.OnGuiOpened();
+--
+Vintagestory.Client/GuiScreenServerDashboard.cs-411-		ElementBounds elementBounds = ElementBounds.Fixed(0.0, 0.0, num, 35.0);
+Vintagestory.Client/GuiScreenServerDashboard.cs-412-		string vtmlCode = Lang.Get("<font opacity=\"0.6\">Status: </font> {0}", Lang.Get("serverstatus-" + gameServerStatus.StatusCode));
+Vintagestory.Client/GuiScreenServerDashboard.cs-413-		string vtmlCode2 = "";
+Vintagestory.Client/GuiScreenServerDashboard.cs-414-		if (gameServerStatus.DownloadState == EnumDownloadSavesStatus.Ready)
+Vintagestory.Client/GuiScreenServerDashboard.cs-415-		{
+Vintagestory.Client/GuiScreenServerDashboard.cs-416-			vtmlCode2 = Lang.Get("Your world download is ready, please download it within 24 hours.");
+Vintagestory.Client/GuiScreenServerDashboard.cs-417-		}
+Vintagestory.Client/GuiScreenServerDashboard.cs-418-		if (gameServerStatus.DownloadState == EnumDownloadSavesStatus.Copying)
+Vintagestory.Client/GuiScreenServerDashboard.cs-419-		{
+Vintagestory.Client/GuiScreenServerDashboard.cs-420-			vtmlCode2 = Lang.Get("World download requested, copying in progress...");
+Vintagestory.Client/GuiScreenServerDashboard.cs-421-		}
+Vintagestory.Client/GuiScreenServerDashboard.cs-422-		string text = ((!(gameServerStatus.ActiveserverDays >= 2f)) ? Lang.Get("Your game server (version {0}) is installed and ready to use. You have {1} hours of server time left.", gameServerStatus.Version, (int)(gameServerStatus.ActiveserverDays * 24f)) : Lang.Get("Your game server (version {0}) is installed and ready to use. You have {1} days of s
+Vintagestory.Client/GuiScreenServerDashboard.cs:423:		GuiElementRichtext guiElementRichtext = new GuiElementRichtext(ElementComposer.Api, VtmlUtil.Richtextify(ElementComposer.Api, gameServerStatus.Dashboardnotification, CairoFont.WhiteSmallText()), elementBounds.FlatCopy());
+Vintagestory.Client/GuiScreenServerDashboard.cs-424-		guiElementRichtext.CalcHeightAndPositions();
+Vintagestory.Client/GuiScreenServerDashboard.cs-425-		ElementComposer = screenBase(showSupportText: true).BeginChildElements(elementBounds.FlatCopy()).AddStaticText(text, CairoFont.WhiteSmallText(), elementBounds = elementBounds.BelowCopy(0.0, 50.0));
+Vintagestory.Client/GuiScreenServerDashboard.cs-426-		if (!string.IsNullOrEmpty(gameServerStatus.Dashboardnotification))
+Vintagestory.Client/GuiScreenServerDashboard.cs-427-		{
+Vintagestory.Client/GuiScreenServerDashboard.cs-428-			ElementComposer.AddGameOverlay(elementBounds = elementBounds.BelowCopy(0.0, 30.0).WithFixedHeight(guiElementRichtext.TotalHeight / (double)RuntimeEnv.GUIScale), new double[4]
+Vintagestory.Client/GuiScreenServerDashboard.cs-429-			{
+Vintagestory.Client/GuiScreenServerDashboard.cs-430-				1.0,
+Vintagestory.Client/GuiScreenServerDashboard.cs-431-				237.0 / 255.0,
+Vintagestory.Client/GuiScreenServerDashboard.cs-432-				105.0 / 255.0,
+Vintagestory.Client/GuiScreenServerDashboard.cs-433-				1.0
+Vintagestory.Client/GuiScreenServerDashboard.cs-434-			}).AddRichtext(gameServerStatus.Dashboardnotification, CairoFont.WhiteSmallText().WithColor(new double[4] { 0.2, 0.2, 0.2, 1.0 }), elementBounds.FlatCopy().WithFixedHeight(35.0).WithFixedOffset(5.0, 0.0)
+Vintagestory.Client/GuiScreenServerDashboard.cs-435-				.WithFixedWidth(590.0), "dashboardnotification");
+Vintagestory.Client/GuiScreenServerDashboard.cs-436-		}
+Vintagestory.Client/GuiScreenServerDashboard.cs-437-		GuiComposer elementComposer = ElementComposer;
+Vintagestory.Client/GuiScreenServerDashboard.cs-438-		CairoFont baseFont = CairoFont.WhiteSmallishText();
+Vintagestory.Client/GuiScreenServerDashboard.cs-439-		ElementBounds elementBounds2 = elementBounds.BelowCopy(0.0, 30.0).WithFixedHeight(35.0).WithFixedPadding(0.0, 0.0);
+Vintagestory.Client/GuiScreenServerDashboard.cs-440-		ElementBounds elementBounds3;
+Vintagestory.Client/GuiScreenServerDashboard.cs-441-		ElementBounds leftBounds;
+Vintagestory.Client/GuiScreenServerDashboard.cs-442-		ElementBounds elementBounds4;
+Vintagestory.Client/GuiScreenServerDashboard.cs-443-		GuiComposerHelpers.AddRichtext(bounds: elementBounds = elementBounds2.BelowCopy(0.0, 5.0).WithFixedHeight(35.0), composer: elementComposer.AddRichtext(vtmlCode, baseFont, elementBounds2, "serverStatus"), vtmlCode: Lang.Get("<font opacity=\"0.6\">Host:</font> {0}", gameServerStatus.Identifier), baseFont: CairoFont.WhiteSmallishText()).AddAutoSiz
+Vintagestory.Client/GuiScreenServerDashboard.cs-444-			.AddAutoSizeHoverText(Lang.Get("Copy host to clipboard"), CairoFont.WhiteSmallText(), 150, elementBounds3.FlatCopy())
+Vintagestory.Client/GuiScreenServerDashboard.cs-445-			.AddRichtext(Lang.Get("<font opacity=\"0.6\">To give players the ability to join your world, join the server and type<br>/player <i>playername</i> whitelist on</font>", gameServerStatus.ConnectionString), CairoFont.WhiteDetailText(), elementBounds = elementBounds.BelowCopy(0.0, 5.0).WithFixedWidth(num).WithAlignment(EnumDialogArea.None))
+Vintagestory.Client/GuiScreenServerDashboard.cs-446-			.AddSmallButton(Lang.Get("Start Server"), onStartServer, elementBounds = elementBounds.BelowCopy(0.0, 30.0).WithFixedWidth(200.0), EnumButtonStyle.Normal, "startButton")
+Vintagestory.Client/GuiScreenServerDashboard.cs-447-			.AddSmallButton(Lang.Get("Stop Server"), onStopServer, leftBounds = elementBounds.FlatCopy().WithFixedWidth(200.0).RightOf(elementBounds, 10.0), EnumButtonStyle.Normal, "stopButton")
+Vintagestory.Client/GuiScreenServerDashboard.cs-448-			.AddSmallButton(Lang.Get("Force Stop Server"), onKillServer, elementBounds.FlatCopy().WithFixedWidth(150.0).RightOf(leftBounds, 10.0), EnumButtonStyle.Small, "killButton")

@@ -1,0 +1,260 @@
+Vintagestory.API.Client/GuiComposerHelpers.cs-1194-	/// Adds a rich text element to the GUI
+Vintagestory.API.Client/GuiComposerHelpers.cs-1195-	/// </summary>
+Vintagestory.API.Client/GuiComposerHelpers.cs-1196-	/// <param name="composer"></param>
+Vintagestory.API.Client/GuiComposerHelpers.cs-1197-	/// <param name="vtmlCode"></param>
+Vintagestory.API.Client/GuiComposerHelpers.cs-1198-	/// <param name="baseFont"></param>
+Vintagestory.API.Client/GuiComposerHelpers.cs-1199-	/// <param name="bounds"></param>
+Vintagestory.API.Client/GuiComposerHelpers.cs-1200-	/// <param name="key"></param>
+Vintagestory.API.Client/GuiComposerHelpers.cs-1201-	/// <returns></returns>
+Vintagestory.API.Client/GuiComposerHelpers.cs-1202-	public static GuiComposer AddRichtext(this GuiComposer composer, string vtmlCode, CairoFont baseFont, ElementBounds bounds, string key = null)
+Vintagestory.API.Client/GuiComposerHelpers.cs-1203-	{
+Vintagestory.API.Client/GuiComposerHelpers.cs-1204-		if (!composer.Composed)
+Vintagestory.API.Client/GuiComposerHelpers.cs-1205-		{
+Vintagestory.API.Client/GuiComposerHelpers.cs:1206:			composer.AddInteractiveElement(new GuiElementRichtext(composer.Api, VtmlUtil.Richtextify(composer.Api, vtmlCode, baseFont), bounds), key);
+Vintagestory.API.Client/GuiComposerHelpers.cs-1207-		}
+Vintagestory.API.Client/GuiComposerHelpers.cs-1208-		return composer;
+Vintagestory.API.Client/GuiComposerHelpers.cs-1209-	}
+Vintagestory.API.Client/GuiComposerHelpers.cs-1210-
+Vintagestory.API.Client/GuiComposerHelpers.cs-1211-	/// <summary>
+Vintagestory.API.Client/GuiComposerHelpers.cs-1212-	/// Adds a rich text element to the GUI
+Vintagestory.API.Client/GuiComposerHelpers.cs-1213-	/// </summary>
+Vintagestory.API.Client/GuiComposerHelpers.cs-1214-	/// <param name="composer"></param>
+Vintagestory.API.Client/GuiComposerHelpers.cs-1215-	/// <param name="vtmlCode"></param>
+Vintagestory.API.Client/GuiComposerHelpers.cs-1216-	/// <param name="baseFont"></param>
+Vintagestory.API.Client/GuiComposerHelpers.cs-1217-	/// <param name="bounds"></param>
+Vintagestory.API.Client/GuiComposerHelpers.cs-1218-	/// <param name="didClickLink"></param>
+Vintagestory.API.Client/GuiComposerHelpers.cs-1219-	/// <param name="key"></param>
+Vintagestory.API.Client/GuiComposerHelpers.cs-1220-	/// <returns></returns>
+Vintagestory.API.Client/GuiComposerHelpers.cs-1221-	public static GuiComposer AddRichtext(this GuiComposer composer, string vtmlCode, CairoFont baseFont, ElementBounds bounds, Action<LinkTextComponent> didClickLink, string key = null)
+Vintagestory.API.Client/GuiComposerHelpers.cs-1222-	{
+Vintagestory.API.Client/GuiComposerHelpers.cs-1223-		if (!composer.Composed)
+Vintagestory.API.Client/GuiComposerHelpers.cs-1224-		{
+Vintagestory.API.Client/GuiComposerHelpers.cs:1225:			composer.AddInteractiveElement(new GuiElementRichtext(composer.Api, VtmlUtil.Richtextify(composer.Api, vtmlCode, baseFont, didClickLink), bounds), key);
+Vintagestory.API.Client/GuiComposerHelpers.cs-1226-		}
+Vintagestory.API.Client/GuiComposerHelpers.cs-1227-		return composer;
+Vintagestory.API.Client/GuiComposerHelpers.cs-1228-	}
+Vintagestory.API.Client/GuiComposerHelpers.cs-1229-
+Vintagestory.API.Client/GuiComposerHelpers.cs-1230-	/// <summary>
+Vintagestory.API.Client/GuiComposerHelpers.cs-1231-	/// Adds a rich text element to the GUI
+Vintagestory.API.Client/GuiComposerHelpers.cs-1232-	/// </summary>
+Vintagestory.API.Client/GuiComposerHelpers.cs-1233-	/// <param name="composer"></param>
+Vintagestory.API.Client/GuiComposerHelpers.cs-1234-	/// <param name="components"></param>
+Vintagestory.API.Client/GuiComposerHelpers.cs-1235-	/// <param name="bounds"></param>
+Vintagestory.API.Client/GuiComposerHelpers.cs-1236-	/// <param name="key"></param>
+Vintagestory.API.Client/GuiComposerHelpers.cs-1237-	/// <returns></returns>
+Vintagestory.API.Client/GuiComposerHelpers.cs-1238-	public static GuiComposer AddRichtext(this GuiComposer composer, RichTextComponentBase[] components, ElementBounds bounds, string key = null)
+Vintagestory.API.Client/GuiComposerHelpers.cs-1239-	{
+Vintagestory.API.Client/GuiComposerHelpers.cs-1240-		if (!composer.Composed)
+Vintagestory.API.Client/GuiComposerHelpers.cs-1241-		{
+Vintagestory.API.Client/GuiComposerHelpers.cs-1242-			composer.AddInteractiveElement(new GuiElementRichtext(composer.Api, components, bounds), key);
+Vintagestory.API.Client/GuiComposerHelpers.cs-1243-		}
+Vintagestory.API.Client/GuiComposerHelpers.cs-1244-		return composer;
+Vintagestory.API.Client/GuiComposerHelpers.cs-1245-	}
+Vintagestory.API.Client/GuiComposerHelpers.cs-1246-
+Vintagestory.API.Client/GuiComposerHelpers.cs-1247-	/// <summary>
+Vintagestory.API.Client/GuiComposerHelpers.cs-1248-	/// Gets the chat input by name.
+Vintagestory.API.Client/GuiComposerHelpers.cs-1249-	/// </summary>
+Vintagestory.API.Client/GuiComposerHelpers.cs-1250-	/// <param name="composer"></param>
+--
+Vintagestory.API.Client/GuiElementRichtext.cs-499-	}
+Vintagestory.API.Client/GuiElementRichtext.cs-500-
+Vintagestory.API.Client/GuiElementRichtext.cs-501-	public void SetNewTextWithoutRecompose(string vtmlCode, CairoFont baseFont, Action<LinkTextComponent> didClickLink = null, bool recalcBounds = false)
+Vintagestory.API.Client/GuiElementRichtext.cs-502-	{
+Vintagestory.API.Client/GuiElementRichtext.cs-503-		if (Components != null)
+Vintagestory.API.Client/GuiElementRichtext.cs-504-		{
+Vintagestory.API.Client/GuiElementRichtext.cs-505-			RichTextComponentBase[] components = Components;
+Vintagestory.API.Client/GuiElementRichtext.cs-506-			for (int i = 0; i < components.Length; i++)
+Vintagestory.API.Client/GuiElementRichtext.cs-507-			{
+Vintagestory.API.Client/GuiElementRichtext.cs-508-				components[i]?.Dispose();
+Vintagestory.API.Client/GuiElementRichtext.cs-509-			}
+Vintagestory.API.Client/GuiElementRichtext.cs-510-		}
+Vintagestory.API.Client/GuiElementRichtext.cs:511:		Components = VtmlUtil.Richtextify(api, vtmlCode, baseFont, didClickLink);
+Vintagestory.API.Client/GuiElementRichtext.cs-512-		if (recalcBounds)
+Vintagestory.API.Client/GuiElementRichtext.cs-513-		{
+Vintagestory.API.Client/GuiElementRichtext.cs-514-			CalcHeightAndPositions();
+Vintagestory.API.Client/GuiElementRichtext.cs-515-			Bounds.CalcWorldBounds();
+Vintagestory.API.Client/GuiElementRichtext.cs-516-		}
+Vintagestory.API.Client/GuiElementRichtext.cs-517-	}
+Vintagestory.API.Client/GuiElementRichtext.cs-518-
+Vintagestory.API.Client/GuiElementRichtext.cs-519-	public void RecomposeInto(ImageSurface surface, Context ctx)
+Vintagestory.API.Client/GuiElementRichtext.cs-520-	{
+Vintagestory.API.Client/GuiElementRichtext.cs-521-		ComposeFor(Bounds.CopyOnlySize(), ctx, surface);
+Vintagestory.API.Client/GuiElementRichtext.cs-522-		generateTexture(surface, ref richtTextTexture);
+Vintagestory.API.Client/GuiElementRichtext.cs-523-	}
+Vintagestory.API.Client/GuiElementRichtext.cs-524-
+Vintagestory.API.Client/GuiElementRichtext.cs-525-	public override void Dispose()
+Vintagestory.API.Client/GuiElementRichtext.cs-526-	{
+Vintagestory.API.Client/GuiElementRichtext.cs-527-		base.Dispose();
+Vintagestory.API.Client/GuiElementRichtext.cs-528-		richtTextTexture?.Dispose();
+Vintagestory.API.Client/GuiElementRichtext.cs-529-		RichTextComponentBase[] components = Components;
+Vintagestory.API.Client/GuiElementRichtext.cs-530-		for (int i = 0; i < components.Length; i++)
+Vintagestory.API.Client/GuiElementRichtext.cs-531-		{
+Vintagestory.API.Client/GuiElementRichtext.cs-532-			components[i].Dispose();
+Vintagestory.API.Client/GuiElementRichtext.cs-533-		}
+Vintagestory.API.Client/GuiElementRichtext.cs-534-	}
+Vintagestory.API.Client/GuiElementRichtext.cs-535-}
+--
+Vintagestory.API.Common/VtmlUtil.cs-11-
+Vintagestory.API.Common/VtmlUtil.cs-12-namespace Vintagestory.API.Common;
+Vintagestory.API.Common/VtmlUtil.cs-13-
+Vintagestory.API.Common/VtmlUtil.cs-14-public class VtmlUtil
+Vintagestory.API.Common/VtmlUtil.cs-15-{
+Vintagestory.API.Common/VtmlUtil.cs-16-	/// <summary>
+Vintagestory.API.Common/VtmlUtil.cs-17-	/// You can register your own tag converters here
+Vintagestory.API.Common/VtmlUtil.cs-18-	/// </summary>
+Vintagestory.API.Common/VtmlUtil.cs-19-	public static Dictionary<string, Tag2RichTextDelegate> TagConverters = new Dictionary<string, Tag2RichTextDelegate>();
+Vintagestory.API.Common/VtmlUtil.cs-20-
+Vintagestory.API.Common/VtmlUtil.cs-21-	private static CairoFont monospacedFont = new CairoFont(16.0, "Consolas", new double[4] { 1.0, 1.0, 1.0, 1.0 });
+Vintagestory.API.Common/VtmlUtil.cs-22-
+Vintagestory.API.Common/VtmlUtil.cs:23:	public static RichTextComponentBase[] Richtextify(ICoreClientAPI capi, string vtmlCode, CairoFont baseFont, Action<LinkTextComponent> didClickLink = null)
+Vintagestory.API.Common/VtmlUtil.cs-24-	{
+Vintagestory.API.Common/VtmlUtil.cs-25-		List<RichTextComponentBase> elems = new List<RichTextComponentBase>();
+Vintagestory.API.Common/VtmlUtil.cs-26-		Stack<CairoFont> stack = new Stack<CairoFont>();
+Vintagestory.API.Common/VtmlUtil.cs-27-		stack.Push(baseFont);
+Vintagestory.API.Common/VtmlUtil.cs-28-		VtmlToken[] tokens = VtmlParser.Tokenize(capi.Logger, vtmlCode);
+Vintagestory.API.Common/VtmlUtil.cs:29:		Richtextify(capi, tokens, ref elems, stack, didClickLink);
+Vintagestory.API.Common/VtmlUtil.cs-30-		return elems.ToArray();
+Vintagestory.API.Common/VtmlUtil.cs-31-	}
+Vintagestory.API.Common/VtmlUtil.cs-32-
+Vintagestory.API.Common/VtmlUtil.cs:33:	private static void Richtextify(ICoreClientAPI capi, VtmlToken[] tokens, ref List<RichTextComponentBase> elems, Stack<CairoFont> fontStack, Action<LinkTextComponent> didClickLink)
+Vintagestory.API.Common/VtmlUtil.cs-34-	{
+Vintagestory.API.Common/VtmlUtil.cs-35-		for (int i = 0; i < tokens.Length; i++)
+Vintagestory.API.Common/VtmlUtil.cs-36-		{
+Vintagestory.API.Common/VtmlUtil.cs:37:			Richtextify(capi, tokens[i], ref elems, fontStack, didClickLink);
+Vintagestory.API.Common/VtmlUtil.cs-38-		}
+Vintagestory.API.Common/VtmlUtil.cs-39-	}
+Vintagestory.API.Common/VtmlUtil.cs-40-
+Vintagestory.API.Common/VtmlUtil.cs:41:	private static void Richtextify(ICoreClientAPI capi, VtmlToken token, ref List<RichTextComponentBase> elems, Stack<CairoFont> fontStack, Action<LinkTextComponent> didClickLink)
+Vintagestory.API.Common/VtmlUtil.cs-42-	{
+Vintagestory.API.Common/VtmlUtil.cs-43-		if (token is VtmlTagToken)
+Vintagestory.API.Common/VtmlUtil.cs-44-		{
+Vintagestory.API.Common/VtmlUtil.cs-45-			VtmlTagToken vtmlTagToken = token as VtmlTagToken;
+Vintagestory.API.Common/VtmlUtil.cs-46-			switch (vtmlTagToken.Name)
+Vintagestory.API.Common/VtmlUtil.cs-47-			{
+Vintagestory.API.Common/VtmlUtil.cs-48-			case "br":
+Vintagestory.API.Common/VtmlUtil.cs-49-				elems.Add(new RichTextComponent(capi, "\r\n", fontStack.Peek()));
+Vintagestory.API.Common/VtmlUtil.cs-50-				break;
+Vintagestory.API.Common/VtmlUtil.cs-51-			case "hk":
+Vintagestory.API.Common/VtmlUtil.cs-52-			case "hotkey":
+Vintagestory.API.Common/VtmlUtil.cs-53-				if (!string.IsNullOrEmpty(vtmlTagToken.ContentText) && !vtmlTagToken.ContentText.All(char.IsWhiteSpace))
+Vintagestory.API.Common/VtmlUtil.cs-54-				{
+Vintagestory.API.Common/VtmlUtil.cs-55-					string text = vtmlTagToken.ContentText;
+Vintagestory.API.Common/VtmlUtil.cs-56-					if (text == "leftmouse")
+Vintagestory.API.Common/VtmlUtil.cs-57-					{
+Vintagestory.API.Common/VtmlUtil.cs-58-						text = "primarymouse";
+Vintagestory.API.Common/VtmlUtil.cs-59-					}
+Vintagestory.API.Common/VtmlUtil.cs-60-					if (text == "rightmouse")
+Vintagestory.API.Common/VtmlUtil.cs-61-					{
+Vintagestory.API.Common/VtmlUtil.cs-62-						text = "secondarymouse";
+Vintagestory.API.Common/VtmlUtil.cs-63-					}
+Vintagestory.API.Common/VtmlUtil.cs-64-					if (text == "toolmode")
+Vintagestory.API.Common/VtmlUtil.cs-65-					{
+Vintagestory.API.Common/VtmlUtil.cs-66-						text = "toolmodeselect";
+--
+Vintagestory.API.Common/VtmlUtil.cs-69-					hotkeyComponent.PaddingLeft--;
+Vintagestory.API.Common/VtmlUtil.cs-70-					hotkeyComponent.PaddingRight += 3.0;
+Vintagestory.API.Common/VtmlUtil.cs-71-					elems.Add(hotkeyComponent);
+Vintagestory.API.Common/VtmlUtil.cs-72-				}
+Vintagestory.API.Common/VtmlUtil.cs-73-				break;
+Vintagestory.API.Common/VtmlUtil.cs-74-			case "i":
+Vintagestory.API.Common/VtmlUtil.cs-75-			{
+Vintagestory.API.Common/VtmlUtil.cs-76-				CairoFont cairoFont = fontStack.Peek().Clone();
+Vintagestory.API.Common/VtmlUtil.cs-77-				cairoFont.Slant = FontSlant.Italic;
+Vintagestory.API.Common/VtmlUtil.cs-78-				fontStack.Push(cairoFont);
+Vintagestory.API.Common/VtmlUtil.cs-79-				foreach (VtmlToken childElement in vtmlTagToken.ChildElements)
+Vintagestory.API.Common/VtmlUtil.cs-80-				{
+Vintagestory.API.Common/VtmlUtil.cs:81:					Richtextify(capi, childElement, ref elems, fontStack, didClickLink);
+Vintagestory.API.Common/VtmlUtil.cs-82-				}
+Vintagestory.API.Common/VtmlUtil.cs-83-				fontStack.Pop();
+Vintagestory.API.Common/VtmlUtil.cs-84-				break;
+Vintagestory.API.Common/VtmlUtil.cs-85-			}
+Vintagestory.API.Common/VtmlUtil.cs-86-			case "a":
+Vintagestory.API.Common/VtmlUtil.cs-87-			{
+Vintagestory.API.Common/VtmlUtil.cs-88-				LinkTextComponent linkTextComponent = new LinkTextComponent(capi, vtmlTagToken.ContentText, fontStack.Peek(), didClickLink);
+Vintagestory.API.Common/VtmlUtil.cs-89-				if (!vtmlTagToken.Attributes.TryGetValue("href", out linkTextComponent.Href))
+Vintagestory.API.Common/VtmlUtil.cs-90-				{
+Vintagestory.API.Common/VtmlUtil.cs-91-					capi.Logger.Warning("Language file includes an <a /> link missing href");
+Vintagestory.API.Common/VtmlUtil.cs-92-				}
+Vintagestory.API.Common/VtmlUtil.cs-93-				elems.Add(linkTextComponent);
+Vintagestory.API.Common/VtmlUtil.cs-94-				break;
+Vintagestory.API.Common/VtmlUtil.cs-95-			}
+Vintagestory.API.Common/VtmlUtil.cs-96-			case "icon":
+Vintagestory.API.Common/VtmlUtil.cs-97-			{
+Vintagestory.API.Common/VtmlUtil.cs-98-				vtmlTagToken.Attributes.TryGetValue("name", out var value);
+Vintagestory.API.Common/VtmlUtil.cs-99-				vtmlTagToken.Attributes.TryGetValue("path", out var value2);
+Vintagestory.API.Common/VtmlUtil.cs-100-				if (value == null)
+Vintagestory.API.Common/VtmlUtil.cs-101-				{
+Vintagestory.API.Common/VtmlUtil.cs-102-					value = vtmlTagToken.ContentText;
+Vintagestory.API.Common/VtmlUtil.cs-103-				}
+Vintagestory.API.Common/VtmlUtil.cs-104-				IconComponent iconComponent = new IconComponent(capi, value, value2, fontStack.Peek());
+Vintagestory.API.Common/VtmlUtil.cs-105-				iconComponent.BoundsPerLine[0].Ascent = fontStack.Peek().GetFontExtents().Ascent;
+Vintagestory.API.Common/VtmlUtil.cs-106-				elems.Add(iconComponent);
+--
+Vintagestory.API.Common/VtmlUtil.cs-151-				}
+Vintagestory.API.Common/VtmlUtil.cs-152-				if (vtmlTagToken.Attributes.TryGetValue("offy", out var value8))
+Vintagestory.API.Common/VtmlUtil.cs-153-				{
+Vintagestory.API.Common/VtmlUtil.cs-154-					slideshowItemstackTextComponent.offY = GuiElement.scaled(value8.ToFloat());
+Vintagestory.API.Common/VtmlUtil.cs-155-				}
+Vintagestory.API.Common/VtmlUtil.cs-156-				elems.Add(slideshowItemstackTextComponent);
+Vintagestory.API.Common/VtmlUtil.cs-157-				break;
+Vintagestory.API.Common/VtmlUtil.cs-158-			}
+Vintagestory.API.Common/VtmlUtil.cs-159-			case "font":
+Vintagestory.API.Common/VtmlUtil.cs-160-				fontStack.Push(getFont(vtmlTagToken, fontStack));
+Vintagestory.API.Common/VtmlUtil.cs-161-				foreach (VtmlToken childElement2 in vtmlTagToken.ChildElements)
+Vintagestory.API.Common/VtmlUtil.cs-162-				{
+Vintagestory.API.Common/VtmlUtil.cs:163:					Richtextify(capi, childElement2, ref elems, fontStack, didClickLink);
+Vintagestory.API.Common/VtmlUtil.cs-164-				}
+Vintagestory.API.Common/VtmlUtil.cs-165-				fontStack.Pop();
+Vintagestory.API.Common/VtmlUtil.cs-166-				break;
+Vintagestory.API.Common/VtmlUtil.cs-167-			case "clear":
+Vintagestory.API.Common/VtmlUtil.cs-168-				elems.Add(new ClearFloatTextComponent(capi));
+Vintagestory.API.Common/VtmlUtil.cs-169-				break;
+Vintagestory.API.Common/VtmlUtil.cs-170-			case "code":
+Vintagestory.API.Common/VtmlUtil.cs-171-			{
+Vintagestory.API.Common/VtmlUtil.cs-172-				double[] color = fontStack.Peek().Color;
+Vintagestory.API.Common/VtmlUtil.cs-173-				int num = ColorUtil.Rgb2Hsv((float)color[0], (float)color[1], (float)color[2]) | -16777216;
+Vintagestory.API.Common/VtmlUtil.cs-174-				num >>= 8;
+Vintagestory.API.Common/VtmlUtil.cs-175-				int num2 = ColorUtil.Hsv2Rgb((num & 0xFF00) + ((num & 0xFF) << 16) + ((num >> 16) & 0xFF));
+Vintagestory.API.Common/VtmlUtil.cs-176-				double[] array = new double[4];
+Vintagestory.API.Common/VtmlUtil.cs-177-				array[3] = 1.0;
+Vintagestory.API.Common/VtmlUtil.cs-178-				array[2] = (double)(num2 & 0xFF) / 255.0;
+Vintagestory.API.Common/VtmlUtil.cs-179-				array[1] = (double)((num2 >> 8) & 0xFF) / 255.0;
+Vintagestory.API.Common/VtmlUtil.cs-180-				array[0] = (double)((num2 >> 16) & 0xFF) / 255.0;
+Vintagestory.API.Common/VtmlUtil.cs-181-				fontStack.Push(monospacedFont.Clone().WithColor(array));
+Vintagestory.API.Common/VtmlUtil.cs-182-				foreach (VtmlToken childElement3 in vtmlTagToken.ChildElements)
+Vintagestory.API.Common/VtmlUtil.cs-183-				{
+Vintagestory.API.Common/VtmlUtil.cs:184:					Richtextify(capi, childElement3, ref elems, fontStack, didClickLink);
+Vintagestory.API.Common/VtmlUtil.cs-185-				}
+Vintagestory.API.Common/VtmlUtil.cs-186-				fontStack.Pop();
+Vintagestory.API.Common/VtmlUtil.cs-187-				break;
+Vintagestory.API.Common/VtmlUtil.cs-188-			}
+Vintagestory.API.Common/VtmlUtil.cs-189-			case "strong":
+Vintagestory.API.Common/VtmlUtil.cs-190-				fontStack.Push(fontStack.Peek().Clone().WithWeight(FontWeight.Bold));
+Vintagestory.API.Common/VtmlUtil.cs-191-				foreach (VtmlToken childElement4 in vtmlTagToken.ChildElements)
+Vintagestory.API.Common/VtmlUtil.cs-192-				{
+Vintagestory.API.Common/VtmlUtil.cs:193:					Richtextify(capi, childElement4, ref elems, fontStack, didClickLink);
+Vintagestory.API.Common/VtmlUtil.cs-194-				}
+Vintagestory.API.Common/VtmlUtil.cs-195-				fontStack.Pop();
+Vintagestory.API.Common/VtmlUtil.cs-196-				break;
+Vintagestory.API.Common/VtmlUtil.cs-197-			}
+Vintagestory.API.Common/VtmlUtil.cs-198-			if (vtmlTagToken.Name != null && TagConverters.ContainsKey(vtmlTagToken.Name))
+Vintagestory.API.Common/VtmlUtil.cs-199-			{
+Vintagestory.API.Common/VtmlUtil.cs-200-				RichTextComponentBase richTextComponentBase = TagConverters[vtmlTagToken.Name](capi, vtmlTagToken, fontStack, didClickLink);
+Vintagestory.API.Common/VtmlUtil.cs-201-				if (richTextComponentBase != null)
+Vintagestory.API.Common/VtmlUtil.cs-202-				{
+Vintagestory.API.Common/VtmlUtil.cs-203-					elems.Add(richTextComponentBase);
+Vintagestory.API.Common/VtmlUtil.cs-204-				}
+Vintagestory.API.Common/VtmlUtil.cs-205-			}
+Vintagestory.API.Common/VtmlUtil.cs-206-		}
+Vintagestory.API.Common/VtmlUtil.cs-207-		else
+Vintagestory.API.Common/VtmlUtil.cs-208-		{
+Vintagestory.API.Common/VtmlUtil.cs-209-			VtmlTextToken vtmlTextToken = token as VtmlTextToken;
+Vintagestory.API.Common/VtmlUtil.cs-210-			elems.Add(new RichTextComponent(capi, vtmlTextToken.Text, fontStack.Peek()));
+Vintagestory.API.Common/VtmlUtil.cs-211-		}
+Vintagestory.API.Common/VtmlUtil.cs-212-	}
+Vintagestory.API.Common/VtmlUtil.cs-213-
+Vintagestory.API.Common/VtmlUtil.cs-214-	private static CairoFont getFont(VtmlTagToken tag, Stack<CairoFont> fontStack)
+Vintagestory.API.Common/VtmlUtil.cs-215-	{
+Vintagestory.API.Common/VtmlUtil.cs-216-		string text = "";
+Vintagestory.API.Common/VtmlUtil.cs-217-		EnumTextOrientation orientation = EnumTextOrientation.Left;
+Vintagestory.API.Common/VtmlUtil.cs-218-		double[] color = ColorUtil.WhiteArgbDouble;

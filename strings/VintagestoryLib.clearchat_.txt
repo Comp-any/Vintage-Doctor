@@ -1,0 +1,38 @@
+Vintagestory.Client.NoObf/HudDialogChat.cs-85-		game.eventManager?.OnNewServerToClientChatLine.Add(OnNewServerToClientChatLine);
+Vintagestory.Client.NoObf/HudDialogChat.cs-86-		game.eventManager?.OnNewClientToServerChatLine.Add(OnNewClientToServerChatLine);
+Vintagestory.Client.NoObf/HudDialogChat.cs-87-		game.eventManager?.OnNewClientOnlyChatLine.Add(OnNewClientOnlyChatLine);
+Vintagestory.Client.NoObf/HudDialogChat.cs-88-		game.ChatHistoryByPlayerGroup[GlobalConstants.GeneralChatGroup] = new LimitedList<string>(historyMax);
+Vintagestory.Client.NoObf/HudDialogChat.cs-89-		ComposeChatGuis();
+Vintagestory.Client.NoObf/HudDialogChat.cs-90-		Composers["chat"].UnfocusOwnElements();
+Vintagestory.Client.NoObf/HudDialogChat.cs-91-		UpdateText();
+Vintagestory.Client.NoObf/HudDialogChat.cs-92-		CommandArgumentParsers parsers = game.api.ChatCommands.Parsers;
+Vintagestory.Client.NoObf/HudDialogChat.cs-93-		game.api.ChatCommands.GetOrCreate("debug").BeginSubCommand("recomposechat").RequiresPrivilege(Privilege.chat)
+Vintagestory.Client.NoObf/HudDialogChat.cs-94-			.WithDescription("Recompose chat dialogs")
+Vintagestory.Client.NoObf/HudDialogChat.cs-95-			.HandleWith(CmdChatC)
+Vintagestory.Client.NoObf/HudDialogChat.cs-96-			.EndSubCommand();
+Vintagestory.Client.NoObf/HudDialogChat.cs:97:		game.api.ChatCommands.Create("clearchat").WithDescription("Clear all chat history").HandleWith(CmdClearChat);
+Vintagestory.Client.NoObf/HudDialogChat.cs-98-		game.api.ChatCommands.Create("chatsize").WithDescription("Set the chat dialog width and height (default 400x160)").WithArgs(parsers.OptionalInt("width", 700), parsers.OptionalInt("height", 200))
+Vintagestory.Client.NoObf/HudDialogChat.cs-99-			.HandleWith(CmdChatSize);
+Vintagestory.Client.NoObf/HudDialogChat.cs-100-		game.api.ChatCommands.Create("pastemode").WithDescription("Set the chats paste mode. If set to multi pasting multiple lines will produce multiple chat lines.").WithArgs(parsers.WordRange("mode", "single", "multi"))
+Vintagestory.Client.NoObf/HudDialogChat.cs-101-			.HandleWith(CmdPasteMode);
+Vintagestory.Client.NoObf/HudDialogChat.cs-102-		game.PacketHandlers[50] = HandlePlayerGroupPacket;
+Vintagestory.Client.NoObf/HudDialogChat.cs-103-		game.PacketHandlers[49] = HandlePlayerGroupsPacket;
+Vintagestory.Client.NoObf/HudDialogChat.cs-104-		game.PacketHandlers[57] = HandleGotoGroupPacket;
+Vintagestory.Client.NoObf/HudDialogChat.cs-105-		ScreenManager.hotkeyManager.SetHotKeyHandler("chatdialog", OnKeyCombinationTab);
+Vintagestory.Client.NoObf/HudDialogChat.cs-106-		ScreenManager.hotkeyManager.SetHotKeyHandler("beginclientcommand", (KeyCombination kc) =>
+Vintagestory.Client.NoObf/HudDialogChat.cs-107-		{
+Vintagestory.Client.NoObf/HudDialogChat.cs-108-			OnKeyCombinationTab(kc);
+Vintagestory.Client.NoObf/HudDialogChat.cs-109-			OnKeyCombinationToggle(kc);
+Vintagestory.Client.NoObf/HudDialogChat.cs-110-			Composers["chat"].GetChatInput("chatinput").SetValue(".");
+Vintagestory.Client.NoObf/HudDialogChat.cs-111-			return true;
+Vintagestory.Client.NoObf/HudDialogChat.cs-112-		});
+Vintagestory.Client.NoObf/HudDialogChat.cs-113-		ScreenManager.hotkeyManager.SetHotKeyHandler("beginservercommand", (KeyCombination kc) =>
+Vintagestory.Client.NoObf/HudDialogChat.cs-114-		{
+Vintagestory.Client.NoObf/HudDialogChat.cs-115-			OnKeyCombinationTab(kc);
+Vintagestory.Client.NoObf/HudDialogChat.cs-116-			OnKeyCombinationToggle(kc);
+Vintagestory.Client.NoObf/HudDialogChat.cs-117-			Composers["chat"].GetChatInput("chatinput").SetValue("/");
+Vintagestory.Client.NoObf/HudDialogChat.cs-118-			return true;
+Vintagestory.Client.NoObf/HudDialogChat.cs-119-		});
+Vintagestory.Client.NoObf/HudDialogChat.cs-120-		game.api.RegisterLinkProtocol("screenshot", onLinkClicked);
+Vintagestory.Client.NoObf/HudDialogChat.cs-121-		game.api.RegisterLinkProtocol("chattype", onChatType);
+Vintagestory.Client.NoObf/HudDialogChat.cs-122-		game.api.RegisterLinkProtocol("datafolder", onDataFolderLinkClicked);

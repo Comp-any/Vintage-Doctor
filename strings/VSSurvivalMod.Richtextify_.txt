@@ -1,0 +1,792 @@
+Vintagestory.GameContent/DlgTalkComponent.cs-72-				{
+Vintagestory.GameContent/DlgTalkComponent.cs-73-					SelectAnswerById(id);
+Vintagestory.GameContent/DlgTalkComponent.cs-74-				});
+Vintagestory.GameContent/DlgTalkComponent.cs-75-				list.Add(linkTextComponent);
+Vintagestory.GameContent/DlgTalkComponent.cs-76-				list.Add(new RichTextComponent(api as ICoreClientAPI, "\r\n", cairoFont));
+Vintagestory.GameContent/DlgTalkComponent.cs-77-				CairoFont font = linkTextComponent.Font;
+Vintagestory.GameContent/DlgTalkComponent.cs-78-				HashSet<int> hashSet = usedAnswers;
+Vintagestory.GameContent/DlgTalkComponent.cs-79-				font.WithColor((hashSet != null && hashSet.Contains(id)) ? GuiStyle.ColorParchment : GuiStyle.ColorTime1).WithOrientation(EnumTextOrientation.Right);
+Vintagestory.GameContent/DlgTalkComponent.cs-80-				num++;
+Vintagestory.GameContent/DlgTalkComponent.cs-81-			}
+Vintagestory.GameContent/DlgTalkComponent.cs-82-			else
+Vintagestory.GameContent/DlgTalkComponent.cs-83-			{
+Vintagestory.GameContent/DlgTalkComponent.cs:84:				list.AddRange(VtmlUtil.Richtextify(api as ICoreClientAPI, text + "\r\n", cairoFont));
+Vintagestory.GameContent/DlgTalkComponent.cs-85-			}
+Vintagestory.GameContent/DlgTalkComponent.cs-86-		}
+Vintagestory.GameContent/DlgTalkComponent.cs-87-		return list.ToArray();
+Vintagestory.GameContent/DlgTalkComponent.cs-88-	}
+Vintagestory.GameContent/DlgTalkComponent.cs-89-
+Vintagestory.GameContent/DlgTalkComponent.cs-90-	private bool conditionsMet(ConditionElement[] conds)
+Vintagestory.GameContent/DlgTalkComponent.cs-91-	{
+Vintagestory.GameContent/DlgTalkComponent.cs-92-		if (conds == null)
+Vintagestory.GameContent/DlgTalkComponent.cs-93-		{
+Vintagestory.GameContent/DlgTalkComponent.cs-94-			return true;
+Vintagestory.GameContent/DlgTalkComponent.cs-95-		}
+Vintagestory.GameContent/DlgTalkComponent.cs-96-		foreach (ConditionElement cond in conds)
+Vintagestory.GameContent/DlgTalkComponent.cs-97-		{
+Vintagestory.GameContent/DlgTalkComponent.cs-98-			if (!isConditionMet(cond))
+Vintagestory.GameContent/DlgTalkComponent.cs-99-			{
+Vintagestory.GameContent/DlgTalkComponent.cs-100-				return false;
+Vintagestory.GameContent/DlgTalkComponent.cs-101-			}
+Vintagestory.GameContent/DlgTalkComponent.cs-102-		}
+Vintagestory.GameContent/DlgTalkComponent.cs-103-		return true;
+Vintagestory.GameContent/DlgTalkComponent.cs-104-	}
+Vintagestory.GameContent/DlgTalkComponent.cs-105-
+Vintagestory.GameContent/DlgTalkComponent.cs-106-	private bool isConditionMet(ConditionElement cond)
+Vintagestory.GameContent/DlgTalkComponent.cs-107-	{
+Vintagestory.GameContent/DlgTalkComponent.cs-108-		if (IsConditionMet(cond.Variable, cond.IsValue, cond.Invert))
+Vintagestory.GameContent/DlgTalkComponent.cs-109-		{
+--
+Vintagestory.GameContent/ActivityCellEntry.cs-25-	public bool Visible => true;
+Vintagestory.GameContent/ActivityCellEntry.cs-26-
+Vintagestory.GameContent/ActivityCellEntry.cs-27-	ElementBounds IGuiElementCell.Bounds => Bounds;
+Vintagestory.GameContent/ActivityCellEntry.cs-28-
+Vintagestory.GameContent/ActivityCellEntry.cs-29-	public ActivityCellEntry(ICoreClientAPI capi, ElementBounds bounds, string name, string detail, Action<int> onClick, float leftColWidth = 200f, float rightColWidth = 300f)
+Vintagestory.GameContent/ActivityCellEntry.cs-30-		: base(capi, bounds)
+Vintagestory.GameContent/ActivityCellEntry.cs-31-	{
+Vintagestory.GameContent/ActivityCellEntry.cs-32-		this.onClick = onClick;
+Vintagestory.GameContent/ActivityCellEntry.cs-33-		CairoFont cairoFont = CairoFont.WhiteDetailText();
+Vintagestory.GameContent/ActivityCellEntry.cs-34-		double fixedY = (unScaledCellHeight - cairoFont.UnscaledFontsize) / 2.0;
+Vintagestory.GameContent/ActivityCellEntry.cs-35-		ElementBounds elementBounds = ElementBounds.Fixed(0.0, fixedY, leftColWidth, 25.0).WithParent(Bounds);
+Vintagestory.GameContent/ActivityCellEntry.cs-36-		ElementBounds bounds2 = ElementBounds.Fixed(0.0, fixedY, rightColWidth, 25.0).WithParent(Bounds).FixedRightOf(elementBounds, 10.0);
+Vintagestory.GameContent/ActivityCellEntry.cs:37:		nameTextElem = new GuiElementRichtext(capi, VtmlUtil.Richtextify(capi, name, cairoFont), elementBounds);
+Vintagestory.GameContent/ActivityCellEntry.cs:38:		detailTextElem = new GuiElementRichtext(capi, VtmlUtil.Richtextify(capi, detail, cairoFont), bounds2);
+Vintagestory.GameContent/ActivityCellEntry.cs-39-		hoverTexture = new LoadedTexture(capi);
+Vintagestory.GameContent/ActivityCellEntry.cs-40-	}
+Vintagestory.GameContent/ActivityCellEntry.cs-41-
+Vintagestory.GameContent/ActivityCellEntry.cs-42-	public void Recompose()
+Vintagestory.GameContent/ActivityCellEntry.cs-43-	{
+Vintagestory.GameContent/ActivityCellEntry.cs-44-		composed = true;
+Vintagestory.GameContent/ActivityCellEntry.cs-45-		nameTextElem.Compose();
+Vintagestory.GameContent/ActivityCellEntry.cs-46-		detailTextElem.Compose();
+Vintagestory.GameContent/ActivityCellEntry.cs-47-		ImageSurface imageSurface = new ImageSurface(Format.Argb32, 2, 2);
+Vintagestory.GameContent/ActivityCellEntry.cs-48-		Context context = genContext(imageSurface);
+Vintagestory.GameContent/ActivityCellEntry.cs-49-		context.NewPath();
+Vintagestory.GameContent/ActivityCellEntry.cs-50-		context.LineTo(0.0, 0.0);
+Vintagestory.GameContent/ActivityCellEntry.cs-51-		context.LineTo(2.0, 0.0);
+Vintagestory.GameContent/ActivityCellEntry.cs-52-		context.LineTo(2.0, 2.0);
+Vintagestory.GameContent/ActivityCellEntry.cs-53-		context.LineTo(0.0, 2.0);
+Vintagestory.GameContent/ActivityCellEntry.cs-54-		context.ClosePath();
+Vintagestory.GameContent/ActivityCellEntry.cs-55-		context.SetSourceRGBA(0.0, 0.0, 0.0, 0.15);
+Vintagestory.GameContent/ActivityCellEntry.cs-56-		context.Fill();
+Vintagestory.GameContent/ActivityCellEntry.cs-57-		generateTexture(imageSurface, ref hoverTexture);
+Vintagestory.GameContent/ActivityCellEntry.cs-58-		context.Dispose();
+Vintagestory.GameContent/ActivityCellEntry.cs-59-		imageSurface.Dispose();
+Vintagestory.GameContent/ActivityCellEntry.cs-60-	}
+Vintagestory.GameContent/ActivityCellEntry.cs-61-
+Vintagestory.GameContent/ActivityCellEntry.cs-62-	public void OnRenderInteractiveElements(ICoreClientAPI api, float deltaTime)
+Vintagestory.GameContent/ActivityCellEntry.cs-63-	{
+--
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-175-		addRecipeNotes(capi, list);
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-176-		return list.ToArray();
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-177-	}
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-178-
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-179-	protected void addGeneralInfo(ICoreClientAPI capi, ItemStack[] allStacks, List<RichTextComponentBase> components)
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-180-	{
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-181-		ItemStack mealBlock = dummySlot.Itemstack.Clone();
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-182-		components.Add(new MealstackTextComponent(capi, mealBlock, Recipe, 100.0, EnumFloat.Left, null, slots, isPie)
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-183-		{
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-184-			PaddingRight = GuiElement.scaled(10.0),
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-185-			offX = -8.0
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-186-		});
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs:187:		components.AddRange(VtmlUtil.Richtextify(capi, Title + "\n", CairoFont.WhiteSmallishText()));
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-188-		if (capi.Settings.Bool["extendedDebugInfo"])
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-189-		{
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-190-			CairoFont cairoFont = CairoFont.WhiteDetailText();
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-191-			cairoFont.Color[3] = 0.5;
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs:192:			components.AddRange(VtmlUtil.Richtextify(capi, "Page code:" + pageCode + "\n", cairoFont));
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-193-		}
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-194-		HandbookMealNutritionFacts nutritionFacts = getNutritionFacts(capi, allStacks, slots);
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-195-		float num = (float)Math.Round(nutritionFacts.MinSatiety);
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-196-		float num2 = (float)Math.Round(nutritionFacts.MaxSatiety);
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-197-		float minHealth = nutritionFacts.MinHealth;
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-198-		float maxHealth = nutritionFacts.MaxHealth;
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-199-		string text = "";
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-200-		if (nutritionFacts.Categories.Count > 0)
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-201-		{
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-202-			text = Lang.Get("handbook-mealrecipe-nutritionfacts-satietycategories", string.Join(", ", nutritionFacts.Categories.Select((EnumFoodCategory category) => Lang.Get("foodcategory-" + category.ToString().ToLowerInvariant()))));
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-203-		}
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-204-		bool num3 = num != 0f || num2 != 0f;
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-205-		bool flag = minHealth > 0f || maxHealth > 0f;
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-206-		if (num3 | flag)
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-207-		{
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs:208:			components.AddRange(VtmlUtil.Richtextify(capi, Lang.Get("handbook-mealrecipe-nutritionfacts") + "\n", CairoFont.WhiteSmallText()));
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-209-		}
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-210-		if (num3)
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-211-		{
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs:212:			components.AddRange(VtmlUtil.Richtextify(capi, Lang.Get("handbook-mealrecipe-nutritionfactsline-satiety", num, num2, text) + "\n", CairoFont.WhiteDetailText()));
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-213-		}
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-214-		if (flag)
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-215-		{
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs:216:			components.AddRange(VtmlUtil.Richtextify(capi, Lang.Get("handbook-mealrecipe-nutritionfactsline-health", ((minHealth >= 0f) ? "+" : "") + minHealth, ((maxHealth >= 0f) ? "+" : "") + maxHealth) + "\n", CairoFont.WhiteDetailText()));
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-217-		}
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-218-	}
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-219-
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-220-	private void addIngredientLists(ICoreClientAPI capi, ItemStack[] allStacks, List<RichTextComponentBase> components, ActionConsumable<string> openDetailPageFor)
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-221-	{
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-222-		List<CookingRecipeIngredient> source = (isPie ? Recipe.Ingredients.ToList() : CombinedIngredientsList());
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-223-		bool haveText = components.Count > 0;
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-224-		CollectibleBehaviorHandbookTextAndExtraInfo.AddHeading(components, capi, "handbook-mealrecipe-requiredingredients", ref haveText);
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-225-		foreach (CookingRecipeIngredient item in source.Where((CookingRecipeIngredient ingredient) => ingredient.MinQuantity > 0))
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-226-		{
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-227-			List<ItemStack> ingredientStacks = getIngredientStacks(capi, item, allStacks);
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-228-			if (ingredientStacks.Count > 0)
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-229-			{
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-230-				addIngredientHeading(components, capi, item, "handbook-mealrecipe" + (isPie ? "-pie" : "-") + "ingredients", ingredientStacks, openDetailPageFor);
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-231-			}
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-232-		}
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-233-		IEnumerable<CookingRecipeIngredient> enumerable = source.Where((CookingRecipeIngredient ingredient) => ingredient.MinQuantity == 0);
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-234-		if (enumerable.Count() > 0)
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-235-		{
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-236-			haveText = components.Count > 0;
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-237-			CollectibleBehaviorHandbookTextAndExtraInfo.AddHeading(components, capi, "handbook-mealrecipe-optionalingredients", ref haveText);
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-238-		}
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-239-		foreach (CookingRecipeIngredient item2 in enumerable)
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-240-		{
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-241-			List<ItemStack> ingredientStacks2 = getIngredientStacks(capi, item2, allStacks);
+--
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-289-				text = Lang.GetMatchingIfExists("handbook-mealrecipe-directionstext-" + Recipe.Code + "-pie");
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-290-			}
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-291-			if (text == null)
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-292-			{
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-293-				text = Lang.GetMatchingIfExists("handbook-mealrecipe-directionstext-pie");
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-294-			}
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-295-		}
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-296-		if (text == null)
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-297-		{
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-298-			text = Lang.Get("handbook-mealrecipe-directionstext");
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-299-		}
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-300-		components.Add(new ClearFloatTextComponent(capi, 14f));
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs:301:		components.AddRange(VtmlUtil.Richtextify(capi, Lang.Get("handbook-mealrecipe" + (isPie ? "-pie" : "-") + "directions", text) + "\n", CairoFont.WhiteSmallText()));
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-302-	}
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-303-
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-304-	protected void addRecipeNotes(ICoreClientAPI capi, List<RichTextComponentBase> components)
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-305-	{
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-306-		string matchingIfExists = Lang.GetMatchingIfExists("handbook-mealrecipe-notestext-" + Recipe.Code);
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-307-		if (isPie)
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-308-		{
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-309-			if (matchingIfExists == null)
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-310-			{
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-311-				matchingIfExists = Lang.GetMatchingIfExists("handbook-mealrecipe-notestext-" + Recipe.Code + "-pie");
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-312-			}
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-313-			if (matchingIfExists == null)
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-314-			{
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-315-				matchingIfExists = Lang.GetMatchingIfExists("handbook-mealrecipe-notestext-pie");
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-316-			}
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-317-		}
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-318-		if (matchingIfExists != null)
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-319-		{
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-320-			components.Add(new ClearFloatTextComponent(capi, 14f));
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs:321:			components.AddRange(VtmlUtil.Richtextify(capi, Lang.Get("handbook-mealrecipe-notes", matchingIfExists), CairoFont.WhiteSmallText()));
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-322-		}
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-323-	}
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-324-
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-325-	private HandbookMealNutritionFacts getNutritionFacts(ICoreClientAPI capi, ItemStack[] allStacks, int slots = 4)
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-326-	{
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-327-		if (cachedNutritionFacts == null)
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-328-		{
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-329-			float num2;
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-330-			float num3;
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-331-			float num4;
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-332-			float num = (num2 = (num3 = (num4 = 0f)));
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-333-			List<IngredientMinMax> list = new List<IngredientMinMax>();
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-334-			HashSet<EnumFoodCategory> hashSet = new HashSet<EnumFoodCategory>();
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-335-			List<CookingRecipeIngredient> list2 = new List<CookingRecipeIngredient>();
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-336-			foreach (CookingRecipeIngredient item in isPie ? Recipe.Ingredients.ToList() : CombinedIngredientsList())
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-337-			{
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-338-				CookingRecipeIngredient cookingRecipeIngredient = item.Clone();
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-339-				List<ItemStack> ingredientStacks = getIngredientStacks(capi, cookingRecipeIngredient, allStacks);
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-340-				float num6;
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-341-				float num5 = (num6 = float.MaxValue);
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-342-				float num8;
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-343-				float num7 = (num8 = float.MinValue);
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-344-				bool flag = true;
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-345-				while (ingredientStacks.Count > 0)
+Vintagestory.GameContent/GuiHandbookMealRecipePage.cs-346-				{
+--
+Vintagestory.GameContent/GuiHandbookCommandPage.cs-57-		Texture?.Dispose();
+Vintagestory.GameContent/GuiHandbookCommandPage.cs-58-		Texture = null;
+Vintagestory.GameContent/GuiHandbookCommandPage.cs-59-	}
+Vintagestory.GameContent/GuiHandbookCommandPage.cs-60-
+Vintagestory.GameContent/GuiHandbookCommandPage.cs-61-	public override void ComposePage(GuiComposer detailViewGui, ElementBounds textBounds, ItemStack[] allstacks, ActionConsumable<string> openDetailPageFor)
+Vintagestory.GameContent/GuiHandbookCommandPage.cs-62-	{
+Vintagestory.GameContent/GuiHandbookCommandPage.cs-63-		RichTextComponentBase[] pageText = GetPageText(detailViewGui.Api, allstacks, openDetailPageFor);
+Vintagestory.GameContent/GuiHandbookCommandPage.cs-64-		detailViewGui.AddRichtext(pageText, textBounds, "richtext");
+Vintagestory.GameContent/GuiHandbookCommandPage.cs-65-	}
+Vintagestory.GameContent/GuiHandbookCommandPage.cs-66-
+Vintagestory.GameContent/GuiHandbookCommandPage.cs-67-	protected virtual RichTextComponentBase[] GetPageText(ICoreClientAPI capi, ItemStack[] allStacks, ActionConsumable<string> openDetailPageFor)
+Vintagestory.GameContent/GuiHandbookCommandPage.cs-68-	{
+Vintagestory.GameContent/GuiHandbookCommandPage.cs:69:		return VtmlUtil.Richtextify(capi, "<font size=\"24\"><strong>" + Command.CallSyntax + "</strong></font>\n\n" + TextCacheAll, CairoFont.WhiteSmallText());
+Vintagestory.GameContent/GuiHandbookCommandPage.cs-70-	}
+Vintagestory.GameContent/GuiHandbookCommandPage.cs-71-
+Vintagestory.GameContent/GuiHandbookCommandPage.cs-72-	public override PageText GetPageText()
+Vintagestory.GameContent/GuiHandbookCommandPage.cs-73-	{
+Vintagestory.GameContent/GuiHandbookCommandPage.cs-74-		return new PageText
+Vintagestory.GameContent/GuiHandbookCommandPage.cs-75-		{
+Vintagestory.GameContent/GuiHandbookCommandPage.cs-76-			Title = TextCacheTitle,
+Vintagestory.GameContent/GuiHandbookCommandPage.cs-77-			Text = TextCacheAll
+Vintagestory.GameContent/GuiHandbookCommandPage.cs-78-		};
+Vintagestory.GameContent/GuiHandbookCommandPage.cs-79-	}
+Vintagestory.GameContent/GuiHandbookCommandPage.cs-80-
+Vintagestory.GameContent/GuiHandbookCommandPage.cs-81-	public override float GetSearchTextPosRel(string searchText)
+Vintagestory.GameContent/GuiHandbookCommandPage.cs-82-	{
+Vintagestory.GameContent/GuiHandbookCommandPage.cs-83-		if (string.IsNullOrEmpty(searchText) || string.IsNullOrEmpty(TextCacheAll))
+Vintagestory.GameContent/GuiHandbookCommandPage.cs-84-		{
+Vintagestory.GameContent/GuiHandbookCommandPage.cs-85-			return 0f;
+Vintagestory.GameContent/GuiHandbookCommandPage.cs-86-		}
+Vintagestory.GameContent/GuiHandbookCommandPage.cs-87-		Regex regex = GuiDialog.RegexFromSearchText(searchText);
+Vintagestory.GameContent/GuiHandbookCommandPage.cs-88-		if (TextCacheTitle != null && regex.Matches(TextCacheTitle).Count > 0)
+Vintagestory.GameContent/GuiHandbookCommandPage.cs-89-		{
+Vintagestory.GameContent/GuiHandbookCommandPage.cs-90-			return 0f;
+Vintagestory.GameContent/GuiHandbookCommandPage.cs-91-		}
+Vintagestory.GameContent/GuiHandbookCommandPage.cs-92-		string[] array = regex.Split(TextCacheAll);
+Vintagestory.GameContent/GuiHandbookCommandPage.cs-93-		if (array.Length < 2)
+Vintagestory.GameContent/GuiHandbookCommandPage.cs-94-		{
+--
+Vintagestory.GameContent/GuiDialogConfirmPurchase.cs-42-		ElementBounds elementBounds2 = ElementBounds.Fill.WithFixedPadding(GuiStyle.ElementToDialogPadding);
+Vintagestory.GameContent/GuiDialogConfirmPurchase.cs-43-		elementBounds2.BothSizing = ElementSizing.FitToChildren;
+Vintagestory.GameContent/GuiDialogConfirmPurchase.cs-44-		dialogBounds = ElementStdBounds.AutosizedMainDialog.WithAlignment(EnumDialogArea.CenterMiddle).WithFixedAlignmentOffset(0.0 - GuiStyle.DialogToScreenPadding, 0.0);
+Vintagestory.GameContent/GuiDialogConfirmPurchase.cs-45-		elementBounds2.verticalSizing = ElementSizing.FitToChildren;
+Vintagestory.GameContent/GuiDialogConfirmPurchase.cs-46-		elementBounds2.horizontalSizing = ElementSizing.Fixed;
+Vintagestory.GameContent/GuiDialogConfirmPurchase.cs-47-		elementBounds2.fixedWidth = 300.0;
+Vintagestory.GameContent/GuiDialogConfirmPurchase.cs-48-		int num = auctionSys.DeliveryCostsByDistance(traderEntity.Pos.XYZ, auction.SrcAuctioneerEntityPos);
+Vintagestory.GameContent/GuiDialogConfirmPurchase.cs-49-		RichTextComponentBase[] array = new RichTextComponentBase[2]
+Vintagestory.GameContent/GuiDialogConfirmPurchase.cs-50-		{
+Vintagestory.GameContent/GuiDialogConfirmPurchase.cs-51-			new ItemstackTextComponent(capi, auction.ItemStack, 60.0, 10.0),
+Vintagestory.GameContent/GuiDialogConfirmPurchase.cs-52-			new RichTextComponent(capi, auction.ItemStack.GetName() + "\r\n", CairoFont.WhiteSmallText())
+Vintagestory.GameContent/GuiDialogConfirmPurchase.cs-53-		};
+Vintagestory.GameContent/GuiDialogConfirmPurchase.cs:54:		array = array.Append(VtmlUtil.Richtextify(capi, auction.ItemStack.GetDescription(capi.World, new DummySlot(auction.ItemStack)), CairoFont.WhiteDetailText()));
+Vintagestory.GameContent/GuiDialogConfirmPurchase.cs-55-		CairoFont cairoFont = CairoFont.WhiteDetailText();
+Vintagestory.GameContent/GuiDialogConfirmPurchase.cs-56-		double unscaledFontsize = cairoFont.UnscaledFontsize;
+Vintagestory.GameContent/GuiDialogConfirmPurchase.cs-57-		ItemStack singleCurrencyStack = auctionSys.SingleCurrencyStack;
+Vintagestory.GameContent/GuiDialogConfirmPurchase.cs-58-		RichTextComponentBase[] components = new RichTextComponentBase[2]
+Vintagestory.GameContent/GuiDialogConfirmPurchase.cs-59-		{
+Vintagestory.GameContent/GuiDialogConfirmPurchase.cs-60-			new RichTextComponent(capi, Lang.Get("Delivery: {0}", num), cairoFont)
+Vintagestory.GameContent/GuiDialogConfirmPurchase.cs-61-			{
+Vintagestory.GameContent/GuiDialogConfirmPurchase.cs-62-				PaddingRight = 10.0,
+Vintagestory.GameContent/GuiDialogConfirmPurchase.cs-63-				VerticalAlign = EnumVerticalAlign.Top
+Vintagestory.GameContent/GuiDialogConfirmPurchase.cs-64-			},
+Vintagestory.GameContent/GuiDialogConfirmPurchase.cs-65-			new ItemstackTextComponent(capi, singleCurrencyStack, unscaledFontsize * 2.5, 0.0, EnumFloat.Inline)
+Vintagestory.GameContent/GuiDialogConfirmPurchase.cs-66-			{
+Vintagestory.GameContent/GuiDialogConfirmPurchase.cs-67-				VerticalAlign = EnumVerticalAlign.Top,
+Vintagestory.GameContent/GuiDialogConfirmPurchase.cs-68-				offX = 0.0 - GuiElement.scaled(unscaledFontsize * 0.5),
+Vintagestory.GameContent/GuiDialogConfirmPurchase.cs-69-				offY = 0.0 - GuiElement.scaled(unscaledFontsize * 0.75)
+Vintagestory.GameContent/GuiDialogConfirmPurchase.cs-70-			}
+Vintagestory.GameContent/GuiDialogConfirmPurchase.cs-71-		};
+Vintagestory.GameContent/GuiDialogConfirmPurchase.cs-72-		RichTextComponentBase[] components2 = new RichTextComponentBase[2]
+Vintagestory.GameContent/GuiDialogConfirmPurchase.cs-73-		{
+Vintagestory.GameContent/GuiDialogConfirmPurchase.cs-74-			new RichTextComponent(capi, Lang.Get("Total Cost: {0}", auction.Price + num), cairoFont)
+Vintagestory.GameContent/GuiDialogConfirmPurchase.cs-75-			{
+Vintagestory.GameContent/GuiDialogConfirmPurchase.cs-76-				PaddingRight = 10.0,
+Vintagestory.GameContent/GuiDialogConfirmPurchase.cs-77-				VerticalAlign = EnumVerticalAlign.Top
+Vintagestory.GameContent/GuiDialogConfirmPurchase.cs-78-			},
+Vintagestory.GameContent/GuiDialogConfirmPurchase.cs-79-			new ItemstackTextComponent(capi, singleCurrencyStack, unscaledFontsize * 2.5, 0.0, EnumFloat.Inline)
+--
+Vintagestory.GameContent/TutorialStepReceive.cs-47-		rwatcher.MatchEventName = receiveEventMapping[enumReceiveType];
+Vintagestory.GameContent/TutorialStepReceive.cs-48-	}
+Vintagestory.GameContent/TutorialStepReceive.cs-49-
+Vintagestory.GameContent/TutorialStepReceive.cs-50-	public override RichTextComponentBase[] GetText(CairoFont font)
+Vintagestory.GameContent/TutorialStepReceive.cs-51-	{
+Vintagestory.GameContent/TutorialStepReceive.cs-52-		if (rwatcher.QuantityGoal > 1)
+Vintagestory.GameContent/TutorialStepReceive.cs-53-		{
+Vintagestory.GameContent/TutorialStepReceive.cs-54-			_ = " " + Lang.Get("({0}/{1} collected)", rwatcher.QuantityAchieved, rwatcher.QuantityGoal);
+Vintagestory.GameContent/TutorialStepReceive.cs-55-		}
+Vintagestory.GameContent/TutorialStepReceive.cs-56-		_ = receiveType;
+Vintagestory.GameContent/TutorialStepReceive.cs-57-		string text = Lang.Get(base.text, (rwatcher.QuantityAchieved >= rwatcher.QuantityGoal) ? rwatcher.QuantityGoal : (rwatcher.QuantityGoal - rwatcher.QuantityAchieved));
+Vintagestory.GameContent/TutorialStepReceive.cs-58-		text = Lang.Get("tutorialstep-numbered", index + 1, text);
+Vintagestory.GameContent/TutorialStepReceive.cs:59:		return VtmlUtil.Richtextify(capi, text, font);
+Vintagestory.GameContent/TutorialStepReceive.cs-60-	}
+Vintagestory.GameContent/TutorialStepReceive.cs-61-
+Vintagestory.GameContent/TutorialStepReceive.cs-62-	public override bool OnItemStackReceived(ItemStack stack, string eventName)
+Vintagestory.GameContent/TutorialStepReceive.cs-63-	{
+Vintagestory.GameContent/TutorialStepReceive.cs-64-		rwatcher.OnItemStackReceived(stack, eventName);
+Vintagestory.GameContent/TutorialStepReceive.cs-65-		if (rwatcher.Dirty)
+Vintagestory.GameContent/TutorialStepReceive.cs-66-		{
+Vintagestory.GameContent/TutorialStepReceive.cs-67-			rwatcher.Dirty = false;
+Vintagestory.GameContent/TutorialStepReceive.cs-68-			return true;
+Vintagestory.GameContent/TutorialStepReceive.cs-69-		}
+Vintagestory.GameContent/TutorialStepReceive.cs-70-		return false;
+Vintagestory.GameContent/TutorialStepReceive.cs-71-	}
+Vintagestory.GameContent/TutorialStepReceive.cs-72-
+Vintagestory.GameContent/TutorialStepReceive.cs-73-	public override bool DoCheckPlayerInventory(IPlayerInventoryManager inventoryManager)
+Vintagestory.GameContent/TutorialStepReceive.cs-74-	{
+Vintagestory.GameContent/TutorialStepReceive.cs-75-		rwatcher.DoCheckPlayerInventory(inventoryManager);
+Vintagestory.GameContent/TutorialStepReceive.cs-76-		if (rwatcher.Dirty)
+Vintagestory.GameContent/TutorialStepReceive.cs-77-		{
+Vintagestory.GameContent/TutorialStepReceive.cs-78-			rwatcher.Dirty = false;
+Vintagestory.GameContent/TutorialStepReceive.cs-79-			return true;
+Vintagestory.GameContent/TutorialStepReceive.cs-80-		}
+Vintagestory.GameContent/TutorialStepReceive.cs-81-		return false;
+Vintagestory.GameContent/TutorialStepReceive.cs-82-	}
+Vintagestory.GameContent/TutorialStepReceive.cs-83-}
+--
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-129-		addEatenByInfo(capi, itemstack, list, marginTop);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-130-		capi.World.FrameProfiler.Mark("handbook-CollectibleGetHandbookInfo-3d");
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-131-		addStorableInfo(capi, allStacks, openDetailPageFor, itemstack, list, marginTop);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-132-		addStoredInInfo(capi, allStacks, openDetailPageFor, itemstack, list, marginTop);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-133-		collObj.GetCollectibleInterface<ICustomHandbookPageContent>()?.OnHandbookPageComposed(list, inSlot, capi, allStacks, openDetailPageFor);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-134-		capi.World.FrameProfiler.Mark("handbook-CollectibleGetHandbookInfo-4");
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-135-		return list.ToArray();
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-136-	}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-137-
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-138-	protected void addGeneralInfo(ItemSlot inSlot, ICoreClientAPI capi, ItemStack stack, List<RichTextComponentBase> components, out float marginTop, out float marginBottom)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-139-	{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-140-		components.Add(new ItemstackTextComponent(capi, stack, 100.0, 10.0));
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs:141:		components.AddRange(VtmlUtil.Richtextify(capi, stack.GetName() + "\n", CairoFont.WhiteSmallishText()));
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-142-		if (capi.Settings.Bool["extendedDebugInfo"])
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-143-		{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-144-			CairoFont cairoFont = CairoFont.WhiteDetailText();
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-145-			cairoFont.Color[3] = 0.5;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs:146:			components.AddRange(VtmlUtil.Richtextify(capi, "Page code:" + GuiHandbookItemStackPage.PageCodeForStack(stack) + "\n", cairoFont));
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-147-		}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs:148:		components.AddRange(VtmlUtil.Richtextify(capi, stack.GetDescription(capi.World, inSlot), CairoFont.WhiteSmallText()));
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-149-		marginTop = 7f;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-150-		marginBottom = 3f;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-151-	}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-152-
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-153-	protected void addDropsInfo(ICoreClientAPI capi, ActionConsumable<string> openDetailPageFor, ItemStack stack, List<RichTextComponentBase> components, float marginTop, List<ItemStack> breakBlocks)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-154-	{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-155-		if (stack.Class != EnumItemClass.Block)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-156-		{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-157-			return;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-158-		}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-159-		Dictionary<int, List<ItemStack>> dictionary = new Dictionary<int, List<ItemStack>>();
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-160-		BlockDropItemStack[] dropsForHandbook = stack.Block.GetDropsForHandbook(stack, capi.World.Player);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-161-		int i;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-162-		if (dropsForHandbook != null)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-163-		{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-164-			BlockDropItemStack[] array = dropsForHandbook;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-165-			for (i = 0; i < array.Length; i++)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-166-			{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-167-				BlockDropItemStack blockDropItemStack = array[i];
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-168-				int key = (int)((!blockDropItemStack.Tool.HasValue) ? ((EnumTool)(-1)) : blockDropItemStack.Tool.Value);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-169-				if (dictionary.TryGetValue(key, out var value))
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-170-				{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-171-					value.Add(blockDropItemStack.ResolvedItemstack);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-172-					continue;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-173-				}
+--
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1846-		if (((list3.Count > 0 || list4.Count > 0 || (list10.Count > 0 && list6.Count > 0) || (list9.Count > 0 && list21.Count > 0) || list7.Count > 0 || list8.Count > 0) | flag) || text3 != null || list11.Count > 0 || list12.Count > 0 || list13.Count > 0 || list14.Count > 0 || (list22.Count > 0 && grindables.Count > 0) || dicti
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1847-		{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1848-			AddHeading(components, capi, "Created by", ref haveText);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1849-			ClearFloatTextComponent clearFloatTextComponent = new ClearFloatTextComponent(capi, 7f);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1850-			ClearFloatTextComponent item2 = new ClearFloatTextComponent(capi, 3f);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1851-			if (text3 != null)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1852-			{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1853-				components.Add(item2);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1854-				item2 = clearFloatTextComponent;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1855-				RichTextComponent richTextComponent = new RichTextComponent(capi, "• ", CairoFont.WhiteSmallText());
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1856-				richTextComponent.PaddingLeft = 2.0;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1857-				components.Add(richTextComponent);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs:1858:				components.AddRange(VtmlUtil.Richtextify(capi, Lang.Get(text3) + "\n", CairoFont.WhiteSmallText()));
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1859-			}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1860-			if (list10.Count > 0 && list6.Count > 0)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1861-			{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1862-				components.Add(item2);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1863-				item2 = clearFloatTextComponent;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1864-				AddSubHeading(components, capi, openDetailPageFor, "handbook-createdby-metalmolding", "craftinginfo-smelting");
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1865-				int num5 = 2;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1866-				while (list6.Count > 0)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1867-				{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1868-					ItemStack dstack = list6[0];
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1869-					list6.RemoveAt(0);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1870-					if (dstack != null)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1871-					{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1872-						ItemStack[] array4 = list10.Select((ItemStack moldable) =>
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1873-						{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1874-							ItemStack itemStack20 = moldable.Clone();
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1875-							itemStack20.StackSize = (dstack.ItemAttributes?["requiredUnits"].AsInt(100) ?? 100) / 5;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1876-							return itemStack20;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1877-						}).ToArray();
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1878-						ItemStack[] moldedOutput = getMoldedOutput(dstack, array4);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1879-						SlideshowItemstackTextComponent slideshowItemstackTextComponent = new SlideshowItemstackTextComponent(capi, array4, 40.0, EnumFloat.Inline, (ItemStack cs) =>
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1880-						{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1881-							openDetailPageFor(getPageCodeForStack(capi, cs));
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1882-						});
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-1883-						slideshowItemstackTextComponent.ShowStackSize = true;
+--
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2549-		{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2550-			bool haveText = true;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2551-			for (int i = 0; i < ExtraHandBookSections.Length; i++)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2552-			{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2553-				ExtraHandbookSection extraHandbookSection = ExtraHandBookSections[i];
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2554-				AddHeading(components, capi, extraHandbookSection.Title, ref haveText);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2555-				components.Add(new ClearFloatTextComponent(capi, 2f));
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2556-				RichTextComponent richTextComponent = new RichTextComponent(capi, "", CairoFont.WhiteSmallText());
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2557-				richTextComponent.PaddingLeft = 2.0;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2558-				components.Add(richTextComponent);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2559-				if (extraHandbookSection.TextParts != null)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2560-				{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs:2561:					components.AddRange(VtmlUtil.Richtextify(capi, string.Join(", ", extraHandbookSection.TextParts) + "\n", CairoFont.WhiteSmallText()));
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2562-				}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2563-				else
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2564-				{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs:2565:					components.AddRange(VtmlUtil.Richtextify(capi, Lang.Get(extraHandbookSection.Text) + "\n", CairoFont.WhiteSmallText()));
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2566-				}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2567-			}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2568-		}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2569-		string text = collObj.Code.Domain + ":" + stack.Class.Name();
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2570-		string text2 = collObj.Code.ToShortString();
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2571-		string matchingIfExists = Lang.GetMatchingIfExists(text + "-handbooktitle-" + text2);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2572-		string matchingIfExists2 = Lang.GetMatchingIfExists(text + "-handbooktext-" + text2);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2573-		if (matchingIfExists != null || matchingIfExists2 != null)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2574-		{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2575-			components.Add(new ClearFloatTextComponent(capi, 14f));
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2576-			if (matchingIfExists != null)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2577-			{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2578-				components.Add(new RichTextComponent(capi, matchingIfExists + "\n", CairoFont.WhiteSmallText().WithWeight(FontWeight.Bold)));
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2579-				components.Add(new ClearFloatTextComponent(capi, 2f));
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2580-			}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2581-			if (matchingIfExists2 != null)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2582-			{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2583-				RichTextComponent richTextComponent2 = new RichTextComponent(capi, "", CairoFont.WhiteSmallText());
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2584-				richTextComponent2.PaddingLeft = 2.0;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2585-				components.Add(richTextComponent2);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs:2586:				components.AddRange(VtmlUtil.Richtextify(capi, matchingIfExists2 + "\n", CairoFont.WhiteSmallText()));
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2587-			}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2588-		}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2589-	}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2590-
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2591-	protected List<RichTextComponentBase> BuildBarrelRecipesText(ICoreClientAPI capi, ItemStack stack, ActionConsumable<string> openDetailPageFor)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2592-	{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2593-		List<RichTextComponentBase> list = new List<RichTextComponentBase>();
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2594-		List<BarrelRecipe> barrelRecipes = capi.GetBarrelRecipes();
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2595-		if (barrelRecipes.Count == 0)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2596-		{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2597-			return list;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2598-		}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2599-		Dictionary<string, List<BarrelRecipe>> dictionary = new Dictionary<string, List<BarrelRecipe>>();
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2600-		foreach (BarrelRecipe item in barrelRecipes)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2601-		{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2602-			ItemStack resolvedItemStack = item.RecipeOutput.ResolvedItemStack;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2603-			if (resolvedItemStack != null && resolvedItemStack.Equals(capi.World, stack, GlobalConstants.IgnoredStackAttributes))
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2604-			{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2605-				string key = item.Code + "-ing" + item.Ingredients.Length + "-quant" + resolvedItemStack.StackSize + "-hash" + resolvedItemStack.GetHashCode(GlobalConstants.IgnoredStackAttributes);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2606-				if (!dictionary.TryGetValue(key, out var value))
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2607-				{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2608-					value = (dictionary[key] = new List<BarrelRecipe>());
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2609-				}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2610-				value.Add(item);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2611-			}
+--
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2746-			ClearFloatTextComponent item = new ClearFloatTextComponent(capi, 3f);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2747-			bool haveText = components.Count > 0;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2748-			components.Add(item);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2749-			item = clearFloatTextComponent;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2750-			AddHeading(components, capi, "Storable in/on", ref haveText);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2751-			if (flag)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2752-			{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2753-				components.Add(item);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2754-				item = clearFloatTextComponent;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2755-				RichTextComponent richTextComponent = new RichTextComponent(capi, "", CairoFont.WhiteSmallText());
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2756-				richTextComponent.PaddingLeft = 2.0;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2757-				components.Add(richTextComponent);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs:2758:				components.AddRange(VtmlUtil.Richtextify(capi, Lang.Get("handbook-storable-ground") + "\n", CairoFont.WhiteSmallText()));
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2759-			}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2760-			if (list3.Count > 0)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2761-			{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2762-				components.Add(item);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2763-				item = clearFloatTextComponent;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2764-				AddSubHeading(components, capi, openDetailPageFor, "handbook-storable-displaycontainers", null);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2765-				AddSlideShowComponent(components, capi, list3, openDetailPageFor, showStackSize: false);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2766-				components.Add(new RichTextComponent(capi, "\n", CairoFont.WhiteSmallText()));
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2767-			}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2768-			if (list2.Count > 0)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2769-			{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2770-				components.Add(item);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2771-				item = clearFloatTextComponent;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2772-				AddSubHeading(components, capi, openDetailPageFor, "handbook-storable-liquidcontainers", null);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2773-				AddSlideShowComponent(components, capi, list2, openDetailPageFor, showStackSize: false);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2774-				components.Add(new RichTextComponent(capi, "\n", CairoFont.WhiteSmallText()));
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2775-			}
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2776-			if (list.Count > 0)
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2777-			{
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2778-				components.Add(item);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2779-				item = clearFloatTextComponent;
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2780-				AddSubHeading(components, capi, openDetailPageFor, "handbook-storable-foodcontainers", null);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2781-				AddSlideShowComponent(components, capi, list, openDetailPageFor, showStackSize: false);
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2782-				components.Add(new RichTextComponent(capi, "\n", CairoFont.WhiteSmallText()));
+Vintagestory.GameContent/CollectibleBehaviorHandbookTextAndExtraInfo.cs-2783-			}
+--
+Vintagestory.GameContent/GuiHandbookTextPage.cs-32-	public override void Dispose()
+Vintagestory.GameContent/GuiHandbookTextPage.cs-33-	{
+Vintagestory.GameContent/GuiHandbookTextPage.cs-34-		Texture?.Dispose();
+Vintagestory.GameContent/GuiHandbookTextPage.cs-35-		Texture = null;
+Vintagestory.GameContent/GuiHandbookTextPage.cs-36-	}
+Vintagestory.GameContent/GuiHandbookTextPage.cs-37-
+Vintagestory.GameContent/GuiHandbookTextPage.cs-38-	public void Init(ICoreClientAPI capi)
+Vintagestory.GameContent/GuiHandbookTextPage.cs-39-	{
+Vintagestory.GameContent/GuiHandbookTextPage.cs-40-		if (Text.Length < 255)
+Vintagestory.GameContent/GuiHandbookTextPage.cs-41-		{
+Vintagestory.GameContent/GuiHandbookTextPage.cs-42-			Text = Lang.Get(Text);
+Vintagestory.GameContent/GuiHandbookTextPage.cs-43-		}
+Vintagestory.GameContent/GuiHandbookTextPage.cs:44:		comps = VtmlUtil.Richtextify(capi, Text, CairoFont.WhiteSmallText().WithLineHeightMultiplier(1.2));
+Vintagestory.GameContent/GuiHandbookTextPage.cs-45-		titleCached = Lang.Get(Title).ToSearchFriendly();
+Vintagestory.GameContent/GuiHandbookTextPage.cs-46-	}
+Vintagestory.GameContent/GuiHandbookTextPage.cs-47-
+Vintagestory.GameContent/GuiHandbookTextPage.cs-48-	public override void ComposePage(GuiComposer detailViewGui, ElementBounds textBounds, ItemStack[] allstacks, ActionConsumable<string> openDetailPageFor)
+Vintagestory.GameContent/GuiHandbookTextPage.cs-49-	{
+Vintagestory.GameContent/GuiHandbookTextPage.cs-50-		detailViewGui.AddRichtext(comps, textBounds, "richtext");
+Vintagestory.GameContent/GuiHandbookTextPage.cs-51-	}
+Vintagestory.GameContent/GuiHandbookTextPage.cs-52-
+Vintagestory.GameContent/GuiHandbookTextPage.cs-53-	public void Recompose(ICoreClientAPI capi)
+Vintagestory.GameContent/GuiHandbookTextPage.cs-54-	{
+Vintagestory.GameContent/GuiHandbookTextPage.cs-55-		Texture?.Dispose();
+Vintagestory.GameContent/GuiHandbookTextPage.cs-56-		Texture = new TextTextureUtil(capi).GenTextTexture(Lang.Get(Title), CairoFont.WhiteSmallText());
+Vintagestory.GameContent/GuiHandbookTextPage.cs-57-	}
+Vintagestory.GameContent/GuiHandbookTextPage.cs-58-
+Vintagestory.GameContent/GuiHandbookTextPage.cs-59-	public override PageText GetPageText()
+Vintagestory.GameContent/GuiHandbookTextPage.cs-60-	{
+Vintagestory.GameContent/GuiHandbookTextPage.cs-61-		return new PageText
+Vintagestory.GameContent/GuiHandbookTextPage.cs-62-		{
+Vintagestory.GameContent/GuiHandbookTextPage.cs-63-			Title = titleCached,
+Vintagestory.GameContent/GuiHandbookTextPage.cs-64-			Text = Text
+Vintagestory.GameContent/GuiHandbookTextPage.cs-65-		};
+Vintagestory.GameContent/GuiHandbookTextPage.cs-66-	}
+Vintagestory.GameContent/GuiHandbookTextPage.cs-67-
+Vintagestory.GameContent/GuiHandbookTextPage.cs-68-	public override void RenderListEntryTo(ICoreClientAPI capi, float dt, double x, double y, double cellWidth, double cellHeight)
+Vintagestory.GameContent/GuiHandbookTextPage.cs-69-	{
+--
+Vintagestory.GameContent/ModSystemTutorial.cs-315-			tutorial = Tutorials[pagecode.Substring("tutorial-".Length)];
+Vintagestory.GameContent/ModSystemTutorial.cs-316-		}
+Vintagestory.GameContent/ModSystemTutorial.cs-317-		List<TutorialStepBase> tutorialSteps = tutorial.GetTutorialSteps(skipOld);
+Vintagestory.GameContent/ModSystemTutorial.cs-318-		tutorialSteps.Reverse();
+Vintagestory.GameContent/ModSystemTutorial.cs-319-		foreach (TutorialStepBase item in tutorialSteps)
+Vintagestory.GameContent/ModSystemTutorial.cs-320-		{
+Vintagestory.GameContent/ModSystemTutorial.cs-321-			cairoFont = cairoFont.Clone();
+Vintagestory.GameContent/ModSystemTutorial.cs-322-			cairoFont.Color[3] = (item.Complete ? 0.7 : 1.0);
+Vintagestory.GameContent/ModSystemTutorial.cs-323-			cairoFont.WithFontSize(item.Complete ? 15 : 18);
+Vintagestory.GameContent/ModSystemTutorial.cs-324-			RichTextComponentBase[] text = item.GetText(cairoFont);
+Vintagestory.GameContent/ModSystemTutorial.cs-325-			if (item.Complete)
+Vintagestory.GameContent/ModSystemTutorial.cs-326-			{
+Vintagestory.GameContent/ModSystemTutorial.cs:327:				list.AddRange(VtmlUtil.Richtextify(capi, "<font color=\"green\"><icon path=\"icons/checkmark.svg\"></icon></font>", cairoFont));
+Vintagestory.GameContent/ModSystemTutorial.cs-328-				RichTextComponentBase[] array = text;
+Vintagestory.GameContent/ModSystemTutorial.cs-329-				for (int i = 0; i < array.Length; i++)
+Vintagestory.GameContent/ModSystemTutorial.cs-330-				{
+Vintagestory.GameContent/ModSystemTutorial.cs-331-					if (array[i] is LinkTextComponent linkTextComponent)
+Vintagestory.GameContent/ModSystemTutorial.cs-332-					{
+Vintagestory.GameContent/ModSystemTutorial.cs-333-						linkTextComponent.Clickable = false;
+Vintagestory.GameContent/ModSystemTutorial.cs-334-					}
+Vintagestory.GameContent/ModSystemTutorial.cs-335-				}
+Vintagestory.GameContent/ModSystemTutorial.cs-336-			}
+Vintagestory.GameContent/ModSystemTutorial.cs-337-			list.AddRange(text);
+Vintagestory.GameContent/ModSystemTutorial.cs-338-			list.Add(new RichTextComponent(capi, "\n", cairoFont));
+Vintagestory.GameContent/ModSystemTutorial.cs-339-		}
+Vintagestory.GameContent/ModSystemTutorial.cs-340-		return list.ToArray();
+Vintagestory.GameContent/ModSystemTutorial.cs-341-	}
+Vintagestory.GameContent/ModSystemTutorial.cs-342-}
+--
+Vintagestory.GameContent/TutorialStepGeneric.cs-14-
+Vintagestory.GameContent/TutorialStepGeneric.cs-15-	public override bool Complete => watcher.MilestoneReached();
+Vintagestory.GameContent/TutorialStepGeneric.cs-16-
+Vintagestory.GameContent/TutorialStepGeneric.cs-17-	protected TutorialStepGeneric(ICoreClientAPI capi, string text)
+Vintagestory.GameContent/TutorialStepGeneric.cs-18-	{
+Vintagestory.GameContent/TutorialStepGeneric.cs-19-		this.capi = capi;
+Vintagestory.GameContent/TutorialStepGeneric.cs-20-		base.text = text;
+Vintagestory.GameContent/TutorialStepGeneric.cs-21-	}
+Vintagestory.GameContent/TutorialStepGeneric.cs-22-
+Vintagestory.GameContent/TutorialStepGeneric.cs-23-	public override RichTextComponentBase[] GetText(CairoFont font)
+Vintagestory.GameContent/TutorialStepGeneric.cs-24-	{
+Vintagestory.GameContent/TutorialStepGeneric.cs-25-		string vtmlCode = Lang.Get(text, (watcher.QuantityAchieved >= watcher.QuantityGoal) ? watcher.QuantityGoal : (watcher.QuantityGoal - watcher.QuantityAchieved));
+Vintagestory.GameContent/TutorialStepGeneric.cs:26:		return VtmlUtil.Richtextify(capi, vtmlCode, font);
+Vintagestory.GameContent/TutorialStepGeneric.cs-27-	}
+Vintagestory.GameContent/TutorialStepGeneric.cs-28-
+Vintagestory.GameContent/TutorialStepGeneric.cs-29-	public override void Restart()
+Vintagestory.GameContent/TutorialStepGeneric.cs-30-	{
+Vintagestory.GameContent/TutorialStepGeneric.cs-31-		watcher.Restart();
+Vintagestory.GameContent/TutorialStepGeneric.cs-32-	}
+Vintagestory.GameContent/TutorialStepGeneric.cs-33-
+Vintagestory.GameContent/TutorialStepGeneric.cs-34-	public override void Skip()
+Vintagestory.GameContent/TutorialStepGeneric.cs-35-	{
+Vintagestory.GameContent/TutorialStepGeneric.cs-36-		watcher.Skip();
+Vintagestory.GameContent/TutorialStepGeneric.cs-37-	}
+Vintagestory.GameContent/TutorialStepGeneric.cs-38-
+Vintagestory.GameContent/TutorialStepGeneric.cs-39-	public override void FromJson(JsonObject job)
+Vintagestory.GameContent/TutorialStepGeneric.cs-40-	{
+Vintagestory.GameContent/TutorialStepGeneric.cs-41-		watcher.FromJson(job[code]);
+Vintagestory.GameContent/TutorialStepGeneric.cs-42-	}
+Vintagestory.GameContent/TutorialStepGeneric.cs-43-
+Vintagestory.GameContent/TutorialStepGeneric.cs-44-	public override void ToJson(JsonObject job)
+Vintagestory.GameContent/TutorialStepGeneric.cs-45-	{
+Vintagestory.GameContent/TutorialStepGeneric.cs-46-		JObject jObject = new JObject();
+Vintagestory.GameContent/TutorialStepGeneric.cs-47-		watcher.ToJson(new JsonObject(jObject));
+Vintagestory.GameContent/TutorialStepGeneric.cs-48-		if (jObject.Count > 0)
+Vintagestory.GameContent/TutorialStepGeneric.cs-49-		{
+Vintagestory.GameContent/TutorialStepGeneric.cs-50-			job.Token[code] = jObject;
+Vintagestory.GameContent/TutorialStepGeneric.cs-51-		}
+--
+Vintagestory.GameContent/TutorialStepPressHotkeys.cs-90-				list.Add("<hk>" + item + "</hk>");
+Vintagestory.GameContent/TutorialStepPressHotkeys.cs-91-			}
+Vintagestory.GameContent/TutorialStepPressHotkeys.cs-92-		}
+Vintagestory.GameContent/TutorialStepPressHotkeys.cs-93-		object[] array = new object[2]
+Vintagestory.GameContent/TutorialStepPressHotkeys.cs-94-		{
+Vintagestory.GameContent/TutorialStepPressHotkeys.cs-95-			index + 1,
+Vintagestory.GameContent/TutorialStepPressHotkeys.cs-96-			null
+Vintagestory.GameContent/TutorialStepPressHotkeys.cs-97-		};
+Vintagestory.GameContent/TutorialStepPressHotkeys.cs-98-		string key = text;
+Vintagestory.GameContent/TutorialStepPressHotkeys.cs-99-		object[] args = list.ToArray();
+Vintagestory.GameContent/TutorialStepPressHotkeys.cs-100-		array[1] = Lang.Get(key, args);
+Vintagestory.GameContent/TutorialStepPressHotkeys.cs-101-		string vtmlCode = Lang.Get("tutorialstep-numbered", array);
+Vintagestory.GameContent/TutorialStepPressHotkeys.cs:102:		return VtmlUtil.Richtextify(capi, vtmlCode, font);
+Vintagestory.GameContent/TutorialStepPressHotkeys.cs-103-	}
+Vintagestory.GameContent/TutorialStepPressHotkeys.cs-104-
+Vintagestory.GameContent/TutorialStepPressHotkeys.cs-105-	public override void Restart()
+Vintagestory.GameContent/TutorialStepPressHotkeys.cs-106-	{
+Vintagestory.GameContent/TutorialStepPressHotkeys.cs-107-		hotkeysPressed.Clear();
+Vintagestory.GameContent/TutorialStepPressHotkeys.cs-108-		deferredActionTrigger = EnumEntityAction.None;
+Vintagestory.GameContent/TutorialStepPressHotkeys.cs-109-		deferredActionPreReq = EnumEntityAction.None;
+Vintagestory.GameContent/TutorialStepPressHotkeys.cs-110-	}
+Vintagestory.GameContent/TutorialStepPressHotkeys.cs-111-
+Vintagestory.GameContent/TutorialStepPressHotkeys.cs-112-	public override void Skip()
+Vintagestory.GameContent/TutorialStepPressHotkeys.cs-113-	{
+Vintagestory.GameContent/TutorialStepPressHotkeys.cs-114-		foreach (string item in hotkeysToPress)
+Vintagestory.GameContent/TutorialStepPressHotkeys.cs-115-		{
+Vintagestory.GameContent/TutorialStepPressHotkeys.cs-116-			hotkeysPressed.Add(item);
+Vintagestory.GameContent/TutorialStepPressHotkeys.cs-117-		}
+Vintagestory.GameContent/TutorialStepPressHotkeys.cs-118-	}
+Vintagestory.GameContent/TutorialStepPressHotkeys.cs-119-
+Vintagestory.GameContent/TutorialStepPressHotkeys.cs-120-	public override bool OnHotkeyPressed(string hotkeycode, KeyCombination keyComb)
+Vintagestory.GameContent/TutorialStepPressHotkeys.cs-121-	{
+Vintagestory.GameContent/TutorialStepPressHotkeys.cs-122-		if (hotkeysToPress.Contains(hotkeycode) && !hotkeysPressed.Contains(hotkeycode))
+Vintagestory.GameContent/TutorialStepPressHotkeys.cs-123-		{
+Vintagestory.GameContent/TutorialStepPressHotkeys.cs-124-			hotkeysPressed.Add(hotkeycode);
+Vintagestory.GameContent/TutorialStepPressHotkeys.cs-125-			return true;
+Vintagestory.GameContent/TutorialStepPressHotkeys.cs-126-		}
+Vintagestory.GameContent/TutorialStepPressHotkeys.cs-127-		return false;
+--
+Vintagestory.GameContent/GuiDialogJournal.cs-52-		CairoFont hoverFont = CairoFont.WhiteSmallText().Clone().WithColor(GuiStyle.ActiveButtonTextColor);
+Vintagestory.GameContent/GuiDialogJournal.cs-53-		for (int i = 0; i < journalitems.Count; i++)
+Vintagestory.GameContent/GuiDialogJournal.cs-54-		{
+Vintagestory.GameContent/GuiDialogJournal.cs-55-			int page = i;
+Vintagestory.GameContent/GuiDialogJournal.cs-56-			GuiElementTextButton guiElementTextButton = new GuiElementTextButton(capi, Lang.Get(journalitems[i].Title), CairoFont.WhiteSmallText(), hoverFont, () => onClickItem(page), elementBounds, EnumButtonStyle.Small);
+Vintagestory.GameContent/GuiDialogJournal.cs-57-			guiElementTextButton.SetOrientation(EnumTextOrientation.Left);
+Vintagestory.GameContent/GuiDialogJournal.cs-58-			container.Add(guiElementTextButton);
+Vintagestory.GameContent/GuiDialogJournal.cs-59-			elementBounds = elementBounds.BelowCopy();
+Vintagestory.GameContent/GuiDialogJournal.cs-60-		}
+Vintagestory.GameContent/GuiDialogJournal.cs-61-		if (journalitems.Count == 0)
+Vintagestory.GameContent/GuiDialogJournal.cs-62-		{
+Vintagestory.GameContent/GuiDialogJournal.cs-63-			string vtmlCode = "<i>" + Lang.Get("No lore found. Collect lore in the world to fill this list!.") + "</i>";
+Vintagestory.GameContent/GuiDialogJournal.cs:64:			container.Add(new GuiElementRichtext(capi, VtmlUtil.Richtextify(capi, vtmlCode, CairoFont.WhiteSmallText()), elementBounds));
+Vintagestory.GameContent/GuiDialogJournal.cs-65-		}
+Vintagestory.GameContent/GuiDialogJournal.cs-66-		Composers["loreList"].EndClip().AddVerticalScrollbar(OnNewScrollbarvalue, elementBounds5, "scrollbar").EndChildElements()
+Vintagestory.GameContent/GuiDialogJournal.cs-67-			.Compose();
+Vintagestory.GameContent/GuiDialogJournal.cs-68-		containerBounds.CalcWorldBounds();
+Vintagestory.GameContent/GuiDialogJournal.cs-69-		elementBounds3.CalcWorldBounds();
+Vintagestory.GameContent/GuiDialogJournal.cs-70-		Composers["loreList"].GetScrollbar("scrollbar").SetHeights((float)elementBounds3.fixedHeight, (float)containerBounds.fixedHeight);
+Vintagestory.GameContent/GuiDialogJournal.cs-71-	}
+Vintagestory.GameContent/GuiDialogJournal.cs-72-
+Vintagestory.GameContent/GuiDialogJournal.cs-73-	private bool onClickItem(int page)
+Vintagestory.GameContent/GuiDialogJournal.cs-74-	{
+Vintagestory.GameContent/GuiDialogJournal.cs-75-		currentLoreItemIndex = page;
+Vintagestory.GameContent/GuiDialogJournal.cs-76-		this.page = 0;
+Vintagestory.GameContent/GuiDialogJournal.cs-77-		CairoFont cairoFont = CairoFont.WhiteDetailText().WithFontSize(17f).WithLineHeightMultiplier(1.149999976158142);
+Vintagestory.GameContent/GuiDialogJournal.cs-78-		new TextDrawUtil();
+Vintagestory.GameContent/GuiDialogJournal.cs-79-		StringBuilder stringBuilder = new StringBuilder();
+Vintagestory.GameContent/GuiDialogJournal.cs-80-		JournalEntry journalEntry = journalitems[currentLoreItemIndex];
+Vintagestory.GameContent/GuiDialogJournal.cs-81-		for (int i = 0; i < journalEntry.Chapters.Count; i++)
+Vintagestory.GameContent/GuiDialogJournal.cs-82-		{
+Vintagestory.GameContent/GuiDialogJournal.cs-83-			if (i > 0)
+Vintagestory.GameContent/GuiDialogJournal.cs-84-			{
+Vintagestory.GameContent/GuiDialogJournal.cs-85-				stringBuilder.AppendLine();
+Vintagestory.GameContent/GuiDialogJournal.cs-86-				stringBuilder.AppendLine();
+Vintagestory.GameContent/GuiDialogJournal.cs-87-				stringBuilder.AppendLine();
+Vintagestory.GameContent/GuiDialogJournal.cs-88-			}
+Vintagestory.GameContent/GuiDialogJournal.cs-89-			stringBuilder.Append(Lang.Get(journalEntry.Chapters[i].Text));
+--
+Vintagestory.GameContent/AuctionCellEntry.cs-54-	{
+Vintagestory.GameContent/AuctionCellEntry.cs-55-		iconSize = (float)GuiElement.scaled(unscaledIconSize);
+Vintagestory.GameContent/AuctionCellEntry.cs-56-		dummySlot = new DummySlot(auction.ItemStack, inventoryAuction);
+Vintagestory.GameContent/AuctionCellEntry.cs-57-		this.onClick = onClick;
+Vintagestory.GameContent/AuctionCellEntry.cs-58-		this.auction = auction;
+Vintagestory.GameContent/AuctionCellEntry.cs-59-		CairoFont cairoFont = CairoFont.WhiteDetailText();
+Vintagestory.GameContent/AuctionCellEntry.cs-60-		double fixedY = (unScaledCellHeight - cairoFont.UnscaledFontsize) / 2.0;
+Vintagestory.GameContent/AuctionCellEntry.cs-61-		scissorBounds = ElementBounds.FixedSize(unscaledIconSize, unscaledIconSize).WithParent(Bounds);
+Vintagestory.GameContent/AuctionCellEntry.cs-62-		ElementBounds elementBounds = ElementBounds.Fixed(0.0, fixedY, 270.0, 25.0).WithParent(Bounds).FixedRightOf(scissorBounds);
+Vintagestory.GameContent/AuctionCellEntry.cs-63-		ElementBounds elementBounds2 = ElementBounds.Fixed(0.0, fixedY, 85.0, 25.0).WithParent(Bounds).FixedRightOf(elementBounds);
+Vintagestory.GameContent/AuctionCellEntry.cs-64-		ElementBounds elementBounds3 = ElementBounds.Fixed(0.0, 0.0, 200.0, 25.0).WithParent(Bounds).FixedRightOf(elementBounds2);
+Vintagestory.GameContent/AuctionCellEntry.cs-65-		ElementBounds bounds2 = ElementBounds.Fixed(0.0, fixedY, 155.0, 25.0).WithParent(Bounds).FixedRightOf(elementBounds3);
+Vintagestory.GameContent/AuctionCellEntry.cs:66:		stackNameTextElem = new GuiElementRichtext(capi, VtmlUtil.Richtextify(capi, dummySlot.Itemstack.GetName(), cairoFont), elementBounds);
+Vintagestory.GameContent/AuctionCellEntry.cs-67-		double unscaledFontsize = cairoFont.UnscaledFontsize;
+Vintagestory.GameContent/AuctionCellEntry.cs-68-		ItemStack singleCurrencyStack = capi.ModLoader.GetModSystem<ModSystemAuction>().SingleCurrencyStack;
+Vintagestory.GameContent/AuctionCellEntry.cs-69-		RichTextComponentBase[] components = new RichTextComponentBase[2]
+Vintagestory.GameContent/AuctionCellEntry.cs-70-		{
+Vintagestory.GameContent/AuctionCellEntry.cs-71-			new RichTextComponent(capi, auction.Price.ToString() ?? "", cairoFont)
+Vintagestory.GameContent/AuctionCellEntry.cs-72-			{
+Vintagestory.GameContent/AuctionCellEntry.cs-73-				PaddingRight = 10.0,
+Vintagestory.GameContent/AuctionCellEntry.cs-74-				VerticalAlign = EnumVerticalAlign.Top
+Vintagestory.GameContent/AuctionCellEntry.cs-75-			},
+Vintagestory.GameContent/AuctionCellEntry.cs-76-			new ItemstackTextComponent(capi, singleCurrencyStack, unscaledFontsize * 2.5, 0.0, EnumFloat.Inline)
+Vintagestory.GameContent/AuctionCellEntry.cs-77-			{
+Vintagestory.GameContent/AuctionCellEntry.cs-78-				VerticalAlign = EnumVerticalAlign.Top,
+Vintagestory.GameContent/AuctionCellEntry.cs-79-				offX = 0.0 - GuiElement.scaled(unscaledFontsize * 0.5),
+Vintagestory.GameContent/AuctionCellEntry.cs-80-				offY = 0.0 - GuiElement.scaled(unscaledFontsize * 0.75)
+Vintagestory.GameContent/AuctionCellEntry.cs-81-			}
+Vintagestory.GameContent/AuctionCellEntry.cs-82-		};
+Vintagestory.GameContent/AuctionCellEntry.cs-83-		priceTextElem = new GuiElementRichtext(capi, components, elementBounds2);
+Vintagestory.GameContent/AuctionCellEntry.cs:84:		expireTextElem = new GuiElementRichtext(capi, VtmlUtil.Richtextify(capi, prevExpireText = auction.GetExpireText(capi), cairoFont.Clone().WithFontSize(14f)), elementBounds3);
+Vintagestory.GameContent/AuctionCellEntry.cs-85-		expireTextElem.BeforeCalcBounds();
+Vintagestory.GameContent/AuctionCellEntry.cs-86-		elementBounds3.fixedY = 5.0 + (25.0 - expireTextElem.TotalHeight / (double)RuntimeEnv.GUIScale) / 2.0;
+Vintagestory.GameContent/AuctionCellEntry.cs:87:		sellerTextElem = new GuiElementRichtext(capi, VtmlUtil.Richtextify(capi, auction.SellerName, cairoFont.Clone().WithOrientation(EnumTextOrientation.Right)), bounds2);
+Vintagestory.GameContent/AuctionCellEntry.cs-88-		hoverTexture = new LoadedTexture(capi);
+Vintagestory.GameContent/AuctionCellEntry.cs-89-	}
+Vintagestory.GameContent/AuctionCellEntry.cs-90-
+Vintagestory.GameContent/AuctionCellEntry.cs-91-	public void Recompose()
+Vintagestory.GameContent/AuctionCellEntry.cs-92-	{
+Vintagestory.GameContent/AuctionCellEntry.cs-93-		composed = true;
+Vintagestory.GameContent/AuctionCellEntry.cs-94-		stackNameTextElem.Compose();
+Vintagestory.GameContent/AuctionCellEntry.cs-95-		priceTextElem.Compose();
+Vintagestory.GameContent/AuctionCellEntry.cs-96-		expireTextElem.Compose();
+Vintagestory.GameContent/AuctionCellEntry.cs-97-		sellerTextElem.Compose();
+Vintagestory.GameContent/AuctionCellEntry.cs-98-		ImageSurface imageSurface = new ImageSurface(Format.Argb32, 2, 2);
+Vintagestory.GameContent/AuctionCellEntry.cs-99-		Context context = genContext(imageSurface);
+Vintagestory.GameContent/AuctionCellEntry.cs-100-		context.NewPath();
+Vintagestory.GameContent/AuctionCellEntry.cs-101-		context.LineTo(0.0, 0.0);
+Vintagestory.GameContent/AuctionCellEntry.cs-102-		context.LineTo(2.0, 0.0);
+Vintagestory.GameContent/AuctionCellEntry.cs-103-		context.LineTo(2.0, 2.0);
+Vintagestory.GameContent/AuctionCellEntry.cs-104-		context.LineTo(0.0, 2.0);
+Vintagestory.GameContent/AuctionCellEntry.cs-105-		context.ClosePath();
+Vintagestory.GameContent/AuctionCellEntry.cs-106-		context.SetSourceRGBA(0.0, 0.0, 0.0, 0.15);
+Vintagestory.GameContent/AuctionCellEntry.cs-107-		context.Fill();
+Vintagestory.GameContent/AuctionCellEntry.cs-108-		generateTexture(imageSurface, ref hoverTexture);
+Vintagestory.GameContent/AuctionCellEntry.cs-109-		context.Dispose();
+Vintagestory.GameContent/AuctionCellEntry.cs-110-		imageSurface.Dispose();
+Vintagestory.GameContent/AuctionCellEntry.cs-111-	}
+Vintagestory.GameContent/AuctionCellEntry.cs-112-
+Vintagestory.GameContent/AuctionCellEntry.cs-113-	public void OnRenderInteractiveElements(ICoreClientAPI api, float deltaTime)
+Vintagestory.GameContent/AuctionCellEntry.cs-114-	{
+Vintagestory.GameContent/AuctionCellEntry.cs-115-		if (!composed)
+Vintagestory.GameContent/AuctionCellEntry.cs-116-		{
+Vintagestory.GameContent/AuctionCellEntry.cs-117-			Recompose();
+Vintagestory.GameContent/AuctionCellEntry.cs-118-		}
+Vintagestory.GameContent/AuctionCellEntry.cs-119-		accum1Sec += deltaTime;
+Vintagestory.GameContent/AuctionCellEntry.cs-120-		if (accum1Sec > 1f)
+Vintagestory.GameContent/AuctionCellEntry.cs-121-		{
+Vintagestory.GameContent/AuctionCellEntry.cs-122-			string expireText = auction.GetExpireText(api);
+Vintagestory.GameContent/AuctionCellEntry.cs-123-			if (expireText != prevExpireText)
+Vintagestory.GameContent/AuctionCellEntry.cs-124-			{
+Vintagestory.GameContent/AuctionCellEntry.cs:125:				expireTextElem.Components = VtmlUtil.Richtextify(api, expireText, CairoFont.WhiteDetailText().WithFontSize(14f));
+Vintagestory.GameContent/AuctionCellEntry.cs-126-				expireTextElem.RecomposeText();
+Vintagestory.GameContent/AuctionCellEntry.cs-127-				prevExpireText = expireText;
+Vintagestory.GameContent/AuctionCellEntry.cs-128-			}
+Vintagestory.GameContent/AuctionCellEntry.cs-129-		}
+Vintagestory.GameContent/AuctionCellEntry.cs-130-		if (scissorBounds.InnerWidth <= 0.0 || scissorBounds.InnerHeight <= 0.0)
+Vintagestory.GameContent/AuctionCellEntry.cs-131-		{
+Vintagestory.GameContent/AuctionCellEntry.cs-132-			return;
+Vintagestory.GameContent/AuctionCellEntry.cs-133-		}
+Vintagestory.GameContent/AuctionCellEntry.cs-134-		api.Render.PushScissor(scissorBounds, stacking: true);
+Vintagestory.GameContent/AuctionCellEntry.cs-135-		api.Render.RenderItemstackToGui(dummySlot, scissorBounds.renderX + (double)(iconSize / 2f), scissorBounds.renderY + (double)(iconSize / 2f), 100.0, iconSize * 0.55f, -1);
+Vintagestory.GameContent/AuctionCellEntry.cs-136-		api.Render.PopScissor();
+Vintagestory.GameContent/AuctionCellEntry.cs-137-		api.Render.Render2DTexturePremultipliedAlpha(hoverTexture.TextureId, scissorBounds.renderX, scissorBounds.renderY, scissorBounds.OuterWidth, scissorBounds.OuterHeight);
+Vintagestory.GameContent/AuctionCellEntry.cs-138-		stackNameTextElem.RenderInteractiveElements(deltaTime);
+Vintagestory.GameContent/AuctionCellEntry.cs-139-		priceTextElem.RenderInteractiveElements(deltaTime);
+Vintagestory.GameContent/AuctionCellEntry.cs-140-		expireTextElem.RenderInteractiveElements(deltaTime);
+Vintagestory.GameContent/AuctionCellEntry.cs-141-		MouseOverCursor = expireTextElem.MouseOverCursor;
+Vintagestory.GameContent/AuctionCellEntry.cs-142-		sellerTextElem.RenderInteractiveElements(deltaTime);
+Vintagestory.GameContent/AuctionCellEntry.cs-143-		int mouseX = api.Input.MouseX;
+Vintagestory.GameContent/AuctionCellEntry.cs-144-		int mouseY = api.Input.MouseY;
+Vintagestory.GameContent/AuctionCellEntry.cs-145-		Vec2d vec2d = Bounds.PositionInside(mouseX, mouseY);
+Vintagestory.GameContent/AuctionCellEntry.cs-146-		if (Selected || (vec2d != null && IsPositionInside(api.Input.MouseX, api.Input.MouseY)))
+Vintagestory.GameContent/AuctionCellEntry.cs-147-		{
+Vintagestory.GameContent/AuctionCellEntry.cs-148-			api.Render.Render2DTexturePremultipliedAlpha(hoverTexture.TextureId, Bounds.absX, Bounds.absY, Bounds.OuterWidth, Bounds.OuterHeight);
+Vintagestory.GameContent/AuctionCellEntry.cs-149-			if (Selected)
+Vintagestory.GameContent/AuctionCellEntry.cs-150-			{
