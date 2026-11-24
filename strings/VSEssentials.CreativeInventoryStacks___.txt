@@ -1,0 +1,59 @@
+Vintagestory.ServerMods.NoObf/BlockType.cs-378-		block.RandomizeRotations = RandomizeRotations;
+Vintagestory.ServerMods.NoObf/BlockType.cs-379-		block.RandomizeAxes = RandomizeAxes;
+Vintagestory.ServerMods.NoObf/BlockType.cs-380-		block.RandomSizeAdjust = RandomSizeAdjust;
+Vintagestory.ServerMods.NoObf/BlockType.cs-381-		block.CombustibleProps = CombustibleProps;
+Vintagestory.ServerMods.NoObf/BlockType.cs-382-		block.StorageFlags = (EnumItemStorageFlags)StorageFlags;
+Vintagestory.ServerMods.NoObf/BlockType.cs-383-		block.RenderAlphaTest = RenderAlphaTest;
+Vintagestory.ServerMods.NoObf/BlockType.cs-384-		block.HeldTpHitAnimation = HeldTpHitAnimation;
+Vintagestory.ServerMods.NoObf/BlockType.cs-385-		block.HeldRightTpIdleAnimation = HeldRightTpIdleAnimation;
+Vintagestory.ServerMods.NoObf/BlockType.cs-386-		block.HeldLeftTpIdleAnimation = HeldLeftTpIdleAnimation;
+Vintagestory.ServerMods.NoObf/BlockType.cs-387-		block.HeldLeftReadyAnimation = HeldLeftReadyAnimation;
+Vintagestory.ServerMods.NoObf/BlockType.cs-388-		block.HeldRightReadyAnimation = HeldRightReadyAnimation;
+Vintagestory.ServerMods.NoObf/BlockType.cs-389-		block.HeldTpUseAnimation = HeldTpUseAnimation;
+Vintagestory.ServerMods.NoObf/BlockType.cs:390:		block.CreativeInventoryStacks = ((CreativeInventoryStacks == null) ? null : ((CreativeTabAndStackList[])CreativeInventoryStacks.Clone()));
+Vintagestory.ServerMods.NoObf/BlockType.cs-391-		block.AllowSpawnCreatureGroups = AllowSpawnCreatureGroups;
+Vintagestory.ServerMods.NoObf/BlockType.cs-392-		block.AllCreaturesAllowed = AllowSpawnCreatureGroups.Length == 1 && AllowSpawnCreatureGroups[0] == "*";
+Vintagestory.ServerMods.NoObf/BlockType.cs-393-		EnsureClientServerAccuracy(block.CollisionBoxes);
+Vintagestory.ServerMods.NoObf/BlockType.cs-394-		EnsureClientServerAccuracy(block.SelectionBoxes);
+Vintagestory.ServerMods.NoObf/BlockType.cs-395-		EnsureClientServerAccuracy(block.ParticleCollisionBoxes);
+Vintagestory.ServerMods.NoObf/BlockType.cs-396-		InitBlock(api.ClassRegistry, api.World.Logger, block, Variant);
+Vintagestory.ServerMods.NoObf/BlockType.cs-397-		return block;
+Vintagestory.ServerMods.NoObf/BlockType.cs-398-	}
+Vintagestory.ServerMods.NoObf/BlockType.cs-399-
+Vintagestory.ServerMods.NoObf/BlockType.cs-400-	private void EnsureClientServerAccuracy(Cuboidf[] boxes)
+Vintagestory.ServerMods.NoObf/BlockType.cs-401-	{
+Vintagestory.ServerMods.NoObf/BlockType.cs-402-		if (boxes != null)
+Vintagestory.ServerMods.NoObf/BlockType.cs-403-		{
+Vintagestory.ServerMods.NoObf/BlockType.cs-404-			for (int i = 0; i < boxes.Length; i++)
+Vintagestory.ServerMods.NoObf/BlockType.cs-405-			{
+Vintagestory.ServerMods.NoObf/BlockType.cs-406-				boxes[i].RoundToFracsOfOne10thousand();
+Vintagestory.ServerMods.NoObf/BlockType.cs-407-			}
+Vintagestory.ServerMods.NoObf/BlockType.cs-408-		}
+Vintagestory.ServerMods.NoObf/BlockType.cs-409-	}
+Vintagestory.ServerMods.NoObf/BlockType.cs-410-
+Vintagestory.ServerMods.NoObf/BlockType.cs-411-	private Cuboidf[] ToCuboidf(params RotatableCube[] cubes)
+Vintagestory.ServerMods.NoObf/BlockType.cs-412-	{
+Vintagestory.ServerMods.NoObf/BlockType.cs-413-		Cuboidf[] array = new Cuboidf[cubes.Length];
+Vintagestory.ServerMods.NoObf/BlockType.cs-414-		for (int i = 0; i < cubes.Length; i++)
+Vintagestory.ServerMods.NoObf/BlockType.cs-415-		{
+--
+Vintagestory.ServerMods.NoObf/ItemType.cs-118-		item.Durability = Durability;
+Vintagestory.ServerMods.NoObf/ItemType.cs-119-		item.Dimensions = Size ?? CollectibleObject.DefaultSize;
+Vintagestory.ServerMods.NoObf/ItemType.cs-120-		item.MiningSpeed = MiningSpeed;
+Vintagestory.ServerMods.NoObf/ItemType.cs-121-		item.AttackRange = AttackRange;
+Vintagestory.ServerMods.NoObf/ItemType.cs-122-		item.StorageFlags = (EnumItemStorageFlags)StorageFlags;
+Vintagestory.ServerMods.NoObf/ItemType.cs-123-		item.RenderAlphaTest = RenderAlphaTest;
+Vintagestory.ServerMods.NoObf/ItemType.cs-124-		item.HeldTpHitAnimation = HeldTpHitAnimation;
+Vintagestory.ServerMods.NoObf/ItemType.cs-125-		item.HeldRightTpIdleAnimation = HeldRightTpIdleAnimation;
+Vintagestory.ServerMods.NoObf/ItemType.cs-126-		item.HeldLeftTpIdleAnimation = HeldLeftTpIdleAnimation;
+Vintagestory.ServerMods.NoObf/ItemType.cs-127-		item.HeldLeftReadyAnimation = HeldLeftReadyAnimation;
+Vintagestory.ServerMods.NoObf/ItemType.cs-128-		item.HeldRightReadyAnimation = HeldRightReadyAnimation;
+Vintagestory.ServerMods.NoObf/ItemType.cs-129-		item.HeldTpUseAnimation = HeldTpUseAnimation;
+Vintagestory.ServerMods.NoObf/ItemType.cs:130:		item.CreativeInventoryStacks = ((CreativeInventoryStacks == null) ? null : ((CreativeTabAndStackList[])CreativeInventoryStacks.Clone()));
+Vintagestory.ServerMods.NoObf/ItemType.cs-131-		item.MatterState = MatterState;
+Vintagestory.ServerMods.NoObf/ItemType.cs-132-		item.ParticleProperties = ParticleProperties;
+Vintagestory.ServerMods.NoObf/ItemType.cs-133-		item.ParticlesTextureCode = ParticlesTextureCode;
+Vintagestory.ServerMods.NoObf/ItemType.cs-134-		InitItem(api.ClassRegistry, api.World.Logger, item, Variant);
+Vintagestory.ServerMods.NoObf/ItemType.cs-135-		return item;
+Vintagestory.ServerMods.NoObf/ItemType.cs-136-	}
+Vintagestory.ServerMods.NoObf/ItemType.cs-137-}

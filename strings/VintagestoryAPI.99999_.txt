@@ -1,0 +1,903 @@
+Vintagestory.API.Common.Entities/PModulePlayerInAir.cs-31-		pos.Motion.Add(controls.WalkVector.X * (double)num, controls.WalkVector.Y * (double)num, controls.WalkVector.Z * (double)num);
+Vintagestory.API.Common.Entities/PModulePlayerInAir.cs-32-	}
+Vintagestory.API.Common.Entities/PModulePlayerInAir.cs-33-
+Vintagestory.API.Common.Entities/PModulePlayerInAir.cs-34-	public override void ApplyFlying(float dt, Entity entity, EntityPos pos, EntityControls controls)
+Vintagestory.API.Common.Entities/PModulePlayerInAir.cs-35-	{
+Vintagestory.API.Common.Entities/PModulePlayerInAir.cs-36-		if (controls.Gliding)
+Vintagestory.API.Common.Entities/PModulePlayerInAir.cs-37-		{
+Vintagestory.API.Common.Entities/PModulePlayerInAir.cs-38-			double num = Math.Cos(pos.Pitch);
+Vintagestory.API.Common.Entities/PModulePlayerInAir.cs-39-			double num2 = Math.Sin(pos.Pitch);
+Vintagestory.API.Common.Entities/PModulePlayerInAir.cs-40-			double num3 = Math.Cos(pos.Yaw);
+Vintagestory.API.Common.Entities/PModulePlayerInAir.cs-41-			double num4 = Math.Sin(pos.Yaw);
+Vintagestory.API.Common.Entities/PModulePlayerInAir.cs-42-			double num5 = num2 + 0.15;
+Vintagestory.API.Common.Entities/PModulePlayerInAir.cs:43:			controls.GlideSpeed = GameMath.Clamp(controls.GlideSpeed - num5 * (double)dt * 0.25, 0.004999999888241291, 0.75);
+Vintagestory.API.Common.Entities/PModulePlayerInAir.cs:44:			double num6 = GameMath.Clamp(max: (double)entity.Stats.GetBlended("gliderSpeedMax") - 0.8, val: controls.GlideSpeed, min: 0.004999999888241291);
+Vintagestory.API.Common.Entities/PModulePlayerInAir.cs-45-			float blended = entity.Stats.GetBlended("gliderLiftMax");
+Vintagestory.API.Common.Entities/PModulePlayerInAir.cs-46-			double y = Math.Min(num2 * num6, blended);
+Vintagestory.API.Common.Entities/PModulePlayerInAir.cs-47-			pos.Motion.Add((0.0 - num) * num4 * num6, y, (0.0 - num) * num3 * num6);
+Vintagestory.API.Common.Entities/PModulePlayerInAir.cs:48:			pos.Motion.Mul(GameMath.Clamp(1.0 - pos.Motion.Length() * 0.12999999523162842, 0.0, 1.0));
+Vintagestory.API.Common.Entities/PModulePlayerInAir.cs-49-		}
+Vintagestory.API.Common.Entities/PModulePlayerInAir.cs-50-		else
+Vintagestory.API.Common.Entities/PModulePlayerInAir.cs-51-		{
+Vintagestory.API.Common.Entities/PModulePlayerInAir.cs-52-			base.ApplyFlying(dt, entity, pos, controls);
+Vintagestory.API.Common.Entities/PModulePlayerInAir.cs-53-		}
+Vintagestory.API.Common.Entities/PModulePlayerInAir.cs-54-	}
+Vintagestory.API.Common.Entities/PModulePlayerInAir.cs-55-}
+--
+Vintagestory.API.Common.Entities/PModuleGravity.cs-37-		}
+Vintagestory.API.Common.Entities/PModuleGravity.cs-38-		if (!controls.IsClimbing)
+Vintagestory.API.Common.Entities/PModuleGravity.cs-39-		{
+Vintagestory.API.Common.Entities/PModuleGravity.cs-40-			return entity.ApplyGravity;
+Vintagestory.API.Common.Entities/PModuleGravity.cs-41-		}
+Vintagestory.API.Common.Entities/PModuleGravity.cs-42-		return false;
+Vintagestory.API.Common.Entities/PModuleGravity.cs-43-	}
+Vintagestory.API.Common.Entities/PModuleGravity.cs-44-
+Vintagestory.API.Common.Entities/PModuleGravity.cs-45-	public override void DoApply(float dt, Entity entity, EntityPos pos, EntityControls controls)
+Vintagestory.API.Common.Entities/PModuleGravity.cs-46-	{
+Vintagestory.API.Common.Entities/PModuleGravity.cs-47-		if ((!entity.Swimming || !controls.TriesToMove || !entity.Alive) && pos.Y > -100.0)
+Vintagestory.API.Common.Entities/PModuleGravity.cs-48-		{
+Vintagestory.API.Common.Entities/PModuleGravity.cs:49:			double num = (gravityPerSecond + Math.Max(0.0, -0.014999999664723873 * pos.Motion.Y)) * (double)(entity.FeetInLiquid ? 0.33f : 1f) * (double)dt;
+Vintagestory.API.Common.Entities/PModuleGravity.cs-50-			pos.Motion.Y -= num * GameMath.Clamp(1.0 - 50.0 * controls.GlideSpeed * controls.GlideSpeed, 0.0, 1.0);
+Vintagestory.API.Common.Entities/PModuleGravity.cs-51-		}
+Vintagestory.API.Common.Entities/PModuleGravity.cs-52-	}
+Vintagestory.API.Common.Entities/PModuleGravity.cs-53-}
+--
+Vintagestory.API.Common.Entities/PModulePlayerInLiquid.cs-37-		float num = GameMath.Clamp((float)(int)pos.Y + (float)block.LiquidLevel / 8f + (blockAbove.IsLiquid() ? 1.125f : 0f) + (blockAbove2.IsLiquid() ? 1.125f : 0f) - (float)pos.Y - (float)entity.SwimmingOffsetY, 0f, 1f);
+Vintagestory.API.Common.Entities/PModulePlayerInLiquid.cs-38-		num = Math.Min(1f, num + 0.075f);
+Vintagestory.API.Common.Entities/PModulePlayerInLiquid.cs-39-		double y = 0.0;
+Vintagestory.API.Common.Entities/PModulePlayerInLiquid.cs-40-		if (controls.Jump)
+Vintagestory.API.Common.Entities/PModulePlayerInLiquid.cs-41-		{
+Vintagestory.API.Common.Entities/PModulePlayerInLiquid.cs-42-			if (num > 0.1f || !controls.TriesToMove)
+Vintagestory.API.Common.Entities/PModulePlayerInLiquid.cs-43-			{
+Vintagestory.API.Common.Entities/PModulePlayerInLiquid.cs-44-				y = 0.005f * num * dt * 60f;
+Vintagestory.API.Common.Entities/PModulePlayerInLiquid.cs-45-			}
+Vintagestory.API.Common.Entities/PModulePlayerInLiquid.cs-46-		}
+Vintagestory.API.Common.Entities/PModulePlayerInLiquid.cs-47-		else
+Vintagestory.API.Common.Entities/PModulePlayerInLiquid.cs-48-		{
+Vintagestory.API.Common.Entities/PModulePlayerInLiquid.cs:49:			y = controls.FlyVector.Y * (double)(1f + Push) * 0.029999999329447746 * (double)num;
+Vintagestory.API.Common.Entities/PModulePlayerInLiquid.cs-50-		}
+Vintagestory.API.Common.Entities/PModulePlayerInLiquid.cs:51:		pos.Motion.Add(controls.FlyVector.X * (double)(1f + Push) * 0.029999999329447746, y, controls.FlyVector.Z * (double)(1f + Push) * 0.029999999329447746);
+Vintagestory.API.Common.Entities/PModulePlayerInLiquid.cs-52-	}
+Vintagestory.API.Common.Entities/PModulePlayerInLiquid.cs-53-}
+--
+Vintagestory.API.Common.Entities/PModuleInLiquid.cs-49-
+Vintagestory.API.Common.Entities/PModuleInLiquid.cs-50-	public virtual void HandleSwimming(float dt, Entity entity, EntityPos pos, EntityControls controls)
+Vintagestory.API.Common.Entities/PModuleInLiquid.cs-51-	{
+Vintagestory.API.Common.Entities/PModuleInLiquid.cs-52-		Push = Math.Max(1f, Push - 0.1f * dt * 60f);
+Vintagestory.API.Common.Entities/PModuleInLiquid.cs-53-		int x = (int)pos.X;
+Vintagestory.API.Common.Entities/PModuleInLiquid.cs-54-		int num = (int)pos.InternalY;
+Vintagestory.API.Common.Entities/PModuleInLiquid.cs-55-		int z = (int)pos.Z;
+Vintagestory.API.Common.Entities/PModuleInLiquid.cs-56-		Block blockRaw = entity.World.BlockAccessor.GetBlockRaw(x, num, z, 2);
+Vintagestory.API.Common.Entities/PModuleInLiquid.cs-57-		Block blockRaw2 = entity.World.BlockAccessor.GetBlockRaw(x, num + 1, z, 2);
+Vintagestory.API.Common.Entities/PModuleInLiquid.cs-58-		Block blockRaw3 = entity.World.BlockAccessor.GetBlockRaw(x, num + 2, z, 2);
+Vintagestory.API.Common.Entities/PModuleInLiquid.cs-59-		float num2 = GameMath.Clamp((float)(int)pos.Y + (float)blockRaw.LiquidLevel / 8f + (blockRaw2.IsLiquid() ? 1.125f : 0f) + (blockRaw3.IsLiquid() ? 1.125f : 0f) - (float)pos.Y - (float)entity.SwimmingOffsetY, 0f, 1f);
+Vintagestory.API.Common.Entities/PModuleInLiquid.cs-60-		num2 = Math.Min(1f, num2 + 0.075f);
+Vintagestory.API.Common.Entities/PModuleInLiquid.cs:61:		double num3 = ((!controls.Jump) ? (controls.FlyVector.Y * (double)(1f + Push) * 0.029999999329447746 * (double)num2) : ((double)(0.005f * num2 * dt * 60f)));
+Vintagestory.API.Common.Entities/PModuleInLiquid.cs-62-		if (entity.Properties.Habitat == EnumHabitat.Underwater && blockRaw.IsLiquid() && !blockRaw2.IsLiquid())
+Vintagestory.API.Common.Entities/PModuleInLiquid.cs-63-		{
+Vintagestory.API.Common.Entities/PModuleInLiquid.cs-64-			float num4 = (float)(int)pos.Y + (float)blockRaw.LiquidLevel / 8f - entity.CollisionBox.Y2;
+Vintagestory.API.Common.Entities/PModuleInLiquid.cs-65-			if (pos.Y > (double)num4)
+Vintagestory.API.Common.Entities/PModuleInLiquid.cs-66-			{
+Vintagestory.API.Common.Entities/PModuleInLiquid.cs-67-				num3 = 0.0 - GameMath.Clamp(pos.Y - (double)num4, 0.0, 0.05);
+Vintagestory.API.Common.Entities/PModuleInLiquid.cs-68-			}
+Vintagestory.API.Common.Entities/PModuleInLiquid.cs-69-		}
+Vintagestory.API.Common.Entities/PModuleInLiquid.cs:70:		pos.Motion.Add((double)Swimspeed * controls.FlyVector.X * (double)(1f + Push) * 0.029999999329447746, (double)Swimspeed * num3, (double)Swimspeed * controls.FlyVector.Z * (double)(1f + Push) * 0.029999999329447746);
+Vintagestory.API.Common.Entities/PModuleInLiquid.cs-71-	}
+Vintagestory.API.Common.Entities/PModuleInLiquid.cs-72-}
+--
+Vintagestory.API.Common.Entities/Entity.cs-1013-				if (damageSource.GetAttackAngle(Pos.XYZ, out var _, out var attackPitch))
+Vintagestory.API.Common.Entities/Entity.cs-1014-				{
+Vintagestory.API.Common.Entities/Entity.cs-1015-					flag = Math.Abs(attackPitch) > 1.3962633609771729 || Math.Abs(attackPitch) < 0.1745329201221466;
+Vintagestory.API.Common.Entities/Entity.cs-1016-				}
+Vintagestory.API.Common.Entities/Entity.cs-1017-				Vec3d vec3d = (Pos.XYZ - damageSource.GetSourcePosition()).Normalize();
+Vintagestory.API.Common.Entities/Entity.cs-1018-				if (flag)
+Vintagestory.API.Common.Entities/Entity.cs-1019-				{
+Vintagestory.API.Common.Entities/Entity.cs-1020-					vec3d.Y = 0.05000000074505806;
+Vintagestory.API.Common.Entities/Entity.cs-1021-					vec3d.Normalize();
+Vintagestory.API.Common.Entities/Entity.cs-1022-				}
+Vintagestory.API.Common.Entities/Entity.cs-1023-				else
+Vintagestory.API.Common.Entities/Entity.cs-1024-				{
+Vintagestory.API.Common.Entities/Entity.cs:1025:					vec3d.Y = 0.699999988079071;
+Vintagestory.API.Common.Entities/Entity.cs-1026-				}
+Vintagestory.API.Common.Entities/Entity.cs-1027-				vec3d.Y /= damageSource.YDirKnockbackDiv;
+Vintagestory.API.Common.Entities/Entity.cs-1028-				float num = damageSource.KnockbackStrength * GameMath.Clamp((1f - Properties.KnockbackResistance) / 10f, 0f, 1f);
+Vintagestory.API.Common.Entities/Entity.cs-1029-				WatchedAttributes.SetFloat("onHurtDir", (float)Math.Atan2(vec3d.X, vec3d.Z));
+Vintagestory.API.Common.Entities/Entity.cs-1030-				WatchedAttributes.SetDouble("kbdirX", vec3d.X * (double)num);
+Vintagestory.API.Common.Entities/Entity.cs-1031-				WatchedAttributes.SetDouble("kbdirY", vec3d.Y * (double)num);
+Vintagestory.API.Common.Entities/Entity.cs-1032-				WatchedAttributes.SetDouble("kbdirZ", vec3d.Z * (double)num);
+Vintagestory.API.Common.Entities/Entity.cs-1033-			}
+Vintagestory.API.Common.Entities/Entity.cs-1034-			else
+Vintagestory.API.Common.Entities/Entity.cs-1035-			{
+Vintagestory.API.Common.Entities/Entity.cs-1036-				WatchedAttributes.SetDouble("kbdirX", 0.0);
+Vintagestory.API.Common.Entities/Entity.cs-1037-				WatchedAttributes.SetDouble("kbdirY", 0.0);
+Vintagestory.API.Common.Entities/Entity.cs-1038-				WatchedAttributes.SetDouble("kbdirZ", 0.0);
+Vintagestory.API.Common.Entities/Entity.cs-1039-				WatchedAttributes.SetFloat("onHurtDir", -999f);
+Vintagestory.API.Common.Entities/Entity.cs-1040-			}
+Vintagestory.API.Common.Entities/Entity.cs-1041-			return damage > 0f;
+Vintagestory.API.Common.Entities/Entity.cs-1042-		}
+Vintagestory.API.Common.Entities/Entity.cs-1043-		return false;
+Vintagestory.API.Common.Entities/Entity.cs-1044-	}
+Vintagestory.API.Common.Entities/Entity.cs-1045-
+Vintagestory.API.Common.Entities/Entity.cs-1046-	/// <summary>
+Vintagestory.API.Common.Entities/Entity.cs-1047-	/// Should return true if the entity can get damaged by given damageSource. Is called by ReceiveDamage.
+Vintagestory.API.Common.Entities/Entity.cs-1048-	/// </summary>
+Vintagestory.API.Common.Entities/Entity.cs-1049-	/// <param name="damageSource"></param>
+Vintagestory.API.Common.Entities/Entity.cs-1050-	/// <param name="damage"></param>
+--
+Vintagestory.API.MathTools/Quaterniond.cs-8-	public static double[] Create()
+Vintagestory.API.MathTools/Quaterniond.cs-9-	{
+Vintagestory.API.MathTools/Quaterniond.cs-10-		return new double[4] { 0.0, 0.0, 0.0, 1.0 };
+Vintagestory.API.MathTools/Quaterniond.cs-11-	}
+Vintagestory.API.MathTools/Quaterniond.cs-12-
+Vintagestory.API.MathTools/Quaterniond.cs-13-	/// **
+Vintagestory.API.MathTools/Quaterniond.cs-14-	public static double[] RotationTo(double[] output, double[] a, double[] b)
+Vintagestory.API.MathTools/Quaterniond.cs-15-	{
+Vintagestory.API.MathTools/Quaterniond.cs-16-		double[] array = Vec3Utilsd.Create();
+Vintagestory.API.MathTools/Quaterniond.cs-17-		double[] a2 = Vec3Utilsd.FromValues(1.0, 0.0, 0.0);
+Vintagestory.API.MathTools/Quaterniond.cs-18-		double[] a3 = Vec3Utilsd.FromValues(0.0, 1.0, 0.0);
+Vintagestory.API.MathTools/Quaterniond.cs-19-		double num = Vec3Utilsd.Dot(a, b);
+Vintagestory.API.MathTools/Quaterniond.cs:20:		double num2 = 999999.0;
+Vintagestory.API.MathTools/Quaterniond.cs-21-		num2 /= 1000000.0;
+Vintagestory.API.MathTools/Quaterniond.cs-22-		double num3 = 1.0;
+Vintagestory.API.MathTools/Quaterniond.cs-23-		num3 /= 1000000.0;
+Vintagestory.API.MathTools/Quaterniond.cs-24-		if (num < 0.0 - num2)
+Vintagestory.API.MathTools/Quaterniond.cs-25-		{
+Vintagestory.API.MathTools/Quaterniond.cs-26-			Vec3Utilsd.Cross(array, a2, a);
+Vintagestory.API.MathTools/Quaterniond.cs-27-			if (Vec3Utilsd.Length_(array) < num3)
+Vintagestory.API.MathTools/Quaterniond.cs-28-			{
+Vintagestory.API.MathTools/Quaterniond.cs-29-				Vec3Utilsd.Cross(array, a3, a);
+Vintagestory.API.MathTools/Quaterniond.cs-30-			}
+Vintagestory.API.MathTools/Quaterniond.cs-31-			Vec3Utilsd.Normalize(array, array);
+Vintagestory.API.MathTools/Quaterniond.cs-32-			SetAxisAngle(output, array, 3.1415927410125732);
+Vintagestory.API.MathTools/Quaterniond.cs-33-			return output;
+Vintagestory.API.MathTools/Quaterniond.cs-34-		}
+Vintagestory.API.MathTools/Quaterniond.cs-35-		if (num > num2)
+Vintagestory.API.MathTools/Quaterniond.cs-36-		{
+Vintagestory.API.MathTools/Quaterniond.cs-37-			output[0] = 0.0;
+Vintagestory.API.MathTools/Quaterniond.cs-38-			output[1] = 0.0;
+Vintagestory.API.MathTools/Quaterniond.cs-39-			output[2] = 0.0;
+Vintagestory.API.MathTools/Quaterniond.cs-40-			output[3] = 1.0;
+Vintagestory.API.MathTools/Quaterniond.cs-41-			return output;
+Vintagestory.API.MathTools/Quaterniond.cs-42-		}
+Vintagestory.API.MathTools/Quaterniond.cs-43-		Vec3Utilsd.Cross(array, a, b);
+Vintagestory.API.MathTools/Quaterniond.cs-44-		output[0] = array[0];
+Vintagestory.API.MathTools/Quaterniond.cs-45-		output[1] = array[1];
+--
+Vintagestory.API.MathTools/Quaternionf.cs-8-	public static float[] Create()
+Vintagestory.API.MathTools/Quaternionf.cs-9-	{
+Vintagestory.API.MathTools/Quaternionf.cs-10-		return new float[4] { 0f, 0f, 0f, 1f };
+Vintagestory.API.MathTools/Quaternionf.cs-11-	}
+Vintagestory.API.MathTools/Quaternionf.cs-12-
+Vintagestory.API.MathTools/Quaternionf.cs-13-	/// **
+Vintagestory.API.MathTools/Quaternionf.cs-14-	public static float[] RotationTo(float[] output, float[] a, float[] b)
+Vintagestory.API.MathTools/Quaternionf.cs-15-	{
+Vintagestory.API.MathTools/Quaternionf.cs-16-		float[] array = Vec3Utilsf.Create();
+Vintagestory.API.MathTools/Quaternionf.cs-17-		float[] a2 = Vec3Utilsf.FromValues(1f, 0f, 0f);
+Vintagestory.API.MathTools/Quaternionf.cs-18-		float[] a3 = Vec3Utilsf.FromValues(0f, 1f, 0f);
+Vintagestory.API.MathTools/Quaternionf.cs-19-		float num = Vec3Utilsf.Dot(a, b);
+Vintagestory.API.MathTools/Quaternionf.cs:20:		float num2 = 999999f;
+Vintagestory.API.MathTools/Quaternionf.cs-21-		num2 /= 1000000f;
+Vintagestory.API.MathTools/Quaternionf.cs-22-		float num3 = 1f;
+Vintagestory.API.MathTools/Quaternionf.cs-23-		num3 /= 1000000f;
+Vintagestory.API.MathTools/Quaternionf.cs-24-		if (num < 0f - num2)
+Vintagestory.API.MathTools/Quaternionf.cs-25-		{
+Vintagestory.API.MathTools/Quaternionf.cs-26-			Vec3Utilsf.Cross(array, a2, a);
+Vintagestory.API.MathTools/Quaternionf.cs-27-			if (Vec3Utilsf.Length_(array) < num3)
+Vintagestory.API.MathTools/Quaternionf.cs-28-			{
+Vintagestory.API.MathTools/Quaternionf.cs-29-				Vec3Utilsf.Cross(array, a3, a);
+Vintagestory.API.MathTools/Quaternionf.cs-30-			}
+Vintagestory.API.MathTools/Quaternionf.cs-31-			Vec3Utilsf.Normalize(array, array);
+Vintagestory.API.MathTools/Quaternionf.cs-32-			SetAxisAngle(output, array, (float)Math.PI);
+Vintagestory.API.MathTools/Quaternionf.cs-33-			return output;
+Vintagestory.API.MathTools/Quaternionf.cs-34-		}
+Vintagestory.API.MathTools/Quaternionf.cs-35-		if (num > num2)
+Vintagestory.API.MathTools/Quaternionf.cs-36-		{
+Vintagestory.API.MathTools/Quaternionf.cs-37-			output[0] = 0f;
+Vintagestory.API.MathTools/Quaternionf.cs-38-			output[1] = 0f;
+Vintagestory.API.MathTools/Quaternionf.cs-39-			output[2] = 0f;
+Vintagestory.API.MathTools/Quaternionf.cs-40-			output[3] = 1f;
+Vintagestory.API.MathTools/Quaternionf.cs-41-			return output;
+Vintagestory.API.MathTools/Quaternionf.cs-42-		}
+Vintagestory.API.MathTools/Quaternionf.cs-43-		Vec3Utilsf.Cross(array, a, b);
+Vintagestory.API.MathTools/Quaternionf.cs-44-		output[0] = array[0];
+Vintagestory.API.MathTools/Quaternionf.cs-45-		output[1] = array[1];
+--
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-43-			Y = y;
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-44-		}
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-45-	}
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-46-
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-47-	private const int DoubleClickMilliseconds = 400;
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-48-
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-49-	internal float[] caretColor = new float[4] { 1f, 1f, 1f, 1f };
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-50-
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-51-	internal bool hideCharacters;
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-52-
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-53-	internal bool multilineMode;
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-54-
+Vintagestory.API.Client/GuiElementEditableTextBase.cs:55:	internal int maxlines = 99999;
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-56-
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-57-	internal int maxlength = -1;
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-58-
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-59-	internal double caretX;
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-60-
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-61-	internal double caretY;
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-62-
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-63-	internal double topPadding;
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-64-
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-65-	internal double leftPadding = 3.0;
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-66-
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-67-	internal double rightSpacing;
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-68-
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-69-	internal double bottomSpacing;
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-70-
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-71-	private int? selectedTextStart;
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-72-
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-73-	private long lastClickTime;
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-74-
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-75-	private int lastClickCursor;
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-76-
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-77-	private bool handlingOnKeyEvent;
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-78-
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-79-	private bool mouseDown;
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-80-
+--
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-368-		}
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-369-		if (maxlength > 0 && text.Length > maxlength)
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-370-		{
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-371-			text = text.Substring(0, maxlength);
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-372-		}
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-373-		List<string> list = new List<string>();
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-374-		text = text.Replace("\r\n", "\n").Replace('\r', '\n');
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-375-		if (multilineMode)
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-376-		{
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-377-			double boxWidth = Bounds.InnerWidth - 2.0 * Bounds.absPaddingX;
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-378-			if (!WordWrap)
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-379-			{
+Vintagestory.API.Client/GuiElementEditableTextBase.cs:380:				boxWidth = 999999.0;
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-381-			}
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-382-			TextLine[] array = textUtil.Lineize(Font, text, boxWidth, EnumLinebreakBehavior.Default, keepLinebreakChar: true);
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-383-			foreach (TextLine textLine in array)
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-384-			{
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-385-				list.Add(textLine.Text);
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-386-			}
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-387-			if (list.Count == 0)
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-388-			{
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-389-				list.Add("");
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-390-			}
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-391-		}
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-392-		else
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-393-		{
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-394-			list.Add(text);
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-395-		}
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-396-		return list;
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-397-	}
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-398-
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-399-	internal virtual void TextChanged()
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-400-	{
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-401-		OnTextChanged?.Invoke(string.Join("", lines));
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-402-		if (!handlingOnKeyEvent)
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-403-		{
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-404-			selectedTextStart = null;
+Vintagestory.API.Client/GuiElementEditableTextBase.cs-405-		}
+--
+Vintagestory.API.Client/GuiElementNumberInput.cs-62-
+Vintagestory.API.Client/GuiElementNumberInput.cs-63-	public override void ComposeTextElements(Context ctx, ImageSurface surface)
+Vintagestory.API.Client/GuiElementNumberInput.cs-64-	{
+Vintagestory.API.Client/GuiElementNumberInput.cs-65-		rightSpacing = GuiElement.scaled(17.0);
+Vintagestory.API.Client/GuiElementNumberInput.cs-66-		EmbossRoundRectangleElement(ctx, Bounds, inverse: true, 2, 1);
+Vintagestory.API.Client/GuiElementNumberInput.cs-67-		ctx.SetSourceRGBA(0.0, 0.0, 0.0, 0.2);
+Vintagestory.API.Client/GuiElementNumberInput.cs-68-		ElementRoundRectangle(ctx, Bounds, isBackground: false, 1.0);
+Vintagestory.API.Client/GuiElementNumberInput.cs-69-		ctx.Fill();
+Vintagestory.API.Client/GuiElementNumberInput.cs-70-		GenTextHighlightTexture();
+Vintagestory.API.Client/GuiElementNumberInput.cs-71-		GenButtonHighlightTexture();
+Vintagestory.API.Client/GuiElementNumberInput.cs-72-		if (!enabled)
+Vintagestory.API.Client/GuiElementNumberInput.cs-73-		{
+Vintagestory.API.Client/GuiElementNumberInput.cs:74:			Font.Color[3] = 0.3499999940395355;
+Vintagestory.API.Client/GuiElementNumberInput.cs-75-		}
+Vintagestory.API.Client/GuiElementNumberInput.cs-76-		highlightBounds = Bounds.CopyOffsetedSibling().WithFixedPadding(0.0, 0.0).FixedGrow(2.0 * Bounds.absPaddingX, 2.0 * Bounds.absPaddingY);
+Vintagestory.API.Client/GuiElementNumberInput.cs-77-		highlightBounds.CalcWorldBounds();
+Vintagestory.API.Client/GuiElementNumberInput.cs-78-		RecomposeText();
+Vintagestory.API.Client/GuiElementNumberInput.cs-79-		double num = Bounds.OuterHeight / 2.0 - 1.0;
+Vintagestory.API.Client/GuiElementNumberInput.cs-80-		double[] array = GuiStyle.DialogHighlightColor.ToArray();
+Vintagestory.API.Client/GuiElementNumberInput.cs-81-		if (!enabled)
+Vintagestory.API.Client/GuiElementNumberInput.cs-82-		{
+Vintagestory.API.Client/GuiElementNumberInput.cs-83-			array[3] = 0.315;
+Vintagestory.API.Client/GuiElementNumberInput.cs-84-		}
+Vintagestory.API.Client/GuiElementNumberInput.cs-85-		ctx.SetSourceRGBA(array);
+Vintagestory.API.Client/GuiElementNumberInput.cs-86-		GuiElement.RoundRectangle(ctx, Bounds.drawX + Bounds.InnerWidth - GuiElement.scaled(18.0) * Scale, Bounds.drawY, rightSpacing * Scale, num, 1.0);
+Vintagestory.API.Client/GuiElementNumberInput.cs-87-		ctx.Fill();
+Vintagestory.API.Client/GuiElementNumberInput.cs-88-		EmbossRoundRectangleElement(ctx, Bounds.drawX + Bounds.InnerWidth - GuiElement.scaled(18.0) * Scale, Bounds.drawY, rightSpacing * Scale, num, inverse: false, 2, 1);
+Vintagestory.API.Client/GuiElementNumberInput.cs-89-		ctx.NewPath();
+Vintagestory.API.Client/GuiElementNumberInput.cs-90-		ctx.LineTo(Bounds.drawX + Bounds.InnerWidth - GuiElement.scaled(9.0) * Scale, Bounds.drawY + GuiElement.scaled(1.0) * Scale);
+Vintagestory.API.Client/GuiElementNumberInput.cs-91-		ctx.LineTo(Bounds.drawX + Bounds.InnerWidth - GuiElement.scaled(14.0) * Scale, Bounds.drawY + (num - GuiElement.scaled(2.0)) * Scale);
+Vintagestory.API.Client/GuiElementNumberInput.cs-92-		ctx.LineTo(Bounds.drawX + Bounds.InnerWidth - GuiElement.scaled(4.0) * Scale, Bounds.drawY + (num - GuiElement.scaled(2.0)) * Scale);
+Vintagestory.API.Client/GuiElementNumberInput.cs-93-		ctx.ClosePath();
+Vintagestory.API.Client/GuiElementNumberInput.cs-94-		ctx.SetSourceRGBA(1.0, 1.0, 1.0, enabled ? 0.4 : 0.14);
+Vintagestory.API.Client/GuiElementNumberInput.cs-95-		ctx.Fill();
+Vintagestory.API.Client/GuiElementNumberInput.cs-96-		ctx.SetSourceRGBA(array);
+Vintagestory.API.Client/GuiElementNumberInput.cs-97-		GuiElement.RoundRectangle(ctx, Bounds.drawX + Bounds.InnerWidth - (rightSpacing + GuiElement.scaled(1.0)) * Scale, Bounds.drawY + num + GuiElement.scaled(1.0) * Scale, rightSpacing * Scale, num, 1.0);
+Vintagestory.API.Client/GuiElementNumberInput.cs-98-		ctx.Fill();
+Vintagestory.API.Client/GuiElementNumberInput.cs-99-		EmbossRoundRectangleElement(ctx, Bounds.drawX + Bounds.InnerWidth - (rightSpacing + GuiElement.scaled(1.0)) * Scale, Bounds.drawY + num + GuiElement.scaled(1.0) * Scale, rightSpacing * Scale, num, inverse: false, 2, 1);
+--
+Vintagestory.API.Client/GuiElementEngravedText.cs-20-	{
+Vintagestory.API.Client/GuiElementEngravedText.cs-21-		this.orientation = orientation;
+Vintagestory.API.Client/GuiElementEngravedText.cs-22-	}
+Vintagestory.API.Client/GuiElementEngravedText.cs-23-
+Vintagestory.API.Client/GuiElementEngravedText.cs-24-	public override void ComposeTextElements(Context ctxStatic, ImageSurface surfaceStatic)
+Vintagestory.API.Client/GuiElementEngravedText.cs-25-	{
+Vintagestory.API.Client/GuiElementEngravedText.cs-26-		Font.SetupContext(ctxStatic);
+Vintagestory.API.Client/GuiElementEngravedText.cs-27-		Bounds.CalcWorldBounds();
+Vintagestory.API.Client/GuiElementEngravedText.cs-28-		ImageSurface imageSurface = new ImageSurface(Format.Argb32, Bounds.ParentBounds.OuterWidthInt, Bounds.ParentBounds.OuterHeightInt);
+Vintagestory.API.Client/GuiElementEngravedText.cs-29-		Context context = new Context(imageSurface);
+Vintagestory.API.Client/GuiElementEngravedText.cs-30-		context.SetSourceRGB(0.0, 0.0, 0.0);
+Vintagestory.API.Client/GuiElementEngravedText.cs-31-		context.Paint();
+Vintagestory.API.Client/GuiElementEngravedText.cs:32:		Font.Color = new double[4] { 20.0, 20.0, 20.0, 0.3499999940395355 };
+Vintagestory.API.Client/GuiElementEngravedText.cs-33-		Font.SetupContext(context);
+Vintagestory.API.Client/GuiElementEngravedText.cs-34-		DrawMultilineTextAt(context, Bounds.drawX + GuiElement.scaled(2.0), Bounds.drawY + GuiElement.scaled(2.0), orientation);
+Vintagestory.API.Client/GuiElementEngravedText.cs-35-		imageSurface.BlurFull(7.0);
+Vintagestory.API.Client/GuiElementEngravedText.cs-36-		ImageSurface imageSurface2 = new ImageSurface(Format.Argb32, Bounds.ParentBounds.OuterWidthInt, Bounds.ParentBounds.OuterHeightInt);
+Vintagestory.API.Client/GuiElementEngravedText.cs-37-		Context context2 = new Context(imageSurface2);
+Vintagestory.API.Client/GuiElementEngravedText.cs-38-		context2.Operator = Operator.Source;
+Vintagestory.API.Client/GuiElementEngravedText.cs-39-		context2.Antialias = Antialias.Best;
+Vintagestory.API.Client/GuiElementEngravedText.cs-40-		Font.Color = new double[4] { 0.0, 0.0, 0.0, 0.4 };
+Vintagestory.API.Client/GuiElementEngravedText.cs-41-		Font.SetupContext(context2);
+Vintagestory.API.Client/GuiElementEngravedText.cs-42-		context2.SetSourceRGBA(0.0, 0.0, 0.0, 0.4);
+Vintagestory.API.Client/GuiElementEngravedText.cs-43-		DrawMultilineTextAt(context2, Bounds.drawX - GuiElement.scaled(0.5), Bounds.drawY - GuiElement.scaled(0.5), orientation);
+Vintagestory.API.Client/GuiElementEngravedText.cs-44-		context2.SetSourceRGBA(1.0, 1.0, 1.0, 1.0);
+Vintagestory.API.Client/GuiElementEngravedText.cs-45-		DrawMultilineTextAt(context2, Bounds.drawX + GuiElement.scaled(1.0), Bounds.drawY + GuiElement.scaled(1.0), orientation);
+Vintagestory.API.Client/GuiElementEngravedText.cs-46-		context2.Operator = Operator.Atop;
+Vintagestory.API.Client/GuiElementEngravedText.cs-47-		context2.SetSourceSurface(imageSurface, 0, 0);
+Vintagestory.API.Client/GuiElementEngravedText.cs-48-		context2.Paint();
+Vintagestory.API.Client/GuiElementEngravedText.cs-49-		context.Dispose();
+Vintagestory.API.Client/GuiElementEngravedText.cs-50-		imageSurface.Dispose();
+Vintagestory.API.Client/GuiElementEngravedText.cs-51-		context2.Operator = Operator.Over;
+Vintagestory.API.Client/GuiElementEngravedText.cs-52-		Font.Color = new double[4] { 0.0, 0.0, 0.0, 0.35 };
+Vintagestory.API.Client/GuiElementEngravedText.cs-53-		Font.SetupContext(context2);
+Vintagestory.API.Client/GuiElementEngravedText.cs-54-		DrawMultilineTextAt(context2, (int)Bounds.drawX, (int)Bounds.drawY, orientation);
+Vintagestory.API.Client/GuiElementEngravedText.cs-55-		ctxStatic.Antialias = Antialias.Best;
+Vintagestory.API.Client/GuiElementEngravedText.cs-56-		ctxStatic.Operator = Operator.HardLight;
+Vintagestory.API.Client/GuiElementEngravedText.cs-57-		ctxStatic.SetSourceSurface(imageSurface2, 0, 0);
+--
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-73-		{
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-74-			new LineRectangled(0.0, 0.0, 2.0 * (size + num) + size, 2.0 * (size + num) + size)
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-75-		};
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-76-		this.size = size;
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-77-		Random random = new Random(123);
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-78-		for (int i = 0; i < 30; i++)
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-79-		{
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-80-			int[,] array = (variantDisplaySequence[i] = new int[3, 3]);
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-81-			for (int j = 0; j < 3; j++)
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-82-			{
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-83-				for (int k = 0; k < 3; k++)
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-84-				{
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs:85:					array[j, k] = api.World.Rand.Next(99999);
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-86-				}
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-87-			}
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-88-		}
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-89-		List<GridRecipeAndUnnamedIngredients> list = new List<GridRecipeAndUnnamedIngredients>();
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-90-		ResolveRecipes(list, gridRecipes, allStacks, random);
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-91-		resolvedIngredientsCache.Clear();
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-92-		GridRecipesAndUnnamedIngredients = list.ToArray();
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-93-		GridRecipesAndUnnamedIngredients.Shuffle(random);
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-94-		bool flag = false;
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-95-		for (int l = 0; l < GridRecipesAndUnnamedIngredients.Length; l++)
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-96-		{
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-97-			string text = GridRecipesAndUnnamedIngredients[l]?.Recipe?.RequiresTrait;
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-98-			if (text != null)
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-99-			{
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-100-				extraTexts[l] = api.Gui.TextTexture.GenTextTexture(Lang.Get("gridrecipe-requirestrait", Lang.Get("traitname-" + text)), CairoFont.WhiteDetailText());
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-101-				if (!flag)
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-102-				{
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-103-					BoundsPerLine[0].Height += GuiElement.scaled(20.0);
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-104-				}
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-105-				flag = true;
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-106-			}
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-107-		}
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-108-		if (GridRecipesAndUnnamedIngredients.Length == 0)
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-109-		{
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-110-			throw new ArgumentException("Could not resolve any of the supplied grid recipes?");
+--
+Vintagestory.API.Client/TextFlowPath.cs-10-
+Vintagestory.API.Client/TextFlowPath.cs-11-	public double Y2;
+Vintagestory.API.Client/TextFlowPath.cs-12-
+Vintagestory.API.Client/TextFlowPath.cs-13-	public TextFlowPath()
+Vintagestory.API.Client/TextFlowPath.cs-14-	{
+Vintagestory.API.Client/TextFlowPath.cs-15-	}
+Vintagestory.API.Client/TextFlowPath.cs-16-
+Vintagestory.API.Client/TextFlowPath.cs-17-	public TextFlowPath(double boxWidth)
+Vintagestory.API.Client/TextFlowPath.cs-18-	{
+Vintagestory.API.Client/TextFlowPath.cs-19-		X1 = 0.0;
+Vintagestory.API.Client/TextFlowPath.cs-20-		Y1 = 0.0;
+Vintagestory.API.Client/TextFlowPath.cs-21-		X2 = boxWidth;
+Vintagestory.API.Client/TextFlowPath.cs:22:		Y2 = 99999.0;
+Vintagestory.API.Client/TextFlowPath.cs-23-	}
+Vintagestory.API.Client/TextFlowPath.cs-24-
+Vintagestory.API.Client/TextFlowPath.cs-25-	public TextFlowPath(double x1, double y1, double x2, double y2)
+Vintagestory.API.Client/TextFlowPath.cs-26-	{
+Vintagestory.API.Client/TextFlowPath.cs-27-		X1 = x1;
+Vintagestory.API.Client/TextFlowPath.cs-28-		Y1 = y1;
+Vintagestory.API.Client/TextFlowPath.cs-29-		X2 = x2;
+Vintagestory.API.Client/TextFlowPath.cs-30-		Y2 = y2;
+Vintagestory.API.Client/TextFlowPath.cs-31-	}
+Vintagestory.API.Client/TextFlowPath.cs-32-}
+--
+Vintagestory.API.Client/GuiElementDropDown.cs-212-		ComposeCurrentValue();
+Vintagestory.API.Client/GuiElementDropDown.cs-213-	}
+Vintagestory.API.Client/GuiElementDropDown.cs-214-
+Vintagestory.API.Client/GuiElementDropDown.cs-215-	private void ComposeCurrentValue()
+Vintagestory.API.Client/GuiElementDropDown.cs-216-	{
+Vintagestory.API.Client/GuiElementDropDown.cs-217-		double innerWidth = Bounds.InnerWidth;
+Vintagestory.API.Client/GuiElementDropDown.cs-218-		valueWidth = (int)((Bounds.InnerWidth - GuiElement.scaled(20.0)) * Scale);
+Vintagestory.API.Client/GuiElementDropDown.cs-219-		valueHeight = (int)(GuiElement.scaled(30.0) * Scale);
+Vintagestory.API.Client/GuiElementDropDown.cs-220-		ImageSurface imageSurface = new ImageSurface(Format.Argb32, valueWidth, valueHeight);
+Vintagestory.API.Client/GuiElementDropDown.cs-221-		Context context = genContext(imageSurface);
+Vintagestory.API.Client/GuiElementDropDown.cs-222-		if (!enabled)
+Vintagestory.API.Client/GuiElementDropDown.cs-223-		{
+Vintagestory.API.Client/GuiElementDropDown.cs:224:			Font.Color[3] = 0.3499999940395355;
+Vintagestory.API.Client/GuiElementDropDown.cs-225-		}
+Vintagestory.API.Client/GuiElementDropDown.cs-226-		Font.SetupContext(context);
+Vintagestory.API.Client/GuiElementDropDown.cs-227-		context.SetSourceRGBA(GuiStyle.DialogDefaultTextColor);
+Vintagestory.API.Client/GuiElementDropDown.cs-228-		string text = "";
+Vintagestory.API.Client/GuiElementDropDown.cs-229-		double height = Font.GetFontExtents().Height;
+Vintagestory.API.Client/GuiElementDropDown.cs-230-		if (listMenu.SelectedIndices.Length > 1)
+Vintagestory.API.Client/GuiElementDropDown.cs-231-		{
+Vintagestory.API.Client/GuiElementDropDown.cs-232-			for (int i = 0; i < listMenu.SelectedIndices.Length; i++)
+Vintagestory.API.Client/GuiElementDropDown.cs-233-			{
+Vintagestory.API.Client/GuiElementDropDown.cs-234-				int num = listMenu.SelectedIndices[i];
+Vintagestory.API.Client/GuiElementDropDown.cs-235-				string text2 = "";
+Vintagestory.API.Client/GuiElementDropDown.cs-236-				if (text.Length > 0)
+Vintagestory.API.Client/GuiElementDropDown.cs-237-				{
+Vintagestory.API.Client/GuiElementDropDown.cs-238-					text2 += ", ";
+Vintagestory.API.Client/GuiElementDropDown.cs-239-				}
+Vintagestory.API.Client/GuiElementDropDown.cs-240-				text2 += listMenu.Names[num];
+Vintagestory.API.Client/GuiElementDropDown.cs-241-				int num2 = listMenu.SelectedIndices.Length - i;
+Vintagestory.API.Client/GuiElementDropDown.cs-242-				int num3 = listMenu.SelectedIndices.Length;
+Vintagestory.API.Client/GuiElementDropDown.cs-243-				string text3;
+Vintagestory.API.Client/GuiElementDropDown.cs-244-				if (text.Length > 0)
+Vintagestory.API.Client/GuiElementDropDown.cs-245-				{
+Vintagestory.API.Client/GuiElementDropDown.cs-246-					text3 = " " + ((num2 == 1) ? Lang.Get(SingularMoreNameCode, num2) : Lang.Get(PluralMoreNameCode, num2));
+Vintagestory.API.Client/GuiElementDropDown.cs-247-				}
+Vintagestory.API.Client/GuiElementDropDown.cs-248-				else
+Vintagestory.API.Client/GuiElementDropDown.cs-249-				{
+--
+Vintagestory.API.Client/LinkTextComponent.cs-62-		Font = Font.Clone().WithColor(GuiStyle.ActiveButtonTextColor);
+Vintagestory.API.Client/LinkTextComponent.cs-63-		hoverText = new LoadedTexture(api);
+Vintagestory.API.Client/LinkTextComponent.cs-64-		normalText = new LoadedTexture(api);
+Vintagestory.API.Client/LinkTextComponent.cs-65-	}
+Vintagestory.API.Client/LinkTextComponent.cs-66-
+Vintagestory.API.Client/LinkTextComponent.cs-67-	public override EnumCalcBoundsResult CalcBounds(TextFlowPath[] flowPath, double currentLineHeight, double offsetX, double lineY, out double nextOffsetX)
+Vintagestory.API.Client/LinkTextComponent.cs-68-	{
+Vintagestory.API.Client/LinkTextComponent.cs-69-		return base.CalcBounds(flowPath, currentLineHeight, offsetX, lineY, out nextOffsetX);
+Vintagestory.API.Client/LinkTextComponent.cs-70-	}
+Vintagestory.API.Client/LinkTextComponent.cs-71-
+Vintagestory.API.Client/LinkTextComponent.cs-72-	public override void ComposeElements(Context ctxStatic, ImageSurface surfaceStatic)
+Vintagestory.API.Client/LinkTextComponent.cs-73-	{
+Vintagestory.API.Client/LinkTextComponent.cs:74:		leftMostX = 999999.0;
+Vintagestory.API.Client/LinkTextComponent.cs:75:		topMostY = 999999.0;
+Vintagestory.API.Client/LinkTextComponent.cs-76-		double num = 0.0;
+Vintagestory.API.Client/LinkTextComponent.cs-77-		double num2 = 0.0;
+Vintagestory.API.Client/LinkTextComponent.cs-78-		for (int i = 0; i < Lines.Length; i++)
+Vintagestory.API.Client/LinkTextComponent.cs-79-		{
+Vintagestory.API.Client/LinkTextComponent.cs-80-			TextLine textLine = Lines[i];
+Vintagestory.API.Client/LinkTextComponent.cs-81-			leftMostX = Math.Min(leftMostX, textLine.Bounds.X);
+Vintagestory.API.Client/LinkTextComponent.cs-82-			topMostY = Math.Min(topMostY, textLine.Bounds.Y);
+Vintagestory.API.Client/LinkTextComponent.cs-83-			num = Math.Max(num, textLine.Bounds.X + textLine.Bounds.Width);
+Vintagestory.API.Client/LinkTextComponent.cs-84-			num2 = Math.Max(num2, textLine.Bounds.Y + textLine.Bounds.Height);
+Vintagestory.API.Client/LinkTextComponent.cs-85-		}
+Vintagestory.API.Client/LinkTextComponent.cs-86-		ImageSurface imageSurface = new ImageSurface(Format.Argb32, (int)(num - leftMostX), (int)(num2 - topMostY));
+Vintagestory.API.Client/LinkTextComponent.cs-87-		Context context = new Context(imageSurface);
+Vintagestory.API.Client/LinkTextComponent.cs-88-		context.SetSourceRGBA(0.0, 0.0, 0.0, 0.0);
+Vintagestory.API.Client/LinkTextComponent.cs-89-		context.Paint();
+Vintagestory.API.Client/LinkTextComponent.cs-90-		context.Save();
+Vintagestory.API.Client/LinkTextComponent.cs-91-		Matrix matrix = context.Matrix;
+Vintagestory.API.Client/LinkTextComponent.cs-92-		matrix.Translate((int)(0.0 - leftMostX), (int)(0.0 - topMostY));
+Vintagestory.API.Client/LinkTextComponent.cs-93-		context.Matrix = matrix;
+Vintagestory.API.Client/LinkTextComponent.cs-94-		CairoFont font = Font;
+Vintagestory.API.Client/LinkTextComponent.cs-95-		ComposeFor(context, imageSurface);
+Vintagestory.API.Client/LinkTextComponent.cs-96-		api.Gui.LoadOrUpdateCairoTexture(imageSurface, linearMag: false, ref normalText);
+Vintagestory.API.Client/LinkTextComponent.cs-97-		context.Operator = Operator.Clear;
+Vintagestory.API.Client/LinkTextComponent.cs-98-		context.SetSourceRGBA(0.0, 0.0, 0.0, 0.0);
+Vintagestory.API.Client/LinkTextComponent.cs-99-		context.Paint();
+Vintagestory.API.Client/LinkTextComponent.cs-100-		context.Operator = Operator.Over;
+--
+Vintagestory.API.Client/GuiElementTextInput.cs-8-	protected LoadedTexture highlightTexture;
+Vintagestory.API.Client/GuiElementTextInput.cs-9-
+Vintagestory.API.Client/GuiElementTextInput.cs-10-	protected ElementBounds highlightBounds;
+Vintagestory.API.Client/GuiElementTextInput.cs-11-
+Vintagestory.API.Client/GuiElementTextInput.cs-12-	internal bool DeleteOnRefocusBackSpace;
+Vintagestory.API.Client/GuiElementTextInput.cs-13-
+Vintagestory.API.Client/GuiElementTextInput.cs-14-	protected int refocusStage;
+Vintagestory.API.Client/GuiElementTextInput.cs-15-
+Vintagestory.API.Client/GuiElementTextInput.cs-16-	private LoadedTexture placeHolderTextTexture;
+Vintagestory.API.Client/GuiElementTextInput.cs-17-
+Vintagestory.API.Client/GuiElementTextInput.cs-18-	protected double enabledAlpha = 1.0;
+Vintagestory.API.Client/GuiElementTextInput.cs-19-
+Vintagestory.API.Client/GuiElementTextInput.cs:20:	protected double disabledAlpha = 0.3499999940395355;
+Vintagestory.API.Client/GuiElementTextInput.cs-21-
+Vintagestory.API.Client/GuiElementTextInput.cs-22-	private bool focusLostSinceKeyDown;
+Vintagestory.API.Client/GuiElementTextInput.cs-23-
+Vintagestory.API.Client/GuiElementTextInput.cs-24-	public override bool Enabled
+Vintagestory.API.Client/GuiElementTextInput.cs-25-	{
+Vintagestory.API.Client/GuiElementTextInput.cs-26-		get
+Vintagestory.API.Client/GuiElementTextInput.cs-27-		{
+Vintagestory.API.Client/GuiElementTextInput.cs-28-			return base.Enabled;
+Vintagestory.API.Client/GuiElementTextInput.cs-29-		}
+Vintagestory.API.Client/GuiElementTextInput.cs-30-		set
+Vintagestory.API.Client/GuiElementTextInput.cs-31-		{
+Vintagestory.API.Client/GuiElementTextInput.cs-32-			bool flag = enabled;
+Vintagestory.API.Client/GuiElementTextInput.cs-33-			enabled = value;
+Vintagestory.API.Client/GuiElementTextInput.cs-34-			MouseOverCursor = (value ? "textselect" : null);
+Vintagestory.API.Client/GuiElementTextInput.cs-35-			Font.Color[3] = (enabled ? enabledAlpha : disabledAlpha);
+Vintagestory.API.Client/GuiElementTextInput.cs-36-			if (flag != enabled)
+Vintagestory.API.Client/GuiElementTextInput.cs-37-			{
+Vintagestory.API.Client/GuiElementTextInput.cs-38-				RecomposeText();
+Vintagestory.API.Client/GuiElementTextInput.cs-39-			}
+Vintagestory.API.Client/GuiElementTextInput.cs-40-		}
+Vintagestory.API.Client/GuiElementTextInput.cs-41-	}
+Vintagestory.API.Client/GuiElementTextInput.cs-42-
+Vintagestory.API.Client/GuiElementTextInput.cs-43-	/// <summary>
+Vintagestory.API.Client/GuiElementTextInput.cs-44-	/// Adds a text input to the GUI
+Vintagestory.API.Client/GuiElementTextInput.cs-45-	/// </summary>
+--
+Vintagestory.API.Client/GuiElementTextInput.cs-76-	public override void ComposeTextElements(Context ctx, ImageSurface surface)
+Vintagestory.API.Client/GuiElementTextInput.cs-77-	{
+Vintagestory.API.Client/GuiElementTextInput.cs-78-		EmbossRoundRectangleElement(ctx, Bounds, inverse: true, 2, 1);
+Vintagestory.API.Client/GuiElementTextInput.cs-79-		ctx.SetSourceRGBA(0.0, 0.0, 0.0, 0.2);
+Vintagestory.API.Client/GuiElementTextInput.cs-80-		ElementRoundRectangle(ctx, Bounds, isBackground: false, 1.0);
+Vintagestory.API.Client/GuiElementTextInput.cs-81-		ctx.Fill();
+Vintagestory.API.Client/GuiElementTextInput.cs-82-		ImageSurface imageSurface = new ImageSurface(Format.Argb32, (int)Bounds.OuterWidth, (int)Bounds.OuterHeight);
+Vintagestory.API.Client/GuiElementTextInput.cs-83-		Context context = genContext(imageSurface);
+Vintagestory.API.Client/GuiElementTextInput.cs-84-		context.SetSourceRGBA(1.0, 1.0, 1.0, 0.2);
+Vintagestory.API.Client/GuiElementTextInput.cs-85-		context.Paint();
+Vintagestory.API.Client/GuiElementTextInput.cs-86-		if (!enabled)
+Vintagestory.API.Client/GuiElementTextInput.cs-87-		{
+Vintagestory.API.Client/GuiElementTextInput.cs:88:			Font.Color[3] = 0.3499999940395355;
+Vintagestory.API.Client/GuiElementTextInput.cs-89-		}
+Vintagestory.API.Client/GuiElementTextInput.cs-90-		generateTexture(imageSurface, ref highlightTexture);
+Vintagestory.API.Client/GuiElementTextInput.cs-91-		context.Dispose();
+Vintagestory.API.Client/GuiElementTextInput.cs-92-		imageSurface.Dispose();
+Vintagestory.API.Client/GuiElementTextInput.cs-93-		highlightBounds = Bounds.CopyOffsetedSibling().WithFixedPadding(0.0, 0.0).FixedGrow(2.0 * Bounds.absPaddingX, 2.0 * Bounds.absPaddingY);
+Vintagestory.API.Client/GuiElementTextInput.cs-94-		highlightBounds.CalcWorldBounds();
+Vintagestory.API.Client/GuiElementTextInput.cs-95-		RecomposeText();
+Vintagestory.API.Client/GuiElementTextInput.cs-96-	}
+Vintagestory.API.Client/GuiElementTextInput.cs-97-
+Vintagestory.API.Client/GuiElementTextInput.cs-98-	public override void RenderInteractiveElements(float deltaTime)
+Vintagestory.API.Client/GuiElementTextInput.cs-99-	{
+Vintagestory.API.Client/GuiElementTextInput.cs-100-		if (HasFocus)
+Vintagestory.API.Client/GuiElementTextInput.cs-101-		{
+Vintagestory.API.Client/GuiElementTextInput.cs-102-			api.Render.GlToggleBlend(blend: true);
+Vintagestory.API.Client/GuiElementTextInput.cs-103-			api.Render.Render2DTexture(highlightTexture.TextureId, highlightBounds);
+Vintagestory.API.Client/GuiElementTextInput.cs-104-		}
+Vintagestory.API.Client/GuiElementTextInput.cs-105-		else if (placeHolderTextTexture != null && (text == null || text.Length == 0) && (lines == null || lines.Count == 0 || lines[0] == null || lines[0] == ""))
+Vintagestory.API.Client/GuiElementTextInput.cs-106-		{
+Vintagestory.API.Client/GuiElementTextInput.cs-107-			api.Render.GlToggleBlend(blend: true);
+Vintagestory.API.Client/GuiElementTextInput.cs-108-			api.Render.Render2DTexturePremultipliedAlpha(placeHolderTextTexture.TextureId, (int)(highlightBounds.renderX + highlightBounds.absPaddingX + 3.0), (int)(highlightBounds.renderY + highlightBounds.absPaddingY + (highlightBounds.OuterHeight - (double)placeHolderTextTexture.Height) / 2.0), placeHolderTextTexture.Width, placeHolderTextTexture.Height
+Vintagestory.API.Client/GuiElementTextInput.cs-109-		}
+Vintagestory.API.Client/GuiElementTextInput.cs-110-		api.Render.GlScissor((int)Bounds.renderX, (int)((double)api.Render.FrameHeight - Bounds.renderY - Bounds.InnerHeight), Math.Max(0, Bounds.OuterWidthInt + 1 - (int)rightSpacing), Math.Max(0, Bounds.OuterHeightInt + 1 - (int)bottomSpacing));
+Vintagestory.API.Client/GuiElementTextInput.cs-111-		api.Render.GlScissorFlag(enable: true);
+Vintagestory.API.Client/GuiElementTextInput.cs-112-		RenderTextSelection();
+Vintagestory.API.Client/GuiElementTextInput.cs-113-		api.Render.Render2DTexturePremultipliedAlpha(textTexture.TextureId, Bounds.renderX - renderLeftOffset, Bounds.renderY, textSize.X, textSize.Y);
+--
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-47-	/// The amount of drag while travelling through water.
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-48-	/// </summary>
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-49-	public double WaterDragValue = GlobalConstants.WaterDrag;
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-50-
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-51-	/// <summary>
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-52-	/// The amount of drag while travelling through the air.
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-53-	/// </summary>
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-54-	public double AirDragValue = GlobalConstants.AirDragAlways;
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-55-
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-56-	/// <summary>
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-57-	/// The amount of drag while travelling on the ground.
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-58-	/// </summary>
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs:59:	public double GroundDragValue = 0.699999988079071;
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-60-
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-61-	/// <summary>
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-62-	/// The amount of drag while travelling on the ground.
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-63-	/// </summary>
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-64-	public double BoyancyMul = 1.0;
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-65-
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-66-	/// <summary>
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-67-	/// The amount of gravity applied per tick to this entity.
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-68-	/// </summary>
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-69-	public double GravityPerSecond = GlobalConstants.GravityPerSecond;
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-70-
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-71-	/// <summary>
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-72-	/// If set, will test for entity collision every tick (expensive)
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-73-	/// </summary>
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-74-	public Action<float> OnPhysicsTickCallback;
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-75-
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-76-	/// <summary>
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-77-	/// True when theres 1000 currently loaded entities. This will cause dropped items to enter a physics dormancy state if the conditions are right. Set by ModSystemDormancyStateChecker in EntityItemRenderer.cs
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-78-	/// </summary>
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-79-	public static bool UsePhysicsDormancyStateServer;
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-80-
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-81-	/// <summary>
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-82-	/// Used for performance, to put near-stationary passive entities (eg. EntityItem) into a low update state
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-83-	/// </summary>
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-84-	protected int restingCounter;
+--
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-174-		{
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-175-			motion.Set(0.0, 0.0, 0.0);
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-176-		}
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-177-		entity.Pos.Motion.Set(motion);
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-178-		PhysicsBehaviorBase.collisionTester.NewTick(entityPos);
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-179-		SetState(entityPos);
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-180-		RemoteMotionAndCollision(entityPos, num);
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-181-		ApplyTests(entityPos);
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-182-	}
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-183-
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-184-	public void RemoteMotionAndCollision(EntityPos pos, float dtFactor)
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-185-	{
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs:186:		double num = GravityPerSecond / 60.0 * (double)dtFactor + Math.Max(0.0, -0.014999999664723873 * pos.Motion.Y * (double)dtFactor);
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-187-		pos.Motion.Y -= num;
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-188-		PhysicsBehaviorBase.collisionTester.ApplyTerrainCollision(entity, pos, dtFactor, ref newPos, 0f, CollisionYExtra);
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-189-		bool flag = pos.Motion.Y < 0.0;
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-190-		entity.OnGround = entity.CollidedVertically & flag;
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-191-		pos.Motion.Y += num;
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-192-		pos.SetPos(nPos);
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-193-	}
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-194-
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-195-	public void MotionAndCollision(EntityPos pos, float dt)
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-196-	{
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-197-		float num = 60f * dt;
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-198-		Entity entity = base.entity;
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-199-		Vec3d motion = pos.Motion;
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-200-		IBlockAccessor blockAccessor = entity.World.BlockAccessor;
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-201-		int dimension = pos.Dimension;
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-202-		if (onGroundBefore)
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-203-		{
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-204-			if (motion.HorLength() < 1E-05)
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-205-			{
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-206-				motion.X = 0.0;
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-207-				motion.Z = 0.0;
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-208-			}
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-209-			else if (!feetInLiquidBefore)
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-210-			{
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-211-				Block blockRaw = blockAccessor.GetBlockRaw((int)pos.X, (int)(pos.InternalY - 0.05000000074505806), (int)pos.Z, 1);
+--
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-235-		{
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-236-			motion.Scale((float)Math.Pow(AirDragValue, dt * 33f));
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-237-		}
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-238-		if (entity.ApplyGravity)
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-239-		{
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-240-			double num4 = GravityPerSecond / 60.0 * (double)num;
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-241-			if (entity.Swimming)
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-242-			{
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-243-				float num5 = GameMath.Clamp(1f - entity.MaterialDensity / (float)block.MaterialDensity, -1f, 1f);
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-244-				Block blockRaw2 = blockAccessor.GetBlockRaw((int)pos.X, (int)(pos.InternalY + 1.0), (int)pos.Z, 2);
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-245-				float num6 = GameMath.Clamp((float)(int)pos.Y + (float)block.LiquidLevel / 8f + (blockRaw2.IsLiquid() ? 1.125f : 0f) - (float)pos.Y - (entity.SelectionBox.Y2 - (float)entity.SwimmingOffsetY), 0f, 1f);
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-246-				double num7 = GameMath.Clamp(60f * num5 * num6, -0.5f, 1.5f) - 1f;
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs:247:				double num8 = GameMath.Clamp(10.0 * Math.Abs(motion.Length() * (double)num) - 0.019999999552965164, 1.0, 1.25);
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-248-				motion.Y += num4 * num7 * BoyancyMul;
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-249-				motion.Mul(1.0 / num8);
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-250-			}
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-251-			else
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-252-			{
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-253-				motion.Y -= num4;
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-254-			}
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-255-		}
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-256-		double num9 = motion.X * (double)num + pos.X;
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-257-		double num10 = motion.Y * (double)num + pos.Y;
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-258-		double num11 = motion.Z * (double)num + pos.Z;
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-259-		applyCollision(pos, num);
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-260-		Vec3d vec3d = newPos;
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-261-		if (blockAccessor.IsNotTraversable((int)num9, (int)pos.Y, (int)pos.Z, dimension))
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-262-		{
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-263-			vec3d.X = pos.X;
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-264-		}
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-265-		if (blockAccessor.IsNotTraversable((int)pos.X, (int)num10, (int)pos.Z, dimension))
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-266-		{
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-267-			vec3d.Y = pos.Y;
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-268-		}
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-269-		if (blockAccessor.IsNotTraversable((int)pos.X, (int)pos.Y, (int)num11, dimension))
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-270-		{
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-271-			vec3d.Z = pos.Z;
+Vintagestory.API.Common/EntityBehaviorPassivePhysics.cs-272-		}
+--
+Vintagestory.API.Common/BlockMaterialUtil.cs-22-		blastResistances[num][0] = 0.0;
+Vintagestory.API.Common/BlockMaterialUtil.cs-23-		blastResistances[num][1] = 3.2;
+Vintagestory.API.Common/BlockMaterialUtil.cs-24-		blastResistances[num][2] = 3.2;
+Vintagestory.API.Common/BlockMaterialUtil.cs-25-		blastResistances[num][3] = 2.4;
+Vintagestory.API.Common/BlockMaterialUtil.cs-26-		blastResistances[num][4] = 2.0;
+Vintagestory.API.Common/BlockMaterialUtil.cs-27-		blastResistances[num][5] = 0.4;
+Vintagestory.API.Common/BlockMaterialUtil.cs-28-		blastResistances[num][6] = 2.0;
+Vintagestory.API.Common/BlockMaterialUtil.cs-29-		blastResistances[num][7] = 16.0;
+Vintagestory.API.Common/BlockMaterialUtil.cs-30-		blastResistances[num][8] = 4.0;
+Vintagestory.API.Common/BlockMaterialUtil.cs-31-		blastResistances[num][9] = 0.4;
+Vintagestory.API.Common/BlockMaterialUtil.cs-32-		blastResistances[num][10] = 2.0;
+Vintagestory.API.Common/BlockMaterialUtil.cs-33-		blastResistances[num][11] = 8.0;
+Vintagestory.API.Common/BlockMaterialUtil.cs:34:		blastResistances[num][12] = 999999.0;
+Vintagestory.API.Common/BlockMaterialUtil.cs-35-		blastResistances[num][13] = 0.1;
+Vintagestory.API.Common/BlockMaterialUtil.cs-36-		blastResistances[num][14] = 0.1;
+Vintagestory.API.Common/BlockMaterialUtil.cs-37-		blastResistances[num][15] = 0.3;
+Vintagestory.API.Common/BlockMaterialUtil.cs-38-		blastResistances[num][16] = 0.2;
+Vintagestory.API.Common/BlockMaterialUtil.cs-39-		blastResistances[num][17] = 6.0;
+Vintagestory.API.Common/BlockMaterialUtil.cs-40-		blastResistances[num][18] = 4.0;
+Vintagestory.API.Common/BlockMaterialUtil.cs-41-		blastResistances[num][21] = 1.0;
+Vintagestory.API.Common/BlockMaterialUtil.cs-42-		num = 0;
+Vintagestory.API.Common/BlockMaterialUtil.cs-43-		blastDropChances[num] = new double[values2.Length];
+Vintagestory.API.Common/BlockMaterialUtil.cs-44-		blastDropChances[num].Fill(0.25);
+Vintagestory.API.Common/BlockMaterialUtil.cs-45-		blastDropChances[num][7] = 0.9;
+Vintagestory.API.Common/BlockMaterialUtil.cs-46-		blastResistances[num] = new double[values2.Length];
+Vintagestory.API.Common/BlockMaterialUtil.cs-47-		blastResistances[num][0] = 0.0;
+Vintagestory.API.Common/BlockMaterialUtil.cs-48-		blastResistances[num][1] = 1.6;
+Vintagestory.API.Common/BlockMaterialUtil.cs-49-		blastResistances[num][2] = 3.2;
+Vintagestory.API.Common/BlockMaterialUtil.cs-50-		blastResistances[num][3] = 2.4;
+Vintagestory.API.Common/BlockMaterialUtil.cs-51-		blastResistances[num][4] = 2.0;
+Vintagestory.API.Common/BlockMaterialUtil.cs-52-		blastResistances[num][5] = 0.4;
+Vintagestory.API.Common/BlockMaterialUtil.cs-53-		blastResistances[num][6] = 3.0;
+Vintagestory.API.Common/BlockMaterialUtil.cs-54-		blastResistances[num][8] = 4.0;
+Vintagestory.API.Common/BlockMaterialUtil.cs-55-		blastResistances[num][9] = 0.4;
+Vintagestory.API.Common/BlockMaterialUtil.cs-56-		blastResistances[num][10] = 2.0;
+Vintagestory.API.Common/BlockMaterialUtil.cs-57-		blastResistances[num][11] = 8.0;
+Vintagestory.API.Common/BlockMaterialUtil.cs:58:		blastResistances[num][12] = 999999.0;
+Vintagestory.API.Common/BlockMaterialUtil.cs-59-		blastResistances[num][13] = 0.1;
+Vintagestory.API.Common/BlockMaterialUtil.cs-60-		blastResistances[num][14] = 0.1;
+Vintagestory.API.Common/BlockMaterialUtil.cs-61-		blastResistances[num][15] = 0.3;
+Vintagestory.API.Common/BlockMaterialUtil.cs-62-		blastResistances[num][16] = 0.2;
+Vintagestory.API.Common/BlockMaterialUtil.cs-63-		blastResistances[num][17] = 6.0;
+Vintagestory.API.Common/BlockMaterialUtil.cs-64-		blastResistances[num][18] = 4.0;
+Vintagestory.API.Common/BlockMaterialUtil.cs-65-		blastResistances[num][21] = 1.0;
+Vintagestory.API.Common/BlockMaterialUtil.cs-66-		num = 2;
+Vintagestory.API.Common/BlockMaterialUtil.cs-67-		blastDropChances[num] = new double[values2.Length];
+Vintagestory.API.Common/BlockMaterialUtil.cs-68-		blastDropChances[num].Fill(0.5);
+Vintagestory.API.Common/BlockMaterialUtil.cs-69-		blastResistances[num] = new double[values2.Length];
+Vintagestory.API.Common/BlockMaterialUtil.cs-70-		blastResistances[num][0] = 0.0;
+Vintagestory.API.Common/BlockMaterialUtil.cs-71-		blastResistances[num][1] = 38.400000000000006;
+Vintagestory.API.Common/BlockMaterialUtil.cs-72-		blastResistances[num][2] = 38.400000000000006;
+Vintagestory.API.Common/BlockMaterialUtil.cs:73:		blastResistances[num][3] = 28.799999999999997;
+Vintagestory.API.Common/BlockMaterialUtil.cs-74-		blastResistances[num][4] = 24.0;
+Vintagestory.API.Common/BlockMaterialUtil.cs-75-		blastResistances[num][5] = 4.800000000000001;
+Vintagestory.API.Common/BlockMaterialUtil.cs:76:		blastResistances[num][6] = 67.19999999999999;
+Vintagestory.API.Common/BlockMaterialUtil.cs-77-		blastResistances[num][7] = 48.0;
+Vintagestory.API.Common/BlockMaterialUtil.cs-78-		blastResistances[num][8] = 48.0;
+Vintagestory.API.Common/BlockMaterialUtil.cs-79-		blastResistances[num][9] = 4.800000000000001;
+Vintagestory.API.Common/BlockMaterialUtil.cs-80-		blastResistances[num][10] = 24.0;
+Vintagestory.API.Common/BlockMaterialUtil.cs-81-		blastResistances[num][11] = 96.0;
+Vintagestory.API.Common/BlockMaterialUtil.cs-82-		blastResistances[num][12] = 11999988.0;
+Vintagestory.API.Common/BlockMaterialUtil.cs-83-		blastResistances[num][13] = 1.2000000000000002;
+Vintagestory.API.Common/BlockMaterialUtil.cs-84-		blastResistances[num][14] = 1.2000000000000002;
+Vintagestory.API.Common/BlockMaterialUtil.cs:85:		blastResistances[num][15] = 3.5999999999999996;
+Vintagestory.API.Common/BlockMaterialUtil.cs-86-		blastResistances[num][16] = 2.4000000000000004;
+Vintagestory.API.Common/BlockMaterialUtil.cs-87-		blastResistances[num][17] = 72.0;
+Vintagestory.API.Common/BlockMaterialUtil.cs-88-		blastResistances[num][18] = 48.0;
+Vintagestory.API.Common/BlockMaterialUtil.cs-89-		blastResistances[num][21] = 12.0;
+Vintagestory.API.Common/BlockMaterialUtil.cs-90-	}
+Vintagestory.API.Common/BlockMaterialUtil.cs-91-
+Vintagestory.API.Common/BlockMaterialUtil.cs-92-	/// <summary>
+Vintagestory.API.Common/BlockMaterialUtil.cs-93-	/// Calculates the blast resistance of a given material.
+Vintagestory.API.Common/BlockMaterialUtil.cs-94-	/// </summary>
+Vintagestory.API.Common/BlockMaterialUtil.cs-95-	/// <param name="blastType">The blast type the material is being it with.</param>
+Vintagestory.API.Common/BlockMaterialUtil.cs-96-	/// <param name="material">The material of the block.</param>
+Vintagestory.API.Common/BlockMaterialUtil.cs-97-	/// <returns>the resulting blast resistance.</returns>
+Vintagestory.API.Common/BlockMaterialUtil.cs-98-	public static double MaterialBlastResistance(EnumBlastType blastType, EnumBlockMaterial material)
+Vintagestory.API.Common/BlockMaterialUtil.cs-99-	{
+Vintagestory.API.Common/BlockMaterialUtil.cs-100-		return blastResistances[(int)blastType][(int)material];
+Vintagestory.API.Common/BlockMaterialUtil.cs-101-	}
+Vintagestory.API.Common/BlockMaterialUtil.cs-102-
+Vintagestory.API.Common/BlockMaterialUtil.cs-103-	/// <summary>
+Vintagestory.API.Common/BlockMaterialUtil.cs-104-	/// Calculates the blast drop chance of a given material.
+Vintagestory.API.Common/BlockMaterialUtil.cs-105-	/// </summary>
+Vintagestory.API.Common/BlockMaterialUtil.cs-106-	/// <param name="blastType">The blast type the material is being it with.</param>
+Vintagestory.API.Common/BlockMaterialUtil.cs-107-	/// <param name="material">The material of the block.</param>
+Vintagestory.API.Common/BlockMaterialUtil.cs-108-	/// <returns>the resulting drop chance.</returns>
+Vintagestory.API.Common/BlockMaterialUtil.cs-109-	public static double MaterialBlastDropChances(EnumBlastType blastType, EnumBlockMaterial material)
+Vintagestory.API.Common/BlockMaterialUtil.cs-110-	{
+--
+Vintagestory.API.Common/ItemSlot.cs-27-	public string HexBackgroundColor;
+Vintagestory.API.Common/ItemSlot.cs-28-
+Vintagestory.API.Common/ItemSlot.cs-29-	/// <summary>
+Vintagestory.API.Common/ItemSlot.cs-30-	/// Restrictions on which items can be stored here.
+Vintagestory.API.Common/ItemSlot.cs-31-	/// An item with any of the provided tags is storable.
+Vintagestory.API.Common/ItemSlot.cs-32-	/// An empty set (default) means no restrictions.
+Vintagestory.API.Common/ItemSlot.cs-33-	/// </summary>
+Vintagestory.API.Common/ItemSlot.cs-34-	public virtual TagSet CanStoreTags { get; set; } = new TagSet();
+Vintagestory.API.Common/ItemSlot.cs-35-
+Vintagestory.API.Common/ItemSlot.cs-36-	/// <summary>
+Vintagestory.API.Common/ItemSlot.cs-37-	/// The upper holding limit of the slot itself. Standard slots are only limited by the item stacks maxstack size.
+Vintagestory.API.Common/ItemSlot.cs-38-	/// </summary>
+Vintagestory.API.Common/ItemSlot.cs:39:	public virtual int MaxSlotStackSize { get; set; } = 999999;
+Vintagestory.API.Common/ItemSlot.cs-40-
+Vintagestory.API.Common/ItemSlot.cs-41-	/// <summary>
+Vintagestory.API.Common/ItemSlot.cs-42-	/// Gets the inventory attached to this ItemSlot.
+Vintagestory.API.Common/ItemSlot.cs-43-	/// </summary>
+Vintagestory.API.Common/ItemSlot.cs-44-	public InventoryBase Inventory => inventory;
+Vintagestory.API.Common/ItemSlot.cs-45-
+Vintagestory.API.Common/ItemSlot.cs-46-	public virtual bool DrawUnavailable { get; set; }
+Vintagestory.API.Common/ItemSlot.cs-47-
+Vintagestory.API.Common/ItemSlot.cs-48-	/// <summary>
+Vintagestory.API.Common/ItemSlot.cs-49-	/// The ItemStack contained within the slot.
+Vintagestory.API.Common/ItemSlot.cs-50-	/// </summary>
+Vintagestory.API.Common/ItemSlot.cs-51-	public ItemStack? Itemstack
+Vintagestory.API.Common/ItemSlot.cs-52-	{
+Vintagestory.API.Common/ItemSlot.cs-53-		get
+Vintagestory.API.Common/ItemSlot.cs-54-		{
+Vintagestory.API.Common/ItemSlot.cs-55-			return itemstack;
+Vintagestory.API.Common/ItemSlot.cs-56-		}
+Vintagestory.API.Common/ItemSlot.cs-57-		set
+Vintagestory.API.Common/ItemSlot.cs-58-		{
+Vintagestory.API.Common/ItemSlot.cs-59-			itemstack = value;
+Vintagestory.API.Common/ItemSlot.cs-60-		}
+Vintagestory.API.Common/ItemSlot.cs-61-	}
+Vintagestory.API.Common/ItemSlot.cs-62-
+Vintagestory.API.Common/ItemSlot.cs-63-	/// <summary>
+Vintagestory.API.Common/ItemSlot.cs-64-	/// The number of items in the stack.
+--
+Vintagestory.API.Common/EntityAgent.cs-723-
+Vintagestory.API.Common/EntityAgent.cs-724-	protected virtual void HandleHandAnimations(float dt)
+Vintagestory.API.Common/EntityAgent.cs-725-	{
+Vintagestory.API.Common/EntityAgent.cs-726-	}
+Vintagestory.API.Common/EntityAgent.cs-727-
+Vintagestory.API.Common/EntityAgent.cs-728-	/// <summary>
+Vintagestory.API.Common/EntityAgent.cs-729-	/// Gets the walk speed multiplier.
+Vintagestory.API.Common/EntityAgent.cs-730-	/// </summary>
+Vintagestory.API.Common/EntityAgent.cs-731-	/// <param name="groundDragFactor">The amount of drag provided by the current ground. (Default: 0.3)</param>
+Vintagestory.API.Common/EntityAgent.cs-732-	public virtual double GetWalkSpeedMultiplier(double groundDragFactor = 0.3)
+Vintagestory.API.Common/EntityAgent.cs-733-	{
+Vintagestory.API.Common/EntityAgent.cs-734-		int num = (int)(Pos.InternalY - 0.05000000074505806);
+Vintagestory.API.Common/EntityAgent.cs:735:		int num2 = (int)(Pos.InternalY + 0.009999999776482582);
+Vintagestory.API.Common/EntityAgent.cs-736-		Block blockRaw = World.BlockAccessor.GetBlockRaw((int)Pos.X, num, (int)Pos.Z);
+Vintagestory.API.Common/EntityAgent.cs-737-		insidePos.Set((int)Pos.X, num2, (int)Pos.Z);
+Vintagestory.API.Common/EntityAgent.cs-738-		insidePos.SetDimension(Pos.Dimension);
+Vintagestory.API.Common/EntityAgent.cs-739-		insideBlock = World.BlockAccessor.GetBlock(insidePos);
+Vintagestory.API.Common/EntityAgent.cs-740-		double num3 = (servercontrols.Sneak ? ((double)GlobalConstants.SneakSpeedMultiplier) : 1.0) * (servercontrols.Sprint ? GlobalConstants.SprintSpeedMultiplier : 1.0);
+Vintagestory.API.Common/EntityAgent.cs-741-		if (FeetInLiquid)
+Vintagestory.API.Common/EntityAgent.cs-742-		{
+Vintagestory.API.Common/EntityAgent.cs-743-			num3 /= 2.5;
+Vintagestory.API.Common/EntityAgent.cs-744-		}
+Vintagestory.API.Common/EntityAgent.cs-745-		return num3 * (double)(blockRaw.WalkSpeedMultiplier * ((num == num2) ? 1f : insideBlock.WalkSpeedMultiplier));
+Vintagestory.API.Common/EntityAgent.cs-746-	}
+Vintagestory.API.Common/EntityAgent.cs-747-
+Vintagestory.API.Common/EntityAgent.cs-748-	/// <summary>
+Vintagestory.API.Common/EntityAgent.cs-749-	/// Serializes the slots contents to be stored in the SaveGame
+Vintagestory.API.Common/EntityAgent.cs-750-	/// </summary>
+Vintagestory.API.Common/EntityAgent.cs-751-	/// <returns></returns>
+Vintagestory.API.Common/EntityAgent.cs-752-	public override void ToBytes(BinaryWriter writer, bool forClient)
+Vintagestory.API.Common/EntityAgent.cs-753-	{
+Vintagestory.API.Common/EntityAgent.cs-754-		if (MountedOn != null)
+Vintagestory.API.Common/EntityAgent.cs-755-		{
+Vintagestory.API.Common/EntityAgent.cs-756-			TreeAttribute treeAttribute = new TreeAttribute();
+Vintagestory.API.Common/EntityAgent.cs-757-			MountedOn?.MountableToTreeAttributes(treeAttribute);
+Vintagestory.API.Common/EntityAgent.cs-758-			WatchedAttributes["mountedOn"] = treeAttribute;
+Vintagestory.API.Common/EntityAgent.cs-759-		}
+Vintagestory.API.Common/EntityAgent.cs-760-		else if (WatchedAttributes.HasAttribute("mountedOn"))
+--
+Vintagestory.API.Common/EntityPlayer.cs-412-		{
+Vintagestory.API.Common/EntityPlayer.cs-413-			OtherAnimManager.Init(api, this);
+Vintagestory.API.Common/EntityPlayer.cs-414-		}
+Vintagestory.API.Common/EntityPlayer.cs-415-	}
+Vintagestory.API.Common/EntityPlayer.cs-416-
+Vintagestory.API.Common/EntityPlayer.cs-417-	public override double GetWalkSpeedMultiplier(double groundDragFactor = 0.3)
+Vintagestory.API.Common/EntityPlayer.cs-418-	{
+Vintagestory.API.Common/EntityPlayer.cs-419-		double num = base.GetWalkSpeedMultiplier(groundDragFactor);
+Vintagestory.API.Common/EntityPlayer.cs-420-		IPlayer player = Player;
+Vintagestory.API.Common/EntityPlayer.cs-421-		if (player != null && player.WorldData.CurrentGameMode == EnumGameMode.Creative)
+Vintagestory.API.Common/EntityPlayer.cs-422-		{
+Vintagestory.API.Common/EntityPlayer.cs-423-			int num2 = (int)(Pos.InternalY - 0.05000000074505806);
+Vintagestory.API.Common/EntityPlayer.cs:424:			int num3 = (int)(Pos.InternalY + 0.009999999776482582);
+Vintagestory.API.Common/EntityPlayer.cs-425-			Block blockRaw = World.BlockAccessor.GetBlockRaw((int)Pos.X, num2, (int)Pos.Z);
+Vintagestory.API.Common/EntityPlayer.cs-426-			num /= (double)(blockRaw.WalkSpeedMultiplier * ((num2 == num3) ? 1f : insideBlock.WalkSpeedMultiplier));
+Vintagestory.API.Common/EntityPlayer.cs-427-		}
+Vintagestory.API.Common/EntityPlayer.cs-428-		num *= (double)GameMath.Clamp(walkSpeed, 0f, 999f);
+Vintagestory.API.Common/EntityPlayer.cs-429-		if (!servercontrols.Sneak && !PrevFrameCanStandUp)
+Vintagestory.API.Common/EntityPlayer.cs-430-		{
+Vintagestory.API.Common/EntityPlayer.cs-431-			num *= (double)GlobalConstants.SneakSpeedMultiplier;
+Vintagestory.API.Common/EntityPlayer.cs-432-		}
+Vintagestory.API.Common/EntityPlayer.cs-433-		return num;
+Vintagestory.API.Common/EntityPlayer.cs-434-	}
+Vintagestory.API.Common/EntityPlayer.cs-435-
+Vintagestory.API.Common/EntityPlayer.cs-436-	public void OnSelfBeforeRender(float dt)
+Vintagestory.API.Common/EntityPlayer.cs-437-	{
+Vintagestory.API.Common/EntityPlayer.cs-438-		updateEyeHeight(dt);
+Vintagestory.API.Common/EntityPlayer.cs-439-		HandleSeraphHandAnimations(dt);
+Vintagestory.API.Common/EntityPlayer.cs-440-	}
+Vintagestory.API.Common/EntityPlayer.cs-441-
+Vintagestory.API.Common/EntityPlayer.cs-442-	public override void OnTesselation(ref Shape entityShape, string shapePathForLogging)
+Vintagestory.API.Common/EntityPlayer.cs-443-	{
+Vintagestory.API.Common/EntityPlayer.cs-444-		tesselating = true;
+Vintagestory.API.Common/EntityPlayer.cs-445-		base.OnTesselation(ref entityShape, shapePathForLogging);
+Vintagestory.API.Common/EntityPlayer.cs-446-		ICoreAPI api = Api;
+Vintagestory.API.Common/EntityPlayer.cs-447-		if (api != null && api.Side == EnumAppSide.Client)
+Vintagestory.API.Common/EntityPlayer.cs-448-		{
+Vintagestory.API.Common/EntityPlayer.cs-449-			AnimManager.HeadController = new PlayerHeadController(AnimManager, this, entityShape);

@@ -1,0 +1,667 @@
+Vintagestory.GameContent/EntityBlockFalling.cs-70-	public bool DoRemoveBlock = true;
+Vintagestory.GameContent/EntityBlockFalling.cs-71-
+Vintagestory.GameContent/EntityBlockFalling.cs-72-	public float maxSpawnHeightForParticles = 1.4f;
+Vintagestory.GameContent/EntityBlockFalling.cs-73-
+Vintagestory.GameContent/EntityBlockFalling.cs-74-	public bool DoRender;
+Vintagestory.GameContent/EntityBlockFalling.cs-75-
+Vintagestory.GameContent/EntityBlockFalling.cs-76-	public MultiTextureMeshRef meshRef;
+Vintagestory.GameContent/EntityBlockFalling.cs-77-
+Vintagestory.GameContent/EntityBlockFalling.cs-78-	public bool reusedMeshRef;
+Vintagestory.GameContent/EntityBlockFalling.cs-79-
+Vintagestory.GameContent/EntityBlockFalling.cs-80-	private EntityPartitioning ep;
+Vintagestory.GameContent/EntityBlockFalling.cs-81-
+Vintagestory.GameContent/EntityBlockFalling.cs:82:	public override float MaterialDensity => 99999f;
+Vintagestory.GameContent/EntityBlockFalling.cs-83-
+Vintagestory.GameContent/EntityBlockFalling.cs-84-	public override byte[] LightHsv => lightHsv;
+Vintagestory.GameContent/EntityBlockFalling.cs-85-
+Vintagestory.GameContent/EntityBlockFalling.cs-86-	public Block Block => World.BlockAccessor.GetBlock(blockCode);
+Vintagestory.GameContent/EntityBlockFalling.cs-87-
+Vintagestory.GameContent/EntityBlockFalling.cs-88-	public override bool IsInteractable => false;
+Vintagestory.GameContent/EntityBlockFalling.cs-89-
+Vintagestory.GameContent/EntityBlockFalling.cs-90-	public EntityBlockFalling()
+Vintagestory.GameContent/EntityBlockFalling.cs-91-	{
+Vintagestory.GameContent/EntityBlockFalling.cs-92-	}
+Vintagestory.GameContent/EntityBlockFalling.cs-93-
+Vintagestory.GameContent/EntityBlockFalling.cs-94-	public EntityBlockFalling(Block block, BlockEntity blockEntity, BlockPos initialPos, AssetLocation fallSound, float impactDamageMul, bool canFallSideways, float dustIntensity)
+Vintagestory.GameContent/EntityBlockFalling.cs-95-	{
+Vintagestory.GameContent/EntityBlockFalling.cs-96-		this.impactDamageMul = impactDamageMul;
+Vintagestory.GameContent/EntityBlockFalling.cs-97-		this.fallSound = fallSound;
+Vintagestory.GameContent/EntityBlockFalling.cs-98-		this.canFallSideways = canFallSideways;
+Vintagestory.GameContent/EntityBlockFalling.cs-99-		this.dustIntensity = dustIntensity;
+Vintagestory.GameContent/EntityBlockFalling.cs-100-		WatchedAttributes.SetBool("canFallSideways", canFallSideways);
+Vintagestory.GameContent/EntityBlockFalling.cs-101-		WatchedAttributes.SetFloat("dustIntensity", dustIntensity);
+Vintagestory.GameContent/EntityBlockFalling.cs-102-		if (fallSound != null)
+Vintagestory.GameContent/EntityBlockFalling.cs-103-		{
+Vintagestory.GameContent/EntityBlockFalling.cs-104-			WatchedAttributes.SetString("fallSound", fallSound.ToShortString());
+Vintagestory.GameContent/EntityBlockFalling.cs-105-		}
+Vintagestory.GameContent/EntityBlockFalling.cs-106-		Code = new AssetLocation("blockfalling");
+Vintagestory.GameContent/EntityBlockFalling.cs-107-		blockCode = block.Code;
+--
+Vintagestory.GameContent/WeatherSimulationSnowAccum.cs-384-		int x = chunkPos.X;
+Vintagestory.GameContent/WeatherSimulationSnowAccum.cs-385-		int y = chunkPos.Y;
+Vintagestory.GameContent/WeatherSimulationSnowAccum.cs-386-		int num = x * 32 / regionsize;
+Vintagestory.GameContent/WeatherSimulationSnowAccum.cs-387-		int num2 = y * 32 / regionsize;
+Vintagestory.GameContent/WeatherSimulationSnowAccum.cs-388-		int num3 = num * regionsize;
+Vintagestory.GameContent/WeatherSimulationSnowAccum.cs-389-		int num4 = num2 * regionsize;
+Vintagestory.GameContent/WeatherSimulationSnowAccum.cs-390-		int seaLevel = sapi.World.SeaLevel;
+Vintagestory.GameContent/WeatherSimulationSnowAccum.cs-391-		int count = ws.GeneralConfig.SnowLayerBlocks.Count;
+Vintagestory.GameContent/WeatherSimulationSnowAccum.cs-392-		BlockPos blockPos = new BlockPos(0);
+Vintagestory.GameContent/WeatherSimulationSnowAccum.cs-393-		BlockPos blockPos2 = new BlockPos(0);
+Vintagestory.GameContent/WeatherSimulationSnowAccum.cs-394-		float num5 = sapi.World.BlockAccessor.MapSizeY - seaLevel;
+Vintagestory.GameContent/WeatherSimulationSnowAccum.cs-395-		ushort[] array = randomShuffles[sapi.World.Rand.Next(randomShuffles.Length)];
+Vintagestory.GameContent/WeatherSimulationSnowAccum.cs:396:		int num6 = -99999;
+Vintagestory.GameContent/WeatherSimulationSnowAccum.cs-397-		IWorldChunk worldChunk = null;
+Vintagestory.GameContent/WeatherSimulationSnowAccum.cs-398-		int max = sapi.World.BlockAccessor.MapSizeY - 1;
+Vintagestory.GameContent/WeatherSimulationSnowAccum.cs-399-		foreach (int num7 in array)
+Vintagestory.GameContent/WeatherSimulationSnowAccum.cs-400-		{
+Vintagestory.GameContent/WeatherSimulationSnowAccum.cs-401-			int num8 = GameMath.Clamp(mc.RainHeightMap[num7], 0, max);
+Vintagestory.GameContent/WeatherSimulationSnowAccum.cs-402-			int num9 = num8 / 32;
+Vintagestory.GameContent/WeatherSimulationSnowAccum.cs-403-			blockPos.Set(x * 32 + num7 % 32, num8, y * 32 + num7 / 32);
+Vintagestory.GameContent/WeatherSimulationSnowAccum.cs-404-			if (num6 != num9)
+Vintagestory.GameContent/WeatherSimulationSnowAccum.cs-405-			{
+Vintagestory.GameContent/WeatherSimulationSnowAccum.cs-406-				worldChunk = ((chunksCol != null) ? chunksCol[num9] : null) ?? sapi.WorldManager.GetChunk(x, num9, y);
+Vintagestory.GameContent/WeatherSimulationSnowAccum.cs-407-				num6 = num9;
+Vintagestory.GameContent/WeatherSimulationSnowAccum.cs-408-			}
+Vintagestory.GameContent/WeatherSimulationSnowAccum.cs-409-			if (worldChunk == null)
+Vintagestory.GameContent/WeatherSimulationSnowAccum.cs-410-			{
+Vintagestory.GameContent/WeatherSimulationSnowAccum.cs-411-				return null;
+Vintagestory.GameContent/WeatherSimulationSnowAccum.cs-412-			}
+Vintagestory.GameContent/WeatherSimulationSnowAccum.cs-413-			float x2 = (float)(blockPos.X - num3) / (float)regionsize;
+Vintagestory.GameContent/WeatherSimulationSnowAccum.cs-414-			float y2 = GameMath.Clamp((float)(blockPos.Y - seaLevel) / num5, 0f, 1f);
+Vintagestory.GameContent/WeatherSimulationSnowAccum.cs-415-			float z = (float)(blockPos.Z - num4) / (float)regionsize;
+Vintagestory.GameContent/WeatherSimulationSnowAccum.cs-416-			Block block = worldChunk.GetLocalBlockAtBlockPos(sapi.World, blockPos);
+Vintagestory.GameContent/WeatherSimulationSnowAccum.cs-417-			Block localBlockAtBlockPos = worldChunk.GetLocalBlockAtBlockPos(sapi.World, blockPos.X, blockPos.Y, blockPos.Z, 2);
+Vintagestory.GameContent/WeatherSimulationSnowAccum.cs-418-			if (localBlockAtBlockPos.Id != 0)
+Vintagestory.GameContent/WeatherSimulationSnowAccum.cs-419-			{
+Vintagestory.GameContent/WeatherSimulationSnowAccum.cs-420-				if (!localBlockAtBlockPos.IsLiquid())
+Vintagestory.GameContent/WeatherSimulationSnowAccum.cs-421-				{
+--
+Vintagestory.GameContent/POIRegistry.cs-49-				}
+Vintagestory.GameContent/POIRegistry.cs-50-			}
+Vintagestory.GameContent/POIRegistry.cs-51-		}
+Vintagestory.GameContent/POIRegistry.cs-52-	}
+Vintagestory.GameContent/POIRegistry.cs-53-
+Vintagestory.GameContent/POIRegistry.cs-54-	public IPointOfInterest GetNearestPoi(Vec3d centerPos, float radius, PoiMatcher matcher = null)
+Vintagestory.GameContent/POIRegistry.cs-55-	{
+Vintagestory.GameContent/POIRegistry.cs-56-		int num = (int)(centerPos.X - (double)radius) / 32;
+Vintagestory.GameContent/POIRegistry.cs-57-		int num2 = (int)(centerPos.Z - (double)radius) / 32;
+Vintagestory.GameContent/POIRegistry.cs-58-		int num3 = (int)(centerPos.X + (double)radius) / 32;
+Vintagestory.GameContent/POIRegistry.cs-59-		int num4 = (int)(centerPos.Z + (double)radius) / 32;
+Vintagestory.GameContent/POIRegistry.cs-60-		float num5 = radius * radius;
+Vintagestory.GameContent/POIRegistry.cs:61:		float num6 = 9999999f;
+Vintagestory.GameContent/POIRegistry.cs-62-		IPointOfInterest result = null;
+Vintagestory.GameContent/POIRegistry.cs-63-		for (int i = num; i <= num3; i++)
+Vintagestory.GameContent/POIRegistry.cs-64-		{
+Vintagestory.GameContent/POIRegistry.cs-65-			for (int j = num2; j <= num4; j++)
+Vintagestory.GameContent/POIRegistry.cs-66-			{
+Vintagestory.GameContent/POIRegistry.cs-67-				tmp.Set(i, j);
+Vintagestory.GameContent/POIRegistry.cs-68-				PoisByChunkColumn.TryGetValue(tmp, out var value);
+Vintagestory.GameContent/POIRegistry.cs-69-				if (value == null)
+Vintagestory.GameContent/POIRegistry.cs-70-				{
+Vintagestory.GameContent/POIRegistry.cs-71-					continue;
+Vintagestory.GameContent/POIRegistry.cs-72-				}
+Vintagestory.GameContent/POIRegistry.cs-73-				for (int k = 0; k < value.Count; k++)
+Vintagestory.GameContent/POIRegistry.cs-74-				{
+Vintagestory.GameContent/POIRegistry.cs-75-					float num7 = value[k].Position.SquareDistanceTo(centerPos);
+Vintagestory.GameContent/POIRegistry.cs-76-					if (!(num7 > num5) && num7 < num6 && matcher(value[k]))
+Vintagestory.GameContent/POIRegistry.cs-77-					{
+Vintagestory.GameContent/POIRegistry.cs-78-						result = value[k];
+Vintagestory.GameContent/POIRegistry.cs-79-						num6 = num7;
+Vintagestory.GameContent/POIRegistry.cs-80-					}
+Vintagestory.GameContent/POIRegistry.cs-81-				}
+Vintagestory.GameContent/POIRegistry.cs-82-			}
+Vintagestory.GameContent/POIRegistry.cs-83-		}
+Vintagestory.GameContent/POIRegistry.cs-84-		return result;
+Vintagestory.GameContent/POIRegistry.cs-85-	}
+Vintagestory.GameContent/POIRegistry.cs-86-
+Vintagestory.GameContent/POIRegistry.cs-87-	public IPointOfInterest GetWeightedNearestPoi(Vec3d centerPos, float radius, PoiMatcher matcher = null)
+Vintagestory.GameContent/POIRegistry.cs-88-	{
+Vintagestory.GameContent/POIRegistry.cs-89-		int num = (int)(centerPos.X - (double)radius) / 32;
+Vintagestory.GameContent/POIRegistry.cs-90-		int num2 = (int)(centerPos.Z - (double)radius) / 32;
+Vintagestory.GameContent/POIRegistry.cs-91-		int num3 = (int)(centerPos.X + (double)radius) / 32;
+Vintagestory.GameContent/POIRegistry.cs-92-		int num4 = (int)(centerPos.Z + (double)radius) / 32;
+Vintagestory.GameContent/POIRegistry.cs-93-		float num5 = radius * radius;
+Vintagestory.GameContent/POIRegistry.cs:94:		float num6 = 9999999f;
+Vintagestory.GameContent/POIRegistry.cs-95-		IPointOfInterest result = null;
+Vintagestory.GameContent/POIRegistry.cs-96-		for (int i = num; i <= num3; i++)
+Vintagestory.GameContent/POIRegistry.cs-97-		{
+Vintagestory.GameContent/POIRegistry.cs-98-			double num7 = 0.0;
+Vintagestory.GameContent/POIRegistry.cs-99-			if ((double)(i * 32) > centerPos.X)
+Vintagestory.GameContent/POIRegistry.cs-100-			{
+Vintagestory.GameContent/POIRegistry.cs-101-				num7 = (double)(i * 32) - centerPos.X;
+Vintagestory.GameContent/POIRegistry.cs-102-			}
+Vintagestory.GameContent/POIRegistry.cs-103-			else if ((double)((i + 1) * 32) < centerPos.X)
+Vintagestory.GameContent/POIRegistry.cs-104-			{
+Vintagestory.GameContent/POIRegistry.cs-105-				num7 = centerPos.X - (double)((i + 1) * 32);
+Vintagestory.GameContent/POIRegistry.cs-106-			}
+Vintagestory.GameContent/POIRegistry.cs-107-			for (int j = num2; j <= num4; j++)
+Vintagestory.GameContent/POIRegistry.cs-108-			{
+Vintagestory.GameContent/POIRegistry.cs-109-				double num8 = 0.0;
+Vintagestory.GameContent/POIRegistry.cs-110-				if ((double)(j * 32) > centerPos.Z)
+Vintagestory.GameContent/POIRegistry.cs-111-				{
+Vintagestory.GameContent/POIRegistry.cs-112-					num8 = (double)(j * 32) - centerPos.Z;
+Vintagestory.GameContent/POIRegistry.cs-113-				}
+Vintagestory.GameContent/POIRegistry.cs-114-				else if ((double)((j + 1) * 32) < centerPos.Z)
+Vintagestory.GameContent/POIRegistry.cs-115-				{
+Vintagestory.GameContent/POIRegistry.cs-116-					num8 = centerPos.Z - (double)((j + 1) * 32);
+Vintagestory.GameContent/POIRegistry.cs-117-				}
+Vintagestory.GameContent/POIRegistry.cs-118-				if (num7 * num7 + num8 * num8 > (double)num6)
+Vintagestory.GameContent/POIRegistry.cs-119-				{
+--
+Vintagestory.GameContent/EntityBehaviorHealth.cs-298-		{
+Vintagestory.GameContent/EntityBehaviorHealth.cs-299-			num = Math.Min(num / 2.0, Math.Min(14.0, num));
+Vintagestory.GameContent/EntityBehaviorHealth.cs-300-			withYMotion /= 2.0;
+Vintagestory.GameContent/EntityBehaviorHealth.cs-301-			if ((double)entity.Pos.Pitch < 3.9269909262657166)
+Vintagestory.GameContent/EntityBehaviorHealth.cs-302-			{
+Vintagestory.GameContent/EntityBehaviorHealth.cs-303-				num = 0.0;
+Vintagestory.GameContent/EntityBehaviorHealth.cs-304-			}
+Vintagestory.GameContent/EntityBehaviorHealth.cs-305-		}
+Vintagestory.GameContent/EntityBehaviorHealth.cs-306-		if (!(withYMotion > num3))
+Vintagestory.GameContent/EntityBehaviorHealth.cs-307-		{
+Vintagestory.GameContent/EntityBehaviorHealth.cs-308-			num *= (double)entity.Properties.FallDamageMultiplier;
+Vintagestory.GameContent/EntityBehaviorHealth.cs-309-			double num4 = Math.Max(0.0, num - num2);
+Vintagestory.GameContent/EntityBehaviorHealth.cs:310:			double num5 = -0.04100000113248825 * Math.Pow(num4, 0.75) - 0.2199999988079071;
+Vintagestory.GameContent/EntityBehaviorHealth.cs-311-			double num6 = Math.Max(0.0, 0.0 - num5 + withYMotion);
+Vintagestory.GameContent/EntityBehaviorHealth.cs-312-			num4 -= 20.0 * num6;
+Vintagestory.GameContent/EntityBehaviorHealth.cs-313-			if (!(num4 <= 0.0))
+Vintagestory.GameContent/EntityBehaviorHealth.cs-314-			{
+Vintagestory.GameContent/EntityBehaviorHealth.cs-315-				num4 *= (double)entity.Stats.GetBlended("fallDamageFactor");
+Vintagestory.GameContent/EntityBehaviorHealth.cs-316-				entity.ReceiveDamage(new DamageSource
+Vintagestory.GameContent/EntityBehaviorHealth.cs-317-				{
+Vintagestory.GameContent/EntityBehaviorHealth.cs-318-					Source = EnumDamageSource.Fall,
+Vintagestory.GameContent/EntityBehaviorHealth.cs-319-					Type = EnumDamageType.Gravity,
+Vintagestory.GameContent/EntityBehaviorHealth.cs-320-					IgnoreInvFrames = true
+Vintagestory.GameContent/EntityBehaviorHealth.cs-321-				}, (float)num4);
+Vintagestory.GameContent/EntityBehaviorHealth.cs-322-			}
+Vintagestory.GameContent/EntityBehaviorHealth.cs-323-		}
+Vintagestory.GameContent/EntityBehaviorHealth.cs-324-	}
+Vintagestory.GameContent/EntityBehaviorHealth.cs-325-
+Vintagestory.GameContent/EntityBehaviorHealth.cs-326-	public override void GetInfoText(StringBuilder infotext)
+Vintagestory.GameContent/EntityBehaviorHealth.cs-327-	{
+Vintagestory.GameContent/EntityBehaviorHealth.cs-328-		ICoreClientAPI obj = entity.Api as ICoreClientAPI;
+Vintagestory.GameContent/EntityBehaviorHealth.cs-329-		if (obj != null && obj.World.Player?.WorldData?.CurrentGameMode == EnumGameMode.Creative)
+Vintagestory.GameContent/EntityBehaviorHealth.cs-330-		{
+Vintagestory.GameContent/EntityBehaviorHealth.cs-331-			infotext.AppendLine(Lang.Get("Health: {0}/{1}", Health, MaxHealth));
+Vintagestory.GameContent/EntityBehaviorHealth.cs-332-		}
+Vintagestory.GameContent/EntityBehaviorHealth.cs-333-	}
+Vintagestory.GameContent/EntityBehaviorHealth.cs-334-
+Vintagestory.GameContent/EntityBehaviorHealth.cs-335-	public override WorldInteraction[]? GetInteractionHelp(IClientWorldAccessor world, EntitySelection es, IClientPlayer player, ref EnumHandling handled)
+--
+Vintagestory.GameContent/EntityBehaviorGait.cs-287-			{
+Vintagestory.GameContent/EntityBehaviorGait.cs-288-				controls.WalkVector.Z = 0.0;
+Vintagestory.GameContent/EntityBehaviorGait.cs-289-			}
+Vintagestory.GameContent/EntityBehaviorGait.cs-290-		}
+Vintagestory.GameContent/EntityBehaviorGait.cs-291-		if (entity.Swimming)
+Vintagestory.GameContent/EntityBehaviorGait.cs-292-		{
+Vintagestory.GameContent/EntityBehaviorGait.cs-293-			controls.FlyVector.Set(controls.WalkVector);
+Vintagestory.GameContent/EntityBehaviorGait.cs-294-			Vec3d xYZ = entity.Pos.XYZ;
+Vintagestory.GameContent/EntityBehaviorGait.cs-295-			Block blockRaw = entity.World.BlockAccessor.GetBlockRaw((int)xYZ.X, (int)xYZ.Y, (int)xYZ.Z, 2);
+Vintagestory.GameContent/EntityBehaviorGait.cs-296-			Block blockRaw2 = entity.World.BlockAccessor.GetBlockRaw((int)xYZ.X, (int)(xYZ.Y + 1.0), (int)xYZ.Z, 2);
+Vintagestory.GameContent/EntityBehaviorGait.cs-297-			float num = GameMath.Clamp((float)(int)xYZ.Y + (float)blockRaw.LiquidLevel / 8f + (blockRaw2.IsLiquid() ? 1.125f : 0f) - (float)xYZ.Y - (float)entity.SwimmingOffsetY, 0f, 1f);
+Vintagestory.GameContent/EntityBehaviorGait.cs-298-			num = Math.Min(1f, num + 0.075f);
+Vintagestory.GameContent/EntityBehaviorGait.cs:299:			controls.FlyVector.Y = GameMath.Clamp(controls.FlyVector.Y, 0.019999999552965164, 0.03999999910593033) * (double)num * 3.0;
+Vintagestory.GameContent/EntityBehaviorGait.cs-300-			if (entity.CollidedHorizontally)
+Vintagestory.GameContent/EntityBehaviorGait.cs-301-			{
+Vintagestory.GameContent/EntityBehaviorGait.cs-302-				controls.FlyVector.Y = 0.05000000074505806;
+Vintagestory.GameContent/EntityBehaviorGait.cs-303-			}
+Vintagestory.GameContent/EntityBehaviorGait.cs-304-			eagent.Pos.Motion.Y += ((double)num - 0.1) / 300.0;
+Vintagestory.GameContent/EntityBehaviorGait.cs-305-		}
+Vintagestory.GameContent/EntityBehaviorGait.cs-306-	}
+Vintagestory.GameContent/EntityBehaviorGait.cs-307-
+Vintagestory.GameContent/EntityBehaviorGait.cs-308-	protected virtual void UpdateTurnAnimation()
+Vintagestory.GameContent/EntityBehaviorGait.cs-309-	{
+Vintagestory.GameContent/EntityBehaviorGait.cs-310-		string text = null;
+Vintagestory.GameContent/EntityBehaviorGait.cs-311-		if (!CurrentGait.HasBackwardMotion)
+Vintagestory.GameContent/EntityBehaviorGait.cs-312-		{
+Vintagestory.GameContent/EntityBehaviorGait.cs-313-			if (AngularVelocity > 0.001)
+Vintagestory.GameContent/EntityBehaviorGait.cs-314-			{
+Vintagestory.GameContent/EntityBehaviorGait.cs-315-				text = "turn-left";
+Vintagestory.GameContent/EntityBehaviorGait.cs-316-			}
+Vintagestory.GameContent/EntityBehaviorGait.cs-317-			else if (AngularVelocity < -0.001)
+Vintagestory.GameContent/EntityBehaviorGait.cs-318-			{
+Vintagestory.GameContent/EntityBehaviorGait.cs-319-				text = "turn-right";
+Vintagestory.GameContent/EntityBehaviorGait.cs-320-			}
+Vintagestory.GameContent/EntityBehaviorGait.cs-321-		}
+Vintagestory.GameContent/EntityBehaviorGait.cs-322-		if (text != currentTurnAnimation)
+Vintagestory.GameContent/EntityBehaviorGait.cs-323-		{
+Vintagestory.GameContent/EntityBehaviorGait.cs-324-			if (currentTurnAnimation != null)
+--
+Vintagestory.GameContent/CollectibleBehaviorQuenchable.cs-60-			return false;
+Vintagestory.GameContent/CollectibleBehaviorQuenchable.cs-61-		}
+Vintagestory.GameContent/CollectibleBehaviorQuenchable.cs-62-		slot.Itemstack.Collectible.SetTemperature(world, slot.Itemstack, temperature2);
+Vintagestory.GameContent/CollectibleBehaviorQuenchable.cs-63-		float num = temperature - targetTemperature;
+Vintagestory.GameContent/CollectibleBehaviorQuenchable.cs-64-		if (num > 90f)
+Vintagestory.GameContent/CollectibleBehaviorQuenchable.cs-65-		{
+Vintagestory.GameContent/CollectibleBehaviorQuenchable.cs-66-			double num2 = 0.0;
+Vintagestory.GameContent/CollectibleBehaviorQuenchable.cs-67-			Entity.SplashParticleProps.BasePos.Set(pos.X - num2 / 2.0, pos.Y - 0.75, pos.Z - num2 / 2.0);
+Vintagestory.GameContent/CollectibleBehaviorQuenchable.cs-68-			Entity.SplashParticleProps.AddVelocity.Set(0f, 0f, 0f);
+Vintagestory.GameContent/CollectibleBehaviorQuenchable.cs-69-			Entity.SplashParticleProps.QuantityMul = 0.1f;
+Vintagestory.GameContent/CollectibleBehaviorQuenchable.cs-70-			world.SpawnParticles(Entity.SplashParticleProps);
+Vintagestory.GameContent/CollectibleBehaviorQuenchable.cs-71-		}
+Vintagestory.GameContent/CollectibleBehaviorQuenchable.cs:72:		long num3 = slot.Itemstack.TempAttributes.GetLong("lastPlayedSizzlesTotalMs", -99999L);
+Vintagestory.GameContent/CollectibleBehaviorQuenchable.cs-73-		if (playSizzle && num > 200f && world.Side == EnumAppSide.Client && world.ElapsedMilliseconds - num3 > 10000)
+Vintagestory.GameContent/CollectibleBehaviorQuenchable.cs-74-		{
+Vintagestory.GameContent/CollectibleBehaviorQuenchable.cs-75-			world.PlaySoundAt(new AssetLocation("sounds/sizzle"), pos.X, pos.Y, pos.Z);
+Vintagestory.GameContent/CollectibleBehaviorQuenchable.cs-76-			slot.Itemstack.TempAttributes.SetLong("lastPlayedSizzlesTotalMs", world.ElapsedMilliseconds);
+Vintagestory.GameContent/CollectibleBehaviorQuenchable.cs-77-		}
+Vintagestory.GameContent/CollectibleBehaviorQuenchable.cs-78-		return true;
+Vintagestory.GameContent/CollectibleBehaviorQuenchable.cs-79-	}
+Vintagestory.GameContent/CollectibleBehaviorQuenchable.cs-80-
+Vintagestory.GameContent/CollectibleBehaviorQuenchable.cs-81-	public CollectibleBehaviorQuenchable(CollectibleObject collObj)
+Vintagestory.GameContent/CollectibleBehaviorQuenchable.cs-82-		: base(collObj)
+Vintagestory.GameContent/CollectibleBehaviorQuenchable.cs-83-	{
+Vintagestory.GameContent/CollectibleBehaviorQuenchable.cs-84-	}
+Vintagestory.GameContent/CollectibleBehaviorQuenchable.cs-85-
+Vintagestory.GameContent/CollectibleBehaviorQuenchable.cs-86-	public override void OnLoaded(ICoreAPI api)
+Vintagestory.GameContent/CollectibleBehaviorQuenchable.cs-87-	{
+Vintagestory.GameContent/CollectibleBehaviorQuenchable.cs-88-		MetalWorldProperties metalWorldProperties = api.Assets.Get("worldproperties/block/metal.json").ToObject<MetalWorldProperties>();
+Vintagestory.GameContent/CollectibleBehaviorQuenchable.cs-89-		string metalCode = collObj.Variant[metalGroupCode];
+Vintagestory.GameContent/CollectibleBehaviorQuenchable.cs-90-		if (metalCode == null)
+Vintagestory.GameContent/CollectibleBehaviorQuenchable.cs-91-		{
+Vintagestory.GameContent/CollectibleBehaviorQuenchable.cs-92-			api.Logger.Warning("Collectible {0} has quenchable property, but cannot get metal code from metal group code \"{1}\"", collObj.Code, metalGroupCode);
+Vintagestory.GameContent/CollectibleBehaviorQuenchable.cs-93-			return;
+Vintagestory.GameContent/CollectibleBehaviorQuenchable.cs-94-		}
+Vintagestory.GameContent/CollectibleBehaviorQuenchable.cs-95-		metalProps = metalWorldProperties.Variants.FirstOrDefault((MetalPropertyVariant p) => p.Code.ToShortString().Equals(metalCode));
+Vintagestory.GameContent/CollectibleBehaviorQuenchable.cs-96-		if (metalProps == null)
+Vintagestory.GameContent/CollectibleBehaviorQuenchable.cs-97-		{
+--
+Vintagestory.GameContent/FallingBlockParticlesModSystem.cs-67-	{
+Vintagestory.GameContent/FallingBlockParticlesModSystem.cs-68-		toRegister.Enqueue(entity);
+Vintagestory.GameContent/FallingBlockParticlesModSystem.cs-69-	}
+Vintagestory.GameContent/FallingBlockParticlesModSystem.cs-70-
+Vintagestory.GameContent/FallingBlockParticlesModSystem.cs-71-	public void Unregister(EntityBlockFalling entity)
+Vintagestory.GameContent/FallingBlockParticlesModSystem.cs-72-	{
+Vintagestory.GameContent/FallingBlockParticlesModSystem.cs-73-		toRemove.Enqueue(entity);
+Vintagestory.GameContent/FallingBlockParticlesModSystem.cs-74-	}
+Vintagestory.GameContent/FallingBlockParticlesModSystem.cs-75-
+Vintagestory.GameContent/FallingBlockParticlesModSystem.cs-76-	private bool asyncParticleSpawn(float dt, IAsyncParticleManager manager)
+Vintagestory.GameContent/FallingBlockParticlesModSystem.cs-77-	{
+Vintagestory.GameContent/FallingBlockParticlesModSystem.cs-78-		int num = manager.ParticlesAlive(EnumParticleModel.Quad);
+Vintagestory.GameContent/FallingBlockParticlesModSystem.cs:79:		float num2 = Math.Max(0.05f, (float)Math.Pow(0.949999988079071, (float)num / 200f));
+Vintagestory.GameContent/FallingBlockParticlesModSystem.cs-80-		foreach (EntityBlockFalling fallingBlock in fallingBlocks)
+Vintagestory.GameContent/FallingBlockParticlesModSystem.cs-81-		{
+Vintagestory.GameContent/FallingBlockParticlesModSystem.cs-82-			float num3 = 0f;
+Vintagestory.GameContent/FallingBlockParticlesModSystem.cs-83-			if (fallingBlock.nowImpacted)
+Vintagestory.GameContent/FallingBlockParticlesModSystem.cs-84-			{
+Vintagestory.GameContent/FallingBlockParticlesModSystem.cs-85-				if (capi.World.BlockAccessor.GetBlock(fallingBlock.Pos.AsBlockPos, 2).Id == 0)
+Vintagestory.GameContent/FallingBlockParticlesModSystem.cs-86-				{
+Vintagestory.GameContent/FallingBlockParticlesModSystem.cs-87-					num3 = 20f;
+Vintagestory.GameContent/FallingBlockParticlesModSystem.cs-88-				}
+Vintagestory.GameContent/FallingBlockParticlesModSystem.cs-89-				fallingBlock.nowImpacted = false;
+Vintagestory.GameContent/FallingBlockParticlesModSystem.cs-90-			}
+Vintagestory.GameContent/FallingBlockParticlesModSystem.cs-91-			if (fallingBlock.Block.Id != 0)
+Vintagestory.GameContent/FallingBlockParticlesModSystem.cs-92-			{
+Vintagestory.GameContent/FallingBlockParticlesModSystem.cs-93-				dustParticles.Color = fallingBlock.stackForParticleColor.Collectible.GetRandomColor(capi, fallingBlock.stackForParticleColor);
+Vintagestory.GameContent/FallingBlockParticlesModSystem.cs-94-				dustParticles.Color &= 16777215;
+Vintagestory.GameContent/FallingBlockParticlesModSystem.cs-95-				dustParticles.Color |= -1778384896;
+Vintagestory.GameContent/FallingBlockParticlesModSystem.cs-96-				dustParticles.MinPos.Set(fallingBlock.Pos.X - 0.2 - 0.5, fallingBlock.Pos.Y, fallingBlock.Pos.Z - 0.2 - 0.5);
+Vintagestory.GameContent/FallingBlockParticlesModSystem.cs-97-				dustParticles.MinSize = 1f;
+Vintagestory.GameContent/FallingBlockParticlesModSystem.cs-98-				float num4 = num3 / 20f;
+Vintagestory.GameContent/FallingBlockParticlesModSystem.cs-99-				dustParticles.AddPos.Y = fallingBlock.maxSpawnHeightForParticles;
+Vintagestory.GameContent/FallingBlockParticlesModSystem.cs-100-				dustParticles.MinVelocity.Set(-0.2f * num4, 1f * (float)fallingBlock.Pos.Motion.Y, -0.2f * num4);
+Vintagestory.GameContent/FallingBlockParticlesModSystem.cs-101-				dustParticles.AddVelocity.Set(0.4f * num4, 0.2f * (float)fallingBlock.Pos.Motion.Y + (0f - num4), 0.4f * num4);
+Vintagestory.GameContent/FallingBlockParticlesModSystem.cs-102-				dustParticles.MinQuantity = num3 * fallingBlock.dustIntensity * num2 / 2f;
+Vintagestory.GameContent/FallingBlockParticlesModSystem.cs-103-				dustParticles.AddQuantity = (6f * Math.Abs((float)fallingBlock.Pos.Motion.Y) + num3) * fallingBlock.dustIntensity * num2 / 2f;
+Vintagestory.GameContent/FallingBlockParticlesModSystem.cs-104-				manager.Spawn(dustParticles);
+--
+Vintagestory.GameContent/EntityBehaviorControlledPhysics.cs-239-			if (knockBackCounter > 0f)
+Vintagestory.GameContent/EntityBehaviorControlledPhysics.cs-240-			{
+Vintagestory.GameContent/EntityBehaviorControlledPhysics.cs-241-				knockBackCounter -= dt;
+Vintagestory.GameContent/EntityBehaviorControlledPhysics.cs-242-				return;
+Vintagestory.GameContent/EntityBehaviorControlledPhysics.cs-243-			}
+Vintagestory.GameContent/EntityBehaviorControlledPhysics.cs-244-			knockBackCounter = 0f;
+Vintagestory.GameContent/EntityBehaviorControlledPhysics.cs-245-			entity.Attributes.SetInt("dmgkb", 0);
+Vintagestory.GameContent/EntityBehaviorControlledPhysics.cs-246-		}
+Vintagestory.GameContent/EntityBehaviorControlledPhysics.cs-247-	}
+Vintagestory.GameContent/EntityBehaviorControlledPhysics.cs-248-
+Vintagestory.GameContent/EntityBehaviorControlledPhysics.cs-249-	public void RemoteMotionAndCollision(EntityPos pos, float dtFactor)
+Vintagestory.GameContent/EntityBehaviorControlledPhysics.cs-250-	{
+Vintagestory.GameContent/EntityBehaviorControlledPhysics.cs:251:		double num = (double)(1f / 60f * dtFactor) + Math.Max(0.0, -0.014999999664723873 * pos.Motion.Y * (double)dtFactor);
+Vintagestory.GameContent/EntityBehaviorControlledPhysics.cs-252-		pos.Motion.Y -= num;
+Vintagestory.GameContent/EntityBehaviorControlledPhysics.cs-253-		PhysicsBehaviorBase.collisionTester.ApplyTerrainCollision(entity, pos, dtFactor, ref newPos, 0f, 0f);
+Vintagestory.GameContent/EntityBehaviorControlledPhysics.cs-254-		bool flag = lPos.Motion.Y < 0.0;
+Vintagestory.GameContent/EntityBehaviorControlledPhysics.cs-255-		entity.OnGround = entity.CollidedVertically & flag;
+Vintagestory.GameContent/EntityBehaviorControlledPhysics.cs-256-		pos.Motion.Y += num;
+Vintagestory.GameContent/EntityBehaviorControlledPhysics.cs-257-		pos.SetPos(nPos);
+Vintagestory.GameContent/EntityBehaviorControlledPhysics.cs-258-	}
+Vintagestory.GameContent/EntityBehaviorControlledPhysics.cs-259-
+Vintagestory.GameContent/EntityBehaviorControlledPhysics.cs-260-	public void MotionAndCollision(EntityPos pos, EntityControls controls, float dt)
+Vintagestory.GameContent/EntityBehaviorControlledPhysics.cs-261-	{
+Vintagestory.GameContent/EntityBehaviorControlledPhysics.cs-262-		if (!EnableModulesApplication)
+Vintagestory.GameContent/EntityBehaviorControlledPhysics.cs-263-		{
+Vintagestory.GameContent/EntityBehaviorControlledPhysics.cs-264-			return;
+Vintagestory.GameContent/EntityBehaviorControlledPhysics.cs-265-		}
+Vintagestory.GameContent/EntityBehaviorControlledPhysics.cs-266-		Entity entity = base.entity;
+Vintagestory.GameContent/EntityBehaviorControlledPhysics.cs-267-		foreach (PModule physicsModule in physicsModules)
+Vintagestory.GameContent/EntityBehaviorControlledPhysics.cs-268-		{
+Vintagestory.GameContent/EntityBehaviorControlledPhysics.cs-269-			if (physicsModule.Applicable(entity, pos, controls))
+Vintagestory.GameContent/EntityBehaviorControlledPhysics.cs-270-			{
+Vintagestory.GameContent/EntityBehaviorControlledPhysics.cs-271-				physicsModule.DoApply(dt, entity, pos, controls);
+Vintagestory.GameContent/EntityBehaviorControlledPhysics.cs-272-			}
+Vintagestory.GameContent/EntityBehaviorControlledPhysics.cs-273-		}
+Vintagestory.GameContent/EntityBehaviorControlledPhysics.cs-274-		foreach (PModule customModule in customModules)
+Vintagestory.GameContent/EntityBehaviorControlledPhysics.cs-275-		{
+Vintagestory.GameContent/EntityBehaviorControlledPhysics.cs-276-			if (customModule.Applicable(entity, pos, controls))
+--
+Vintagestory.GameContent/EntityShapeRenderer.cs-546-		{
+Vintagestory.GameContent/EntityShapeRenderer.cs-547-			return;
+Vintagestory.GameContent/EntityShapeRenderer.cs-548-		}
+Vintagestory.GameContent/EntityShapeRenderer.cs-549-		shaderProgram.Uniform("damageEffect", 0f);
+Vintagestory.GameContent/EntityShapeRenderer.cs-550-		shaderProgram.Stop();
+Vintagestory.GameContent/EntityShapeRenderer.cs-551-		float num3 = Math.Max(0f, 1f - (float)capi.World.BlockAccessor.GetDistanceToRainFall(entity.Pos.AsBlockPos) / 5f);
+Vintagestory.GameContent/EntityShapeRenderer.cs-552-		AdvancedParticleProperties[] array = stack.Collectible?.ParticleProperties;
+Vintagestory.GameContent/EntityShapeRenderer.cs-553-		if (stack.Collectible == null || capi.IsGamePaused)
+Vintagestory.GameContent/EntityShapeRenderer.cs-554-		{
+Vintagestory.GameContent/EntityShapeRenderer.cs-555-			return;
+Vintagestory.GameContent/EntityShapeRenderer.cs-556-		}
+Vintagestory.GameContent/EntityShapeRenderer.cs-557-		accum += dt;
+Vintagestory.GameContent/EntityShapeRenderer.cs:558:		if (array != null && array.Length != 0 && accum > 0.16499999f)
+Vintagestory.GameContent/EntityShapeRenderer.cs-559-		{
+Vintagestory.GameContent/EntityShapeRenderer.cs:560:			accum = Math.Min(1f, accum - 0.16499999f);
+Vintagestory.GameContent/EntityShapeRenderer.cs-561-			Vec4f vec4f = ItemModelMat.TransformVector(new Vec4f(stack.Collectible.TopMiddlePos.X, stack.Collectible.TopMiddlePos.Y, stack.Collectible.TopMiddlePos.Z, 1f));
+Vintagestory.GameContent/EntityShapeRenderer.cs-562-			if (pMatrixHandFov != null)
+Vintagestory.GameContent/EntityShapeRenderer.cs-563-			{
+Vintagestory.GameContent/EntityShapeRenderer.cs-564-				Matrixf matrixf = new Matrixf();
+Vintagestory.GameContent/EntityShapeRenderer.cs-565-				Vec4f vec = matrixf.Set(pMatrixHandFov).Mul(render.CameraMatrixOriginf).TransformVector(vec4f);
+Vintagestory.GameContent/EntityShapeRenderer.cs-566-				vec4f = new Matrixf(render.CameraMatrixOriginf).Invert().Mul(matrixf.Set(pMatrixNormalFov).Invert()).TransformVector(vec);
+Vintagestory.GameContent/EntityShapeRenderer.cs-567-			}
+Vintagestory.GameContent/EntityShapeRenderer.cs-568-			EntityPlayer entityPlayer = capi.World.Player.Entity;
+Vintagestory.GameContent/EntityShapeRenderer.cs-569-			foreach (AdvancedParticleProperties advancedParticleProperties in array)
+Vintagestory.GameContent/EntityShapeRenderer.cs-570-			{
+Vintagestory.GameContent/EntityShapeRenderer.cs-571-				advancedParticleProperties.WindAffectednesAtPos = num3;
+Vintagestory.GameContent/EntityShapeRenderer.cs-572-				advancedParticleProperties.WindAffectednes = num3;
+Vintagestory.GameContent/EntityShapeRenderer.cs-573-				advancedParticleProperties.basePos.X = (double)vec4f.X + entityPlayer.CameraPos.X;
+Vintagestory.GameContent/EntityShapeRenderer.cs-574-				advancedParticleProperties.basePos.Y = (double)vec4f.Y + entityPlayer.CameraPos.Y;
+Vintagestory.GameContent/EntityShapeRenderer.cs-575-				advancedParticleProperties.basePos.Z = (double)vec4f.Z + entityPlayer.CameraPos.Z;
+Vintagestory.GameContent/EntityShapeRenderer.cs-576-				eagent.World.SpawnParticles(advancedParticleProperties);
+Vintagestory.GameContent/EntityShapeRenderer.cs-577-			}
+Vintagestory.GameContent/EntityShapeRenderer.cs-578-		}
+Vintagestory.GameContent/EntityShapeRenderer.cs-579-	}
+Vintagestory.GameContent/EntityShapeRenderer.cs-580-
+Vintagestory.GameContent/EntityShapeRenderer.cs-581-	public override void RenderToGui(float dt, double posX, double posY, double posZ, float yawDelta, float size)
+Vintagestory.GameContent/EntityShapeRenderer.cs-582-	{
+Vintagestory.GameContent/EntityShapeRenderer.cs-583-		float[] array = new float[16];
+Vintagestory.GameContent/EntityShapeRenderer.cs-584-		ModelMat.CopyTo(array);
+Vintagestory.GameContent/EntityShapeRenderer.cs-585-		loadModelMatrixForGui(entity, posX, posY, posZ, yawDelta, size);
+--
+Vintagestory.GameContent/AiTaskSeekEntityR.cs-377-		double distanceToTarget = GetDistanceToTarget();
+Vintagestory.GameContent/AiTaskSeekEntityR.cs-378-		EntityPlayer obj = targetEntity as EntityPlayer;
+Vintagestory.GameContent/AiTaskSeekEntityR.cs-379-		if ((obj != null && obj.Player?.WorldData.CurrentGameMode == EnumGameMode.Creative && !Config.TargetPlayerInAllGameModes) || !Config.JumpAtTarget || Rand.NextDouble() > (double)Config.JumpChance)
+Vintagestory.GameContent/AiTaskSeekEntityR.cs-380-		{
+Vintagestory.GameContent/AiTaskSeekEntityR.cs-381-			return false;
+Vintagestory.GameContent/AiTaskSeekEntityR.cs-382-		}
+Vintagestory.GameContent/AiTaskSeekEntityR.cs-383-		bool flag = entity.World.ElapsedMilliseconds - jumpedMs < Config.JumpCooldownMs;
+Vintagestory.GameContent/AiTaskSeekEntityR.cs-384-		bool result = false;
+Vintagestory.GameContent/AiTaskSeekEntityR.cs-385-		if (distanceToTarget >= (double)Config.DistanceToTargetToJump[0] && distanceToTarget <= (double)Config.DistanceToTargetToJump[1] && !flag && (double)Config.MaxHeightDifferenceToJump >= entity.Pos.Y - targetEntity.Pos.Y)
+Vintagestory.GameContent/AiTaskSeekEntityR.cs-386-		{
+Vintagestory.GameContent/AiTaskSeekEntityR.cs-387-			Vec3d vec3d = new Vec3d(entity.Pos.Motion.X, 0.0, entity.Pos.Motion.Z);
+Vintagestory.GameContent/AiTaskSeekEntityR.cs-388-			double val = vec3d.Length();
+Vintagestory.GameContent/AiTaskSeekEntityR.cs:389:			double num = (targetEntity.Pos.X - entity.Pos.X + targetEntity.Pos.Motion.X * (double)Config.JumpMotionAnticipationFactor) * (double)Config.JumpSpeedFactor * 0.032999999821186066 * 0.5;
+Vintagestory.GameContent/AiTaskSeekEntityR.cs:390:			double num2 = (targetEntity.Pos.Z - entity.Pos.Z + targetEntity.Pos.Motion.Z * (double)Config.JumpMotionAnticipationFactor) * (double)Config.JumpSpeedFactor * 0.032999999821186066 * 0.5;
+Vintagestory.GameContent/AiTaskSeekEntityR.cs:391:			double y = (double)Config.JumpHeightFactor * GameMath.Max(Config.MaxVerticalJumpSpeed, (targetEntity.Pos.Y - entity.Pos.Y) * 0.032999999821186066);
+Vintagestory.GameContent/AiTaskSeekEntityR.cs-392-			vec3d.Set(num, 0.0, num2).Normalize().Mul(val);
+Vintagestory.GameContent/AiTaskSeekEntityR.cs-393-			jumpHorizontalVelocity.Set(num + entity.Pos.Motion.X, 0.0, num2 + entity.Pos.Motion.Z);
+Vintagestory.GameContent/AiTaskSeekEntityR.cs-394-			entity.Pos.Motion.X = vec3d.X;
+Vintagestory.GameContent/AiTaskSeekEntityR.cs-395-			entity.Pos.Motion.Z = vec3d.Z;
+Vintagestory.GameContent/AiTaskSeekEntityR.cs-396-			entity.Pos.Motion.Add(num, y, num2);
+Vintagestory.GameContent/AiTaskSeekEntityR.cs-397-			float yaw = (float)Math.Atan2(num, num2);
+Vintagestory.GameContent/AiTaskSeekEntityR.cs-398-			entity.Pos.Yaw = yaw;
+Vintagestory.GameContent/AiTaskSeekEntityR.cs-399-			PlayJumpAnimation();
+Vintagestory.GameContent/AiTaskSeekEntityR.cs-400-			jumpedMs = entity.World.ElapsedMilliseconds;
+Vintagestory.GameContent/AiTaskSeekEntityR.cs-401-			finishedMs = entity.World.ElapsedMilliseconds;
+Vintagestory.GameContent/AiTaskSeekEntityR.cs-402-			result = true;
+Vintagestory.GameContent/AiTaskSeekEntityR.cs-403-		}
+Vintagestory.GameContent/AiTaskSeekEntityR.cs-404-		if (flag && !entity.Collided && distanceToTarget < (double)Config.DistanceToTargetToJump[0])
+Vintagestory.GameContent/AiTaskSeekEntityR.cs-405-		{
+Vintagestory.GameContent/AiTaskSeekEntityR.cs-406-			entity.Pos.Motion *= Config.AfterJumpSpeedReduction;
+Vintagestory.GameContent/AiTaskSeekEntityR.cs-407-		}
+Vintagestory.GameContent/AiTaskSeekEntityR.cs-408-		return result;
+Vintagestory.GameContent/AiTaskSeekEntityR.cs-409-	}
+Vintagestory.GameContent/AiTaskSeekEntityR.cs-410-
+Vintagestory.GameContent/AiTaskSeekEntityR.cs-411-	protected virtual void AlarmHerd()
+Vintagestory.GameContent/AiTaskSeekEntityR.cs-412-	{
+Vintagestory.GameContent/AiTaskSeekEntityR.cs-413-		if (!Config.AlarmHerd || entity.HerdId == 0L)
+Vintagestory.GameContent/AiTaskSeekEntityR.cs-414-		{
+Vintagestory.GameContent/AiTaskSeekEntityR.cs-415-			return;
+Vintagestory.GameContent/AiTaskSeekEntityR.cs-416-		}
+--
+Vintagestory.GameContent/WeatherSimulationParticles.cs-375-		stormDustParticles.MinVelocity.Set(-0.025f + 12f * windSpeed.X, 0f, -0.025f + 12f * windSpeed.Z).Mul(3f);
+Vintagestory.GameContent/WeatherSimulationParticles.cs-376-		stormDustParticles.AddVelocity.Set(0.05f + 6f * windSpeed.X, -0.25f, 0.05f + 6f * windSpeed.Z).Mul(3f);
+Vintagestory.GameContent/WeatherSimulationParticles.cs-377-		float num7 = Math.Max(1f, num6 * 3f);
+Vintagestory.GameContent/WeatherSimulationParticles.cs-378-		int num8 = (int)((float)dustParticlesPerTick * num7);
+Vintagestory.GameContent/WeatherSimulationParticles.cs-379-		try
+Vintagestory.GameContent/WeatherSimulationParticles.cs-380-		{
+Vintagestory.GameContent/WeatherSimulationParticles.cs-381-			for (int i = 0; i < num8; i++)
+Vintagestory.GameContent/WeatherSimulationParticles.cs-382-			{
+Vintagestory.GameContent/WeatherSimulationParticles.cs-383-				double num9 = particlePos.X + (double)num + rand.NextDouble() * rand.NextDouble() * 60.0 * (double)(1 - 2 * rand.Next(2));
+Vintagestory.GameContent/WeatherSimulationParticles.cs-384-				double num10 = particlePos.Z + (double)num3 + rand.NextDouble() * rand.NextDouble() * 60.0 * (double)(1 - 2 * rand.Next(2));
+Vintagestory.GameContent/WeatherSimulationParticles.cs-385-				int rainMapHeightAt = capi.World.BlockAccessor.GetRainMapHeightAt((int)num9, (int)num10);
+Vintagestory.GameContent/WeatherSimulationParticles.cs-386-				Block blockRaw = capi.World.BlockAccessor.GetBlockRaw((int)num9, rainMapHeightAt, (int)num10);
+Vintagestory.GameContent/WeatherSimulationParticles.cs:387:				if (blockRaw.BlockId != 0 && capi.World.BlockAccessor.GetBlockRaw((int)num9, rainMapHeightAt, (int)num10, 2).BlockId == 0 && (blockRaw.BlockMaterial == EnumBlockMaterial.Sand || blockRaw.BlockMaterial == EnumBlockMaterial.Snow || (!(rand.NextDouble() < 0.699999988079071) && blockRaw.RenderPass != EnumChunkRenderPass.TopSoil)))
+Vintagestory.GameContent/WeatherSimulationParticles.cs-388-				{
+Vintagestory.GameContent/WeatherSimulationParticles.cs-389-					if (blockRaw.BlockMaterial == EnumBlockMaterial.Sand)
+Vintagestory.GameContent/WeatherSimulationParticles.cs-390-					{
+Vintagestory.GameContent/WeatherSimulationParticles.cs-391-						sandFinds += 1f / num7;
+Vintagestory.GameContent/WeatherSimulationParticles.cs-392-						sandCountByBlock[indicesBySandBlockId[blockRaw.Id]] += 1f / num7;
+Vintagestory.GameContent/WeatherSimulationParticles.cs-393-					}
+Vintagestory.GameContent/WeatherSimulationParticles.cs-394-					if ((blockRaw.BlockMaterial != EnumBlockMaterial.Snow || !(conds.Temperature > 5f)) && !(Math.Abs((double)rainMapHeightAt - particlePos.Y) > 15.0))
+Vintagestory.GameContent/WeatherSimulationParticles.cs-395-					{
+Vintagestory.GameContent/WeatherSimulationParticles.cs-396-						tmpPos.Set((int)num9, rainMapHeightAt, (int)num10);
+Vintagestory.GameContent/WeatherSimulationParticles.cs-397-						stormDustParticles.Color = ColorUtil.ReverseColorBytes(blockRaw.GetColor(capi, tmpPos));
+Vintagestory.GameContent/WeatherSimulationParticles.cs-398-						stormDustParticles.Color |= -16777216;
+Vintagestory.GameContent/WeatherSimulationParticles.cs-399-						manager.Spawn(stormDustParticles);
+Vintagestory.GameContent/WeatherSimulationParticles.cs-400-					}
+Vintagestory.GameContent/WeatherSimulationParticles.cs-401-				}
+Vintagestory.GameContent/WeatherSimulationParticles.cs-402-			}
+Vintagestory.GameContent/WeatherSimulationParticles.cs-403-		}
+Vintagestory.GameContent/WeatherSimulationParticles.cs-404-		catch (Exception)
+Vintagestory.GameContent/WeatherSimulationParticles.cs-405-		{
+Vintagestory.GameContent/WeatherSimulationParticles.cs-406-		}
+Vintagestory.GameContent/WeatherSimulationParticles.cs-407-		spawnCount++;
+Vintagestory.GameContent/WeatherSimulationParticles.cs-408-		if (!(num6 > 0.85f))
+Vintagestory.GameContent/WeatherSimulationParticles.cs-409-		{
+Vintagestory.GameContent/WeatherSimulationParticles.cs-410-			return;
+Vintagestory.GameContent/WeatherSimulationParticles.cs-411-		}
+Vintagestory.GameContent/WeatherSimulationParticles.cs-412-		stormWaterParticles.AddVelocity.Y = 1.5f;
+--
+Vintagestory.Essentials/WaypointsTraverser.cs-448-			}
+Vintagestory.Essentials/WaypointsTraverser.cs-449-		}
+Vintagestory.Essentials/WaypointsTraverser.cs-450-		if (entity.Properties.Habitat == EnumHabitat.Underwater)
+Vintagestory.Essentials/WaypointsTraverser.cs-451-		{
+Vintagestory.Essentials/WaypointsTraverser.cs-452-			entityControls.FlyVector.Set(entityControls.WalkVector);
+Vintagestory.Essentials/WaypointsTraverser.cs-453-			Vec3d xYZ = entity.Pos.XYZ;
+Vintagestory.Essentials/WaypointsTraverser.cs-454-			Block blockRaw = entity.World.BlockAccessor.GetBlockRaw((int)xYZ.X, (int)xYZ.Y, (int)xYZ.Z, 2);
+Vintagestory.Essentials/WaypointsTraverser.cs-455-			Block blockRaw2 = entity.World.BlockAccessor.GetBlockRaw((int)xYZ.X, (int)(xYZ.Y + 1.0), (int)xYZ.Z, 2);
+Vintagestory.Essentials/WaypointsTraverser.cs-456-			float num6 = GameMath.Clamp((float)(int)xYZ.Y + (float)blockRaw.LiquidLevel / 8f + (blockRaw2.IsLiquid() ? 1.125f : 0f) - (float)xYZ.Y - (float)entity.SwimmingOffsetY, 0f, 1f);
+Vintagestory.Essentials/WaypointsTraverser.cs-457-			num6 = 1f - Math.Min(1f, num6 + 0.5f);
+Vintagestory.Essentials/WaypointsTraverser.cs-458-			if (num6 > 0f)
+Vintagestory.Essentials/WaypointsTraverser.cs-459-			{
+Vintagestory.Essentials/WaypointsTraverser.cs:460:				entityControls.FlyVector.Y = GameMath.Clamp(entityControls.FlyVector.Y, -0.03999999910593033, -0.019999999552965164) * (double)(1f - num6);
+Vintagestory.Essentials/WaypointsTraverser.cs-461-				return;
+Vintagestory.Essentials/WaypointsTraverser.cs-462-			}
+Vintagestory.Essentials/WaypointsTraverser.cs-463-			float num7 = movingSpeed * GlobalConstants.OverallSpeedMultiplier / (float)Math.Sqrt(targetVec.X * targetVec.X + targetVec.Z * targetVec.Z);
+Vintagestory.Essentials/WaypointsTraverser.cs-464-			entityControls.FlyVector.Y = targetVec.Y * num7;
+Vintagestory.Essentials/WaypointsTraverser.cs-465-		}
+Vintagestory.Essentials/WaypointsTraverser.cs-466-		else if (entity.Swimming)
+Vintagestory.Essentials/WaypointsTraverser.cs-467-		{
+Vintagestory.Essentials/WaypointsTraverser.cs-468-			entityControls.FlyVector.Set(entityControls.WalkVector);
+Vintagestory.Essentials/WaypointsTraverser.cs-469-			Vec3d xYZ2 = entity.Pos.XYZ;
+Vintagestory.Essentials/WaypointsTraverser.cs-470-			Block blockRaw3 = entity.World.BlockAccessor.GetBlockRaw((int)xYZ2.X, (int)xYZ2.Y, (int)xYZ2.Z, 2);
+Vintagestory.Essentials/WaypointsTraverser.cs-471-			Block blockRaw4 = entity.World.BlockAccessor.GetBlockRaw((int)xYZ2.X, (int)(xYZ2.Y + 1.0), (int)xYZ2.Z, 2);
+Vintagestory.Essentials/WaypointsTraverser.cs-472-			float num8 = GameMath.Clamp((float)(int)xYZ2.Y + (float)blockRaw3.LiquidLevel / 8f + (blockRaw4.IsLiquid() ? 1.125f : 0f) - (float)xYZ2.Y - (float)entity.SwimmingOffsetY, 0f, 1f);
+Vintagestory.Essentials/WaypointsTraverser.cs-473-			num8 = Math.Min(1f, num8 + 0.5f);
+Vintagestory.Essentials/WaypointsTraverser.cs:474:			entityControls.FlyVector.Y = GameMath.Clamp(entityControls.FlyVector.Y, 0.019999999552965164, 0.03999999910593033) * (double)num8;
+Vintagestory.Essentials/WaypointsTraverser.cs-475-			if (entity.CollidedHorizontally)
+Vintagestory.Essentials/WaypointsTraverser.cs-476-			{
+Vintagestory.Essentials/WaypointsTraverser.cs-477-				entityControls.FlyVector.Y = 0.05000000074505806;
+Vintagestory.Essentials/WaypointsTraverser.cs-478-			}
+Vintagestory.Essentials/WaypointsTraverser.cs-479-		}
+Vintagestory.Essentials/WaypointsTraverser.cs-480-	}
+Vintagestory.Essentials/WaypointsTraverser.cs-481-
+Vintagestory.Essentials/WaypointsTraverser.cs-482-	private bool IsNearTarget(int waypointOffset, ref bool nearHorizontally)
+Vintagestory.Essentials/WaypointsTraverser.cs-483-	{
+Vintagestory.Essentials/WaypointsTraverser.cs-484-		if (waypoints.Count - 1 < waypointToReachIndex + waypointOffset)
+Vintagestory.Essentials/WaypointsTraverser.cs-485-		{
+Vintagestory.Essentials/WaypointsTraverser.cs-486-			return false;
+Vintagestory.Essentials/WaypointsTraverser.cs-487-		}
+Vintagestory.Essentials/WaypointsTraverser.cs-488-		int index = Math.Min(waypoints.Count - 1, waypointToReachIndex + waypointOffset);
+Vintagestory.Essentials/WaypointsTraverser.cs-489-		Vec3d vec3d = waypoints[index];
+Vintagestory.Essentials/WaypointsTraverser.cs-490-		double internalY = entity.Pos.InternalY;
+Vintagestory.Essentials/WaypointsTraverser.cs-491-		sqDistToTarget = vec3d.HorizontalSquareDistanceTo(entity.Pos.X, entity.Pos.Z);
+Vintagestory.Essentials/WaypointsTraverser.cs-492-		double num = (vec3d.Y - internalY) * (vec3d.Y - internalY);
+Vintagestory.Essentials/WaypointsTraverser.cs-493-		bool flag = internalY > vec3d.Y;
+Vintagestory.Essentials/WaypointsTraverser.cs-494-		sqDistToTarget += (float)Math.Max(0.0, num - (flag ? 1.0 : 0.5));
+Vintagestory.Essentials/WaypointsTraverser.cs-495-		if (!nearHorizontally)
+Vintagestory.Essentials/WaypointsTraverser.cs-496-		{
+Vintagestory.Essentials/WaypointsTraverser.cs-497-			double num2 = vec3d.HorizontalSquareDistanceTo(entity.Pos.X, entity.Pos.Z);
+Vintagestory.Essentials/WaypointsTraverser.cs-498-			nearHorizontally = num2 < (double)(TargetDistance * TargetDistance);
+Vintagestory.Essentials/WaypointsTraverser.cs-499-		}
+--
+Vintagestory.ServerMods/GenHotSprings.cs-66-			genHotspring(baseX, baseZ, key, value);
+Vintagestory.ServerMods/GenHotSprings.cs-67-		}
+Vintagestory.ServerMods/GenHotSprings.cs-68-	}
+Vintagestory.ServerMods/GenHotSprings.cs-69-
+Vintagestory.ServerMods/GenHotSprings.cs-70-	private void genHotspring(int baseX, int baseZ, Vec3i centerPos, HotSpringGenData gendata)
+Vintagestory.ServerMods/GenHotSprings.cs-71-	{
+Vintagestory.ServerMods/GenHotSprings.cs-72-		double num = 2.0 * gendata.horRadius;
+Vintagestory.ServerMods/GenHotSprings.cs-73-		int num2 = (int)GameMath.Clamp((double)centerPos.X - num, -32.0, 63.0);
+Vintagestory.ServerMods/GenHotSprings.cs-74-		int num3 = (int)GameMath.Clamp((double)centerPos.X + num + 1.0, -32.0, 63.0);
+Vintagestory.ServerMods/GenHotSprings.cs-75-		int num4 = (int)GameMath.Clamp((double)centerPos.Z - num, -32.0, 63.0);
+Vintagestory.ServerMods/GenHotSprings.cs-76-		int num5 = (int)GameMath.Clamp((double)centerPos.Z + num + 1.0, -32.0, 63.0);
+Vintagestory.ServerMods/GenHotSprings.cs-77-		double num6 = num * num;
+Vintagestory.ServerMods/GenHotSprings.cs:78:		int num7 = 99999;
+Vintagestory.ServerMods/GenHotSprings.cs-79-		int num8 = 0;
+Vintagestory.ServerMods/GenHotSprings.cs-80-		int num9 = 0;
+Vintagestory.ServerMods/GenHotSprings.cs-81-		long num10 = 0L;
+Vintagestory.ServerMods/GenHotSprings.cs-82-		bool flag = false;
+Vintagestory.ServerMods/GenHotSprings.cs-83-		for (int i = num2; i <= num3; i++)
+Vintagestory.ServerMods/GenHotSprings.cs-84-		{
+Vintagestory.ServerMods/GenHotSprings.cs-85-			double num11 = (double)((i - centerPos.X) * (i - centerPos.X)) / num6;
+Vintagestory.ServerMods/GenHotSprings.cs-86-			for (int j = num4; j <= num5; j++)
+Vintagestory.ServerMods/GenHotSprings.cs-87-			{
+Vintagestory.ServerMods/GenHotSprings.cs-88-				double num12 = (double)((j - centerPos.Z) * (j - centerPos.Z)) / num6;
+Vintagestory.ServerMods/GenHotSprings.cs-89-				if (num11 + num12 < 1.0)
+Vintagestory.ServerMods/GenHotSprings.cs-90-				{
+Vintagestory.ServerMods/GenHotSprings.cs-91-					IMapChunk mapChunk = wgenBlockAccessor.GetMapChunk((baseX + i) / 32, (baseZ + j) / 32);
+Vintagestory.ServerMods/GenHotSprings.cs-92-					if (mapChunk == null)
+Vintagestory.ServerMods/GenHotSprings.cs-93-					{
+Vintagestory.ServerMods/GenHotSprings.cs-94-						return;
+Vintagestory.ServerMods/GenHotSprings.cs-95-					}
+Vintagestory.ServerMods/GenHotSprings.cs-96-					int num13 = mapChunk.WorldGenTerrainHeightMap[GameMath.Mod(j, 32) * 32 + GameMath.Mod(i, 32)];
+Vintagestory.ServerMods/GenHotSprings.cs-97-					num7 = Math.Min(num7, num13);
+Vintagestory.ServerMods/GenHotSprings.cs-98-					num8 = Math.Max(num8, num13);
+Vintagestory.ServerMods/GenHotSprings.cs-99-					num9++;
+Vintagestory.ServerMods/GenHotSprings.cs-100-					num10 += num13;
+Vintagestory.ServerMods/GenHotSprings.cs-101-					Block blockRaw = wgenBlockAccessor.GetBlockRaw(baseX + i, num13 + 1, baseZ + j, 2);
+Vintagestory.ServerMods/GenHotSprings.cs-102-					flag |= blockRaw.Id != 0 && blockRaw.LiquidCode != "boilingwater";
+Vintagestory.ServerMods/GenHotSprings.cs-103-				}
+--
+Vintagestory.ServerMods/AnywhereDiscGenerator.cs-27-
+Vintagestory.ServerMods/AnywhereDiscGenerator.cs-28-	protected override void beforeGenDeposit(IMapChunk mapChunk, BlockPos targetPos)
+Vintagestory.ServerMods/AnywhereDiscGenerator.cs-29-	{
+Vintagestory.ServerMods/AnywhereDiscGenerator.cs-30-		ypos = YPosRel.nextFloat(1f, DepositRand);
+Vintagestory.ServerMods/AnywhereDiscGenerator.cs-31-		posyi = (int)ypos;
+Vintagestory.ServerMods/AnywhereDiscGenerator.cs-32-		targetPos.Y = posyi;
+Vintagestory.ServerMods/AnywhereDiscGenerator.cs-33-		currentRelativeDepth = ypos / (float)Api.WorldManager.MapSizeY;
+Vintagestory.ServerMods/AnywhereDiscGenerator.cs-34-		step = (float)mapChunk.MapRegion.OreMapVerticalDistortTop.InnerSize / (float)regionChunkSize;
+Vintagestory.ServerMods/AnywhereDiscGenerator.cs-35-	}
+Vintagestory.ServerMods/AnywhereDiscGenerator.cs-36-
+Vintagestory.ServerMods/AnywhereDiscGenerator.cs-37-	public override void GetYMinMax(BlockPos pos, out double miny, out double maxy)
+Vintagestory.ServerMods/AnywhereDiscGenerator.cs-38-	{
+Vintagestory.ServerMods/AnywhereDiscGenerator.cs:39:		miny = 99999.0;
+Vintagestory.ServerMods/AnywhereDiscGenerator.cs:40:		maxy = -99999.0;
+Vintagestory.ServerMods/AnywhereDiscGenerator.cs-41-		for (int i = 0; i < 100; i++)
+Vintagestory.ServerMods/AnywhereDiscGenerator.cs-42-		{
+Vintagestory.ServerMods/AnywhereDiscGenerator.cs-43-			double val = YPosRel.nextFloat(1f, DepositRand);
+Vintagestory.ServerMods/AnywhereDiscGenerator.cs-44-			miny = Math.Min(miny, val);
+Vintagestory.ServerMods/AnywhereDiscGenerator.cs-45-			maxy = Math.Max(maxy, val);
+Vintagestory.ServerMods/AnywhereDiscGenerator.cs-46-		}
+Vintagestory.ServerMods/AnywhereDiscGenerator.cs-47-	}
+Vintagestory.ServerMods/AnywhereDiscGenerator.cs-48-
+Vintagestory.ServerMods/AnywhereDiscGenerator.cs-49-	protected override void loadYPosAndThickness(IMapChunk heremapchunk, int lx, int lz, BlockPos targetPos, double distanceToEdge)
+Vintagestory.ServerMods/AnywhereDiscGenerator.cs-50-	{
+Vintagestory.ServerMods/AnywhereDiscGenerator.cs-51-		double num = (double)depoitThickness * GameMath.Clamp(distanceToEdge * 2.0 - 0.2, 0.0, 1.0);
+Vintagestory.ServerMods/AnywhereDiscGenerator.cs-52-		hereThickness = (int)num + ((DepositRand.NextDouble() < num - (double)(int)num) ? 1 : 0);
+Vintagestory.ServerMods/AnywhereDiscGenerator.cs-53-		int num2 = (int)getDepositYDistort(targetPos, lx, lz, step, heremapchunk);
+Vintagestory.ServerMods/AnywhereDiscGenerator.cs-54-		targetPos.Y = posyi + num2;
+Vintagestory.ServerMods/AnywhereDiscGenerator.cs-55-	}
+Vintagestory.ServerMods/AnywhereDiscGenerator.cs-56-}
+--
+Vintagestory.ServerMods/GenDeposits.cs-98-				{
+Vintagestory.ServerMods/GenDeposits.cs-99-					DepositVariant[] childDeposits = depositVariant.ChildDeposits;
+Vintagestory.ServerMods/GenDeposits.cs-100-					foreach (DepositVariant obj in childDeposits)
+Vintagestory.ServerMods/GenDeposits.cs-101-					{
+Vintagestory.ServerMods/GenDeposits.cs-102-						obj.fromFile = item.Key.ToString();
+Vintagestory.ServerMods/GenDeposits.cs-103-						obj.parentDeposit = depositVariant;
+Vintagestory.ServerMods/GenDeposits.cs-104-						obj.WithBlockCallback &= blockCallbacks;
+Vintagestory.ServerMods/GenDeposits.cs-105-					}
+Vintagestory.ServerMods/GenDeposits.cs-106-				}
+Vintagestory.ServerMods/GenDeposits.cs-107-			}
+Vintagestory.ServerMods/GenDeposits.cs-108-		}
+Vintagestory.ServerMods/GenDeposits.cs-109-		Deposits = list.ToArray();
+Vintagestory.ServerMods/GenDeposits.cs:110:		depositShapeDistortNoise = NormalizedSimplexNoise.FromDefaultOctaves(3, 0.10000000149011612, 0.8999999761581421, 1L);
+Vintagestory.ServerMods/GenDeposits.cs-111-		regionSize = api.WorldManager.RegionSize;
+Vintagestory.ServerMods/GenDeposits.cs-112-		depositRand = new LCGRandom(api.WorldManager.Seed + 34613);
+Vintagestory.ServerMods/GenDeposits.cs-113-		for (int num3 = 0; num3 < Deposits.Length; num3++)
+Vintagestory.ServerMods/GenDeposits.cs-114-		{
+Vintagestory.ServerMods/GenDeposits.cs-115-			DepositVariant obj2 = Deposits[num3];
+Vintagestory.ServerMods/GenDeposits.cs-116-			obj2.addHandbookAttributes = addHandbookAttributes;
+Vintagestory.ServerMods/GenDeposits.cs-117-			obj2.Init(api, depositRand, depositShapeDistortNoise);
+Vintagestory.ServerMods/GenDeposits.cs-118-		}
+Vintagestory.ServerMods/GenDeposits.cs-119-	}
+Vintagestory.ServerMods/GenDeposits.cs-120-
+Vintagestory.ServerMods/GenDeposits.cs-121-	public override void initWorldGen()
+Vintagestory.ServerMods/GenDeposits.cs-122-	{
+Vintagestory.ServerMods/GenDeposits.cs-123-		base.initWorldGen();
+Vintagestory.ServerMods/GenDeposits.cs-124-		int seed = api.WorldManager.Seed;
+Vintagestory.ServerMods/GenDeposits.cs-125-		Dictionary<string, MapLayerBase> maplayersByCode = new Dictionary<string, MapLayerBase>();
+Vintagestory.ServerMods/GenDeposits.cs-126-		for (int i = 0; i < Deposits.Length; i++)
+Vintagestory.ServerMods/GenDeposits.cs-127-		{
+Vintagestory.ServerMods/GenDeposits.cs-128-			DepositVariant depositVariant = Deposits[i];
+Vintagestory.ServerMods/GenDeposits.cs-129-			if (depositVariant.WithOreMap)
+Vintagestory.ServerMods/GenDeposits.cs-130-			{
+Vintagestory.ServerMods/GenDeposits.cs-131-				depositVariant.OreMapLayer = getOrCreateMapLayer(seed, depositVariant.Code, maplayersByCode, depositVariant.OreMapScale, depositVariant.OreMapContrast, depositVariant.OreMapSub);
+Vintagestory.ServerMods/GenDeposits.cs-132-			}
+Vintagestory.ServerMods/GenDeposits.cs-133-			if (depositVariant.ChildDeposits == null)
+Vintagestory.ServerMods/GenDeposits.cs-134-			{
+Vintagestory.ServerMods/GenDeposits.cs-135-				continue;
+--
+Vintagestory.ServerMods/GenCaves.cs-38-				.EndSubCommand();
+Vintagestory.ServerMods/GenCaves.cs-39-			api.Event.MapChunkGeneration(OnMapChunkGen, "standard");
+Vintagestory.ServerMods/GenCaves.cs-40-			api.Event.MapChunkGeneration(OnMapChunkGen, "superflat");
+Vintagestory.ServerMods/GenCaves.cs-41-			api.Event.ChunkColumnGeneration(GenChunkColumn, EnumWorldGenPass.Terrain, "standard");
+Vintagestory.ServerMods/GenCaves.cs-42-			api.Event.InitWorldGenerator(initWorldGen, "superflat");
+Vintagestory.ServerMods/GenCaves.cs-43-		}
+Vintagestory.ServerMods/GenCaves.cs-44-	}
+Vintagestory.ServerMods/GenCaves.cs-45-
+Vintagestory.ServerMods/GenCaves.cs-46-	public override void initWorldGen()
+Vintagestory.ServerMods/GenCaves.cs-47-	{
+Vintagestory.ServerMods/GenCaves.cs-48-		base.initWorldGen();
+Vintagestory.ServerMods/GenCaves.cs-49-		caveRand = new LCGRandom(api.WorldManager.Seed + 123128);
+Vintagestory.ServerMods/GenCaves.cs:50:		basaltNoise = NormalizedSimplexNoise.FromDefaultOctaves(2, 0.2857142984867096, 0.8999999761581421, api.World.Seed + 12);
+Vintagestory.ServerMods/GenCaves.cs:51:		heightvarNoise = NormalizedSimplexNoise.FromDefaultOctaves(3, 0.05000000074505806, 0.8999999761581421, api.World.Seed + 12);
+Vintagestory.ServerMods/GenCaves.cs-52-		regionsize = api.World.BlockAccessor.RegionSize;
+Vintagestory.ServerMods/GenCaves.cs-53-	}
+Vintagestory.ServerMods/GenCaves.cs-54-
+Vintagestory.ServerMods/GenCaves.cs-55-	private void OnMapChunkGen(IMapChunk mapChunk, int chunkX, int chunkZ)
+Vintagestory.ServerMods/GenCaves.cs-56-	{
+Vintagestory.ServerMods/GenCaves.cs-57-		if (heightvarNoise == null)
+Vintagestory.ServerMods/GenCaves.cs-58-		{
+Vintagestory.ServerMods/GenCaves.cs-59-			return;
+Vintagestory.ServerMods/GenCaves.cs-60-		}
+Vintagestory.ServerMods/GenCaves.cs-61-		mapChunk.CaveHeightDistort = new byte[1024];
+Vintagestory.ServerMods/GenCaves.cs-62-		for (int i = 0; i < 32; i++)
+Vintagestory.ServerMods/GenCaves.cs-63-		{
+Vintagestory.ServerMods/GenCaves.cs-64-			for (int j = 0; j < 32; j++)
+Vintagestory.ServerMods/GenCaves.cs-65-			{
+Vintagestory.ServerMods/GenCaves.cs-66-				double num = heightvarNoise.Noise(32 * chunkX + i, 32 * chunkZ + j) - 0.5;
+Vintagestory.ServerMods/GenCaves.cs-67-				num = ((num > 0.0) ? Math.Max(0.0, num - 0.07) : Math.Min(0.0, num + 0.07));
+Vintagestory.ServerMods/GenCaves.cs-68-				mapChunk.CaveHeightDistort[j * 32 + i] = (byte)(128.0 * num + 127.0);
+Vintagestory.ServerMods/GenCaves.cs-69-			}
+Vintagestory.ServerMods/GenCaves.cs-70-		}
+Vintagestory.ServerMods/GenCaves.cs-71-	}
+Vintagestory.ServerMods/GenCaves.cs-72-
+Vintagestory.ServerMods/GenCaves.cs-73-	private TextCommandResult CmdCaveGenTest(TextCommandCallingArgs args)
+Vintagestory.ServerMods/GenCaves.cs-74-	{
+Vintagestory.ServerMods/GenCaves.cs-75-		caveRand = new LCGRandom(api.WorldManager.Seed + 123128);
+Vintagestory.ServerMods/GenCaves.cs-76-		initWorldGen();

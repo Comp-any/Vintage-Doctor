@@ -1,0 +1,66 @@
+Vintagestory.Client.NoObf/ClientEventAPI.cs-695-			dele?.Invoke();
+Vintagestory.Client.NoObf/ClientEventAPI.cs-696-		});
+Vintagestory.Client.NoObf/ClientEventAPI.cs-697-	}
+Vintagestory.Client.NoObf/ClientEventAPI.cs-698-
+Vintagestory.Client.NoObf/ClientEventAPI.cs-699-	public void TriggerHotkeysChanged()
+Vintagestory.Client.NoObf/ClientEventAPI.cs-700-	{
+Vintagestory.Client.NoObf/ClientEventAPI.cs-701-		Trigger(HotkeysChanged?.GetInvocationList(), "HotkeysChanged", (Action dele) =>
+Vintagestory.Client.NoObf/ClientEventAPI.cs-702-		{
+Vintagestory.Client.NoObf/ClientEventAPI.cs-703-			dele?.Invoke();
+Vintagestory.Client.NoObf/ClientEventAPI.cs-704-		});
+Vintagestory.Client.NoObf/ClientEventAPI.cs-705-	}
+Vintagestory.Client.NoObf/ClientEventAPI.cs-706-
+Vintagestory.Client.NoObf/ClientEventAPI.cs:707:	public void TriggerBlockTexturesLoaded()
+Vintagestory.Client.NoObf/ClientEventAPI.cs-708-	{
+Vintagestory.Client.NoObf/ClientEventAPI.cs-709-		Trigger(BlockTexturesLoaded?.GetInvocationList(), "BlockTexturesLoaded", (Action dele) =>
+Vintagestory.Client.NoObf/ClientEventAPI.cs-710-		{
+Vintagestory.Client.NoObf/ClientEventAPI.cs-711-			dele?.Invoke();
+Vintagestory.Client.NoObf/ClientEventAPI.cs-712-		});
+Vintagestory.Client.NoObf/ClientEventAPI.cs-713-	}
+Vintagestory.Client.NoObf/ClientEventAPI.cs-714-
+Vintagestory.Client.NoObf/ClientEventAPI.cs-715-	public bool TriggerIsPlayerReady()
+Vintagestory.Client.NoObf/ClientEventAPI.cs-716-	{
+Vintagestory.Client.NoObf/ClientEventAPI.cs-717-		if (IsPlayerReady == null)
+Vintagestory.Client.NoObf/ClientEventAPI.cs-718-		{
+Vintagestory.Client.NoObf/ClientEventAPI.cs-719-			return true;
+Vintagestory.Client.NoObf/ClientEventAPI.cs-720-		}
+Vintagestory.Client.NoObf/ClientEventAPI.cs-721-		EnumHandling handling = EnumHandling.PassThrough;
+Vintagestory.Client.NoObf/ClientEventAPI.cs-722-		bool flag = true;
+Vintagestory.Client.NoObf/ClientEventAPI.cs-723-		Delegate[] invocationList = IsPlayerReady.GetInvocationList();
+Vintagestory.Client.NoObf/ClientEventAPI.cs-724-		for (int i = 0; i < invocationList.Length; i++)
+Vintagestory.Client.NoObf/ClientEventAPI.cs-725-		{
+Vintagestory.Client.NoObf/ClientEventAPI.cs-726-			IsPlayerReadyDelegate isPlayerReadyDelegate = (IsPlayerReadyDelegate)invocationList[i];
+Vintagestory.Client.NoObf/ClientEventAPI.cs-727-			try
+Vintagestory.Client.NoObf/ClientEventAPI.cs-728-			{
+Vintagestory.Client.NoObf/ClientEventAPI.cs-729-				bool flag2 = isPlayerReadyDelegate(ref handling);
+Vintagestory.Client.NoObf/ClientEventAPI.cs-730-				if (handling != EnumHandling.PassThrough)
+Vintagestory.Client.NoObf/ClientEventAPI.cs-731-				{
+Vintagestory.Client.NoObf/ClientEventAPI.cs-732-					flag &= flag2;
+--
+Vintagestory.Client.NoObf/SystemModHandler.cs-222-	{
+Vintagestory.Client.NoObf/SystemModHandler.cs-223-		loader.RunModPhase(ModRunPhase.Start);
+Vintagestory.Client.NoObf/SystemModHandler.cs-224-	}
+Vintagestory.Client.NoObf/SystemModHandler.cs-225-
+Vintagestory.Client.NoObf/SystemModHandler.cs-226-	internal void StartModsFully()
+Vintagestory.Client.NoObf/SystemModHandler.cs-227-	{
+Vintagestory.Client.NoObf/SystemModHandler.cs-228-		loader.RunModPhase(ModRunPhase.Normal);
+Vintagestory.Client.NoObf/SystemModHandler.cs-229-	}
+Vintagestory.Client.NoObf/SystemModHandler.cs-230-
+Vintagestory.Client.NoObf/SystemModHandler.cs-231-	public override void OnBlockTexturesLoaded()
+Vintagestory.Client.NoObf/SystemModHandler.cs-232-	{
+Vintagestory.Client.NoObf/SystemModHandler.cs-233-		game.api.Logger.VerboseDebug("Trigger mod event OnBlockTexturesLoaded");
+Vintagestory.Client.NoObf/SystemModHandler.cs:234:		game.api.eventapi.TriggerBlockTexturesLoaded();
+Vintagestory.Client.NoObf/SystemModHandler.cs-235-	}
+Vintagestory.Client.NoObf/SystemModHandler.cs-236-
+Vintagestory.Client.NoObf/SystemModHandler.cs-237-	public override void Dispose(ClientMain game)
+Vintagestory.Client.NoObf/SystemModHandler.cs-238-	{
+Vintagestory.Client.NoObf/SystemModHandler.cs-239-		base.Dispose(game);
+Vintagestory.Client.NoObf/SystemModHandler.cs-240-		loader?.Dispose();
+Vintagestory.Client.NoObf/SystemModHandler.cs-241-		CrashReporter.LoadedMods.Clear();
+Vintagestory.Client.NoObf/SystemModHandler.cs-242-	}
+Vintagestory.Client.NoObf/SystemModHandler.cs-243-
+Vintagestory.Client.NoObf/SystemModHandler.cs-244-	public override EnumClientSystemType GetSystemType()
+Vintagestory.Client.NoObf/SystemModHandler.cs-245-	{
+Vintagestory.Client.NoObf/SystemModHandler.cs-246-		return EnumClientSystemType.Misc;
+Vintagestory.Client.NoObf/SystemModHandler.cs-247-	}
+Vintagestory.Client.NoObf/SystemModHandler.cs-248-}

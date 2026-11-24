@@ -1,0 +1,586 @@
+Vintagestory.Common.Database/SQLiteDbConnectionv1.cs-11-namespace Vintagestory.Common.Database;
+Vintagestory.Common.Database/SQLiteDbConnectionv1.cs-12-
+Vintagestory.Common.Database/SQLiteDbConnectionv1.cs-13-public class SQLiteDbConnectionv1 : IGameDbConnection, IDisposable
+Vintagestory.Common.Database/SQLiteDbConnectionv1.cs-14-{
+Vintagestory.Common.Database/SQLiteDbConnectionv1.cs-15-	private SqliteConnection sqliteConn;
+Vintagestory.Common.Database/SQLiteDbConnectionv1.cs-16-
+Vintagestory.Common.Database/SQLiteDbConnectionv1.cs-17-	private string databaseFileName;
+Vintagestory.Common.Database/SQLiteDbConnectionv1.cs-18-
+Vintagestory.Common.Database/SQLiteDbConnectionv1.cs-19-	public ILogger logger = new NullLogger();
+Vintagestory.Common.Database/SQLiteDbConnectionv1.cs-20-
+Vintagestory.Common.Database/SQLiteDbConnectionv1.cs-21-	private static int MapChunkYCoord = 99998;
+Vintagestory.Common.Database/SQLiteDbConnectionv1.cs-22-
+Vintagestory.Common.Database/SQLiteDbConnectionv1.cs:23:	private static int MapRegionYCoord = 99999;
+Vintagestory.Common.Database/SQLiteDbConnectionv1.cs-24-
+Vintagestory.Common.Database/SQLiteDbConnectionv1.cs-25-	private static ulong pow20minus1 = 1048575uL;
+Vintagestory.Common.Database/SQLiteDbConnectionv1.cs-26-
+Vintagestory.Common.Database/SQLiteDbConnectionv1.cs-27-	public bool IsReadOnly => false;
+Vintagestory.Common.Database/SQLiteDbConnectionv1.cs-28-
+Vintagestory.Common.Database/SQLiteDbConnectionv1.cs-29-	public SQLiteDbConnectionv1(ILogger logger)
+Vintagestory.Common.Database/SQLiteDbConnectionv1.cs-30-	{
+Vintagestory.Common.Database/SQLiteDbConnectionv1.cs-31-		this.logger = logger;
+Vintagestory.Common.Database/SQLiteDbConnectionv1.cs-32-	}
+Vintagestory.Common.Database/SQLiteDbConnectionv1.cs-33-
+Vintagestory.Common.Database/SQLiteDbConnectionv1.cs-34-	public bool OpenOrCreate(string filename, ref string errorMessage, bool requireWriteAccess, bool corruptionProtection, bool doIntegrityCheck)
+Vintagestory.Common.Database/SQLiteDbConnectionv1.cs-35-	{
+Vintagestory.Common.Database/SQLiteDbConnectionv1.cs-36-		try
+Vintagestory.Common.Database/SQLiteDbConnectionv1.cs-37-		{
+Vintagestory.Common.Database/SQLiteDbConnectionv1.cs-38-			databaseFileName = filename;
+Vintagestory.Common.Database/SQLiteDbConnectionv1.cs-39-			bool flag = !File.Exists(databaseFileName);
+Vintagestory.Common.Database/SQLiteDbConnectionv1.cs-40-			DbConnectionStringBuilder dbConnectionStringBuilder = new DbConnectionStringBuilder
+Vintagestory.Common.Database/SQLiteDbConnectionv1.cs-41-			{
+Vintagestory.Common.Database/SQLiteDbConnectionv1.cs-42-				{ "Data Source", databaseFileName },
+Vintagestory.Common.Database/SQLiteDbConnectionv1.cs-43-				{ "Pooling", "false" }
+Vintagestory.Common.Database/SQLiteDbConnectionv1.cs-44-			};
+Vintagestory.Common.Database/SQLiteDbConnectionv1.cs-45-			sqliteConn = new SqliteConnection(dbConnectionStringBuilder.ToString());
+Vintagestory.Common.Database/SQLiteDbConnectionv1.cs-46-			sqliteConn.Open();
+Vintagestory.Common.Database/SQLiteDbConnectionv1.cs-47-			using (SqliteCommand sqliteCommand = sqliteConn.CreateCommand())
+Vintagestory.Common.Database/SQLiteDbConnectionv1.cs-48-			{
+--
+Vintagestory.Client.NoObf/HudDialogChat.cs-15-namespace Vintagestory.Client.NoObf;
+Vintagestory.Client.NoObf/HudDialogChat.cs-16-
+Vintagestory.Client.NoObf/HudDialogChat.cs-17-public class HudDialogChat : HudElement
+Vintagestory.Client.NoObf/HudDialogChat.cs-18-{
+Vintagestory.Client.NoObf/HudDialogChat.cs-19-	private static int historyMax = 30;
+Vintagestory.Client.NoObf/HudDialogChat.cs-20-
+Vintagestory.Client.NoObf/HudDialogChat.cs-21-	private LimitedList<string> typedMessagesHistory = new LimitedList<string>(100);
+Vintagestory.Client.NoObf/HudDialogChat.cs-22-
+Vintagestory.Client.NoObf/HudDialogChat.cs-23-	private int typedMessagesHistoryPos = -1;
+Vintagestory.Client.NoObf/HudDialogChat.cs-24-
+Vintagestory.Client.NoObf/HudDialogChat.cs-25-	private long lastActivityMs = -100000L;
+Vintagestory.Client.NoObf/HudDialogChat.cs-26-
+Vintagestory.Client.NoObf/HudDialogChat.cs:27:	private int lastMessageInGroupId = -99999;
+Vintagestory.Client.NoObf/HudDialogChat.cs-28-
+Vintagestory.Client.NoObf/HudDialogChat.cs-29-	private TreeAttribute eventAttr;
+Vintagestory.Client.NoObf/HudDialogChat.cs-30-
+Vintagestory.Client.NoObf/HudDialogChat.cs-31-	internal bool MultiCommandPasteMode;
+Vintagestory.Client.NoObf/HudDialogChat.cs-32-
+Vintagestory.Client.NoObf/HudDialogChat.cs-33-	private ClientMain game;
+Vintagestory.Client.NoObf/HudDialogChat.cs-34-
+Vintagestory.Client.NoObf/HudDialogChat.cs-35-	private int chatWindowInnerWidth = ClientSettings.ChatWindowWidth;
+Vintagestory.Client.NoObf/HudDialogChat.cs-36-
+Vintagestory.Client.NoObf/HudDialogChat.cs-37-	private int chatWindowInnerHeight = ClientSettings.ChatWindowHeight;
+Vintagestory.Client.NoObf/HudDialogChat.cs-38-
+Vintagestory.Client.NoObf/HudDialogChat.cs-39-	private int tabsHeight = 23;
+Vintagestory.Client.NoObf/HudDialogChat.cs-40-
+Vintagestory.Client.NoObf/HudDialogChat.cs-41-	private int chatInputHeight = 25;
+Vintagestory.Client.NoObf/HudDialogChat.cs-42-
+Vintagestory.Client.NoObf/HudDialogChat.cs-43-	private int horPadding = 6;
+Vintagestory.Client.NoObf/HudDialogChat.cs-44-
+Vintagestory.Client.NoObf/HudDialogChat.cs-45-	private int verPadding = 3;
+Vintagestory.Client.NoObf/HudDialogChat.cs-46-
+Vintagestory.Client.NoObf/HudDialogChat.cs-47-	private int bottomOffset = 100;
+Vintagestory.Client.NoObf/HudDialogChat.cs-48-
+Vintagestory.Client.NoObf/HudDialogChat.cs-49-	private int scrollbarPadding = 1;
+Vintagestory.Client.NoObf/HudDialogChat.cs-50-
+Vintagestory.Client.NoObf/HudDialogChat.cs-51-	private int scrollbarWidth = 10;
+Vintagestory.Client.NoObf/HudDialogChat.cs-52-
+--
+Vintagestory.Client.NoObf/SystemCinematicCamera.cs-109-		game.api.ChatCommands.Create("cam").WithPreCondition(CheckPrecondition).BeginSubCommand("tp")
+Vintagestory.Client.NoObf/SystemCinematicCamera.cs-110-			.WithDescription("Whether to teleport the player back to where he was previously (default on)")
+Vintagestory.Client.NoObf/SystemCinematicCamera.cs-111-			.WithArgs(parsers.OptionalBool("teleportBack"))
+Vintagestory.Client.NoObf/SystemCinematicCamera.cs-112-			.HandleWith(OnCmdTp)
+Vintagestory.Client.NoObf/SystemCinematicCamera.cs-113-			.EndSubCommand()
+Vintagestory.Client.NoObf/SystemCinematicCamera.cs-114-			.BeginSubCommand("gui")
+Vintagestory.Client.NoObf/SystemCinematicCamera.cs-115-			.WithDescription("If set, will hide all guis during while the cam is on (default on)")
+Vintagestory.Client.NoObf/SystemCinematicCamera.cs-116-			.WithArgs(parsers.OptionalBool("shouldDisableGui"))
+Vintagestory.Client.NoObf/SystemCinematicCamera.cs-117-			.HandleWith(OnCmdGui)
+Vintagestory.Client.NoObf/SystemCinematicCamera.cs-118-			.EndSubCommand()
+Vintagestory.Client.NoObf/SystemCinematicCamera.cs-119-			.BeginSubCommand("loop")
+Vintagestory.Client.NoObf/SystemCinematicCamera.cs-120-			.WithDescription("If set then path be repeatedly played")
+Vintagestory.Client.NoObf/SystemCinematicCamera.cs:121:			.WithArgs(parsers.OptionalInt("quantityLoops", 9999999))
+Vintagestory.Client.NoObf/SystemCinematicCamera.cs-122-			.HandleWith(OnCmdLoop)
+Vintagestory.Client.NoObf/SystemCinematicCamera.cs-123-			.EndSubCommand()
+Vintagestory.Client.NoObf/SystemCinematicCamera.cs-124-			.BeginSubCommand("p")
+Vintagestory.Client.NoObf/SystemCinematicCamera.cs-125-			.WithDescription("Add a point to path")
+Vintagestory.Client.NoObf/SystemCinematicCamera.cs-126-			.HandleWith(OnCmdAddPoint)
+Vintagestory.Client.NoObf/SystemCinematicCamera.cs-127-			.EndSubCommand()
+Vintagestory.Client.NoObf/SystemCinematicCamera.cs-128-			.BeginSubCommand("up")
+Vintagestory.Client.NoObf/SystemCinematicCamera.cs-129-			.WithDescription("Update nth point")
+Vintagestory.Client.NoObf/SystemCinematicCamera.cs-130-			.WithArgs(parsers.OptionalInt("point_index"))
+Vintagestory.Client.NoObf/SystemCinematicCamera.cs-131-			.HandleWith(OnCmdUp)
+Vintagestory.Client.NoObf/SystemCinematicCamera.cs-132-			.EndSubCommand()
+Vintagestory.Client.NoObf/SystemCinematicCamera.cs-133-			.BeginSubCommand("goto")
+Vintagestory.Client.NoObf/SystemCinematicCamera.cs-134-			.WithDescription("Teleport to nth point")
+Vintagestory.Client.NoObf/SystemCinematicCamera.cs-135-			.WithArgs(parsers.OptionalInt("point_index"))
+Vintagestory.Client.NoObf/SystemCinematicCamera.cs-136-			.HandleWith(OnCmdGoto)
+Vintagestory.Client.NoObf/SystemCinematicCamera.cs-137-			.EndSubCommand()
+Vintagestory.Client.NoObf/SystemCinematicCamera.cs-138-			.BeginSubCommand("cp")
+Vintagestory.Client.NoObf/SystemCinematicCamera.cs-139-			.WithDescription("Close path")
+Vintagestory.Client.NoObf/SystemCinematicCamera.cs-140-			.HandleWith(OnCmdCp)
+Vintagestory.Client.NoObf/SystemCinematicCamera.cs-141-			.EndSubCommand()
+Vintagestory.Client.NoObf/SystemCinematicCamera.cs-142-			.BeginSubCommand("rp")
+Vintagestory.Client.NoObf/SystemCinematicCamera.cs-143-			.WithDescription("Remove the last point from the path")
+Vintagestory.Client.NoObf/SystemCinematicCamera.cs-144-			.HandleWith(OnCmdRemovePoint)
+Vintagestory.Client.NoObf/SystemCinematicCamera.cs-145-			.EndSubCommand()
+Vintagestory.Client.NoObf/SystemCinematicCamera.cs-146-			.BeginSubCommand("play")
+--
+Vintagestory.Client.NoObf/ClientMain.cs-2131-		MouseGrabbed = ScreenManager.Platform.IsFocused && !exitToDisconnectScreen && !exitToMainMenu && BlocksReceivedAndLoaded && !flag3 && ((DialogsOpened == 0 || (ClientSettings.ImmersiveMouseMode && !flag2)) ^ flag);
+Vintagestory.Client.NoObf/ClientMain.cs-2132-		mouseWorldInteractAnyway = !MouseGrabbed && !flag2;
+Vintagestory.Client.NoObf/ClientMain.cs-2133-		if (!mouseGrabbed && MouseGrabbed)
+Vintagestory.Client.NoObf/ClientMain.cs-2134-		{
+Vintagestory.Client.NoObf/ClientMain.cs-2135-			float num = GameMath.AngleRadDistance(EntityPlayer.Pos.Yaw, EntityPlayer.WalkYaw);
+Vintagestory.Client.NoObf/ClientMain.cs-2136-			EntityPlayer.Pos.Yaw += num;
+Vintagestory.Client.NoObf/ClientMain.cs-2137-		}
+Vintagestory.Client.NoObf/ClientMain.cs-2138-	}
+Vintagestory.Client.NoObf/ClientMain.cs-2139-
+Vintagestory.Client.NoObf/ClientMain.cs-2140-	public void UpdateCameraYawPitch(float dt)
+Vintagestory.Client.NoObf/ClientMain.cs-2141-	{
+Vintagestory.Client.NoObf/ClientMain.cs-2142-		double num = GameMath.Clamp(dt / (1f / 75f), 0f, 3f);
+Vintagestory.Client.NoObf/ClientMain.cs:2143:		double num2 = GameMath.Clamp((double)((float)ClientSettings.MouseSmoothing / 100f) * num, 0.009999999776482582, 1.0);
+Vintagestory.Client.NoObf/ClientMain.cs-2144-		float num3 = 0.5f * (float)num;
+Vintagestory.Client.NoObf/ClientMain.cs-2145-		if (player.Entity.Swimming && player.CameraMode == EnumCameraMode.FirstPerson && swimmingMouseSmoothing > 0f)
+Vintagestory.Client.NoObf/ClientMain.cs-2146-		{
+Vintagestory.Client.NoObf/ClientMain.cs-2147-			num2 = GameMath.Clamp(1f - swimmingMouseSmoothing, 0f, 1f);
+Vintagestory.Client.NoObf/ClientMain.cs-2148-		}
+Vintagestory.Client.NoObf/ClientMain.cs-2149-		double num4 = num2 * (MouseDeltaX - DelayedMouseDeltaX);
+Vintagestory.Client.NoObf/ClientMain.cs-2150-		double num5 = num2 * (MouseDeltaY - DelayedMouseDeltaY);
+Vintagestory.Client.NoObf/ClientMain.cs-2151-		DelayedMouseDeltaX += num4;
+Vintagestory.Client.NoObf/ClientMain.cs-2152-		DelayedMouseDeltaY += num5;
+Vintagestory.Client.NoObf/ClientMain.cs-2153-		EntityPlayer entityPlayer = EntityPlayer;
+Vintagestory.Client.NoObf/ClientMain.cs-2154-		if (entityPlayer != null && entityPlayer.MountedOn?.AngleMode == EnumMountAngleMode.FixateYaw && player.CameraMode != EnumCameraMode.FirstPerson)
+Vintagestory.Client.NoObf/ClientMain.cs-2155-		{
+Vintagestory.Client.NoObf/ClientMain.cs-2156-			float yaw = EntityPlayer.MountedOn.SeatPosition.Yaw;
+Vintagestory.Client.NoObf/ClientMain.cs-2157-			EntityPlayer.Pos.Yaw = yaw;
+Vintagestory.Client.NoObf/ClientMain.cs-2158-			EntityPlayer.BodyYaw = yaw;
+Vintagestory.Client.NoObf/ClientMain.cs-2159-			if (MainCamera.CameraMode == EnumCameraMode.FirstPerson)
+Vintagestory.Client.NoObf/ClientMain.cs-2160-			{
+Vintagestory.Client.NoObf/ClientMain.cs-2161-				mouseYaw = yaw;
+Vintagestory.Client.NoObf/ClientMain.cs-2162-			}
+Vintagestory.Client.NoObf/ClientMain.cs-2163-		}
+Vintagestory.Client.NoObf/ClientMain.cs-2164-		if (!AllowCameraControl || !Platform.IsFocused || !MouseGrabbed)
+Vintagestory.Client.NoObf/ClientMain.cs-2165-		{
+Vintagestory.Client.NoObf/ClientMain.cs-2166-			return;
+Vintagestory.Client.NoObf/ClientMain.cs-2167-		}
+Vintagestory.Client.NoObf/ClientMain.cs-2168-		EnumMountAngleMode enumMountAngleMode = EnumMountAngleMode.Unaffected;
+--
+Vintagestory.Client.NoObf/HudHotbar.cs-13-public class HudHotbar : HudElement
+Vintagestory.Client.NoObf/HudHotbar.cs-14-{
+Vintagestory.Client.NoObf/HudHotbar.cs-15-	private IInventory hotbarInv;
+Vintagestory.Client.NoObf/HudHotbar.cs-16-
+Vintagestory.Client.NoObf/HudHotbar.cs-17-	private IInventory backpackInv;
+Vintagestory.Client.NoObf/HudHotbar.cs-18-
+Vintagestory.Client.NoObf/HudHotbar.cs-19-	private GuiElementItemSlotGrid hotbarSlotGrid;
+Vintagestory.Client.NoObf/HudHotbar.cs-20-
+Vintagestory.Client.NoObf/HudHotbar.cs-21-	private GuiElementItemSlotGrid backpackGrid;
+Vintagestory.Client.NoObf/HudHotbar.cs-22-
+Vintagestory.Client.NoObf/HudHotbar.cs-23-	private long itemInfoTextActiveMs;
+Vintagestory.Client.NoObf/HudHotbar.cs-24-
+Vintagestory.Client.NoObf/HudHotbar.cs:25:	private int lastActiveSlotStacksize = 99999;
+Vintagestory.Client.NoObf/HudHotbar.cs-26-
+Vintagestory.Client.NoObf/HudHotbar.cs-27-	private int lastActiveSlotItemId;
+Vintagestory.Client.NoObf/HudHotbar.cs-28-
+Vintagestory.Client.NoObf/HudHotbar.cs-29-	private EnumItemClass lastActiveClassItemClass;
+Vintagestory.Client.NoObf/HudHotbar.cs-30-
+Vintagestory.Client.NoObf/HudHotbar.cs-31-	private bool scrollWheeledSlotInFrame;
+Vintagestory.Client.NoObf/HudHotbar.cs-32-
+Vintagestory.Client.NoObf/HudHotbar.cs-33-	private bool shouldRecompose;
+Vintagestory.Client.NoObf/HudHotbar.cs-34-
+Vintagestory.Client.NoObf/HudHotbar.cs-35-	private LoadedTexture currentToolModeTexture;
+Vintagestory.Client.NoObf/HudHotbar.cs-36-
+Vintagestory.Client.NoObf/HudHotbar.cs-37-	private LoadedTexture toolModeBgTexture;
+Vintagestory.Client.NoObf/HudHotbar.cs-38-
+Vintagestory.Client.NoObf/HudHotbar.cs-39-	private DrawWorldInteractionUtil wiUtil;
+Vintagestory.Client.NoObf/HudHotbar.cs-40-
+Vintagestory.Client.NoObf/HudHotbar.cs-41-	private Matrixf modelMat = new Matrixf();
+Vintagestory.Client.NoObf/HudHotbar.cs-42-
+Vintagestory.Client.NoObf/HudHotbar.cs-43-	private LoadedTexture gearTexture;
+Vintagestory.Client.NoObf/HudHotbar.cs-44-
+Vintagestory.Client.NoObf/HudHotbar.cs-45-	private Dictionary<SoundAttributes, ILoadedSound> leftActiveSlotIdleSound = new Dictionary<SoundAttributes, ILoadedSound>();
+Vintagestory.Client.NoObf/HudHotbar.cs-46-
+Vintagestory.Client.NoObf/HudHotbar.cs-47-	private Dictionary<SoundAttributes, ILoadedSound> rightActiveSlotIdleSound = new Dictionary<SoundAttributes, ILoadedSound>();
+Vintagestory.Client.NoObf/HudHotbar.cs-48-
+Vintagestory.Client.NoObf/HudHotbar.cs-49-	private ItemStack prevLeftStack;
+Vintagestory.Client.NoObf/HudHotbar.cs-50-
+--
+Vintagestory.Client.NoObf/AmbientSound.cs-26-	public EnumSoundType SoundType = EnumSoundType.Ambient;
+Vintagestory.Client.NoObf/AmbientSound.cs-27-
+Vintagestory.Client.NoObf/AmbientSound.cs-28-	public double MaxDistanceMerge = 3.0;
+Vintagestory.Client.NoObf/AmbientSound.cs-29-
+Vintagestory.Client.NoObf/AmbientSound.cs-30-	private Vec3f tmp = new Vec3f();
+Vintagestory.Client.NoObf/AmbientSound.cs-31-
+Vintagestory.Client.NoObf/AmbientSound.cs-32-	private Vec3f tmpout = new Vec3f();
+Vintagestory.Client.NoObf/AmbientSound.cs-33-
+Vintagestory.Client.NoObf/AmbientSound.cs-34-	public float AdjustedVolume => GameMath.Clamp(GameMath.Sqrt(QuantityNearbyBlocks) / Ratio, 1f / Ratio, 1f) * VolumeMul;
+Vintagestory.Client.NoObf/AmbientSound.cs-35-
+Vintagestory.Client.NoObf/AmbientSound.cs-36-	public double DistanceTo(AmbientSound sound)
+Vintagestory.Client.NoObf/AmbientSound.cs-37-	{
+Vintagestory.Client.NoObf/AmbientSound.cs:38:		double num = 9999999.0;
+Vintagestory.Client.NoObf/AmbientSound.cs-39-		for (int i = 0; i < BoundingBoxes.Count; i++)
+Vintagestory.Client.NoObf/AmbientSound.cs-40-		{
+Vintagestory.Client.NoObf/AmbientSound.cs-41-			for (int j = 0; j < sound.BoundingBoxes.Count; j++)
+Vintagestory.Client.NoObf/AmbientSound.cs-42-			{
+Vintagestory.Client.NoObf/AmbientSound.cs-43-				num = Math.Min(num, BoundingBoxes[i].ShortestDistanceFrom(sound.BoundingBoxes[j]));
+Vintagestory.Client.NoObf/AmbientSound.cs-44-			}
+Vintagestory.Client.NoObf/AmbientSound.cs-45-		}
+Vintagestory.Client.NoObf/AmbientSound.cs-46-		return num;
+Vintagestory.Client.NoObf/AmbientSound.cs-47-	}
+Vintagestory.Client.NoObf/AmbientSound.cs-48-
+Vintagestory.Client.NoObf/AmbientSound.cs-49-	public bool Equals(AmbientSound other)
+Vintagestory.Client.NoObf/AmbientSound.cs-50-	{
+Vintagestory.Client.NoObf/AmbientSound.cs-51-		if (AssetLoc.Equals(other.AssetLoc))
+Vintagestory.Client.NoObf/AmbientSound.cs-52-		{
+Vintagestory.Client.NoObf/AmbientSound.cs-53-			return SectionPos.Equals(other.SectionPos);
+Vintagestory.Client.NoObf/AmbientSound.cs-54-		}
+Vintagestory.Client.NoObf/AmbientSound.cs-55-		return false;
+Vintagestory.Client.NoObf/AmbientSound.cs-56-	}
+Vintagestory.Client.NoObf/AmbientSound.cs-57-
+Vintagestory.Client.NoObf/AmbientSound.cs-58-	public bool Equals(AmbientSound x, AmbientSound y)
+Vintagestory.Client.NoObf/AmbientSound.cs-59-	{
+Vintagestory.Client.NoObf/AmbientSound.cs-60-		return x.Equals(y);
+Vintagestory.Client.NoObf/AmbientSound.cs-61-	}
+Vintagestory.Client.NoObf/AmbientSound.cs-62-
+Vintagestory.Client.NoObf/AmbientSound.cs-63-	public override bool Equals(object obj)
+--
+Vintagestory.Client.NoObf/AmbientSound.cs-81-		{
+Vintagestory.Client.NoObf/AmbientSound.cs-82-			Sound.FadeTo(adjustedVolume, 1f, null);
+Vintagestory.Client.NoObf/AmbientSound.cs-83-		}
+Vintagestory.Client.NoObf/AmbientSound.cs-84-	}
+Vintagestory.Client.NoObf/AmbientSound.cs-85-
+Vintagestory.Client.NoObf/AmbientSound.cs-86-	public int GetHashCode(AmbientSound obj)
+Vintagestory.Client.NoObf/AmbientSound.cs-87-	{
+Vintagestory.Client.NoObf/AmbientSound.cs-88-		return obj.AssetLoc.GetHashCode() * 23 + obj.SectionPos.GetHashCode();
+Vintagestory.Client.NoObf/AmbientSound.cs-89-	}
+Vintagestory.Client.NoObf/AmbientSound.cs-90-
+Vintagestory.Client.NoObf/AmbientSound.cs-91-	internal void updatePosition(EntityPos position)
+Vintagestory.Client.NoObf/AmbientSound.cs-92-	{
+Vintagestory.Client.NoObf/AmbientSound.cs:93:		double num = 999999.0;
+Vintagestory.Client.NoObf/AmbientSound.cs:94:		tmpout.Set(-99999f, -99999f, -99999f);
+Vintagestory.Client.NoObf/AmbientSound.cs-95-		foreach (Cuboidi boundingBox in BoundingBoxes)
+Vintagestory.Client.NoObf/AmbientSound.cs-96-		{
+Vintagestory.Client.NoObf/AmbientSound.cs-97-			tmp.X = (float)GameMath.Clamp(position.X, boundingBox.X1, boundingBox.X2);
+Vintagestory.Client.NoObf/AmbientSound.cs-98-			tmp.Y = (float)GameMath.Clamp(position.Y, boundingBox.Y1, boundingBox.Y2);
+Vintagestory.Client.NoObf/AmbientSound.cs-99-			tmp.Z = (float)GameMath.Clamp(position.Z, boundingBox.Z1, boundingBox.Z2);
+Vintagestory.Client.NoObf/AmbientSound.cs-100-			double num2 = tmp.DistanceSq(position.X, position.Y, position.Z);
+Vintagestory.Client.NoObf/AmbientSound.cs-101-			if (num2 < num)
+Vintagestory.Client.NoObf/AmbientSound.cs-102-			{
+Vintagestory.Client.NoObf/AmbientSound.cs-103-				num = num2;
+Vintagestory.Client.NoObf/AmbientSound.cs-104-				tmpout.Set(tmp);
+Vintagestory.Client.NoObf/AmbientSound.cs-105-			}
+Vintagestory.Client.NoObf/AmbientSound.cs-106-		}
+Vintagestory.Client.NoObf/AmbientSound.cs-107-		Sound.SetPosition(tmpout);
+Vintagestory.Client.NoObf/AmbientSound.cs-108-	}
+Vintagestory.Client.NoObf/AmbientSound.cs-109-
+Vintagestory.Client.NoObf/AmbientSound.cs-110-	public void RenderWireFrame(ClientMain game, WireframeCube wireframe)
+Vintagestory.Client.NoObf/AmbientSound.cs-111-	{
+Vintagestory.Client.NoObf/AmbientSound.cs-112-		foreach (Cuboidi boundingBox in BoundingBoxes)
+Vintagestory.Client.NoObf/AmbientSound.cs-113-		{
+Vintagestory.Client.NoObf/AmbientSound.cs-114-			float scalex = boundingBox.X2 - boundingBox.X1;
+Vintagestory.Client.NoObf/AmbientSound.cs-115-			float scaley = boundingBox.Y2 - boundingBox.Y1;
+Vintagestory.Client.NoObf/AmbientSound.cs-116-			float scalez = boundingBox.Z2 - boundingBox.Z1;
+Vintagestory.Client.NoObf/AmbientSound.cs-117-			float num = boundingBox.X1;
+Vintagestory.Client.NoObf/AmbientSound.cs-118-			float num2 = boundingBox.Y1;
+Vintagestory.Client.NoObf/AmbientSound.cs-119-			float num3 = boundingBox.Z1;
+--
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-24-			TryClose();
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-25-		}
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-26-		else
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-27-		{
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-28-			TryOpen();
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-29-		}
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-30-		return TextCommandResult.Success();
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-31-	}
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-32-
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-33-	private void Compose()
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-34-	{
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-35-		string vtmlCode = ((playstyle == "creativebuilding") ? Lang.Get("start-creativeintro") : Lang.Get("start-survivalintro"));
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs:36:		CairoFont baseFont = CairoFont.WhiteSmallText().WithLineHeightMultiplier(1.149999976158142);
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-37-		RichTextComponentBase[] components = VtmlUtil.Richtextify(capi, vtmlCode, baseFont, didClickLink);
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-38-		ElementBounds elementBounds = ElementBounds.Fixed(0.0, 0.0, 400.0, 300.0);
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-39-		elementBounds.ParentBounds = ElementBounds.Empty;
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-40-		GuiElementRichtext guiElementRichtext = new GuiElementRichtext(capi, components, elementBounds);
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-41-		guiElementRichtext.BeforeCalcBounds();
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-42-		elementBounds.ParentBounds = null;
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-43-		float num = (float)(guiElementRichtext.Bounds.fixedY + guiElementRichtext.Bounds.fixedHeight);
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-44-		ClearComposers();
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-45-		SingleComposer = capi.Gui.CreateCompo("helpdialog", ElementStdBounds.AutosizedMainDialog).AddShadedDialogBG(ElementStdBounds.DialogBackground().WithFixedPadding(GuiStyle.ElementToDialogPadding, GuiStyle.ElementToDialogPadding), withTitleBar: false).BeginChildElements()
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-46-			.AddInteractiveElement(guiElementRichtext)
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-47-			.AddSmallButton(Lang.Get("button-close"), OnClose, ElementStdBounds.MenuButton((num + 50f) / 80f).WithAlignment(EnumDialogArea.RightFixed).WithFixedPadding(6.0))
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-48-			.AddSmallButton(Lang.Get("button-close-noshow"), OnCloseAndDontShow, ElementStdBounds.MenuButton((num + 50f) / 80f).WithAlignment(EnumDialogArea.LeftFixed).WithFixedPadding(6.0))
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-49-			.EndChildElements()
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-50-			.Compose();
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-51-	}
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-52-
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-53-	private void didClickLink(LinkTextComponent component)
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-54-	{
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-55-		TryClose();
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-56-		component.HandleLink();
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-57-	}
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-58-
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-59-	public override void OnGuiOpened()
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-60-	{
+Vintagestory.Client.NoObf/GuiDialogFirstlaunchInfo.cs-61-		Compose();
+--
+Vintagestory.Client/LoadedSoundNative.cs-250-			{
+Vintagestory.Client/LoadedSoundNative.cs-251-				throw new Exception("Unable to get sourceId");
+Vintagestory.Client/LoadedSoundNative.cs-252-			}
+Vintagestory.Client/LoadedSoundNative.cs-253-			bufferId = AL.GenBuffer();
+Vintagestory.Client/LoadedSoundNative.cs-254-			ALFormat soundFormat = AudioOpenAl.GetSoundFormat(sample.Channels, sample.BitsPerSample);
+Vintagestory.Client/LoadedSoundNative.cs-255-			fixed (byte* pcm = sample.Pcm)
+Vintagestory.Client/LoadedSoundNative.cs-256-			{
+Vintagestory.Client/LoadedSoundNative.cs-257-				AL.BufferData(bufferId, soundFormat, pcm, sample.Pcm.Length, sample.Rate);
+Vintagestory.Client/LoadedSoundNative.cs-258-			}
+Vintagestory.Client/LoadedSoundNative.cs-259-			AL.GetBuffer(bufferId, ALGetBufferi.Size, out var value);
+Vintagestory.Client/LoadedSoundNative.cs-260-			AL.GetBuffer(bufferId, ALGetBufferi.Channels, out var value2);
+Vintagestory.Client/LoadedSoundNative.cs-261-			soundLengthSeconds = 1f * (float)value / (float)(sample.Rate * sample.BitsPerSample / 8) / (float)value2;
+Vintagestory.Client/LoadedSoundNative.cs:262:			float value3 = 0f - (float)(Math.Log(0.009999999776482582) / Math.Log(soundParams.Range));
+Vintagestory.Client/LoadedSoundNative.cs-263-			float num = (float)Math.Max(3.0, Math.Pow(soundParams.Range, 0.5) - 2.0);
+Vintagestory.Client/LoadedSoundNative.cs-264-			AL.DistanceModel(ALDistanceModel.ExponentDistanceClamped);
+Vintagestory.Client/LoadedSoundNative.cs-265-			AL.Source(sourceId, ALSourcef.RolloffFactor, value3);
+Vintagestory.Client/LoadedSoundNative.cs-266-			AL.Source(sourceId, ALSourcef.ReferenceDistance, (soundParams.ReferenceDistance != 3f) ? soundParams.ReferenceDistance : num);
+Vintagestory.Client/LoadedSoundNative.cs-267-			AL.Source(sourceId, ALSourcef.MaxDistance, 9999f);
+Vintagestory.Client/LoadedSoundNative.cs-268-			AL.Source(sourceId, ALSourcei.Buffer, bufferId);
+Vintagestory.Client/LoadedSoundNative.cs-269-			AL.Source(sourceId, ALSourcef.Gain, soundParams.Volume * GlobalVolume);
+Vintagestory.Client/LoadedSoundNative.cs-270-			AL.Source(sourceId, ALSourcef.Pitch, GameMath.Clamp(soundParams.Pitch + pitchOffset, 0.1f, 3f));
+Vintagestory.Client/LoadedSoundNative.cs-271-			bool flag = (uint)(soundFormat - 4354) <= 1u;
+Vintagestory.Client/LoadedSoundNative.cs-272-			if (flag && AudioOpenAl.UseHrtf)
+Vintagestory.Client/LoadedSoundNative.cs-273-			{
+Vintagestory.Client/LoadedSoundNative.cs-274-				AL.Source(sourceId, (ALSourcei)4147, 2);
+Vintagestory.Client/LoadedSoundNative.cs-275-			}
+Vintagestory.Client/LoadedSoundNative.cs-276-			if (soundParams.Position != null)
+Vintagestory.Client/LoadedSoundNative.cs-277-			{
+Vintagestory.Client/LoadedSoundNative.cs-278-				Vector3 values = new Vector3(soundParams.Position.X, soundParams.Position.Y, soundParams.Position.Z);
+Vintagestory.Client/LoadedSoundNative.cs-279-				AL.Source(sourceId, ALSource3f.Position, ref values);
+Vintagestory.Client/LoadedSoundNative.cs-280-			}
+Vintagestory.Client/LoadedSoundNative.cs-281-			AL.Source(sourceId, ALSourceb.SourceRelative, soundParams.RelativePosition);
+Vintagestory.Client/LoadedSoundNative.cs-282-			AL.Source(sourceId, ALSourceb.Looping, soundParams.ShouldLoop);
+Vintagestory.Client/LoadedSoundNative.cs-283-			if (playbackPosition > 0f)
+Vintagestory.Client/LoadedSoundNative.cs-284-			{
+Vintagestory.Client/LoadedSoundNative.cs-285-				AL.Source(sourceId, ALSourcef.SecOffset, playbackPosition);
+Vintagestory.Client/LoadedSoundNative.cs-286-			}
+Vintagestory.Client/LoadedSoundNative.cs-287-			testError("setup");
+--
+Vintagestory.Client/LoadedSoundNative.cs-588-		duration = Math.Max(0.02f, duration);
+Vintagestory.Client/LoadedSoundNative.cs-589-		newVolume = GameMath.Clamp(newVolume, 0.01, 1.0);
+Vintagestory.Client/LoadedSoundNative.cs-590-		double curVolume = Params.Volume;
+Vintagestory.Client/LoadedSoundNative.cs-591-		fadeState = 0;
+Vintagestory.Client/LoadedSoundNative.cs-592-		if (newVolume > curVolume)
+Vintagestory.Client/LoadedSoundNative.cs-593-		{
+Vintagestory.Client/LoadedSoundNative.cs-594-			fadeState = 1;
+Vintagestory.Client/LoadedSoundNative.cs-595-		}
+Vintagestory.Client/LoadedSoundNative.cs-596-		if (newVolume < curVolume)
+Vintagestory.Client/LoadedSoundNative.cs-597-		{
+Vintagestory.Client/LoadedSoundNative.cs-598-			fadeState = 2;
+Vintagestory.Client/LoadedSoundNative.cs-599-		}
+Vintagestory.Client/LoadedSoundNative.cs:600:		double num = 0.019999999552965164;
+Vintagestory.Client/LoadedSoundNative.cs-601-		double factor = 1.0 - num;
+Vintagestory.Client/LoadedSoundNative.cs-602-		if (newVolume > curVolume)
+Vintagestory.Client/LoadedSoundNative.cs-603-		{
+Vintagestory.Client/LoadedSoundNative.cs-604-			factor = 1.0 + num;
+Vintagestory.Client/LoadedSoundNative.cs-605-			if (curVolume <= 0.0)
+Vintagestory.Client/LoadedSoundNative.cs-606-			{
+Vintagestory.Client/LoadedSoundNative.cs-607-				curVolume = 0.01;
+Vintagestory.Client/LoadedSoundNative.cs-608-			}
+Vintagestory.Client/LoadedSoundNative.cs-609-		}
+Vintagestory.Client/LoadedSoundNative.cs-610-		double num2 = Math.Ceiling((Math.Log(newVolume) - Math.Log(curVolume)) / Math.Log(factor)) / (double)duration;
+Vintagestory.Client/LoadedSoundNative.cs-611-		double stepsPer10ms = num2 / 100.0;
+Vintagestory.Client/LoadedSoundNative.cs-612-		int sleepMs = 10;
+Vintagestory.Client/LoadedSoundNative.cs-613-		if (RuntimeEnv.OS == OS.Windows && duration <= 0.1f)
+Vintagestory.Client/LoadedSoundNative.cs-614-		{
+Vintagestory.Client/LoadedSoundNative.cs-615-			sleepMs = 0;
+Vintagestory.Client/LoadedSoundNative.cs-616-		}
+Vintagestory.Client/LoadedSoundNative.cs-617-		TyronThreadPool.QueueTask(async () =>
+Vintagestory.Client/LoadedSoundNative.cs-618-		{
+Vintagestory.Client/LoadedSoundNative.cs-619-			double stepsToDo = 0.0;
+Vintagestory.Client/LoadedSoundNative.cs-620-			int fadingIter = ++curFadingIter;
+Vintagestory.Client/LoadedSoundNative.cs-621-			while ((factor > 1.0) ? (newVolume - curVolume > 0.01) : (curVolume - newVolume > 0.01))
+Vintagestory.Client/LoadedSoundNative.cs-622-			{
+Vintagestory.Client/LoadedSoundNative.cs-623-				await Task.Delay(sleepMs);
+Vintagestory.Client/LoadedSoundNative.cs-624-				for (stepsToDo += stepsPer10ms; stepsToDo > 1.0; stepsToDo--)
+Vintagestory.Client/LoadedSoundNative.cs-625-				{
+--
+Vintagestory.Common/InventoryPlayerCreative.cs-34-	public CreativeTab CurrentTab => currentTab;
+Vintagestory.Common/InventoryPlayerCreative.cs-35-
+Vintagestory.Common/InventoryPlayerCreative.cs-36-	public int CurrentTabIndex => (currentTab.Inventory as CreativeInventoryTab).TabIndex;
+Vintagestory.Common/InventoryPlayerCreative.cs-37-
+Vintagestory.Common/InventoryPlayerCreative.cs-38-	public override int Count => currentTab.Inventory.Count;
+Vintagestory.Common/InventoryPlayerCreative.cs-39-
+Vintagestory.Common/InventoryPlayerCreative.cs-40-	public CreativeTabs CreativeTabs => tabs;
+Vintagestory.Common/InventoryPlayerCreative.cs-41-
+Vintagestory.Common/InventoryPlayerCreative.cs-42-	public override ItemSlot this[int slotId]
+Vintagestory.Common/InventoryPlayerCreative.cs-43-	{
+Vintagestory.Common/InventoryPlayerCreative.cs-44-		get
+Vintagestory.Common/InventoryPlayerCreative.cs-45-		{
+Vintagestory.Common/InventoryPlayerCreative.cs:46:			if (slotId == 99999)
+Vintagestory.Common/InventoryPlayerCreative.cs-47-			{
+Vintagestory.Common/InventoryPlayerCreative.cs-48-				return blackholeSlot;
+Vintagestory.Common/InventoryPlayerCreative.cs-49-			}
+Vintagestory.Common/InventoryPlayerCreative.cs-50-			if (slotId < 0 || slotId >= Count)
+Vintagestory.Common/InventoryPlayerCreative.cs-51-			{
+Vintagestory.Common/InventoryPlayerCreative.cs-52-				return new ItemSlotCreative(this);
+Vintagestory.Common/InventoryPlayerCreative.cs-53-			}
+Vintagestory.Common/InventoryPlayerCreative.cs-54-			return currentTab.Inventory[slotId];
+Vintagestory.Common/InventoryPlayerCreative.cs-55-		}
+Vintagestory.Common/InventoryPlayerCreative.cs-56-		set
+Vintagestory.Common/InventoryPlayerCreative.cs-57-		{
+Vintagestory.Common/InventoryPlayerCreative.cs-58-			throw new NotSupportedException("InventoryPlayerCreative doesn't support replacing slots");
+Vintagestory.Common/InventoryPlayerCreative.cs-59-		}
+Vintagestory.Common/InventoryPlayerCreative.cs-60-	}
+Vintagestory.Common/InventoryPlayerCreative.cs-61-
+Vintagestory.Common/InventoryPlayerCreative.cs-62-	public InventoryPlayerCreative(string className, string playerUID, ICoreAPI api)
+Vintagestory.Common/InventoryPlayerCreative.cs-63-		: base(className, playerUID, api)
+Vintagestory.Common/InventoryPlayerCreative.cs-64-	{
+Vintagestory.Common/InventoryPlayerCreative.cs-65-		blackholeSlot = new ItemSlotBlackHole(this);
+Vintagestory.Common/InventoryPlayerCreative.cs-66-		InvNetworkUtil = new CreativeNetworkUtil(this, api);
+Vintagestory.Common/InventoryPlayerCreative.cs-67-	}
+Vintagestory.Common/InventoryPlayerCreative.cs-68-
+Vintagestory.Common/InventoryPlayerCreative.cs-69-	public InventoryPlayerCreative(string inventoryId, ICoreAPI api)
+Vintagestory.Common/InventoryPlayerCreative.cs-70-		: base(inventoryId, api)
+Vintagestory.Common/InventoryPlayerCreative.cs-71-	{
+--
+Vintagestory.Common/InventoryPlayerCreative.cs-219-	{
+Vintagestory.Common/InventoryPlayerCreative.cs-220-		return currentTab?.Inventory.Close(player);
+Vintagestory.Common/InventoryPlayerCreative.cs-221-	}
+Vintagestory.Common/InventoryPlayerCreative.cs-222-
+Vintagestory.Common/InventoryPlayerCreative.cs-223-	public override void ResolveBlocksOrItems()
+Vintagestory.Common/InventoryPlayerCreative.cs-224-	{
+Vintagestory.Common/InventoryPlayerCreative.cs-225-	}
+Vintagestory.Common/InventoryPlayerCreative.cs-226-
+Vintagestory.Common/InventoryPlayerCreative.cs-227-	public override int GetSlotId(ItemSlot slot)
+Vintagestory.Common/InventoryPlayerCreative.cs-228-	{
+Vintagestory.Common/InventoryPlayerCreative.cs-229-		if (slot is ItemSlotBlackHole)
+Vintagestory.Common/InventoryPlayerCreative.cs-230-		{
+Vintagestory.Common/InventoryPlayerCreative.cs:231:			return 99999;
+Vintagestory.Common/InventoryPlayerCreative.cs-232-		}
+Vintagestory.Common/InventoryPlayerCreative.cs-233-		if (slot.Itemstack == null)
+Vintagestory.Common/InventoryPlayerCreative.cs-234-		{
+Vintagestory.Common/InventoryPlayerCreative.cs-235-			return -1;
+Vintagestory.Common/InventoryPlayerCreative.cs-236-		}
+Vintagestory.Common/InventoryPlayerCreative.cs-237-		for (int i = 0; i < Count; i++)
+Vintagestory.Common/InventoryPlayerCreative.cs-238-		{
+Vintagestory.Common/InventoryPlayerCreative.cs-239-			if (slot.Itemstack.Equals(this[i].Itemstack))
+Vintagestory.Common/InventoryPlayerCreative.cs-240-			{
+Vintagestory.Common/InventoryPlayerCreative.cs-241-				return i;
+Vintagestory.Common/InventoryPlayerCreative.cs-242-			}
+Vintagestory.Common/InventoryPlayerCreative.cs-243-		}
+Vintagestory.Common/InventoryPlayerCreative.cs-244-		return -1;
+Vintagestory.Common/InventoryPlayerCreative.cs-245-	}
+Vintagestory.Common/InventoryPlayerCreative.cs-246-
+Vintagestory.Common/InventoryPlayerCreative.cs-247-	public override WeightedSlot GetBestSuitedSlot(ItemSlot sourceSlot, ItemStackMoveOperation op, List<ItemSlot> skipSlots = null)
+Vintagestory.Common/InventoryPlayerCreative.cs-248-	{
+Vintagestory.Common/InventoryPlayerCreative.cs-249-		if (skipSlots.Contains(blackholeSlot))
+Vintagestory.Common/InventoryPlayerCreative.cs-250-		{
+Vintagestory.Common/InventoryPlayerCreative.cs-251-			return new WeightedSlot
+Vintagestory.Common/InventoryPlayerCreative.cs-252-			{
+Vintagestory.Common/InventoryPlayerCreative.cs-253-				weight = -1f
+Vintagestory.Common/InventoryPlayerCreative.cs-254-			};
+Vintagestory.Common/InventoryPlayerCreative.cs-255-		}
+Vintagestory.Common/InventoryPlayerCreative.cs-256-		if (!blackholeSlot.CanTakeFrom(sourceSlot))
+--
+Vintagestory.Common/BlockAccessorMapChunkLoading.cs-27-
+Vintagestory.Common/BlockAccessorMapChunkLoading.cs-28-	public override List<BlockUpdate> Commit()
+Vintagestory.Common/BlockAccessorMapChunkLoading.cs-29-	{
+Vintagestory.Common/BlockAccessorMapChunkLoading.cs-30-		FastCommit();
+Vintagestory.Common/BlockAccessorMapChunkLoading.cs-31-		return null;
+Vintagestory.Common/BlockAccessorMapChunkLoading.cs-32-	}
+Vintagestory.Common/BlockAccessorMapChunkLoading.cs-33-
+Vintagestory.Common/BlockAccessorMapChunkLoading.cs-34-	public void FastCommit()
+Vintagestory.Common/BlockAccessorMapChunkLoading.cs-35-	{
+Vintagestory.Common/BlockAccessorMapChunkLoading.cs-36-		ReadFromStagedByDefault = false;
+Vintagestory.Common/BlockAccessorMapChunkLoading.cs-37-		IWorldChunk worldChunk = null;
+Vintagestory.Common/BlockAccessorMapChunkLoading.cs-38-		dirtyChunkPositions.Clear();
+Vintagestory.Common/BlockAccessorMapChunkLoading.cs:39:		int num = -99999;
+Vintagestory.Common/BlockAccessorMapChunkLoading.cs-40-		foreach (KeyValuePair<BlockPos, BlockUpdate> stagedBlock in StagedBlocks)
+Vintagestory.Common/BlockAccessorMapChunkLoading.cs-41-		{
+Vintagestory.Common/BlockAccessorMapChunkLoading.cs-42-			int newSolidBlockId = stagedBlock.Value.NewSolidBlockId;
+Vintagestory.Common/BlockAccessorMapChunkLoading.cs-43-			BlockPos key = stagedBlock.Key;
+Vintagestory.Common/BlockAccessorMapChunkLoading.cs-44-			int num2 = key.Y / 32;
+Vintagestory.Common/BlockAccessorMapChunkLoading.cs-45-			if (num2 != num)
+Vintagestory.Common/BlockAccessorMapChunkLoading.cs-46-			{
+Vintagestory.Common/BlockAccessorMapChunkLoading.cs-47-				worldChunk = chunks[num2];
+Vintagestory.Common/BlockAccessorMapChunkLoading.cs-48-				worldChunk.Unpack();
+Vintagestory.Common/BlockAccessorMapChunkLoading.cs-49-				worldChunk.MarkModified();
+Vintagestory.Common/BlockAccessorMapChunkLoading.cs-50-				int num3 = (key.Y - 1) / 32;
+Vintagestory.Common/BlockAccessorMapChunkLoading.cs-51-				if (num3 != num2 && num3 >= 0)
+Vintagestory.Common/BlockAccessorMapChunkLoading.cs-52-				{
+Vintagestory.Common/BlockAccessorMapChunkLoading.cs-53-					chunks[num3].MarkModified();
+Vintagestory.Common/BlockAccessorMapChunkLoading.cs-54-				}
+Vintagestory.Common/BlockAccessorMapChunkLoading.cs-55-				if (newSolidBlockId > 0 || stagedBlock.Value.NewFluidBlockId > 0)
+Vintagestory.Common/BlockAccessorMapChunkLoading.cs-56-				{
+Vintagestory.Common/BlockAccessorMapChunkLoading.cs-57-					worldChunk.Empty = false;
+Vintagestory.Common/BlockAccessorMapChunkLoading.cs-58-				}
+Vintagestory.Common/BlockAccessorMapChunkLoading.cs-59-				num = num2;
+Vintagestory.Common/BlockAccessorMapChunkLoading.cs-60-			}
+Vintagestory.Common/BlockAccessorMapChunkLoading.cs-61-			int index3d = worldmap.ChunkSizedIndex3D(key.X & 0x1F, key.Y & 0x1F, key.Z & 0x1F);
+Vintagestory.Common/BlockAccessorMapChunkLoading.cs-62-			Block block = null;
+Vintagestory.Common/BlockAccessorMapChunkLoading.cs-63-			if (stagedBlock.Value.NewSolidBlockId >= 0)
+Vintagestory.Common/BlockAccessorMapChunkLoading.cs-64-			{
+--
+Vintagestory.Server/ConnectedClient.cs-7-using Vintagestory.API.Config;
+Vintagestory.Server/ConnectedClient.cs-8-using Vintagestory.API.MathTools;
+Vintagestory.Server/ConnectedClient.cs-9-using Vintagestory.API.Server;
+Vintagestory.Server/ConnectedClient.cs-10-using Vintagestory.API.Util;
+Vintagestory.Server/ConnectedClient.cs-11-using Vintagestory.Common;
+Vintagestory.Server/ConnectedClient.cs-12-
+Vintagestory.Server/ConnectedClient.cs-13-namespace Vintagestory.Server;
+Vintagestory.Server/ConnectedClient.cs-14-
+Vintagestory.Server/ConnectedClient.cs-15-public class ConnectedClient
+Vintagestory.Server/ConnectedClient.cs-16-{
+Vintagestory.Server/ConnectedClient.cs-17-	public int AuditFlySuspicion;
+Vintagestory.Server/ConnectedClient.cs-18-
+Vintagestory.Server/ConnectedClient.cs:19:	public long AuditFlySuspicionPrintedTotalMs = -99999L;
+Vintagestory.Server/ConnectedClient.cs-20-
+Vintagestory.Server/ConnectedClient.cs-21-	public long LastAuditFlySuspicionTotalMs;
+Vintagestory.Server/ConnectedClient.cs-22-
+Vintagestory.Server/ConnectedClient.cs-23-	public long LastActivityTotalMs;
+Vintagestory.Server/ConnectedClient.cs-24-
+Vintagestory.Server/ConnectedClient.cs-25-	public int TotalFlySuspicions;
+Vintagestory.Server/ConnectedClient.cs-26-
+Vintagestory.Server/ConnectedClient.cs-27-	public int TotalTeleSupicions;
+Vintagestory.Server/ConnectedClient.cs-28-
+Vintagestory.Server/ConnectedClient.cs-29-	public string LoginToken;
+Vintagestory.Server/ConnectedClient.cs-30-
+Vintagestory.Server/ConnectedClient.cs-31-	private ServerWorldPlayerData worlddata;
+Vintagestory.Server/ConnectedClient.cs-32-
+Vintagestory.Server/ConnectedClient.cs-33-	public EntityControls previousControls = new EntityControls();
+Vintagestory.Server/ConnectedClient.cs-34-
+Vintagestory.Server/ConnectedClient.cs-35-	public ServerPlayer Player;
+Vintagestory.Server/ConnectedClient.cs-36-
+Vintagestory.Server/ConnectedClient.cs-37-	public string SentPlayerUid;
+Vintagestory.Server/ConnectedClient.cs-38-
+Vintagestory.Server/ConnectedClient.cs-39-	public bool IsNewEntityPlayer;
+Vintagestory.Server/ConnectedClient.cs-40-
+Vintagestory.Server/ConnectedClient.cs-41-	public bool FallBackToTcp;
+Vintagestory.Server/ConnectedClient.cs-42-
+Vintagestory.Server/ConnectedClient.cs-43-	public List<Entity> EntitySpawnsToSend;
+Vintagestory.Server/ConnectedClient.cs-44-
+--
+Vintagestory.Server/ServerConfig.cs-764-				Privilege.readlists,
+Vintagestory.Server/ServerConfig.cs-765-				Privilege.attackcreatures,
+Vintagestory.Server/ServerConfig.cs-766-				Privilege.attackplayers,
+Vintagestory.Server/ServerConfig.cs-767-				Privilege.selfkill
+Vintagestory.Server/ServerConfig.cs-768-			})
+Vintagestory.Server/ServerConfig.cs-769-		});
+Vintagestory.Server/ServerConfig.cs-770-		Roles.Add(new PlayerRole
+Vintagestory.Server/ServerConfig.cs-771-		{
+Vintagestory.Server/ServerConfig.cs-772-			Code = "admin",
+Vintagestory.Server/ServerConfig.cs-773-			Name = "Admin",
+Vintagestory.Server/ServerConfig.cs-774-			Description = "Has all privileges, including giving other players admin status.",
+Vintagestory.Server/ServerConfig.cs-775-			LandClaimAllowance = int.MaxValue,
+Vintagestory.Server/ServerConfig.cs:776:			LandClaimMaxAreas = 99999,
+Vintagestory.Server/ServerConfig.cs:777:			PrivilegeLevel = 99999,
+Vintagestory.Server/ServerConfig.cs-778-			Color = Color.LightBlue,
+Vintagestory.Server/ServerConfig.cs-779-			DefaultGameMode = EnumGameMode.Survival,
+Vintagestory.Server/ServerConfig.cs-780-			AutoGrant = true
+Vintagestory.Server/ServerConfig.cs-781-		});
+Vintagestory.Server/ServerConfig.cs-782-		Roles.Sort();
+Vintagestory.Server/ServerConfig.cs-783-		foreach (PlayerRole role in Roles)
+Vintagestory.Server/ServerConfig.cs-784-		{
+Vintagestory.Server/ServerConfig.cs-785-			if (role.AutoGrant)
+Vintagestory.Server/ServerConfig.cs-786-			{
+Vintagestory.Server/ServerConfig.cs-787-				if (role.Privileges != null)
+Vintagestory.Server/ServerConfig.cs-788-				{
+Vintagestory.Server/ServerConfig.cs-789-					role.Privileges = role.Privileges.Union(Privilege.AllCodes()).ToList();
+Vintagestory.Server/ServerConfig.cs-790-				}
+Vintagestory.Server/ServerConfig.cs-791-				else
+Vintagestory.Server/ServerConfig.cs-792-				{
+Vintagestory.Server/ServerConfig.cs-793-					role.Privileges = Privilege.AllCodes().ToList();
+Vintagestory.Server/ServerConfig.cs-794-				}
+Vintagestory.Server/ServerConfig.cs-795-			}
+Vintagestory.Server/ServerConfig.cs-796-		}
+Vintagestory.Server/ServerConfig.cs-797-		foreach (PlayerRole role2 in Roles)
+Vintagestory.Server/ServerConfig.cs-798-		{
+Vintagestory.Server/ServerConfig.cs-799-			RolesByCode[role2.Code] = role2;
+Vintagestory.Server/ServerConfig.cs-800-		}
+Vintagestory.Server/ServerConfig.cs-801-		DefaultRole = RolesByCode[DefaultRoleCode];
+Vintagestory.Server/ServerConfig.cs-802-	}

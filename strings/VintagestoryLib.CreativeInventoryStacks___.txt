@@ -1,0 +1,272 @@
+Packet_ItemType.cs-507-			int[] array = new int[DamagedbyLength];
+Packet_ItemType.cs-508-			for (int i = 0; i < DamagedbyCount; i++)
+Packet_ItemType.cs-509-			{
+Packet_ItemType.cs-510-				array[i] = Damagedby[i];
+Packet_ItemType.cs-511-			}
+Packet_ItemType.cs-512-			Damagedby = array;
+Packet_ItemType.cs-513-		}
+Packet_ItemType.cs-514-		Damagedby[DamagedbyCount++] = value;
+Packet_ItemType.cs-515-	}
+Packet_ItemType.cs-516-
+Packet_ItemType.cs-517-	public void SetCreativeInventoryStacks(byte[] value)
+Packet_ItemType.cs-518-	{
+Packet_ItemType.cs:519:		CreativeInventoryStacks = value;
+Packet_ItemType.cs-520-	}
+Packet_ItemType.cs-521-
+Packet_ItemType.cs-522-	public string[] GetCreativeInventoryTabs()
+Packet_ItemType.cs-523-	{
+Packet_ItemType.cs-524-		return CreativeInventoryTabs;
+Packet_ItemType.cs-525-	}
+Packet_ItemType.cs-526-
+Packet_ItemType.cs-527-	public void SetCreativeInventoryTabs(string[] value, int count, int length)
+Packet_ItemType.cs-528-	{
+Packet_ItemType.cs-529-		CreativeInventoryTabs = value;
+Packet_ItemType.cs-530-		CreativeInventoryTabsCount = count;
+Packet_ItemType.cs-531-		CreativeInventoryTabsLength = length;
+Packet_ItemType.cs-532-	}
+Packet_ItemType.cs-533-
+Packet_ItemType.cs-534-	public void SetCreativeInventoryTabs(string[] value)
+Packet_ItemType.cs-535-	{
+Packet_ItemType.cs-536-		CreativeInventoryTabs = value;
+Packet_ItemType.cs-537-		CreativeInventoryTabsCount = value.Length;
+Packet_ItemType.cs-538-		CreativeInventoryTabsLength = value.Length;
+Packet_ItemType.cs-539-	}
+Packet_ItemType.cs-540-
+Packet_ItemType.cs-541-	public int GetCreativeInventoryTabsCount()
+Packet_ItemType.cs-542-	{
+Packet_ItemType.cs-543-		return CreativeInventoryTabsCount;
+Packet_ItemType.cs-544-	}
+--
+Packet_ItemTypeSerializer.cs-58-				instance.Durability = ProtocolParser.ReadUInt32(stream);
+Packet_ItemTypeSerializer.cs-59-				break;
+Packet_ItemTypeSerializer.cs-60-			case 48:
+Packet_ItemTypeSerializer.cs-61-				instance.MiningmaterialAdd(ProtocolParser.ReadUInt32(stream));
+Packet_ItemTypeSerializer.cs-62-				break;
+Packet_ItemTypeSerializer.cs-63-			case 248:
+Packet_ItemTypeSerializer.cs-64-				instance.MiningmaterialspeedAdd(ProtocolParser.ReadUInt32(stream));
+Packet_ItemTypeSerializer.cs-65-				break;
+Packet_ItemTypeSerializer.cs-66-			case 56:
+Packet_ItemTypeSerializer.cs-67-				instance.DamagedbyAdd(ProtocolParser.ReadUInt32(stream));
+Packet_ItemTypeSerializer.cs-68-				break;
+Packet_ItemTypeSerializer.cs-69-			case 66:
+Packet_ItemTypeSerializer.cs:70:				instance.CreativeInventoryStacks = ProtocolParser.ReadBytes(stream);
+Packet_ItemTypeSerializer.cs-71-				break;
+Packet_ItemTypeSerializer.cs-72-			case 74:
+Packet_ItemTypeSerializer.cs-73-				instance.CreativeInventoryTabsAdd(ProtocolParser.ReadString(stream));
+Packet_ItemTypeSerializer.cs-74-				break;
+Packet_ItemTypeSerializer.cs-75-			case 82:
+Packet_ItemTypeSerializer.cs-76-				if (instance.GuiTransform == null)
+Packet_ItemTypeSerializer.cs-77-				{
+Packet_ItemTypeSerializer.cs-78-					instance.GuiTransform = Packet_ModelTransformSerializer.DeserializeLengthDelimitedNew(stream);
+Packet_ItemTypeSerializer.cs-79-				}
+Packet_ItemTypeSerializer.cs-80-				else
+Packet_ItemTypeSerializer.cs-81-				{
+Packet_ItemTypeSerializer.cs-82-					Packet_ModelTransformSerializer.DeserializeLengthDelimited(stream, instance.GuiTransform);
+Packet_ItemTypeSerializer.cs-83-				}
+Packet_ItemTypeSerializer.cs-84-				break;
+Packet_ItemTypeSerializer.cs-85-			case 90:
+Packet_ItemTypeSerializer.cs-86-				if (instance.FpHandTransform == null)
+Packet_ItemTypeSerializer.cs-87-				{
+Packet_ItemTypeSerializer.cs-88-					instance.FpHandTransform = Packet_ModelTransformSerializer.DeserializeLengthDelimitedNew(stream);
+Packet_ItemTypeSerializer.cs-89-				}
+Packet_ItemTypeSerializer.cs-90-				else
+Packet_ItemTypeSerializer.cs-91-				{
+Packet_ItemTypeSerializer.cs-92-					Packet_ModelTransformSerializer.DeserializeLengthDelimited(stream, instance.FpHandTransform);
+Packet_ItemTypeSerializer.cs-93-				}
+Packet_ItemTypeSerializer.cs-94-				break;
+Packet_ItemTypeSerializer.cs-95-			case 98:
+--
+Vintagestory.Common/InventoryPlayerCreative.cs-149-			if (collectibleObject?.CreativeInventoryTabs != null)
+Vintagestory.Common/InventoryPlayerCreative.cs-150-			{
+Vintagestory.Common/InventoryPlayerCreative.cs-151-				string[] creativeInventoryTabs = collectibleObject.CreativeInventoryTabs;
+Vintagestory.Common/InventoryPlayerCreative.cs-152-				foreach (string key in creativeInventoryTabs)
+Vintagestory.Common/InventoryPlayerCreative.cs-153-				{
+Vintagestory.Common/InventoryPlayerCreative.cs-154-					if (!dictionary.TryGetValue(key, out var value))
+Vintagestory.Common/InventoryPlayerCreative.cs-155-					{
+Vintagestory.Common/InventoryPlayerCreative.cs-156-						value = (dictionary[key] = new List<ItemStack>());
+Vintagestory.Common/InventoryPlayerCreative.cs-157-					}
+Vintagestory.Common/InventoryPlayerCreative.cs-158-					value.Add(new ItemStack(collectibleObject));
+Vintagestory.Common/InventoryPlayerCreative.cs-159-				}
+Vintagestory.Common/InventoryPlayerCreative.cs-160-			}
+Vintagestory.Common/InventoryPlayerCreative.cs:161:			if (collectibleObject?.CreativeInventoryStacks == null)
+Vintagestory.Common/InventoryPlayerCreative.cs-162-			{
+Vintagestory.Common/InventoryPlayerCreative.cs-163-				continue;
+Vintagestory.Common/InventoryPlayerCreative.cs-164-			}
+Vintagestory.Common/InventoryPlayerCreative.cs-165-			for (int k = 0; k < collectibleObject.CreativeInventoryStacks.Length; k++)
+Vintagestory.Common/InventoryPlayerCreative.cs-166-			{
+Vintagestory.Common/InventoryPlayerCreative.cs-167-				CreativeTabAndStackList creativeTabAndStackList = collectibleObject.CreativeInventoryStacks[k];
+Vintagestory.Common/InventoryPlayerCreative.cs-168-				for (int l = 0; l < creativeTabAndStackList.Tabs.Length; l++)
+Vintagestory.Common/InventoryPlayerCreative.cs-169-				{
+Vintagestory.Common/InventoryPlayerCreative.cs-170-					if (!dictionary.TryGetValue(creativeTabAndStackList.Tabs[l], out var value2))
+Vintagestory.Common/InventoryPlayerCreative.cs-171-					{
+Vintagestory.Common/InventoryPlayerCreative.cs-172-						value2 = new List<ItemStack>();
+Vintagestory.Common/InventoryPlayerCreative.cs-173-						dictionary[creativeTabAndStackList.Tabs[l]] = value2;
+Vintagestory.Common/InventoryPlayerCreative.cs-174-					}
+Vintagestory.Common/InventoryPlayerCreative.cs-175-					for (int m = 0; m < creativeTabAndStackList.Stacks.Length; m++)
+Vintagestory.Common/InventoryPlayerCreative.cs-176-					{
+Vintagestory.Common/InventoryPlayerCreative.cs-177-						if (creativeTabAndStackList.Stacks[m].ResolvedItemstack == null)
+Vintagestory.Common/InventoryPlayerCreative.cs-178-						{
+Vintagestory.Common/InventoryPlayerCreative.cs-179-							Api.Logger.Warning("Collectible {0} has a CreativeInventoryStack that could not be resolved: {1} {2}. Will ignore.", collectibleObject.Code, creativeTabAndStackList.Stacks[m].Type, creativeTabAndStackList.Stacks[m].Code);
+Vintagestory.Common/InventoryPlayerCreative.cs-180-						}
+Vintagestory.Common/InventoryPlayerCreative.cs-181-						else
+Vintagestory.Common/InventoryPlayerCreative.cs-182-						{
+Vintagestory.Common/InventoryPlayerCreative.cs-183-							ItemStack itemStack = creativeTabAndStackList.Stacks[m].ResolvedItemstack.Clone();
+Vintagestory.Common/InventoryPlayerCreative.cs-184-							itemStack.ResolveBlockOrItem(Api.World);
+Vintagestory.Common/InventoryPlayerCreative.cs-185-							value2.Add(itemStack);
+Vintagestory.Common/InventoryPlayerCreative.cs-186-						}
+--
+Vintagestory.Common/BlockTypeNet.cs-250-		{
+Vintagestory.Common/BlockTypeNet.cs-251-			block.GrindingProps = CollectibleNet.FromPacket(packet.GrindingProps, world);
+Vintagestory.Common/BlockTypeNet.cs-252-		}
+Vintagestory.Common/BlockTypeNet.cs-253-		if (packet.CrushingProps != null)
+Vintagestory.Common/BlockTypeNet.cs-254-		{
+Vintagestory.Common/BlockTypeNet.cs-255-			block.CrushingProps = CollectibleNet.FromPacket(packet.CrushingProps, world);
+Vintagestory.Common/BlockTypeNet.cs-256-		}
+Vintagestory.Common/BlockTypeNet.cs-257-		if (packet.CreativeInventoryStacks != null)
+Vintagestory.Common/BlockTypeNet.cs-258-		{
+Vintagestory.Common/BlockTypeNet.cs-259-			using MemoryStream input2 = new MemoryStream(packet.CreativeInventoryStacks);
+Vintagestory.Common/BlockTypeNet.cs-260-			BinaryReader binaryReader = new BinaryReader(input2);
+Vintagestory.Common/BlockTypeNet.cs-261-			int num9 = binaryReader.ReadInt32();
+Vintagestory.Common/BlockTypeNet.cs:262:			block.CreativeInventoryStacks = new CreativeTabAndStackList[num9];
+Vintagestory.Common/BlockTypeNet.cs-263-			for (int num10 = 0; num10 < num9; num10++)
+Vintagestory.Common/BlockTypeNet.cs-264-			{
+Vintagestory.Common/BlockTypeNet.cs-265-				block.CreativeInventoryStacks[num10] = new CreativeTabAndStackList();
+Vintagestory.Common/BlockTypeNet.cs-266-				block.CreativeInventoryStacks[num10].FromBytes(binaryReader, world.ClassRegistry);
+Vintagestory.Common/BlockTypeNet.cs-267-			}
+Vintagestory.Common/BlockTypeNet.cs-268-		}
+Vintagestory.Common/BlockTypeNet.cs-269-		if (packet.Drops != null)
+Vintagestory.Common/BlockTypeNet.cs-270-		{
+Vintagestory.Common/BlockTypeNet.cs-271-			block.Drops = new BlockDropItemStack[packet.DropsCount];
+Vintagestory.Common/BlockTypeNet.cs-272-			for (int num11 = 0; num11 < block.Drops.Length; num11++)
+Vintagestory.Common/BlockTypeNet.cs-273-			{
+Vintagestory.Common/BlockTypeNet.cs-274-				block.Drops[num11] = FromPacket(packet.Drops[num11], world);
+Vintagestory.Common/BlockTypeNet.cs-275-			}
+Vintagestory.Common/BlockTypeNet.cs-276-		}
+Vintagestory.Common/BlockTypeNet.cs-277-		if (packet.CropProps != null)
+Vintagestory.Common/BlockTypeNet.cs-278-		{
+Vintagestory.Common/BlockTypeNet.cs-279-			block.CropProps = SerializerUtil.Deserialize<BlockCropProperties>(packet.CropProps);
+Vintagestory.Common/BlockTypeNet.cs-280-			int cropPropBehaviorsCount = packet.CropPropBehaviorsCount;
+Vintagestory.Common/BlockTypeNet.cs-281-			if (cropPropBehaviorsCount > 0)
+Vintagestory.Common/BlockTypeNet.cs-282-			{
+Vintagestory.Common/BlockTypeNet.cs-283-				block.CropProps.Behaviors = new CropBehavior[cropPropBehaviorsCount];
+Vintagestory.Common/BlockTypeNet.cs-284-				for (int num12 = 0; num12 < cropPropBehaviorsCount; num12++)
+Vintagestory.Common/BlockTypeNet.cs-285-				{
+Vintagestory.Common/BlockTypeNet.cs-286-					block.CropProps.Behaviors[num12] = registry.createCropBehavior(block, packet.CropPropBehaviors[num12]);
+Vintagestory.Common/BlockTypeNet.cs-287-				}
+--
+Vintagestory.Common/ItemTypeNet.cs-134-		{
+Vintagestory.Common/ItemTypeNet.cs-135-			item.GrindingProps = CollectibleNet.FromPacket(packet.GrindingProps, world);
+Vintagestory.Common/ItemTypeNet.cs-136-		}
+Vintagestory.Common/ItemTypeNet.cs-137-		if (packet.CrushingProps != null)
+Vintagestory.Common/ItemTypeNet.cs-138-		{
+Vintagestory.Common/ItemTypeNet.cs-139-			item.CrushingProps = CollectibleNet.FromPacket(packet.CrushingProps, world);
+Vintagestory.Common/ItemTypeNet.cs-140-		}
+Vintagestory.Common/ItemTypeNet.cs-141-		if (packet.CreativeInventoryStacks != null)
+Vintagestory.Common/ItemTypeNet.cs-142-		{
+Vintagestory.Common/ItemTypeNet.cs-143-			using MemoryStream input = new MemoryStream(packet.CreativeInventoryStacks);
+Vintagestory.Common/ItemTypeNet.cs-144-			BinaryReader binaryReader = new BinaryReader(input);
+Vintagestory.Common/ItemTypeNet.cs-145-			int num6 = binaryReader.ReadInt32();
+Vintagestory.Common/ItemTypeNet.cs:146:			item.CreativeInventoryStacks = new CreativeTabAndStackList[num6];
+Vintagestory.Common/ItemTypeNet.cs-147-			for (int num7 = 0; num7 < num6; num7++)
+Vintagestory.Common/ItemTypeNet.cs-148-			{
+Vintagestory.Common/ItemTypeNet.cs-149-				item.CreativeInventoryStacks[num7] = new CreativeTabAndStackList();
+Vintagestory.Common/ItemTypeNet.cs-150-				item.CreativeInventoryStacks[num7].FromBytes(binaryReader, world.ClassRegistry);
+Vintagestory.Common/ItemTypeNet.cs-151-			}
+Vintagestory.Common/ItemTypeNet.cs-152-		}
+Vintagestory.Common/ItemTypeNet.cs-153-		if (packet.Shape != null)
+Vintagestory.Common/ItemTypeNet.cs-154-		{
+Vintagestory.Common/ItemTypeNet.cs-155-			item.Shape = CollectibleNet.FromPacket(packet.Shape);
+Vintagestory.Common/ItemTypeNet.cs-156-		}
+Vintagestory.Common/ItemTypeNet.cs-157-		if (packet.Tool >= 0)
+Vintagestory.Common/ItemTypeNet.cs-158-		{
+Vintagestory.Common/ItemTypeNet.cs-159-			item.Tool = (EnumTool)packet.Tool;
+Vintagestory.Common/ItemTypeNet.cs-160-		}
+Vintagestory.Common/ItemTypeNet.cs-161-		item.MaterialDensity = packet.MaterialDensity;
+Vintagestory.Common/ItemTypeNet.cs-162-		item.AttackPower = CollectibleNet.DeserializeFloatPrecise(packet.AttackPower);
+Vintagestory.Common/ItemTypeNet.cs-163-		item.AttackRange = CollectibleNet.DeserializeFloatPrecise(packet.AttackRange);
+Vintagestory.Common/ItemTypeNet.cs-164-		item.LiquidSelectable = packet.LiquidSelectable > 0;
+Vintagestory.Common/ItemTypeNet.cs-165-		item.ToolTier = packet.MiningTier;
+Vintagestory.Common/ItemTypeNet.cs-166-		item.StorageFlags = (EnumItemStorageFlags)packet.StorageFlags;
+Vintagestory.Common/ItemTypeNet.cs-167-		item.RenderAlphaTest = CollectibleNet.DeserializeFloatVeryPrecise(packet.RenderAlphaTest);
+Vintagestory.Common/ItemTypeNet.cs-168-		item.HeldTpHitAnimation = packet.HeldTpHitAnimation;
+Vintagestory.Common/ItemTypeNet.cs-169-		item.HeldRightTpIdleAnimation = packet.HeldRightTpIdleAnimation;
+Vintagestory.Common/ItemTypeNet.cs-170-		item.HeldLeftTpIdleAnimation = packet.HeldLeftTpIdleAnimation;
+Vintagestory.Common/ItemTypeNet.cs-171-		item.HeldLeftReadyAnimation = packet.HeldLeftReadyAnimation;
+--
+Packet_BlockTypeSerializer.cs-105-				instance.LightHsvAdd(ProtocolParser.ReadUInt32(stream));
+Packet_BlockTypeSerializer.cs-106-				break;
+Packet_BlockTypeSerializer.cs-107-			case 408:
+Packet_BlockTypeSerializer.cs-108-				instance.VertexFlags = ProtocolParser.ReadUInt32(stream);
+Packet_BlockTypeSerializer.cs-109-				break;
+Packet_BlockTypeSerializer.cs-110-			case 120:
+Packet_BlockTypeSerializer.cs-111-				instance.Climbable = ProtocolParser.ReadUInt32(stream);
+Packet_BlockTypeSerializer.cs-112-				break;
+Packet_BlockTypeSerializer.cs-113-			case 130:
+Packet_BlockTypeSerializer.cs-114-				instance.CreativeInventoryTabsAdd(ProtocolParser.ReadString(stream));
+Packet_BlockTypeSerializer.cs-115-				break;
+Packet_BlockTypeSerializer.cs-116-			case 138:
+Packet_BlockTypeSerializer.cs:117:				instance.CreativeInventoryStacks = ProtocolParser.ReadBytes(stream);
+Packet_BlockTypeSerializer.cs-118-				break;
+Packet_BlockTypeSerializer.cs-119-			case 192:
+Packet_BlockTypeSerializer.cs-120-				instance.SideOpaqueFlagsAdd(ProtocolParser.ReadUInt32(stream));
+Packet_BlockTypeSerializer.cs-121-				break;
+Packet_BlockTypeSerializer.cs-122-			case 184:
+Packet_BlockTypeSerializer.cs-123-				instance.FaceCullMode = ProtocolParser.ReadUInt32(stream);
+Packet_BlockTypeSerializer.cs-124-				break;
+Packet_BlockTypeSerializer.cs-125-			case 368:
+Packet_BlockTypeSerializer.cs-126-				instance.SideSolidFlagsAdd(ProtocolParser.ReadUInt32(stream));
+Packet_BlockTypeSerializer.cs-127-				break;
+Packet_BlockTypeSerializer.cs-128-			case 202:
+Packet_BlockTypeSerializer.cs-129-				instance.SeasonColorMap = ProtocolParser.ReadString(stream);
+Packet_BlockTypeSerializer.cs-130-				break;
+Packet_BlockTypeSerializer.cs-131-			case 706:
+Packet_BlockTypeSerializer.cs-132-				instance.ClimateColorMap = ProtocolParser.ReadString(stream);
+Packet_BlockTypeSerializer.cs-133-				break;
+Packet_BlockTypeSerializer.cs-134-			case 208:
+Packet_BlockTypeSerializer.cs-135-				instance.CullFaces = ProtocolParser.ReadUInt32(stream);
+Packet_BlockTypeSerializer.cs-136-				break;
+Packet_BlockTypeSerializer.cs-137-			case 216:
+Packet_BlockTypeSerializer.cs-138-				instance.Replacable = ProtocolParser.ReadUInt32(stream);
+Packet_BlockTypeSerializer.cs-139-				break;
+Packet_BlockTypeSerializer.cs-140-			case 232:
+Packet_BlockTypeSerializer.cs-141-				instance.LightAbsorption = ProtocolParser.ReadUInt32(stream);
+Packet_BlockTypeSerializer.cs-142-				break;
+--
+Packet_BlockType.cs-884-			string[] array = new string[CreativeInventoryTabsLength];
+Packet_BlockType.cs-885-			for (int i = 0; i < CreativeInventoryTabsCount; i++)
+Packet_BlockType.cs-886-			{
+Packet_BlockType.cs-887-				array[i] = CreativeInventoryTabs[i];
+Packet_BlockType.cs-888-			}
+Packet_BlockType.cs-889-			CreativeInventoryTabs = array;
+Packet_BlockType.cs-890-		}
+Packet_BlockType.cs-891-		CreativeInventoryTabs[CreativeInventoryTabsCount++] = value;
+Packet_BlockType.cs-892-	}
+Packet_BlockType.cs-893-
+Packet_BlockType.cs-894-	public void SetCreativeInventoryStacks(byte[] value)
+Packet_BlockType.cs-895-	{
+Packet_BlockType.cs:896:		CreativeInventoryStacks = value;
+Packet_BlockType.cs-897-	}
+Packet_BlockType.cs-898-
+Packet_BlockType.cs-899-	public int[] GetSideOpaqueFlags()
+Packet_BlockType.cs-900-	{
+Packet_BlockType.cs-901-		return SideOpaqueFlags;
+Packet_BlockType.cs-902-	}
+Packet_BlockType.cs-903-
+Packet_BlockType.cs-904-	public void SetSideOpaqueFlags(int[] value, int count, int length)
+Packet_BlockType.cs-905-	{
+Packet_BlockType.cs-906-		SideOpaqueFlags = value;
+Packet_BlockType.cs-907-		SideOpaqueFlagsCount = count;
+Packet_BlockType.cs-908-		SideOpaqueFlagsLength = length;
+Packet_BlockType.cs-909-	}
+Packet_BlockType.cs-910-
+Packet_BlockType.cs-911-	public void SetSideOpaqueFlags(int[] value)
+Packet_BlockType.cs-912-	{
+Packet_BlockType.cs-913-		SideOpaqueFlags = value;
+Packet_BlockType.cs-914-		SideOpaqueFlagsCount = value.Length;
+Packet_BlockType.cs-915-		SideOpaqueFlagsLength = value.Length;
+Packet_BlockType.cs-916-	}
+Packet_BlockType.cs-917-
+Packet_BlockType.cs-918-	public int GetSideOpaqueFlagsCount()
+Packet_BlockType.cs-919-	{
+Packet_BlockType.cs-920-		return SideOpaqueFlagsCount;
+Packet_BlockType.cs-921-	}

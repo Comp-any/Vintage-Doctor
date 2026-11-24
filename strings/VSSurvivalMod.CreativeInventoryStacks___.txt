@@ -1,0 +1,272 @@
+Vintagestory.GameContent/BlockClutterBookshelf.cs-74-				bookShelfTypeProps2.Variant = item.Key;
+Vintagestory.GameContent/BlockClutterBookshelf.cs-75-				bookShelfTypeProps2.group = item.Value;
+Vintagestory.GameContent/BlockClutterBookshelf.cs-76-				JsonItemStack jsonItemStack2 = new JsonItemStack();
+Vintagestory.GameContent/BlockClutterBookshelf.cs-77-				jsonItemStack2.Code = Code;
+Vintagestory.GameContent/BlockClutterBookshelf.cs-78-				jsonItemStack2.Type = EnumItemClass.Block;
+Vintagestory.GameContent/BlockClutterBookshelf.cs-79-				jsonItemStack2.Attributes = new JsonObject(JToken.Parse("{ \"type\": \"" + bookShelfTypeProps2.Code + "\", \"variant\": \"" + bookShelfTypeProps2.Variant + "\" }"));
+Vintagestory.GameContent/BlockClutterBookshelf.cs-80-				JsonItemStack jsonItemStack3 = jsonItemStack2;
+Vintagestory.GameContent/BlockClutterBookshelf.cs-81-				jsonItemStack3.Resolve(api.World, ClassType + " type");
+Vintagestory.GameContent/BlockClutterBookshelf.cs-82-				list.Add(jsonItemStack3);
+Vintagestory.GameContent/BlockClutterBookshelf.cs-83-			}
+Vintagestory.GameContent/BlockClutterBookshelf.cs-84-			item.Value.types = null;
+Vintagestory.GameContent/BlockClutterBookshelf.cs-85-		}
+Vintagestory.GameContent/BlockClutterBookshelf.cs:86:		CreativeInventoryStacks = new CreativeTabAndStackList[1]
+Vintagestory.GameContent/BlockClutterBookshelf.cs-87-		{
+Vintagestory.GameContent/BlockClutterBookshelf.cs-88-			new CreativeTabAndStackList
+Vintagestory.GameContent/BlockClutterBookshelf.cs-89-			{
+Vintagestory.GameContent/BlockClutterBookshelf.cs-90-				Stacks = list.ToArray(),
+Vintagestory.GameContent/BlockClutterBookshelf.cs-91-				Tabs = new string[2] { "general", "clutter" }
+Vintagestory.GameContent/BlockClutterBookshelf.cs-92-			}
+Vintagestory.GameContent/BlockClutterBookshelf.cs-93-		};
+Vintagestory.GameContent/BlockClutterBookshelf.cs-94-	}
+Vintagestory.GameContent/BlockClutterBookshelf.cs-95-
+Vintagestory.GameContent/BlockClutterBookshelf.cs-96-	public override bool CanAttachBlockAt(IBlockAccessor blockAccessor, Block block, BlockPos pos, BlockFacing blockFace, Cuboidi attachmentArea = null)
+Vintagestory.GameContent/BlockClutterBookshelf.cs-97-	{
+Vintagestory.GameContent/BlockClutterBookshelf.cs-98-		BEBehaviorClutterBookshelf bEBehavior = GetBEBehavior<BEBehaviorClutterBookshelf>(pos);
+Vintagestory.GameContent/BlockClutterBookshelf.cs-99-		if (bEBehavior != null && bEBehavior.Variant != null)
+Vintagestory.GameContent/BlockClutterBookshelf.cs-100-		{
+Vintagestory.GameContent/BlockClutterBookshelf.cs-101-			variantGroupsByCode.TryGetValue(bEBehavior.Variant, out var value);
+Vintagestory.GameContent/BlockClutterBookshelf.cs-102-			if (value != null && value.DoubleSided)
+Vintagestory.GameContent/BlockClutterBookshelf.cs-103-			{
+Vintagestory.GameContent/BlockClutterBookshelf.cs-104-				int num = (int)(bEBehavior.rotateY * (180f / (float)Math.PI));
+Vintagestory.GameContent/BlockClutterBookshelf.cs-105-				if (num < 0)
+Vintagestory.GameContent/BlockClutterBookshelf.cs-106-				{
+Vintagestory.GameContent/BlockClutterBookshelf.cs-107-					num += 360;
+Vintagestory.GameContent/BlockClutterBookshelf.cs-108-				}
+Vintagestory.GameContent/BlockClutterBookshelf.cs-109-				switch (num)
+Vintagestory.GameContent/BlockClutterBookshelf.cs-110-				{
+Vintagestory.GameContent/BlockClutterBookshelf.cs-111-				case 0:
+--
+Vintagestory.GameContent/BlockClutter.cs-90-					drops[j].Resolve(api.World, "clutter block drop", Code);
+Vintagestory.GameContent/BlockClutter.cs-91-				}
+Vintagestory.GameContent/BlockClutter.cs-92-			}
+Vintagestory.GameContent/BlockClutter.cs-93-			JsonItemStack jsonItemStack = new JsonItemStack
+Vintagestory.GameContent/BlockClutter.cs-94-			{
+Vintagestory.GameContent/BlockClutter.cs-95-				Code = Code,
+Vintagestory.GameContent/BlockClutter.cs-96-				Type = EnumItemClass.Block,
+Vintagestory.GameContent/BlockClutter.cs-97-				Attributes = new JsonObject(JToken.Parse("{ \"type\": \"" + clutterTypeProps.Code + "\" }"))
+Vintagestory.GameContent/BlockClutter.cs-98-			};
+Vintagestory.GameContent/BlockClutter.cs-99-			jsonItemStack.Resolve(api.World, ClassType + " type");
+Vintagestory.GameContent/BlockClutter.cs-100-			list.Add(jsonItemStack);
+Vintagestory.GameContent/BlockClutter.cs-101-		}
+Vintagestory.GameContent/BlockClutter.cs:102:		CreativeInventoryStacks = new CreativeTabAndStackList[1]
+Vintagestory.GameContent/BlockClutter.cs-103-		{
+Vintagestory.GameContent/BlockClutter.cs-104-			new CreativeTabAndStackList
+Vintagestory.GameContent/BlockClutter.cs-105-			{
+Vintagestory.GameContent/BlockClutter.cs-106-				Stacks = list.ToArray(),
+Vintagestory.GameContent/BlockClutter.cs-107-				Tabs = new string[2] { "general", "clutter" }
+Vintagestory.GameContent/BlockClutter.cs-108-			}
+Vintagestory.GameContent/BlockClutter.cs-109-		};
+Vintagestory.GameContent/BlockClutter.cs-110-	}
+Vintagestory.GameContent/BlockClutter.cs-111-
+Vintagestory.GameContent/BlockClutter.cs-112-	public static string Remap(IWorldAccessor worldAccessForResolve, string type)
+Vintagestory.GameContent/BlockClutter.cs-113-	{
+Vintagestory.GameContent/BlockClutter.cs-114-		if (type.StartsWithFast("pipes/"))
+Vintagestory.GameContent/BlockClutter.cs-115-		{
+Vintagestory.GameContent/BlockClutter.cs-116-			return "pipe-veryrusted-" + type.Substring(6);
+Vintagestory.GameContent/BlockClutter.cs-117-		}
+Vintagestory.GameContent/BlockClutter.cs-118-		return type;
+Vintagestory.GameContent/BlockClutter.cs-119-	}
+Vintagestory.GameContent/BlockClutter.cs-120-
+Vintagestory.GameContent/BlockClutter.cs-121-	public override string GetHeldTpIdleAnimation(ItemSlot activeHotbarSlot, Entity forEntity, EnumHand hand)
+Vintagestory.GameContent/BlockClutter.cs-122-	{
+Vintagestory.GameContent/BlockClutter.cs-123-		string code = activeHotbarSlot.Itemstack.Attributes.GetString("type", "");
+Vintagestory.GameContent/BlockClutter.cs-124-		return GetTypeProps(code, activeHotbarSlot.Itemstack, null)?.HeldIdleAnim ?? base.GetHeldTpIdleAnimation(activeHotbarSlot, forEntity, hand);
+Vintagestory.GameContent/BlockClutter.cs-125-	}
+Vintagestory.GameContent/BlockClutter.cs-126-
+Vintagestory.GameContent/BlockClutter.cs-127-	public override string GetHeldReadyAnimation(ItemSlot activeHotbarSlot, Entity forEntity, EnumHand hand)
+--
+Vintagestory.GameContent/BlockRockTyped.cs-79-				}
+Vintagestory.GameContent/BlockRockTyped.cs-80-				JsonItemStack jsonItemStack = new JsonItemStack();
+Vintagestory.GameContent/BlockRockTyped.cs-81-				jsonItemStack.Code = Code;
+Vintagestory.GameContent/BlockRockTyped.cs-82-				jsonItemStack.Type = EnumItemClass.Block;
+Vintagestory.GameContent/BlockRockTyped.cs-83-				jsonItemStack.Attributes = new JsonObject(JToken.Parse("{ \"type\": \"" + clutterTypeProps2.Code + "\", \"rock\": \"" + worldPropertyVariant.Code.Path + "\" }"));
+Vintagestory.GameContent/BlockRockTyped.cs-84-				JsonItemStack jsonItemStack2 = jsonItemStack;
+Vintagestory.GameContent/BlockRockTyped.cs-85-				jsonItemStack2.Resolve(api.World, ClassType + " type");
+Vintagestory.GameContent/BlockRockTyped.cs-86-				list.Add(jsonItemStack2);
+Vintagestory.GameContent/BlockRockTyped.cs-87-			}
+Vintagestory.GameContent/BlockRockTyped.cs-88-		}
+Vintagestory.GameContent/BlockRockTyped.cs-89-		if (Variant["cover"] != "snow")
+Vintagestory.GameContent/BlockRockTyped.cs-90-		{
+Vintagestory.GameContent/BlockRockTyped.cs:91:			CreativeInventoryStacks = new CreativeTabAndStackList[1]
+Vintagestory.GameContent/BlockRockTyped.cs-92-			{
+Vintagestory.GameContent/BlockRockTyped.cs-93-				new CreativeTabAndStackList
+Vintagestory.GameContent/BlockRockTyped.cs-94-				{
+Vintagestory.GameContent/BlockRockTyped.cs-95-					Stacks = list.ToArray(),
+Vintagestory.GameContent/BlockRockTyped.cs-96-					Tabs = new string[2] { "general", "terrain" }
+Vintagestory.GameContent/BlockRockTyped.cs-97-				}
+Vintagestory.GameContent/BlockRockTyped.cs-98-			};
+Vintagestory.GameContent/BlockRockTyped.cs-99-		}
+Vintagestory.GameContent/BlockRockTyped.cs-100-	}
+Vintagestory.GameContent/BlockRockTyped.cs-101-
+Vintagestory.GameContent/BlockRockTyped.cs-102-	public override ItemStack[] GetDrops(IWorldAccessor world, BlockPos pos, IPlayer byPlayer, float dropQuantityMultiplier = 1f)
+Vintagestory.GameContent/BlockRockTyped.cs-103-	{
+Vintagestory.GameContent/BlockRockTyped.cs-104-		BEBehaviorShapeFromAttributes bEBehavior = GetBEBehavior<BEBehaviorShapeFromAttributes>(pos);
+Vintagestory.GameContent/BlockRockTyped.cs-105-		return GetTypeProps(bEBehavior?.Type, null, bEBehavior)?.Drops?.Select((BlockDropItemStack drop) => drop.GetNextItemStack(dropQuantityMultiplier)).Where((ItemStack s) => s != null).ToArray() ?? Array.Empty<ItemStack>();
+Vintagestory.GameContent/BlockRockTyped.cs-106-	}
+Vintagestory.GameContent/BlockRockTyped.cs-107-
+Vintagestory.GameContent/BlockRockTyped.cs-108-	public override BlockDropItemStack[] GetDropsForHandbook(ItemStack handbookStack, IPlayer forPlayer)
+Vintagestory.GameContent/BlockRockTyped.cs-109-	{
+Vintagestory.GameContent/BlockRockTyped.cs-110-		BlockDropItemStack[] dropsForHandbook = base.GetDropsForHandbook(handbookStack, forPlayer);
+Vintagestory.GameContent/BlockRockTyped.cs-111-		dropsForHandbook[0] = dropsForHandbook[0].Clone();
+Vintagestory.GameContent/BlockRockTyped.cs-112-		dropsForHandbook[0].ResolvedItemstack.SetFrom(handbookStack);
+Vintagestory.GameContent/BlockRockTyped.cs-113-		return dropsForHandbook;
+Vintagestory.GameContent/BlockRockTyped.cs-114-	}
+Vintagestory.GameContent/BlockRockTyped.cs-115-
+Vintagestory.GameContent/BlockRockTyped.cs-116-	public override void GetHeldItemInfo(ItemSlot inSlot, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo)
+--
+Vintagestory.GameContent/ItemShieldFromAttributes.cs-148-			string[] source = new string[1] { "" };
+Vintagestory.GameContent/ItemShieldFromAttributes.cs-149-			foreach (string key2 in attributes.Keys)
+Vintagestory.GameContent/ItemShieldFromAttributes.cs-150-			{
+Vintagestory.GameContent/ItemShieldFromAttributes.cs-151-				IEnumerable<string> source2 = source.SelectMany((string variant) => attributes[key2].Select((string val) => variant + $" {key2}: \"{val}\","));
+Vintagestory.GameContent/ItemShieldFromAttributes.cs-152-				if (source2.Any())
+Vintagestory.GameContent/ItemShieldFromAttributes.cs-153-				{
+Vintagestory.GameContent/ItemShieldFromAttributes.cs-154-					source = source2.ToArray();
+Vintagestory.GameContent/ItemShieldFromAttributes.cs-155-				}
+Vintagestory.GameContent/ItemShieldFromAttributes.cs-156-			}
+Vintagestory.GameContent/ItemShieldFromAttributes.cs-157-			source = source.Select((string var) => "{" + var + " }").ToArray();
+Vintagestory.GameContent/ItemShieldFromAttributes.cs-158-			list.AddRange(source.Select(genJstack));
+Vintagestory.GameContent/ItemShieldFromAttributes.cs-159-		}
+Vintagestory.GameContent/ItemShieldFromAttributes.cs:160:		CreativeInventoryStacks = new CreativeTabAndStackList[1]
+Vintagestory.GameContent/ItemShieldFromAttributes.cs-161-		{
+Vintagestory.GameContent/ItemShieldFromAttributes.cs-162-			new CreativeTabAndStackList
+Vintagestory.GameContent/ItemShieldFromAttributes.cs-163-			{
+Vintagestory.GameContent/ItemShieldFromAttributes.cs-164-				Stacks = list.ToArray(),
+Vintagestory.GameContent/ItemShieldFromAttributes.cs-165-				Tabs = new string[3] { "general", "items", "tools" }
+Vintagestory.GameContent/ItemShieldFromAttributes.cs-166-			}
+Vintagestory.GameContent/ItemShieldFromAttributes.cs-167-		};
+Vintagestory.GameContent/ItemShieldFromAttributes.cs-168-	}
+Vintagestory.GameContent/ItemShieldFromAttributes.cs-169-
+Vintagestory.GameContent/ItemShieldFromAttributes.cs-170-	private JsonItemStack genJstack(string json)
+Vintagestory.GameContent/ItemShieldFromAttributes.cs-171-	{
+Vintagestory.GameContent/ItemShieldFromAttributes.cs-172-		JsonItemStack jsonItemStack = new JsonItemStack();
+Vintagestory.GameContent/ItemShieldFromAttributes.cs-173-		jsonItemStack.Code = Code;
+Vintagestory.GameContent/ItemShieldFromAttributes.cs-174-		jsonItemStack.Type = EnumItemClass.Item;
+Vintagestory.GameContent/ItemShieldFromAttributes.cs-175-		jsonItemStack.Attributes = new JsonObject(JToken.Parse(json));
+Vintagestory.GameContent/ItemShieldFromAttributes.cs-176-		jsonItemStack.Resolve(api.World, "shield type");
+Vintagestory.GameContent/ItemShieldFromAttributes.cs-177-		return jsonItemStack;
+Vintagestory.GameContent/ItemShieldFromAttributes.cs-178-	}
+Vintagestory.GameContent/ItemShieldFromAttributes.cs-179-
+Vintagestory.GameContent/ItemShieldFromAttributes.cs-180-	public override void OnBeforeRender(ICoreClientAPI capi, ItemStack itemstack, EnumItemRenderTarget target, ref ItemRenderInfo renderinfo)
+Vintagestory.GameContent/ItemShieldFromAttributes.cs-181-	{
+Vintagestory.GameContent/ItemShieldFromAttributes.cs-182-		int num = itemstack.TempAttributes.GetInt("meshRefId");
+Vintagestory.GameContent/ItemShieldFromAttributes.cs-183-		if (num == 0 || !meshrefs.TryGetValue(num, out renderinfo.ModelRef))
+Vintagestory.GameContent/ItemShieldFromAttributes.cs-184-		{
+Vintagestory.GameContent/ItemShieldFromAttributes.cs-185-			int num2 = meshrefs.Count + 1;
+--
+Vintagestory.GameContent/BlockMaterialFromAttributes.cs-40-		string[] array2 = array;
+Vintagestory.GameContent/BlockMaterialFromAttributes.cs-41-		foreach (string text in array2)
+Vintagestory.GameContent/BlockMaterialFromAttributes.cs-42-		{
+Vintagestory.GameContent/BlockMaterialFromAttributes.cs-43-			JsonItemStack jsonItemStack = new JsonItemStack
+Vintagestory.GameContent/BlockMaterialFromAttributes.cs-44-			{
+Vintagestory.GameContent/BlockMaterialFromAttributes.cs-45-				Code = Code,
+Vintagestory.GameContent/BlockMaterialFromAttributes.cs-46-				Type = EnumItemClass.Block,
+Vintagestory.GameContent/BlockMaterialFromAttributes.cs-47-				Attributes = new JsonObject(JToken.Parse("{ \"material\": \"" + text + "\" }"))
+Vintagestory.GameContent/BlockMaterialFromAttributes.cs-48-			};
+Vintagestory.GameContent/BlockMaterialFromAttributes.cs-49-			jsonItemStack.Resolve(api.World, string.Concat(Code, " type"));
+Vintagestory.GameContent/BlockMaterialFromAttributes.cs-50-			list.Add(jsonItemStack);
+Vintagestory.GameContent/BlockMaterialFromAttributes.cs-51-		}
+Vintagestory.GameContent/BlockMaterialFromAttributes.cs:52:		CreativeInventoryStacks = new CreativeTabAndStackList[1]
+Vintagestory.GameContent/BlockMaterialFromAttributes.cs-53-		{
+Vintagestory.GameContent/BlockMaterialFromAttributes.cs-54-			new CreativeTabAndStackList
+Vintagestory.GameContent/BlockMaterialFromAttributes.cs-55-			{
+Vintagestory.GameContent/BlockMaterialFromAttributes.cs-56-				Stacks = list.ToArray(),
+Vintagestory.GameContent/BlockMaterialFromAttributes.cs-57-				Tabs = new string[2] { "general", "decorative" }
+Vintagestory.GameContent/BlockMaterialFromAttributes.cs-58-			}
+Vintagestory.GameContent/BlockMaterialFromAttributes.cs-59-		};
+Vintagestory.GameContent/BlockMaterialFromAttributes.cs-60-	}
+Vintagestory.GameContent/BlockMaterialFromAttributes.cs-61-
+Vintagestory.GameContent/BlockMaterialFromAttributes.cs-62-	public override void OnUnloaded(ICoreAPI api)
+Vintagestory.GameContent/BlockMaterialFromAttributes.cs-63-	{
+Vintagestory.GameContent/BlockMaterialFromAttributes.cs-64-		Dictionary<string, MeshData> dictionary = ObjectCacheUtil.TryGet<Dictionary<string, MeshData>>(api, MeshKey);
+Vintagestory.GameContent/BlockMaterialFromAttributes.cs-65-		string key;
+Vintagestory.GameContent/BlockMaterialFromAttributes.cs-66-		if (dictionary != null && dictionary.Count > 0)
+Vintagestory.GameContent/BlockMaterialFromAttributes.cs-67-		{
+Vintagestory.GameContent/BlockMaterialFromAttributes.cs-68-			foreach (KeyValuePair<string, MeshData> item in dictionary)
+Vintagestory.GameContent/BlockMaterialFromAttributes.cs-69-			{
+Vintagestory.GameContent/BlockMaterialFromAttributes.cs-70-				item.Deconstruct(out key, out var value);
+Vintagestory.GameContent/BlockMaterialFromAttributes.cs-71-				value.Dispose();
+Vintagestory.GameContent/BlockMaterialFromAttributes.cs-72-			}
+Vintagestory.GameContent/BlockMaterialFromAttributes.cs-73-			ObjectCacheUtil.Delete(api, MeshKey);
+Vintagestory.GameContent/BlockMaterialFromAttributes.cs-74-		}
+Vintagestory.GameContent/BlockMaterialFromAttributes.cs-75-		Dictionary<string, MultiTextureMeshRef> dictionary2 = ObjectCacheUtil.TryGet<Dictionary<string, MultiTextureMeshRef>>(api, MeshKeyInventory);
+Vintagestory.GameContent/BlockMaterialFromAttributes.cs-76-		if (dictionary2 != null && dictionary2.Count > 0)
+Vintagestory.GameContent/BlockMaterialFromAttributes.cs-77-		{
+--
+Vintagestory.GameContent/ItemCreatureInventory.cs-72-			if (attributes == null || attributes["inCreativeInventory"].AsBool(defaultValue: true))
+Vintagestory.GameContent/ItemCreatureInventory.cs-73-			{
+Vintagestory.GameContent/ItemCreatureInventory.cs-74-				JsonItemStack jsonItemStack = new JsonItemStack
+Vintagestory.GameContent/ItemCreatureInventory.cs-75-				{
+Vintagestory.GameContent/ItemCreatureInventory.cs-76-					Code = Code,
+Vintagestory.GameContent/ItemCreatureInventory.cs-77-					Type = EnumItemClass.Item,
+Vintagestory.GameContent/ItemCreatureInventory.cs-78-					Attributes = new JsonObject(JToken.Parse(string.Concat("{ \"type\": \"", entityType.Code, "\" }")))
+Vintagestory.GameContent/ItemCreatureInventory.cs-79-				};
+Vintagestory.GameContent/ItemCreatureInventory.cs-80-				jsonItemStack.Resolve(api.World, "creatureinventory");
+Vintagestory.GameContent/ItemCreatureInventory.cs-81-				list.Add(jsonItemStack);
+Vintagestory.GameContent/ItemCreatureInventory.cs-82-			}
+Vintagestory.GameContent/ItemCreatureInventory.cs-83-		}
+Vintagestory.GameContent/ItemCreatureInventory.cs:84:		CreativeInventoryStacks = new CreativeTabAndStackList[1]
+Vintagestory.GameContent/ItemCreatureInventory.cs-85-		{
+Vintagestory.GameContent/ItemCreatureInventory.cs-86-			new CreativeTabAndStackList
+Vintagestory.GameContent/ItemCreatureInventory.cs-87-			{
+Vintagestory.GameContent/ItemCreatureInventory.cs-88-				Stacks = list.ToArray(),
+Vintagestory.GameContent/ItemCreatureInventory.cs-89-				Tabs = new string[3] { "general", "items", "creatures" }
+Vintagestory.GameContent/ItemCreatureInventory.cs-90-			}
+Vintagestory.GameContent/ItemCreatureInventory.cs-91-		};
+Vintagestory.GameContent/ItemCreatureInventory.cs-92-	}
+Vintagestory.GameContent/ItemCreatureInventory.cs-93-
+Vintagestory.GameContent/ItemCreatureInventory.cs-94-	public override void OnBeforeRender(ICoreClientAPI capi, ItemStack itemstack, EnumItemRenderTarget target, ref ItemRenderInfo renderinfo)
+Vintagestory.GameContent/ItemCreatureInventory.cs-95-	{
+Vintagestory.GameContent/ItemCreatureInventory.cs-96-		Dictionary<string, MultiTextureMeshRef> orCreate = ObjectCacheUtil.GetOrCreate(capi, "itemcreatureinventorymeshes", () => new Dictionary<string, MultiTextureMeshRef>());
+Vintagestory.GameContent/ItemCreatureInventory.cs-97-		string text = itemstack.Attributes.GetString("type");
+Vintagestory.GameContent/ItemCreatureInventory.cs-98-		if (!orCreate.ContainsKey(text))
+Vintagestory.GameContent/ItemCreatureInventory.cs-99-		{
+Vintagestory.GameContent/ItemCreatureInventory.cs-100-			AssetLocation entityCode = new AssetLocation(text);
+Vintagestory.GameContent/ItemCreatureInventory.cs-101-			EntityProperties entityProperties = (nowTesselatingEntityType = api.World.GetEntityType(entityCode));
+Vintagestory.GameContent/ItemCreatureInventory.cs-102-			Shape loadedShape = entityProperties.Client.LoadedShape;
+Vintagestory.GameContent/ItemCreatureInventory.cs-103-			if (loadedShape != null)
+Vintagestory.GameContent/ItemCreatureInventory.cs-104-			{
+Vintagestory.GameContent/ItemCreatureInventory.cs-105-				capi.Tesselator.TesselateShape("itemcreatureinventory", loadedShape, out var modeldata, this, null, 0, 0, 0);
+Vintagestory.GameContent/ItemCreatureInventory.cs-106-				ModelTransform modelTransform = entityProperties.Attributes?[map[target]]?.AsObject<ModelTransform>();
+Vintagestory.GameContent/ItemCreatureInventory.cs-107-				if (modelTransform != null)
+Vintagestory.GameContent/ItemCreatureInventory.cs-108-				{
+Vintagestory.GameContent/ItemCreatureInventory.cs-109-					modeldata.ModelTransform(modelTransform);
+--
+Vintagestory.GameContent/BlockShapeMaterialFromAttributes.cs-82-			string[] array2 = materials;
+Vintagestory.GameContent/BlockShapeMaterialFromAttributes.cs-83-			foreach (string text2 in array2)
+Vintagestory.GameContent/BlockShapeMaterialFromAttributes.cs-84-			{
+Vintagestory.GameContent/BlockShapeMaterialFromAttributes.cs-85-				JsonItemStack jsonItemStack = new JsonItemStack();
+Vintagestory.GameContent/BlockShapeMaterialFromAttributes.cs-86-				jsonItemStack.Code = Code;
+Vintagestory.GameContent/BlockShapeMaterialFromAttributes.cs-87-				jsonItemStack.Type = EnumItemClass.Block;
+Vintagestory.GameContent/BlockShapeMaterialFromAttributes.cs-88-				jsonItemStack.Attributes = new JsonObject(JToken.Parse("{ \"type\": \"" + text + "\", \"material\": \"" + text2 + "\" }"));
+Vintagestory.GameContent/BlockShapeMaterialFromAttributes.cs-89-				JsonItemStack jsonItemStack2 = jsonItemStack;
+Vintagestory.GameContent/BlockShapeMaterialFromAttributes.cs-90-				jsonItemStack2.Resolve(api.World, string.Concat(Code, " type"));
+Vintagestory.GameContent/BlockShapeMaterialFromAttributes.cs-91-				list.Add(jsonItemStack2);
+Vintagestory.GameContent/BlockShapeMaterialFromAttributes.cs-92-			}
+Vintagestory.GameContent/BlockShapeMaterialFromAttributes.cs-93-		}
+Vintagestory.GameContent/BlockShapeMaterialFromAttributes.cs:94:		CreativeInventoryStacks = new CreativeTabAndStackList[1]
+Vintagestory.GameContent/BlockShapeMaterialFromAttributes.cs-95-		{
+Vintagestory.GameContent/BlockShapeMaterialFromAttributes.cs-96-			new CreativeTabAndStackList
+Vintagestory.GameContent/BlockShapeMaterialFromAttributes.cs-97-			{
+Vintagestory.GameContent/BlockShapeMaterialFromAttributes.cs-98-				Stacks = list.ToArray(),
+Vintagestory.GameContent/BlockShapeMaterialFromAttributes.cs-99-				Tabs = new string[2] { "general", "decorative" }
+Vintagestory.GameContent/BlockShapeMaterialFromAttributes.cs-100-			}
+Vintagestory.GameContent/BlockShapeMaterialFromAttributes.cs-101-		};
+Vintagestory.GameContent/BlockShapeMaterialFromAttributes.cs-102-	}
+Vintagestory.GameContent/BlockShapeMaterialFromAttributes.cs-103-
+Vintagestory.GameContent/BlockShapeMaterialFromAttributes.cs-104-	public virtual MeshData GetOrCreateMesh(string? type, string? material, string? cachekeyextra = null, ITexPositionSource? overrideTexturesource = null)
+Vintagestory.GameContent/BlockShapeMaterialFromAttributes.cs-105-	{
+Vintagestory.GameContent/BlockShapeMaterialFromAttributes.cs-106-		Dictionary<string, MeshData> orCreate = ObjectCacheUtil.GetOrCreate(api, MeshKey, () => new Dictionary<string, MeshData>());
+Vintagestory.GameContent/BlockShapeMaterialFromAttributes.cs-107-		ICoreClientAPI capi = (ICoreClientAPI)api;
+Vintagestory.GameContent/BlockShapeMaterialFromAttributes.cs-108-		string key = type + "-" + material + cachekeyextra;
+Vintagestory.GameContent/BlockShapeMaterialFromAttributes.cs-109-		if (overrideTexturesource != null || !orCreate.TryGetValue(key, out var value))
+Vintagestory.GameContent/BlockShapeMaterialFromAttributes.cs-110-		{
+Vintagestory.GameContent/BlockShapeMaterialFromAttributes.cs-111-			CompositeShape compositeShape = Cshape.Clone();
+Vintagestory.GameContent/BlockShapeMaterialFromAttributes.cs-112-			compositeShape.Base.Path = compositeShape.Base.Path.Replace("{type}", type).Replace("{material}", material);
+Vintagestory.GameContent/BlockShapeMaterialFromAttributes.cs-113-			value = capi.TesselatorManager.CreateMesh(string.Concat(Code, " block"), compositeShape, (Shape shape, string name) => new ShapeTextureSource(capi, shape, name, TexturesBSMFA, (string p) => p.Replace("{type}", type).Replace("{material}", material)), overrideTexturesource);
+Vintagestory.GameContent/BlockShapeMaterialFromAttributes.cs-114-			if (overrideTexturesource == null)
+Vintagestory.GameContent/BlockShapeMaterialFromAttributes.cs-115-			{
+Vintagestory.GameContent/BlockShapeMaterialFromAttributes.cs-116-				orCreate[key] = value;
+Vintagestory.GameContent/BlockShapeMaterialFromAttributes.cs-117-			}
+Vintagestory.GameContent/BlockShapeMaterialFromAttributes.cs-118-		}
+Vintagestory.GameContent/BlockShapeMaterialFromAttributes.cs-119-		return value;

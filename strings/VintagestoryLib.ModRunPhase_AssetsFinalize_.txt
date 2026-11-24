@@ -1,0 +1,116 @@
+Vintagestory.Client.NoObf/SystemModHandler.cs-206-		Lang.Load(game.Logger, game.AssetManager, ClientSettings.Language);
+Vintagestory.Client.NoObf/SystemModHandler.cs-207-		game.Logger.Notification("Reloaded lang file now with mod assets");
+Vintagestory.Client.NoObf/SystemModHandler.cs-208-		game.Logger.VerboseDebug("Loaded lang file: " + ClientSettings.Language);
+Vintagestory.Client.NoObf/SystemModHandler.cs-209-	}
+Vintagestory.Client.NoObf/SystemModHandler.cs-210-
+Vintagestory.Client.NoObf/SystemModHandler.cs-211-	internal void OnAssetsLoaded()
+Vintagestory.Client.NoObf/SystemModHandler.cs-212-	{
+Vintagestory.Client.NoObf/SystemModHandler.cs-213-		loader.RunModPhase(ModRunPhase.AssetsLoaded);
+Vintagestory.Client.NoObf/SystemModHandler.cs-214-	}
+Vintagestory.Client.NoObf/SystemModHandler.cs-215-
+Vintagestory.Client.NoObf/SystemModHandler.cs-216-	internal override void OnLevelFinalize()
+Vintagestory.Client.NoObf/SystemModHandler.cs-217-	{
+Vintagestory.Client.NoObf/SystemModHandler.cs:218:		loader.RunModPhase(ModRunPhase.AssetsFinalize);
+Vintagestory.Client.NoObf/SystemModHandler.cs-219-	}
+Vintagestory.Client.NoObf/SystemModHandler.cs-220-
+Vintagestory.Client.NoObf/SystemModHandler.cs-221-	internal void StartMods()
+Vintagestory.Client.NoObf/SystemModHandler.cs-222-	{
+Vintagestory.Client.NoObf/SystemModHandler.cs-223-		loader.RunModPhase(ModRunPhase.Start);
+Vintagestory.Client.NoObf/SystemModHandler.cs-224-	}
+Vintagestory.Client.NoObf/SystemModHandler.cs-225-
+Vintagestory.Client.NoObf/SystemModHandler.cs-226-	internal void StartModsFully()
+Vintagestory.Client.NoObf/SystemModHandler.cs-227-	{
+Vintagestory.Client.NoObf/SystemModHandler.cs-228-		loader.RunModPhase(ModRunPhase.Normal);
+Vintagestory.Client.NoObf/SystemModHandler.cs-229-	}
+Vintagestory.Client.NoObf/SystemModHandler.cs-230-
+Vintagestory.Client.NoObf/SystemModHandler.cs-231-	public override void OnBlockTexturesLoaded()
+Vintagestory.Client.NoObf/SystemModHandler.cs-232-	{
+Vintagestory.Client.NoObf/SystemModHandler.cs-233-		game.api.Logger.VerboseDebug("Trigger mod event OnBlockTexturesLoaded");
+Vintagestory.Client.NoObf/SystemModHandler.cs-234-		game.api.eventapi.TriggerBlockTexturesLoaded();
+Vintagestory.Client.NoObf/SystemModHandler.cs-235-	}
+Vintagestory.Client.NoObf/SystemModHandler.cs-236-
+Vintagestory.Client.NoObf/SystemModHandler.cs-237-	public override void Dispose(ClientMain game)
+Vintagestory.Client.NoObf/SystemModHandler.cs-238-	{
+Vintagestory.Client.NoObf/SystemModHandler.cs-239-		base.Dispose(game);
+Vintagestory.Client.NoObf/SystemModHandler.cs-240-		loader?.Dispose();
+Vintagestory.Client.NoObf/SystemModHandler.cs-241-		CrashReporter.LoadedMods.Clear();
+Vintagestory.Client.NoObf/SystemModHandler.cs-242-	}
+Vintagestory.Client.NoObf/SystemModHandler.cs-243-
+--
+Vintagestory.Common/ModLoader.cs-499-		{
+Vintagestory.Common/ModLoader.cs-500-			switch (phase)
+Vintagestory.Common/ModLoader.cs-501-			{
+Vintagestory.Common/ModLoader.cs-502-			case ModRunPhase.Pre:
+Vintagestory.Common/ModLoader.cs-503-				system.StartPre(api);
+Vintagestory.Common/ModLoader.cs-504-				break;
+Vintagestory.Common/ModLoader.cs-505-			case ModRunPhase.Start:
+Vintagestory.Common/ModLoader.cs-506-				system.Start(api);
+Vintagestory.Common/ModLoader.cs-507-				break;
+Vintagestory.Common/ModLoader.cs-508-			case ModRunPhase.AssetsLoaded:
+Vintagestory.Common/ModLoader.cs-509-				system.AssetsLoaded(api);
+Vintagestory.Common/ModLoader.cs-510-				break;
+Vintagestory.Common/ModLoader.cs:511:			case ModRunPhase.AssetsFinalize:
+Vintagestory.Common/ModLoader.cs-512-				system.AssetsFinalize(api);
+Vintagestory.Common/ModLoader.cs-513-				break;
+Vintagestory.Common/ModLoader.cs-514-			case ModRunPhase.Normal:
+Vintagestory.Common/ModLoader.cs-515-				if (api.Side == EnumAppSide.Client)
+Vintagestory.Common/ModLoader.cs-516-				{
+Vintagestory.Common/ModLoader.cs-517-					system.StartClientSide(api as ICoreClientAPI);
+Vintagestory.Common/ModLoader.cs-518-				}
+Vintagestory.Common/ModLoader.cs-519-				else
+Vintagestory.Common/ModLoader.cs-520-				{
+Vintagestory.Common/ModLoader.cs-521-					system.StartServerSide(api as ICoreServerAPI);
+Vintagestory.Common/ModLoader.cs-522-				}
+Vintagestory.Common/ModLoader.cs-523-				break;
+Vintagestory.Common/ModLoader.cs-524-			case ModRunPhase.Dispose:
+Vintagestory.Common/ModLoader.cs-525-				system.Dispose();
+Vintagestory.Common/ModLoader.cs-526-				break;
+Vintagestory.Common/ModLoader.cs-527-			}
+Vintagestory.Common/ModLoader.cs-528-			return true;
+Vintagestory.Common/ModLoader.cs-529-		}
+Vintagestory.Common/ModLoader.cs-530-		catch (FormatException ex)
+Vintagestory.Common/ModLoader.cs-531-		{
+Vintagestory.Common/ModLoader.cs-532-			throw ex;
+Vintagestory.Common/ModLoader.cs-533-		}
+Vintagestory.Common/ModLoader.cs-534-		catch (Exception e)
+Vintagestory.Common/ModLoader.cs-535-		{
+Vintagestory.Common/ModLoader.cs-536-			mod.Logger.Error("An exception was thrown when trying to start the mod:");
+--
+Vintagestory.Server/ServerSystemModHandler.cs-51-			availableLanguage.Value.Invalidate();
+Vintagestory.Server/ServerSystemModHandler.cs-52-		}
+Vintagestory.Server/ServerSystemModHandler.cs-53-		Lang.Load(ServerMain.Logger, server.AssetManager, server.Config.ServerLanguage);
+Vintagestory.Server/ServerSystemModHandler.cs-54-		ServerMain.Logger.Notification("Reloaded lang file with mod assets");
+Vintagestory.Server/ServerSystemModHandler.cs-55-		ServerMain.Logger.VerboseDebug("Reloaded lang file with mod assets");
+Vintagestory.Server/ServerSystemModHandler.cs-56-		loader.RunModPhase(ModRunPhase.Start);
+Vintagestory.Server/ServerSystemModHandler.cs-57-		ServerMain.Logger.VerboseDebug("Started mods");
+Vintagestory.Server/ServerSystemModHandler.cs-58-		loader.RunModPhase(ModRunPhase.AssetsLoaded);
+Vintagestory.Server/ServerSystemModHandler.cs-59-	}
+Vintagestory.Server/ServerSystemModHandler.cs-60-
+Vintagestory.Server/ServerSystemModHandler.cs-61-	public override void OnFinalizeAssets()
+Vintagestory.Server/ServerSystemModHandler.cs-62-	{
+Vintagestory.Server/ServerSystemModHandler.cs:63:		loader.RunModPhase(ModRunPhase.AssetsFinalize);
+Vintagestory.Server/ServerSystemModHandler.cs-64-	}
+Vintagestory.Server/ServerSystemModHandler.cs-65-
+Vintagestory.Server/ServerSystemModHandler.cs-66-	public override void OnBeginConfiguration()
+Vintagestory.Server/ServerSystemModHandler.cs-67-	{
+Vintagestory.Server/ServerSystemModHandler.cs-68-		TyronThreadPool.QueueTask(async () =>
+Vintagestory.Server/ServerSystemModHandler.cs-69-		{
+Vintagestory.Server/ServerSystemModHandler.cs-70-			await ModDbUtil.LoadBlockedModsAsync(ServerMain.Logger, server.Config.DisableModSafetyCheck);
+Vintagestory.Server/ServerSystemModHandler.cs-71-		}, "LoadBlockedModsAsync");
+Vintagestory.Server/ServerSystemModHandler.cs-72-		server.api.eventapi.OnServerStage(EnumServerRunPhase.Configuration);
+Vintagestory.Server/ServerSystemModHandler.cs-73-	}
+Vintagestory.Server/ServerSystemModHandler.cs-74-
+Vintagestory.Server/ServerSystemModHandler.cs-75-	public override void OnBeginModsAndConfigReady()
+Vintagestory.Server/ServerSystemModHandler.cs-76-	{
+Vintagestory.Server/ServerSystemModHandler.cs-77-		loader.RunModPhase(ModRunPhase.Normal);
+Vintagestory.Server/ServerSystemModHandler.cs-78-		server.api.eventapi.OnServerStage(EnumServerRunPhase.LoadGamePre);
+Vintagestory.Server/ServerSystemModHandler.cs-79-	}
+Vintagestory.Server/ServerSystemModHandler.cs-80-
+Vintagestory.Server/ServerSystemModHandler.cs-81-	public override void OnBeginWorldReady()
+Vintagestory.Server/ServerSystemModHandler.cs-82-	{
+Vintagestory.Server/ServerSystemModHandler.cs-83-		server.api.eventapi.OnServerStage(EnumServerRunPhase.WorldReady);
+Vintagestory.Server/ServerSystemModHandler.cs-84-	}
+Vintagestory.Server/ServerSystemModHandler.cs-85-
+Vintagestory.Server/ServerSystemModHandler.cs-86-	public override void OnBeginGameReady(SaveGame savegame)
+Vintagestory.Server/ServerSystemModHandler.cs-87-	{
+Vintagestory.Server/ServerSystemModHandler.cs-88-		server.api.eventapi.OnServerStage(EnumServerRunPhase.GameReady);

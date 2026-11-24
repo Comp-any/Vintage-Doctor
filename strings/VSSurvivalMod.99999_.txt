@@ -1,0 +1,1500 @@
+Vintagestory.GameContent/BlockEntityCondenser.cs-9-namespace Vintagestory.GameContent;
+Vintagestory.GameContent/BlockEntityCondenser.cs-10-
+Vintagestory.GameContent/BlockEntityCondenser.cs-11-public class BlockEntityCondenser : BlockEntityLiquidContainer
+Vintagestory.GameContent/BlockEntityCondenser.cs-12-{
+Vintagestory.GameContent/BlockEntityCondenser.cs-13-	private MeshData currentMesh;
+Vintagestory.GameContent/BlockEntityCondenser.cs-14-
+Vintagestory.GameContent/BlockEntityCondenser.cs-15-	private BlockCondenser ownBlock;
+Vintagestory.GameContent/BlockEntityCondenser.cs-16-
+Vintagestory.GameContent/BlockEntityCondenser.cs-17-	private MeshData bucketMesh;
+Vintagestory.GameContent/BlockEntityCondenser.cs-18-
+Vintagestory.GameContent/BlockEntityCondenser.cs-19-	private MeshData bucketMeshTmp;
+Vintagestory.GameContent/BlockEntityCondenser.cs-20-
+Vintagestory.GameContent/BlockEntityCondenser.cs:21:	private long lastReceivedDistillateTotalMs = -99999L;
+Vintagestory.GameContent/BlockEntityCondenser.cs-22-
+Vintagestory.GameContent/BlockEntityCondenser.cs-23-	private ItemStack lastReceivedDistillate;
+Vintagestory.GameContent/BlockEntityCondenser.cs-24-
+Vintagestory.GameContent/BlockEntityCondenser.cs-25-	private Vec3f spoutPos;
+Vintagestory.GameContent/BlockEntityCondenser.cs-26-
+Vintagestory.GameContent/BlockEntityCondenser.cs-27-	private Vec3d steamposmin;
+Vintagestory.GameContent/BlockEntityCondenser.cs-28-
+Vintagestory.GameContent/BlockEntityCondenser.cs-29-	private Vec3d steamposmax;
+Vintagestory.GameContent/BlockEntityCondenser.cs-30-
+Vintagestory.GameContent/BlockEntityCondenser.cs-31-	private float partialStackAccum;
+Vintagestory.GameContent/BlockEntityCondenser.cs-32-
+Vintagestory.GameContent/BlockEntityCondenser.cs-33-	public override string InventoryClassName => "condenser";
+Vintagestory.GameContent/BlockEntityCondenser.cs-34-
+Vintagestory.GameContent/BlockEntityCondenser.cs-35-	public BlockEntityCondenser()
+Vintagestory.GameContent/BlockEntityCondenser.cs-36-	{
+Vintagestory.GameContent/BlockEntityCondenser.cs-37-		inventory = new InventoryGeneric(2, null, null);
+Vintagestory.GameContent/BlockEntityCondenser.cs-38-	}
+Vintagestory.GameContent/BlockEntityCondenser.cs-39-
+Vintagestory.GameContent/BlockEntityCondenser.cs-40-	public override void Initialize(ICoreAPI api)
+Vintagestory.GameContent/BlockEntityCondenser.cs-41-	{
+Vintagestory.GameContent/BlockEntityCondenser.cs-42-		base.Initialize(api);
+Vintagestory.GameContent/BlockEntityCondenser.cs-43-		ownBlock = Block as BlockCondenser;
+Vintagestory.GameContent/BlockEntityCondenser.cs-44-		if (Api.Side == EnumAppSide.Client)
+Vintagestory.GameContent/BlockEntityCondenser.cs-45-		{
+Vintagestory.GameContent/BlockEntityCondenser.cs-46-			currentMesh = GenMesh();
+--
+Vintagestory.GameContent/BlockEntityCondenser.cs-127-				bucketMeshTmp.CustomInts.Values.Fill(268435456);
+Vintagestory.GameContent/BlockEntityCondenser.cs-128-				bucketMeshTmp.CustomFloats = new CustomMeshDataPartFloat(bucketMeshTmp.FlagsCount * 2);
+Vintagestory.GameContent/BlockEntityCondenser.cs-129-				bucketMeshTmp.CustomFloats.Count = bucketMeshTmp.FlagsCount * 2;
+Vintagestory.GameContent/BlockEntityCondenser.cs-130-				bucketMesh = bucketMeshTmp.Clone().Translate(0f, 0f, 0.375f).Rotate(0f, (float)Math.PI / 2f + Block.Shape.rotateY * ((float)Math.PI / 180f), 0f);
+Vintagestory.GameContent/BlockEntityCondenser.cs-131-			}
+Vintagestory.GameContent/BlockEntityCondenser.cs-132-		}
+Vintagestory.GameContent/BlockEntityCondenser.cs-133-	}
+Vintagestory.GameContent/BlockEntityCondenser.cs-134-
+Vintagestory.GameContent/BlockEntityCondenser.cs-135-	public bool ReceiveDistillate(ItemSlot sourceSlot, DistillationProps props)
+Vintagestory.GameContent/BlockEntityCondenser.cs-136-	{
+Vintagestory.GameContent/BlockEntityCondenser.cs-137-		if (sourceSlot.Empty)
+Vintagestory.GameContent/BlockEntityCondenser.cs-138-		{
+Vintagestory.GameContent/BlockEntityCondenser.cs:139:			lastReceivedDistillateTotalMs = -99999L;
+Vintagestory.GameContent/BlockEntityCondenser.cs-140-			return true;
+Vintagestory.GameContent/BlockEntityCondenser.cs-141-		}
+Vintagestory.GameContent/BlockEntityCondenser.cs-142-		if (inventory[1].Empty)
+Vintagestory.GameContent/BlockEntityCondenser.cs-143-		{
+Vintagestory.GameContent/BlockEntityCondenser.cs:144:			lastReceivedDistillateTotalMs = -99999L;
+Vintagestory.GameContent/BlockEntityCondenser.cs-145-			return false;
+Vintagestory.GameContent/BlockEntityCondenser.cs-146-		}
+Vintagestory.GameContent/BlockEntityCondenser.cs-147-		ItemStack itemStack = props.DistilledStack.ResolvedItemstack.Clone();
+Vintagestory.GameContent/BlockEntityCondenser.cs-148-		lastReceivedDistillate = itemStack.Clone();
+Vintagestory.GameContent/BlockEntityCondenser.cs-149-		ItemStack itemstack = inventory[1].Itemstack;
+Vintagestory.GameContent/BlockEntityCondenser.cs-150-		BlockLiquidContainerTopOpened blockLiquidContainerTopOpened = itemstack.Collectible as BlockLiquidContainerTopOpened;
+Vintagestory.GameContent/BlockEntityCondenser.cs-151-		if (blockLiquidContainerTopOpened.IsEmpty(itemstack))
+Vintagestory.GameContent/BlockEntityCondenser.cs-152-		{
+Vintagestory.GameContent/BlockEntityCondenser.cs-153-			if (Api.Side == EnumAppSide.Server)
+Vintagestory.GameContent/BlockEntityCondenser.cs-154-			{
+Vintagestory.GameContent/BlockEntityCondenser.cs-155-				itemStack.StackSize = 1;
+Vintagestory.GameContent/BlockEntityCondenser.cs-156-				blockLiquidContainerTopOpened.SetContent(itemstack, itemStack);
+Vintagestory.GameContent/BlockEntityCondenser.cs-157-			}
+Vintagestory.GameContent/BlockEntityCondenser.cs-158-		}
+Vintagestory.GameContent/BlockEntityCondenser.cs-159-		else
+Vintagestory.GameContent/BlockEntityCondenser.cs-160-		{
+Vintagestory.GameContent/BlockEntityCondenser.cs-161-			ItemStack content = blockLiquidContainerTopOpened.GetContent(itemstack);
+Vintagestory.GameContent/BlockEntityCondenser.cs-162-			if (!content.Equals(Api.World, itemStack, GlobalConstants.IgnoredStackAttributes) || blockLiquidContainerTopOpened.IsFull(itemstack))
+Vintagestory.GameContent/BlockEntityCondenser.cs-163-			{
+Vintagestory.GameContent/BlockEntityCondenser.cs:164:				lastReceivedDistillateTotalMs = -99999L;
+Vintagestory.GameContent/BlockEntityCondenser.cs-165-				return false;
+Vintagestory.GameContent/BlockEntityCondenser.cs-166-			}
+Vintagestory.GameContent/BlockEntityCondenser.cs-167-			if (Api.Side == EnumAppSide.Server)
+Vintagestory.GameContent/BlockEntityCondenser.cs-168-			{
+Vintagestory.GameContent/BlockEntityCondenser.cs-169-				if (!inventory[0].Empty || Api.World.Rand.NextDouble() > 0.5)
+Vintagestory.GameContent/BlockEntityCondenser.cs-170-				{
+Vintagestory.GameContent/BlockEntityCondenser.cs-171-					content.StackSize++;
+Vintagestory.GameContent/BlockEntityCondenser.cs-172-					blockLiquidContainerTopOpened.SetContent(itemstack, content);
+Vintagestory.GameContent/BlockEntityCondenser.cs-173-				}
+Vintagestory.GameContent/BlockEntityCondenser.cs-174-				if (!inventory[0].Empty && Api.World.Rand.NextDouble() < 0.5)
+Vintagestory.GameContent/BlockEntityCondenser.cs-175-				{
+Vintagestory.GameContent/BlockEntityCondenser.cs-176-					inventory[0].TakeOut(1);
+Vintagestory.GameContent/BlockEntityCondenser.cs-177-				}
+Vintagestory.GameContent/BlockEntityCondenser.cs-178-			}
+Vintagestory.GameContent/BlockEntityCondenser.cs-179-		}
+Vintagestory.GameContent/BlockEntityCondenser.cs-180-		float num = 1f / props.Ratio - partialStackAccum;
+Vintagestory.GameContent/BlockEntityCondenser.cs-181-		int num2 = (int)Math.Ceiling(num);
+Vintagestory.GameContent/BlockEntityCondenser.cs-182-		partialStackAccum = num - (float)num2;
+Vintagestory.GameContent/BlockEntityCondenser.cs-183-		if (num2 > 0)
+Vintagestory.GameContent/BlockEntityCondenser.cs-184-		{
+Vintagestory.GameContent/BlockEntityCondenser.cs-185-			sourceSlot.TakeOut(num2);
+Vintagestory.GameContent/BlockEntityCondenser.cs-186-		}
+Vintagestory.GameContent/BlockEntityCondenser.cs-187-		MarkDirty(redrawOnClient: true);
+Vintagestory.GameContent/BlockEntityCondenser.cs-188-		lastReceivedDistillateTotalMs = Api.World.ElapsedMilliseconds;
+Vintagestory.GameContent/BlockEntityCondenser.cs-189-		return true;
+--
+Vintagestory.GameContent/CreaturePopulation.cs-1-namespace Vintagestory.GameContent;
+Vintagestory.GameContent/CreaturePopulation.cs-2-
+Vintagestory.GameContent/CreaturePopulation.cs-3-public class CreaturePopulation
+Vintagestory.GameContent/CreaturePopulation.cs-4-{
+Vintagestory.GameContent/CreaturePopulation.cs-5-	public double PopulationSize = 10.0;
+Vintagestory.GameContent/CreaturePopulation.cs-6-
+Vintagestory.GameContent/CreaturePopulation.cs:7:	public double RestorationMul = 1.0499999523162842;
+Vintagestory.GameContent/CreaturePopulation.cs-8-
+Vintagestory.GameContent/CreaturePopulation.cs-9-	public double RetorationDaysInterval = 10.0;
+Vintagestory.GameContent/CreaturePopulation.cs-10-}
+--
+Vintagestory.GameContent/SystemTemporalStability.cs-398-	}
+Vintagestory.GameContent/SystemTemporalStability.cs-399-
+Vintagestory.GameContent/SystemTemporalStability.cs-400-	private void trySpawnMobs()
+Vintagestory.GameContent/SystemTemporalStability.cs-401-	{
+Vintagestory.GameContent/SystemTemporalStability.cs-402-		float stormStrength = StormStrength;
+Vintagestory.GameContent/SystemTemporalStability.cs-403-		if (stormStrength < 0.01f || api.World.Rand.NextDouble() < 0.5 || spawnBreakUntilMs > api.World.ElapsedMilliseconds)
+Vintagestory.GameContent/SystemTemporalStability.cs-404-		{
+Vintagestory.GameContent/SystemTemporalStability.cs-405-			return;
+Vintagestory.GameContent/SystemTemporalStability.cs-406-		}
+Vintagestory.GameContent/SystemTemporalStability.cs-407-		EntityPartitioning modSystem = api.ModLoader.GetModSystem<EntityPartitioning>();
+Vintagestory.GameContent/SystemTemporalStability.cs-408-		int range = 15;
+Vintagestory.GameContent/SystemTemporalStability.cs-409-		nobreakSpawns++;
+Vintagestory.GameContent/SystemTemporalStability.cs:410:		if (api.World.Rand.NextDouble() + 0.03999999910593033 < (double)((float)nobreakSpawns / 100f))
+Vintagestory.GameContent/SystemTemporalStability.cs-411-		{
+Vintagestory.GameContent/SystemTemporalStability.cs-412-			spawnBreakUntilMs = api.World.ElapsedMilliseconds + 1000 * api.World.Rand.Next(15);
+Vintagestory.GameContent/SystemTemporalStability.cs-413-		}
+Vintagestory.GameContent/SystemTemporalStability.cs-414-		IPlayer[] allOnlinePlayers = api.World.AllOnlinePlayers;
+Vintagestory.GameContent/SystemTemporalStability.cs-415-		foreach (IPlayer plr in allOnlinePlayers)
+Vintagestory.GameContent/SystemTemporalStability.cs-416-		{
+Vintagestory.GameContent/SystemTemporalStability.cs-417-			if (!(api.World.Rand.NextDouble() < 0.7))
+Vintagestory.GameContent/SystemTemporalStability.cs-418-			{
+Vintagestory.GameContent/SystemTemporalStability.cs-419-				trySpawnForPlayer(plr, range, stormStrength, modSystem);
+Vintagestory.GameContent/SystemTemporalStability.cs-420-			}
+Vintagestory.GameContent/SystemTemporalStability.cs-421-		}
+Vintagestory.GameContent/SystemTemporalStability.cs-422-	}
+Vintagestory.GameContent/SystemTemporalStability.cs-423-
+Vintagestory.GameContent/SystemTemporalStability.cs-424-	private void trySpawnForPlayer(IPlayer plr, int range, float stormStr, EntityPartitioning part)
+Vintagestory.GameContent/SystemTemporalStability.cs-425-	{
+Vintagestory.GameContent/SystemTemporalStability.cs-426-		Vec3d vec3d = new Vec3d();
+Vintagestory.GameContent/SystemTemporalStability.cs-427-		BlockPos blockPos = new BlockPos(0);
+Vintagestory.GameContent/SystemTemporalStability.cs-428-		TempStormMobConfig.RareStormSpawnsVariant[] rareSpawns = mobConfig.rareSpawns.Variants.Shuffle(api.World.Rand);
+Vintagestory.GameContent/SystemTemporalStability.cs-429-		TempStormMobConfig.TempStormSpawnPattern tempStormSpawnPattern = mobConfig.spawnsByStormStrength.spawnPatterns[data.spawnPatternCode];
+Vintagestory.GameContent/SystemTemporalStability.cs-430-		Dictionary<string, AssetLocation[]> variantGroups = mobConfig.spawnsByStormStrength.variantGroups;
+Vintagestory.GameContent/SystemTemporalStability.cs-431-		Dictionary<string, float> variantQuantityMuls = mobConfig.spawnsByStormStrength.variantQuantityMuls;
+Vintagestory.GameContent/SystemTemporalStability.cs-432-		Dictionary<string, EntityProperties[]> resolvedVariantGroups = mobConfig.spawnsByStormStrength.resolvedVariantGroups;
+Vintagestory.GameContent/SystemTemporalStability.cs-433-		Dictionary<string, int> rareSpawnCounts = new Dictionary<string, int>();
+Vintagestory.GameContent/SystemTemporalStability.cs-434-		Dictionary<string, int> mainSpawnCountsByGroup = new Dictionary<string, int>();
+Vintagestory.GameContent/SystemTemporalStability.cs-435-		Vec3d xYZ = plr.Entity.Pos.XYZ;
+--
+Vintagestory.GameContent/BlockLakeIce.cs-110-			return;
+Vintagestory.GameContent/BlockLakeIce.cs-111-		}
+Vintagestory.GameContent/BlockLakeIce.cs-112-		slot.Itemstack.Collectible.SetTemperature(world, slot.Itemstack, temperature2);
+Vintagestory.GameContent/BlockLakeIce.cs-113-		float num = temperature - coolingMediumTemperature;
+Vintagestory.GameContent/BlockLakeIce.cs-114-		if (num > 90f)
+Vintagestory.GameContent/BlockLakeIce.cs-115-		{
+Vintagestory.GameContent/BlockLakeIce.cs-116-			double num2 = 0.0;
+Vintagestory.GameContent/BlockLakeIce.cs-117-			Entity.SplashParticleProps.BasePos.Set(pos.X - num2 / 2.0, pos.Y - 0.75, pos.Z - num2 / 2.0);
+Vintagestory.GameContent/BlockLakeIce.cs-118-			Entity.SplashParticleProps.AddVelocity.Set(0f, 0f, 0f);
+Vintagestory.GameContent/BlockLakeIce.cs-119-			Entity.SplashParticleProps.QuantityMul = 0.1f;
+Vintagestory.GameContent/BlockLakeIce.cs-120-			world.SpawnParticles(Entity.SplashParticleProps);
+Vintagestory.GameContent/BlockLakeIce.cs-121-		}
+Vintagestory.GameContent/BlockLakeIce.cs:122:		long num3 = slot.Itemstack.TempAttributes.GetLong("lastPlayedSizzlesTotalMs", -99999L);
+Vintagestory.GameContent/BlockLakeIce.cs-123-		if (playSizzle && num > 200f && world.Side == EnumAppSide.Client && world.ElapsedMilliseconds - num3 > 10000)
+Vintagestory.GameContent/BlockLakeIce.cs-124-		{
+Vintagestory.GameContent/BlockLakeIce.cs-125-			world.PlaySoundAt(new AssetLocation("sounds/sizzle"), pos.X, pos.Y, pos.Z);
+Vintagestory.GameContent/BlockLakeIce.cs-126-			slot.Itemstack.TempAttributes.SetLong("lastPlayedSizzlesTotalMs", world.ElapsedMilliseconds);
+Vintagestory.GameContent/BlockLakeIce.cs-127-		}
+Vintagestory.GameContent/BlockLakeIce.cs-128-		if (api.Side != EnumAppSide.Client && world.Calendar.ElapsedSeconds - slot.Itemstack.TempAttributes.GetLong("thawStart", 0L) >= 120)
+Vintagestory.GameContent/BlockLakeIce.cs-129-		{
+Vintagestory.GameContent/BlockLakeIce.cs-130-			slot.Itemstack.TempAttributes.RemoveAttribute("thawStart");
+Vintagestory.GameContent/BlockLakeIce.cs-131-			tmpPos.Set(pos.XInt, pos.YInt, pos.ZInt);
+Vintagestory.GameContent/BlockLakeIce.cs-132-			if (!(world.BlockAccessor.GetBlock(tmpPos) is BlockLakeIce))
+Vintagestory.GameContent/BlockLakeIce.cs-133-			{
+Vintagestory.GameContent/BlockLakeIce.cs-134-				tmpPos.Down();
+Vintagestory.GameContent/BlockLakeIce.cs-135-			}
+Vintagestory.GameContent/BlockLakeIce.cs-136-			if (world.BlockAccessor.GetBlock(tmpPos) is BlockLakeIce)
+Vintagestory.GameContent/BlockLakeIce.cs-137-			{
+Vintagestory.GameContent/BlockLakeIce.cs-138-				world.BlockAccessor.SetBlock(waterBlock, tmpPos, 2);
+Vintagestory.GameContent/BlockLakeIce.cs-139-			}
+Vintagestory.GameContent/BlockLakeIce.cs-140-		}
+Vintagestory.GameContent/BlockLakeIce.cs-141-	}
+Vintagestory.GameContent/BlockLakeIce.cs-142-
+Vintagestory.GameContent/BlockLakeIce.cs-143-	public override bool CanCool(ItemSlot slot, Vec3d pos)
+Vintagestory.GameContent/BlockLakeIce.cs-144-	{
+Vintagestory.GameContent/BlockLakeIce.cs-145-		return slot is EntityItemSlot;
+Vintagestory.GameContent/BlockLakeIce.cs-146-	}
+Vintagestory.GameContent/BlockLakeIce.cs-147-}
+--
+Vintagestory.GameContent/EntityBehaviorMilkable.cs-52-		: base(entity)
+Vintagestory.GameContent/EntityBehaviorMilkable.cs-53-	{
+Vintagestory.GameContent/EntityBehaviorMilkable.cs-54-	}
+Vintagestory.GameContent/EntityBehaviorMilkable.cs-55-
+Vintagestory.GameContent/EntityBehaviorMilkable.cs-56-	public override void Initialize(EntityProperties properties, JsonObject attributes)
+Vintagestory.GameContent/EntityBehaviorMilkable.cs-57-	{
+Vintagestory.GameContent/EntityBehaviorMilkable.cs-58-		base.Initialize(properties, attributes);
+Vintagestory.GameContent/EntityBehaviorMilkable.cs-59-		liquidJsonStack = attributes["liquidStack"].AsObject(new JsonItemStack
+Vintagestory.GameContent/EntityBehaviorMilkable.cs-60-		{
+Vintagestory.GameContent/EntityBehaviorMilkable.cs-61-			Type = EnumItemClass.Item,
+Vintagestory.GameContent/EntityBehaviorMilkable.cs-62-			Code = "milkportion"
+Vintagestory.GameContent/EntityBehaviorMilkable.cs-63-		});
+Vintagestory.GameContent/EntityBehaviorMilkable.cs:64:		liquidJsonStack.StackSize = 999999;
+Vintagestory.GameContent/EntityBehaviorMilkable.cs-65-		lactatingDaysAfterBirth = attributes["lactatingDaysAfterBirth"].AsFloat(21f);
+Vintagestory.GameContent/EntityBehaviorMilkable.cs-66-		yieldLitres = attributes["yieldLitres"].AsFloat(10f);
+Vintagestory.GameContent/EntityBehaviorMilkable.cs-67-	}
+Vintagestory.GameContent/EntityBehaviorMilkable.cs-68-
+Vintagestory.GameContent/EntityBehaviorMilkable.cs-69-	public override string PropertyName()
+Vintagestory.GameContent/EntityBehaviorMilkable.cs-70-	{
+Vintagestory.GameContent/EntityBehaviorMilkable.cs-71-		return "milkable";
+Vintagestory.GameContent/EntityBehaviorMilkable.cs-72-	}
+Vintagestory.GameContent/EntityBehaviorMilkable.cs-73-
+Vintagestory.GameContent/EntityBehaviorMilkable.cs-74-	public override void OnEntityLoaded()
+Vintagestory.GameContent/EntityBehaviorMilkable.cs-75-	{
+Vintagestory.GameContent/EntityBehaviorMilkable.cs-76-		init();
+Vintagestory.GameContent/EntityBehaviorMilkable.cs-77-	}
+Vintagestory.GameContent/EntityBehaviorMilkable.cs-78-
+Vintagestory.GameContent/EntityBehaviorMilkable.cs-79-	public override void OnEntitySpawn()
+Vintagestory.GameContent/EntityBehaviorMilkable.cs-80-	{
+Vintagestory.GameContent/EntityBehaviorMilkable.cs-81-		init();
+Vintagestory.GameContent/EntityBehaviorMilkable.cs-82-	}
+Vintagestory.GameContent/EntityBehaviorMilkable.cs-83-
+Vintagestory.GameContent/EntityBehaviorMilkable.cs-84-	private void init()
+Vintagestory.GameContent/EntityBehaviorMilkable.cs-85-	{
+Vintagestory.GameContent/EntityBehaviorMilkable.cs-86-		bhmul = entity.GetBehavior<EntityBehaviorMultiply>();
+Vintagestory.GameContent/EntityBehaviorMilkable.cs-87-		if (entity.World.Side != EnumAppSide.Client)
+Vintagestory.GameContent/EntityBehaviorMilkable.cs-88-		{
+Vintagestory.GameContent/EntityBehaviorMilkable.cs-89-			entity.GetBehavior<EntityBehaviorTaskAI>().TaskManager.OnShouldExecuteTask += (IAiTask _) => !IsBeingMilked;
+--
+Vintagestory.GameContent/AiTaskEidolonSlam.cs-151-				float num6 = (float)(5.0 - num5) / 5f;
+Vintagestory.GameContent/AiTaskEidolonSlam.cs-152-				float damage2 = Math.Max(0.02f, damage * GlobalConstants.CreatureDamageModifier * num6);
+Vintagestory.GameContent/AiTaskEidolonSlam.cs-153-				e.ReceiveDamage(new DamageSource
+Vintagestory.GameContent/AiTaskEidolonSlam.cs-154-				{
+Vintagestory.GameContent/AiTaskEidolonSlam.cs-155-					Source = EnumDamageSource.Entity,
+Vintagestory.GameContent/AiTaskEidolonSlam.cs-156-					SourceEntity = entity,
+Vintagestory.GameContent/AiTaskEidolonSlam.cs-157-					Type = EnumDamageType.BluntAttack,
+Vintagestory.GameContent/AiTaskEidolonSlam.cs-158-					DamageTier = 1,
+Vintagestory.GameContent/AiTaskEidolonSlam.cs-159-					KnockbackStrength = 0f
+Vintagestory.GameContent/AiTaskEidolonSlam.cs-160-				}, damage2);
+Vintagestory.GameContent/AiTaskEidolonSlam.cs-161-				float num7 = GameMath.Clamp(10f - (float)num5, 0f, 5f);
+Vintagestory.GameContent/AiTaskEidolonSlam.cs-162-				Vec3d vec3d = (entity.Pos.XYZ - e.Pos.XYZ).Normalize();
+Vintagestory.GameContent/AiTaskEidolonSlam.cs:163:				vec3d.Y = 0.699999988079071;
+Vintagestory.GameContent/AiTaskEidolonSlam.cs-164-				float num8 = num7 * GameMath.Clamp((1f - e.Properties.KnockbackResistance) / 10f, 0f, 1f);
+Vintagestory.GameContent/AiTaskEidolonSlam.cs-165-				e.WatchedAttributes.SetFloat("onHurtDir", (float)Math.Atan2(vec3d.X, vec3d.Z));
+Vintagestory.GameContent/AiTaskEidolonSlam.cs-166-				e.WatchedAttributes.SetDouble("kbdirX", vec3d.X * (double)num8);
+Vintagestory.GameContent/AiTaskEidolonSlam.cs-167-				e.WatchedAttributes.SetDouble("kbdirY", vec3d.Y * (double)num8);
+Vintagestory.GameContent/AiTaskEidolonSlam.cs-168-				e.WatchedAttributes.SetDouble("kbdirZ", vec3d.Z * (double)num8);
+Vintagestory.GameContent/AiTaskEidolonSlam.cs-169-				e.WatchedAttributes.SetInt("onHurtCounter", e.WatchedAttributes.GetInt("onHurtCounter") + 1);
+Vintagestory.GameContent/AiTaskEidolonSlam.cs-170-				e.WatchedAttributes.SetFloat("onHurt", 0.01f);
+Vintagestory.GameContent/AiTaskEidolonSlam.cs-171-				return true;
+Vintagestory.GameContent/AiTaskEidolonSlam.cs-172-			}, EnumEntitySearchType.Creatures);
+Vintagestory.GameContent/AiTaskEidolonSlam.cs-173-			IPlayer[] allOnlinePlayers = entity.World.AllOnlinePlayers;
+Vintagestory.GameContent/AiTaskEidolonSlam.cs-174-			for (int num2 = 0; num2 < allOnlinePlayers.Length; num2++)
+Vintagestory.GameContent/AiTaskEidolonSlam.cs-175-			{
+Vintagestory.GameContent/AiTaskEidolonSlam.cs-176-				IServerPlayer serverPlayer = (IServerPlayer)allOnlinePlayers[num2];
+Vintagestory.GameContent/AiTaskEidolonSlam.cs-177-				if (serverPlayer.ConnectionState == EnumClientState.Playing)
+Vintagestory.GameContent/AiTaskEidolonSlam.cs-178-				{
+Vintagestory.GameContent/AiTaskEidolonSlam.cs-179-					double num3 = serverPlayer.Entity.Pos.X - entity.Pos.X;
+Vintagestory.GameContent/AiTaskEidolonSlam.cs-180-					double num4 = serverPlayer.Entity.Pos.Z - entity.Pos.Z;
+Vintagestory.GameContent/AiTaskEidolonSlam.cs-181-					if (Math.Abs(num3) <= (double)spawnRange && Math.Abs(num4) <= (double)spawnRange)
+Vintagestory.GameContent/AiTaskEidolonSlam.cs-182-					{
+Vintagestory.GameContent/AiTaskEidolonSlam.cs-183-						spawnProjectile((float)num3, spawnHeight, (float)num4);
+Vintagestory.GameContent/AiTaskEidolonSlam.cs-184-					}
+Vintagestory.GameContent/AiTaskEidolonSlam.cs-185-				}
+Vintagestory.GameContent/AiTaskEidolonSlam.cs-186-			}
+Vintagestory.GameContent/AiTaskEidolonSlam.cs-187-			entity.World.Api.ModLoader.GetModSystem<ScreenshakeToClientModSystem>().ShakeScreen(entity.Pos.XYZ, 1f, 16f);
+Vintagestory.GameContent/AiTaskEidolonSlam.cs-188-		}
+--
+Vintagestory.GameContent/BlockWater.cs-180-	}
+Vintagestory.GameContent/BlockWater.cs-181-
+Vintagestory.GameContent/BlockWater.cs-182-	public override float GetTraversalCost(BlockPos pos, EnumAICreatureType creatureType)
+Vintagestory.GameContent/BlockWater.cs-183-	{
+Vintagestory.GameContent/BlockWater.cs-184-		if (creatureType == EnumAICreatureType.SeaCreature && !isBoiling)
+Vintagestory.GameContent/BlockWater.cs-185-		{
+Vintagestory.GameContent/BlockWater.cs-186-			return 0f;
+Vintagestory.GameContent/BlockWater.cs-187-		}
+Vintagestory.GameContent/BlockWater.cs-188-		if (!isBoiling || creatureType == EnumAICreatureType.HeatProofCreature)
+Vintagestory.GameContent/BlockWater.cs-189-		{
+Vintagestory.GameContent/BlockWater.cs-190-			return 5f;
+Vintagestory.GameContent/BlockWater.cs-191-		}
+Vintagestory.GameContent/BlockWater.cs:192:		return 99999f;
+Vintagestory.GameContent/BlockWater.cs-193-	}
+Vintagestory.GameContent/BlockWater.cs-194-
+Vintagestory.GameContent/BlockWater.cs-195-	public override void DetermineTopMiddlePos()
+Vintagestory.GameContent/BlockWater.cs-196-	{
+Vintagestory.GameContent/BlockWater.cs-197-		TopMiddlePos.Y = (float)(Height + 1) / 8f;
+Vintagestory.GameContent/BlockWater.cs-198-	}
+Vintagestory.GameContent/BlockWater.cs-199-}
+--
+Vintagestory.GameContent/BlockCrystal.cs-38-		}
+Vintagestory.GameContent/BlockCrystal.cs-39-		else
+Vintagestory.GameContent/BlockCrystal.cs-40-		{
+Vintagestory.GameContent/BlockCrystal.cs-41-			int num = 3;
+Vintagestory.GameContent/BlockCrystal.cs-42-			if (Variant["variant"] == "cluster1" || Variant["variant"] == "cluster2")
+Vintagestory.GameContent/BlockCrystal.cs-43-			{
+Vintagestory.GameContent/BlockCrystal.cs-44-				num = 5;
+Vintagestory.GameContent/BlockCrystal.cs-45-			}
+Vintagestory.GameContent/BlockCrystal.cs-46-			if (Variant["variant"] == "large1" || Variant["variant"] == "large2")
+Vintagestory.GameContent/BlockCrystal.cs-47-			{
+Vintagestory.GameContent/BlockCrystal.cs-48-				num = 7;
+Vintagestory.GameContent/BlockCrystal.cs-49-			}
+Vintagestory.GameContent/BlockCrystal.cs:50:			int num2 = (int)((double)num * Math.Min(1.0, world.Rand.NextDouble() * 0.3100000023841858 + 0.699999988079071));
+Vintagestory.GameContent/BlockCrystal.cs-51-			string text = Variant["type"];
+Vintagestory.GameContent/BlockCrystal.cs-52-			string text2;
+Vintagestory.GameContent/BlockCrystal.cs-53-			if (text == "milkyquartz")
+Vintagestory.GameContent/BlockCrystal.cs-54-			{
+Vintagestory.GameContent/BlockCrystal.cs-55-				text2 = "clearquartz";
+Vintagestory.GameContent/BlockCrystal.cs-56-			}
+Vintagestory.GameContent/BlockCrystal.cs-57-			else
+Vintagestory.GameContent/BlockCrystal.cs-58-			{
+Vintagestory.GameContent/BlockCrystal.cs-59-				text2 = ((!(text == "olivine")) ? Variant["type"] : "ore-olivine");
+Vintagestory.GameContent/BlockCrystal.cs-60-			}
+Vintagestory.GameContent/BlockCrystal.cs-61-			string domainAndPath = text2;
+Vintagestory.GameContent/BlockCrystal.cs-62-			ItemStack itemStack2 = new ItemStack(api.World.GetItem(new AssetLocation(domainAndPath)));
+Vintagestory.GameContent/BlockCrystal.cs-63-			for (int i = 0; i < num2; i++)
+Vintagestory.GameContent/BlockCrystal.cs-64-			{
+Vintagestory.GameContent/BlockCrystal.cs-65-				ItemStack itemStack3 = itemStack2.Clone();
+Vintagestory.GameContent/BlockCrystal.cs-66-				itemStack3.StackSize = 1;
+Vintagestory.GameContent/BlockCrystal.cs-67-				world.SpawnItemEntity(itemStack3, pos);
+Vintagestory.GameContent/BlockCrystal.cs-68-			}
+Vintagestory.GameContent/BlockCrystal.cs-69-		}
+Vintagestory.GameContent/BlockCrystal.cs-70-		world.BulkBlockAccessor.SetBlock(0, pos);
+Vintagestory.GameContent/BlockCrystal.cs-71-	}
+Vintagestory.GameContent/BlockCrystal.cs-72-
+Vintagestory.GameContent/BlockCrystal.cs-73-	public override double GetBlastResistance(IWorldAccessor world, BlockPos pos, Vec3f blastDirectionVector, EnumBlastType blastType)
+Vintagestory.GameContent/BlockCrystal.cs-74-	{
+Vintagestory.GameContent/BlockCrystal.cs-75-		return 0.5;
+--
+Vintagestory.GameContent/AiTaskComeToOwner.cs-8-	private long lastExecutedMs;
+Vintagestory.GameContent/AiTaskComeToOwner.cs-9-
+Vintagestory.GameContent/AiTaskComeToOwner.cs-10-	public AiTaskComeToOwner(EntityAgent entity, JsonObject taskConfig, JsonObject aiConfig)
+Vintagestory.GameContent/AiTaskComeToOwner.cs-11-		: base(entity, taskConfig, aiConfig)
+Vintagestory.GameContent/AiTaskComeToOwner.cs-12-	{
+Vintagestory.GameContent/AiTaskComeToOwner.cs-13-		minSeekSeconds = 10f;
+Vintagestory.GameContent/AiTaskComeToOwner.cs-14-	}
+Vintagestory.GameContent/AiTaskComeToOwner.cs-15-
+Vintagestory.GameContent/AiTaskComeToOwner.cs-16-	public override bool ShouldExecute()
+Vintagestory.GameContent/AiTaskComeToOwner.cs-17-	{
+Vintagestory.GameContent/AiTaskComeToOwner.cs-18-		if (entity.WatchedAttributes.GetTreeAttribute("ownedby") == null)
+Vintagestory.GameContent/AiTaskComeToOwner.cs-19-		{
+Vintagestory.GameContent/AiTaskComeToOwner.cs:20:			lastExecutedMs = -99999L;
+Vintagestory.GameContent/AiTaskComeToOwner.cs-21-			return false;
+Vintagestory.GameContent/AiTaskComeToOwner.cs-22-		}
+Vintagestory.GameContent/AiTaskComeToOwner.cs-23-		if ((float)(entity.World.ElapsedMilliseconds - lastExecutedMs) / 1000f < 20f)
+Vintagestory.GameContent/AiTaskComeToOwner.cs-24-		{
+Vintagestory.GameContent/AiTaskComeToOwner.cs-25-			return base.ShouldExecute();
+Vintagestory.GameContent/AiTaskComeToOwner.cs-26-		}
+Vintagestory.GameContent/AiTaskComeToOwner.cs-27-		return false;
+Vintagestory.GameContent/AiTaskComeToOwner.cs-28-	}
+Vintagestory.GameContent/AiTaskComeToOwner.cs-29-
+Vintagestory.GameContent/AiTaskComeToOwner.cs-30-	public override void StartExecute()
+Vintagestory.GameContent/AiTaskComeToOwner.cs-31-	{
+Vintagestory.GameContent/AiTaskComeToOwner.cs-32-		lastExecutedMs = entity.World.ElapsedMilliseconds;
+Vintagestory.GameContent/AiTaskComeToOwner.cs-33-		ITreeAttribute treeAttribute = entity.WatchedAttributes.GetTreeAttribute("ownedby");
+Vintagestory.GameContent/AiTaskComeToOwner.cs-34-		if (treeAttribute != null)
+Vintagestory.GameContent/AiTaskComeToOwner.cs-35-		{
+Vintagestory.GameContent/AiTaskComeToOwner.cs-36-			string playerUid = treeAttribute.GetString("uid");
+Vintagestory.GameContent/AiTaskComeToOwner.cs-37-			targetEntity = entity.World.PlayerByUid(playerUid)?.Entity;
+Vintagestory.GameContent/AiTaskComeToOwner.cs-38-			if (targetEntity != null)
+Vintagestory.GameContent/AiTaskComeToOwner.cs-39-			{
+Vintagestory.GameContent/AiTaskComeToOwner.cs-40-				float xSize = targetEntity.SelectionBox.XSize;
+Vintagestory.GameContent/AiTaskComeToOwner.cs-41-				pathTraverser.NavigateTo_Async(targetEntity.Pos.XYZ, moveSpeed, xSize + 0.2f, OnGoalReached, OnStuck, null, 1000, 1);
+Vintagestory.GameContent/AiTaskComeToOwner.cs-42-				targetOffset.Set(entity.World.Rand.NextDouble() * 2.0 - 1.0, 0.0, entity.World.Rand.NextDouble() * 2.0 - 1.0);
+Vintagestory.GameContent/AiTaskComeToOwner.cs-43-				stuck = false;
+Vintagestory.GameContent/AiTaskComeToOwner.cs-44-			}
+Vintagestory.GameContent/AiTaskComeToOwner.cs-45-			base.StartExecute();
+--
+Vintagestory.GameContent/BlockEntitySpawner.cs-156-					while (!flag && num5 < 6)
+Vintagestory.GameContent/BlockEntitySpawner.cs-157-					{
+Vintagestory.GameContent/BlockEntitySpawner.cs-158-						BlockFacing blockFacing = BlockFacing.ALLFACES[num5];
+Vintagestory.GameContent/BlockEntitySpawner.cs-159-						blockPos.Set(vec3d).Add(blockFacing.Normali);
+Vintagestory.GameContent/BlockEntitySpawner.cs-160-						flag = Api.World.BlockAccessor.IsSideSolid(blockPos.X, blockPos.Y, blockPos.Z, blockFacing.Opposite);
+Vintagestory.GameContent/BlockEntitySpawner.cs-161-						if (flag)
+Vintagestory.GameContent/BlockEntitySpawner.cs-162-						{
+Vintagestory.GameContent/BlockEntitySpawner.cs-163-							Cuboidd cuboidd = cuboidf.ToDouble().Translate(vec3d);
+Vintagestory.GameContent/BlockEntitySpawner.cs-164-							Cuboidd cuboidd2 = Cuboidf.Default().ToDouble().Translate(blockPos);
+Vintagestory.GameContent/BlockEntitySpawner.cs-165-							switch (blockFacing.Index)
+Vintagestory.GameContent/BlockEntitySpawner.cs-166-							{
+Vintagestory.GameContent/BlockEntitySpawner.cs-167-							case 0:
+Vintagestory.GameContent/BlockEntitySpawner.cs:168:								vec3d.Z -= cuboidd2.Z2 - cuboidd.Z1 + 0.009999999776482582;
+Vintagestory.GameContent/BlockEntitySpawner.cs-169-								break;
+Vintagestory.GameContent/BlockEntitySpawner.cs-170-							case 1:
+Vintagestory.GameContent/BlockEntitySpawner.cs:171:								vec3d.X += cuboidd2.X1 - cuboidd.X2 - 0.009999999776482582;
+Vintagestory.GameContent/BlockEntitySpawner.cs-172-								break;
+Vintagestory.GameContent/BlockEntitySpawner.cs-173-							case 2:
+Vintagestory.GameContent/BlockEntitySpawner.cs:174:								vec3d.Z += cuboidd2.Z1 - cuboidd.Z2 - 0.009999999776482582;
+Vintagestory.GameContent/BlockEntitySpawner.cs-175-								break;
+Vintagestory.GameContent/BlockEntitySpawner.cs-176-							case 3:
+Vintagestory.GameContent/BlockEntitySpawner.cs:177:								vec3d.X -= cuboidd2.X2 - cuboidd.X1 + 0.009999999776482582;
+Vintagestory.GameContent/BlockEntitySpawner.cs-178-								break;
+Vintagestory.GameContent/BlockEntitySpawner.cs-179-							case 4:
+Vintagestory.GameContent/BlockEntitySpawner.cs:180:								vec3d.Y += cuboidd2.Y1 - cuboidd.Y2 - 0.009999999776482582;
+Vintagestory.GameContent/BlockEntitySpawner.cs-181-								break;
+Vintagestory.GameContent/BlockEntitySpawner.cs-182-							case 5:
+Vintagestory.GameContent/BlockEntitySpawner.cs:183:								vec3d.Y -= cuboidd2.Y2 - cuboidd.Y1 + 0.009999999776482582;
+Vintagestory.GameContent/BlockEntitySpawner.cs-184-								break;
+Vintagestory.GameContent/BlockEntitySpawner.cs-185-							}
+Vintagestory.GameContent/BlockEntitySpawner.cs-186-						}
+Vintagestory.GameContent/BlockEntitySpawner.cs-187-						num5++;
+Vintagestory.GameContent/BlockEntitySpawner.cs-188-					}
+Vintagestory.GameContent/BlockEntitySpawner.cs-189-					if (!flag)
+Vintagestory.GameContent/BlockEntitySpawner.cs-190-					{
+Vintagestory.GameContent/BlockEntitySpawner.cs-191-						continue;
+Vintagestory.GameContent/BlockEntitySpawner.cs-192-					}
+Vintagestory.GameContent/BlockEntitySpawner.cs-193-				}
+Vintagestory.GameContent/BlockEntitySpawner.cs-194-				if (num4 == 0L)
+Vintagestory.GameContent/BlockEntitySpawner.cs-195-				{
+Vintagestory.GameContent/BlockEntitySpawner.cs-196-					num4 = GetNextHerdId();
+Vintagestory.GameContent/BlockEntitySpawner.cs-197-				}
+Vintagestory.GameContent/BlockEntitySpawner.cs-198-				DoSpawn(entityType, vec3d, num4);
+Vintagestory.GameContent/BlockEntitySpawner.cs-199-				Data.LastSpawnTotalHours = Api.World.Calendar.TotalHours;
+Vintagestory.GameContent/BlockEntitySpawner.cs-200-				if (Data.InitialQuantitySpawned > 0)
+Vintagestory.GameContent/BlockEntitySpawner.cs-201-				{
+Vintagestory.GameContent/BlockEntitySpawner.cs-202-					Data.InitialQuantitySpawned--;
+Vintagestory.GameContent/BlockEntitySpawner.cs-203-				}
+Vintagestory.GameContent/BlockEntitySpawner.cs-204-				decrementSpawnCount();
+Vintagestory.GameContent/BlockEntitySpawner.cs-205-				return;
+Vintagestory.GameContent/BlockEntitySpawner.cs-206-			}
+Vintagestory.GameContent/BlockEntitySpawner.cs-207-		}
+Vintagestory.GameContent/BlockEntitySpawner.cs-208-		void decrementSpawnCount()
+--
+Vintagestory.GameContent/EntityErel.cs-43-	public override bool CanAttackInside => true;
+Vintagestory.GameContent/EntityErel.cs-44-
+Vintagestory.GameContent/EntityErel.cs-45-	public override bool AllowOutsideLoadedRange => true;
+Vintagestory.GameContent/EntityErel.cs-46-
+Vintagestory.GameContent/EntityErel.cs-47-	public override bool AlwaysActive => true;
+Vintagestory.GameContent/EntityErel.cs-48-
+Vintagestory.GameContent/EntityErel.cs-49-	public long LastAttackTime { get; set; }
+Vintagestory.GameContent/EntityErel.cs-50-
+Vintagestory.GameContent/EntityErel.cs-51-	public double LastAnnoyedTotalDays
+Vintagestory.GameContent/EntityErel.cs-52-	{
+Vintagestory.GameContent/EntityErel.cs-53-		get
+Vintagestory.GameContent/EntityErel.cs-54-		{
+Vintagestory.GameContent/EntityErel.cs:55:			return WatchedAttributes.GetDouble("lastannoyedtotaldays", -9999999.0);
+Vintagestory.GameContent/EntityErel.cs-56-		}
+Vintagestory.GameContent/EntityErel.cs-57-		set
+Vintagestory.GameContent/EntityErel.cs-58-		{
+Vintagestory.GameContent/EntityErel.cs-59-			WatchedAttributes.SetDouble("lastannoyedtotaldays", value);
+Vintagestory.GameContent/EntityErel.cs-60-		}
+Vintagestory.GameContent/EntityErel.cs-61-	}
+Vintagestory.GameContent/EntityErel.cs-62-
+Vintagestory.GameContent/EntityErel.cs-63-	public bool Annoyed
+Vintagestory.GameContent/EntityErel.cs-64-	{
+Vintagestory.GameContent/EntityErel.cs-65-		get
+Vintagestory.GameContent/EntityErel.cs-66-		{
+Vintagestory.GameContent/EntityErel.cs-67-			return WatchedAttributes.GetBool("annoyed");
+Vintagestory.GameContent/EntityErel.cs-68-		}
+Vintagestory.GameContent/EntityErel.cs-69-		set
+Vintagestory.GameContent/EntityErel.cs-70-		{
+Vintagestory.GameContent/EntityErel.cs-71-			WatchedAttributes.SetBool("annoyed", value);
+Vintagestory.GameContent/EntityErel.cs-72-		}
+Vintagestory.GameContent/EntityErel.cs-73-	}
+Vintagestory.GameContent/EntityErel.cs-74-
+Vintagestory.GameContent/EntityErel.cs-75-	public bool StandingOnGround
+Vintagestory.GameContent/EntityErel.cs-76-	{
+Vintagestory.GameContent/EntityErel.cs-77-		get
+Vintagestory.GameContent/EntityErel.cs-78-		{
+Vintagestory.GameContent/EntityErel.cs-79-			return WatchedAttributes.GetBool("standingOnGround");
+Vintagestory.GameContent/EntityErel.cs-80-		}
+--
+Vintagestory.GameContent/EntityBehaviorWritingSurface.cs-121-	{
+Vintagestory.GameContent/EntityBehaviorWritingSurface.cs-122-		capi = entity.World.Api as ICoreClientAPI;
+Vintagestory.GameContent/EntityBehaviorWritingSurface.cs-123-		if (capi != null)
+Vintagestory.GameContent/EntityBehaviorWritingSurface.cs-124-		{
+Vintagestory.GameContent/EntityBehaviorWritingSurface.cs-125-			capi.Event.ReloadTextures += Event_ReloadTextures;
+Vintagestory.GameContent/EntityBehaviorWritingSurface.cs-126-			entity.WatchedAttributes.RegisterModifiedListener(SurfaceName + "_writingSurfaceText", entity.MarkShapeModified);
+Vintagestory.GameContent/EntityBehaviorWritingSurface.cs-127-			signTextConfig = attributes["fontConfig"].AsObject<TextAreaConfig>();
+Vintagestory.GameContent/EntityBehaviorWritingSurface.cs-128-			font = new CairoFont(signTextConfig.FontSize, signTextConfig.FontName, new double[4] { 0.0, 0.0, 0.0, 0.8 });
+Vintagestory.GameContent/EntityBehaviorWritingSurface.cs-129-			if (signTextConfig.BoldFont)
+Vintagestory.GameContent/EntityBehaviorWritingSurface.cs-130-			{
+Vintagestory.GameContent/EntityBehaviorWritingSurface.cs-131-				font.WithWeight(FontWeight.Bold);
+Vintagestory.GameContent/EntityBehaviorWritingSurface.cs-132-			}
+Vintagestory.GameContent/EntityBehaviorWritingSurface.cs:133:			font.LineHeightMultiplier = 0.8999999761581421;
+Vintagestory.GameContent/EntityBehaviorWritingSurface.cs-134-			verticalAlign = signTextConfig.VerticalAlign;
+Vintagestory.GameContent/EntityBehaviorWritingSurface.cs-135-			TextWidth = signTextConfig.MaxWidth;
+Vintagestory.GameContent/EntityBehaviorWritingSurface.cs-136-			TextHeight = signTextConfig.MaxHeight;
+Vintagestory.GameContent/EntityBehaviorWritingSurface.cs-137-			DefaultFontSize = signTextConfig.FontSize;
+Vintagestory.GameContent/EntityBehaviorWritingSurface.cs-138-		}
+Vintagestory.GameContent/EntityBehaviorWritingSurface.cs-139-		writingSurfaces = attributes["writingSurfaces"].AsObject<string[]>();
+Vintagestory.GameContent/EntityBehaviorWritingSurface.cs-140-	}
+Vintagestory.GameContent/EntityBehaviorWritingSurface.cs-141-
+Vintagestory.GameContent/EntityBehaviorWritingSurface.cs-142-	private void Event_ReloadTextures()
+Vintagestory.GameContent/EntityBehaviorWritingSurface.cs-143-	{
+Vintagestory.GameContent/EntityBehaviorWritingSurface.cs-144-		texPos = null;
+Vintagestory.GameContent/EntityBehaviorWritingSurface.cs-145-		previousText = null;
+Vintagestory.GameContent/EntityBehaviorWritingSurface.cs-146-	}
+Vintagestory.GameContent/EntityBehaviorWritingSurface.cs-147-
+Vintagestory.GameContent/EntityBehaviorWritingSurface.cs-148-	public override void OnInteract(EntityAgent byEntity, ItemSlot itemslot, Vec3d hitPosition, EnumInteractMode mode, ref EnumHandling handled)
+Vintagestory.GameContent/EntityBehaviorWritingSurface.cs-149-	{
+Vintagestory.GameContent/EntityBehaviorWritingSurface.cs-150-		if (entity.World.Side == EnumAppSide.Server || writingSurfaces == null)
+Vintagestory.GameContent/EntityBehaviorWritingSurface.cs-151-		{
+Vintagestory.GameContent/EntityBehaviorWritingSurface.cs-152-			return;
+Vintagestory.GameContent/EntityBehaviorWritingSurface.cs-153-		}
+Vintagestory.GameContent/EntityBehaviorWritingSurface.cs-154-		EntityBehaviorSelectionBoxes selBoxes = entity.GetBehavior<EntityBehaviorSelectionBoxes>();
+Vintagestory.GameContent/EntityBehaviorWritingSurface.cs-155-		if (selBoxes == null || !writingSurfaces.Any((string apCode) => selBoxes.IsAPCode((byEntity as EntityPlayer).EntitySelection, apCode)) || (editDialog != null && editDialog.IsOpened()))
+Vintagestory.GameContent/EntityBehaviorWritingSurface.cs-156-		{
+Vintagestory.GameContent/EntityBehaviorWritingSurface.cs-157-			return;
+Vintagestory.GameContent/EntityBehaviorWritingSurface.cs-158-		}
+--
+Vintagestory.GameContent/BlockEntityFruitPress.cs-217-			Vec3d vec3d = blockFacing.Plane.Startd.Add(-0.5, 0.0, -0.5);
+Vintagestory.GameContent/BlockEntityFruitPress.cs-218-			Vec3d vec3d2 = blockFacing.Plane.Endd.Add(-0.5, 0.0, -0.5);
+Vintagestory.GameContent/BlockEntityFruitPress.cs-219-			vec3d.Mul(0.5);
+Vintagestory.GameContent/BlockEntityFruitPress.cs-220-			vec3d2.Mul(0.5);
+Vintagestory.GameContent/BlockEntityFruitPress.cs-221-			vec3d2.Y = 0.3125 - (1.0 - num + (double)Math.Max(0f, 0.9f - num2)) * 0.5;
+Vintagestory.GameContent/BlockEntityFruitPress.cs-222-			vec3d.Add(blockFacing.Normalf.X * 1.2f / 16f, 0.0, blockFacing.Normalf.Z * 1.2f / 16f);
+Vintagestory.GameContent/BlockEntityFruitPress.cs-223-			vec3d2.Add(blockFacing.Normalf.X * 1.2f / 16f, 0.0, blockFacing.Normalf.Z * 1.2f / 16f);
+Vintagestory.GameContent/BlockEntityFruitPress.cs-224-			liquidParticles.MinPos = vec3d;
+Vintagestory.GameContent/BlockEntityFruitPress.cs-225-			liquidParticles.AddPos = vec3d2.Sub(vec3d);
+Vintagestory.GameContent/BlockEntityFruitPress.cs-226-			liquidParticles.MinPos.Add(Pos).Add(0.5, 1.0, 0.5);
+Vintagestory.GameContent/BlockEntityFruitPress.cs-227-			Api.World.SpawnParticles(liquidParticles);
+Vintagestory.GameContent/BlockEntityFruitPress.cs-228-		}
+Vintagestory.GameContent/BlockEntityFruitPress.cs:229:		if (num < 0.8999999761581421)
+Vintagestory.GameContent/BlockEntityFruitPress.cs-230-		{
+Vintagestory.GameContent/BlockEntityFruitPress.cs:231:			liquidParticles.MinPos = Pos.ToVec3d().Add(0.375, 0.699999988079071, 0.375);
+Vintagestory.GameContent/BlockEntityFruitPress.cs-232-			liquidParticles.AddPos.Set(0.25, 0.0, 0.25);
+Vintagestory.GameContent/BlockEntityFruitPress.cs-233-			for (int j = 0; j < 3; j++)
+Vintagestory.GameContent/BlockEntityFruitPress.cs-234-			{
+Vintagestory.GameContent/BlockEntityFruitPress.cs-235-				liquidParticles.Color = capi.BlockTextureAtlas.GetRandomColor(renderer.juiceTexPos, rand.Next(30));
+Vintagestory.GameContent/BlockEntityFruitPress.cs-236-				Api.World.SpawnParticles(liquidParticles);
+Vintagestory.GameContent/BlockEntityFruitPress.cs-237-			}
+Vintagestory.GameContent/BlockEntityFruitPress.cs-238-		}
+Vintagestory.GameContent/BlockEntityFruitPress.cs-239-	}
+Vintagestory.GameContent/BlockEntityFruitPress.cs-240-
+Vintagestory.GameContent/BlockEntityFruitPress.cs-241-	private void onTick100msServer(float dt)
+Vintagestory.GameContent/BlockEntityFruitPress.cs-242-	{
+Vintagestory.GameContent/BlockEntityFruitPress.cs-243-		RunningAnimation animationState = animUtil.animator.GetAnimationState("compress");
+Vintagestory.GameContent/BlockEntityFruitPress.cs-244-		if (serverListenerActive)
+Vintagestory.GameContent/BlockEntityFruitPress.cs-245-		{
+Vintagestory.GameContent/BlockEntityFruitPress.cs-246-			animationState.CurrentFrame = loadedFrame.GetValueOrDefault();
+Vintagestory.GameContent/BlockEntityFruitPress.cs-247-			updateSqueezeRel(animUtil.animator.GetAnimationState("compress"));
+Vintagestory.GameContent/BlockEntityFruitPress.cs-248-			serverListenerActive = false;
+Vintagestory.GameContent/BlockEntityFruitPress.cs-249-			loadedFrame = null;
+Vintagestory.GameContent/BlockEntityFruitPress.cs-250-			return;
+Vintagestory.GameContent/BlockEntityFruitPress.cs-251-		}
+Vintagestory.GameContent/BlockEntityFruitPress.cs-252-		if (CompressAnimActive)
+Vintagestory.GameContent/BlockEntityFruitPress.cs-253-		{
+Vintagestory.GameContent/BlockEntityFruitPress.cs-254-			(Api as ICoreServerAPI)?.Network.BroadcastBlockEntityPacket(Pos, 1001, new FruitPressAnimPacket
+Vintagestory.GameContent/BlockEntityFruitPress.cs-255-			{
+Vintagestory.GameContent/BlockEntityFruitPress.cs-256-				AnimationState = EnumFruitPressAnimState.ScrewContinue,
+--
+Vintagestory.GameContent/BlockEntityFruitPress.cs-271-			squeezedLitresLeft = Math.Max(Math.Max(0.0, squeezedLitresLeft), juiceableLitresLeft - (juiceableLitresLeft + juiceableLitresTransfered) * screwPercent);
+Vintagestory.GameContent/BlockEntityFruitPress.cs-272-			num2 = Math.Min(squeezedLitresLeft, Math.Round((totalHours - lastLiquidTransferTotalHours) * (CompressAnimActive ? GameMath.Clamp(squeezedLitresLeft * (1.0 - num) * 500.0, 25.0, 100.0) : 5.0), 2));
+Vintagestory.GameContent/BlockEntityFruitPress.cs-273-			if (!squeezeSoundPlayed)
+Vintagestory.GameContent/BlockEntityFruitPress.cs-274-			{
+Vintagestory.GameContent/BlockEntityFruitPress.cs-275-				Api.World.PlaySoundAt(new AssetLocation("sounds/player/wetclothsqueeze.ogg"), Pos, 0.0, null, randomizePitch: false);
+Vintagestory.GameContent/BlockEntityFruitPress.cs-276-				squeezeSoundPlayed = true;
+Vintagestory.GameContent/BlockEntityFruitPress.cs-277-			}
+Vintagestory.GameContent/BlockEntityFruitPress.cs-278-		}
+Vintagestory.GameContent/BlockEntityFruitPress.cs-279-		BlockLiquidContainerBase blockLiquidContainerBase = BucketSlot?.Itemstack?.Collectible as BlockLiquidContainerBase;
+Vintagestory.GameContent/BlockEntityFruitPress.cs-280-		if (Api.Side == EnumAppSide.Server && juiceableProps != null && squeezedLitresLeft > 0.0)
+Vintagestory.GameContent/BlockEntityFruitPress.cs-281-		{
+Vintagestory.GameContent/BlockEntityFruitPress.cs-282-			ItemStack resolvedItemstack = juiceableProps.LiquidStack.ResolvedItemstack;
+Vintagestory.GameContent/BlockEntityFruitPress.cs:283:			resolvedItemstack.StackSize = 999999;
+Vintagestory.GameContent/BlockEntityFruitPress.cs-284-			float num3;
+Vintagestory.GameContent/BlockEntityFruitPress.cs-285-			if (blockLiquidContainerBase != null && !blockLiquidContainerBase.IsFull(BucketSlot.Itemstack))
+Vintagestory.GameContent/BlockEntityFruitPress.cs-286-			{
+Vintagestory.GameContent/BlockEntityFruitPress.cs-287-				float currentLitres = blockLiquidContainerBase.GetCurrentLitres(BucketSlot.Itemstack);
+Vintagestory.GameContent/BlockEntityFruitPress.cs-288-				if (num2 > 0.0)
+Vintagestory.GameContent/BlockEntityFruitPress.cs-289-				{
+Vintagestory.GameContent/BlockEntityFruitPress.cs-290-					blockLiquidContainerBase.TryPutLiquid(BucketSlot.Itemstack, resolvedItemstack, (float)num2);
+Vintagestory.GameContent/BlockEntityFruitPress.cs-291-				}
+Vintagestory.GameContent/BlockEntityFruitPress.cs-292-				num3 = blockLiquidContainerBase.GetCurrentLitres(BucketSlot.Itemstack) - currentLitres;
+Vintagestory.GameContent/BlockEntityFruitPress.cs-293-			}
+Vintagestory.GameContent/BlockEntityFruitPress.cs-294-			else
+Vintagestory.GameContent/BlockEntityFruitPress.cs-295-			{
+Vintagestory.GameContent/BlockEntityFruitPress.cs-296-				num3 = (float)num2;
+Vintagestory.GameContent/BlockEntityFruitPress.cs-297-			}
+Vintagestory.GameContent/BlockEntityFruitPress.cs-298-			juiceableLitresLeft -= num3;
+Vintagestory.GameContent/BlockEntityFruitPress.cs-299-			squeezedLitresLeft -= ((pressSqueezeRel <= num) ? num3 : (num3 * 100f));
+Vintagestory.GameContent/BlockEntityFruitPress.cs-300-			juiceableLitresTransfered += num3;
+Vintagestory.GameContent/BlockEntityFruitPress.cs-301-			lastLiquidTransferTotalHours = totalHours;
+Vintagestory.GameContent/BlockEntityFruitPress.cs-302-			MarkDirty(redrawOnClient: true);
+Vintagestory.GameContent/BlockEntityFruitPress.cs-303-		}
+Vintagestory.GameContent/BlockEntityFruitPress.cs-304-		else if (Api.Side == EnumAppSide.Server && (!CompressAnimActive || juiceableLitresLeft <= 0.0))
+Vintagestory.GameContent/BlockEntityFruitPress.cs-305-		{
+Vintagestory.GameContent/BlockEntityFruitPress.cs-306-			UnregisterGameTickListener(listenerId);
+Vintagestory.GameContent/BlockEntityFruitPress.cs-307-			listenerId = 0L;
+Vintagestory.GameContent/BlockEntityFruitPress.cs-308-			MarkDirty(redrawOnClient: true);
+--
+Vintagestory.GameContent/ItemFlute.cs-2-using Vintagestory.API.Common;
+Vintagestory.GameContent/ItemFlute.cs-3-using Vintagestory.API.Common.Entities;
+Vintagestory.GameContent/ItemFlute.cs-4-
+Vintagestory.GameContent/ItemFlute.cs-5-namespace Vintagestory.GameContent;
+Vintagestory.GameContent/ItemFlute.cs-6-
+Vintagestory.GameContent/ItemFlute.cs-7-public class ItemFlute : Item
+Vintagestory.GameContent/ItemFlute.cs-8-{
+Vintagestory.GameContent/ItemFlute.cs-9-	protected string GroupCode = "mountableanimal";
+Vintagestory.GameContent/ItemFlute.cs-10-
+Vintagestory.GameContent/ItemFlute.cs-11-	public override void OnHeldInteractStart(ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handling)
+Vintagestory.GameContent/ItemFlute.cs-12-	{
+Vintagestory.GameContent/ItemFlute.cs-13-		long elapsedMilliseconds = api.World.ElapsedMilliseconds;
+Vintagestory.GameContent/ItemFlute.cs:14:		long num = slot.Itemstack.Attributes.GetLong("lastPlayerMs", -99999L);
+Vintagestory.GameContent/ItemFlute.cs-15-		if (num > elapsedMilliseconds)
+Vintagestory.GameContent/ItemFlute.cs-16-		{
+Vintagestory.GameContent/ItemFlute.cs-17-			num = elapsedMilliseconds - 4001;
+Vintagestory.GameContent/ItemFlute.cs-18-		}
+Vintagestory.GameContent/ItemFlute.cs-19-		if (elapsedMilliseconds - num > 4000)
+Vintagestory.GameContent/ItemFlute.cs-20-		{
+Vintagestory.GameContent/ItemFlute.cs-21-			slot.Itemstack.Attributes.SetLong("lastPlayerMs", elapsedMilliseconds);
+Vintagestory.GameContent/ItemFlute.cs-22-			api.World.PlaySoundAt(new AssetLocation("sounds/instrument/elkcall"), byEntity, (byEntity as EntityPlayer)?.Player, 0.75f, 32f, 0.5f);
+Vintagestory.GameContent/ItemFlute.cs-23-			if (api.Side == EnumAppSide.Server)
+Vintagestory.GameContent/ItemFlute.cs-24-			{
+Vintagestory.GameContent/ItemFlute.cs-25-				callElk(byEntity);
+Vintagestory.GameContent/ItemFlute.cs-26-			}
+Vintagestory.GameContent/ItemFlute.cs-27-			handling = EnumHandHandling.PreventDefault;
+Vintagestory.GameContent/ItemFlute.cs-28-		}
+Vintagestory.GameContent/ItemFlute.cs-29-	}
+Vintagestory.GameContent/ItemFlute.cs-30-
+Vintagestory.GameContent/ItemFlute.cs-31-	private void callElk(EntityAgent byEntity)
+Vintagestory.GameContent/ItemFlute.cs-32-	{
+Vintagestory.GameContent/ItemFlute.cs-33-		IPlayer player = (byEntity as EntityPlayer).Player;
+Vintagestory.GameContent/ItemFlute.cs-34-		if (!api.ModLoader.GetModSystem<ModSystemEntityOwnership>().OwnerShipsByPlayerUid.TryGetValue(player.PlayerUID, out var value) || value == null || !value.TryGetValue(GroupCode, out var value2))
+Vintagestory.GameContent/ItemFlute.cs-35-		{
+Vintagestory.GameContent/ItemFlute.cs-36-			return;
+Vintagestory.GameContent/ItemFlute.cs-37-		}
+Vintagestory.GameContent/ItemFlute.cs-38-		Entity entityById = api.World.GetEntityById(value2.EntityId);
+Vintagestory.GameContent/ItemFlute.cs-39-		if (entityById == null)
+--
+Vintagestory.GameContent/CollectibleBehaviorSqueezable.cs-181-			if (CanSqueezeInto(byEntity.World, block, blockSel))
+Vintagestory.GameContent/CollectibleBehaviorSqueezable.cs-182-			{
+Vintagestory.GameContent/CollectibleBehaviorSqueezable.cs-183-				handling = EnumHandling.PreventDefault;
+Vintagestory.GameContent/CollectibleBehaviorSqueezable.cs-184-				if (secondsUsed < SqueezeTime - 0.05f || SqueezedLiquid == null || byEntity.World.Side == EnumAppSide.Client)
+Vintagestory.GameContent/CollectibleBehaviorSqueezable.cs-185-				{
+Vintagestory.GameContent/CollectibleBehaviorSqueezable.cs-186-					return;
+Vintagestory.GameContent/CollectibleBehaviorSqueezable.cs-187-				}
+Vintagestory.GameContent/CollectibleBehaviorSqueezable.cs-188-				IWorldAccessor world = byEntity.World;
+Vintagestory.GameContent/CollectibleBehaviorSqueezable.cs-189-				if (!CanSqueezeInto(world, block, blockSel))
+Vintagestory.GameContent/CollectibleBehaviorSqueezable.cs-190-				{
+Vintagestory.GameContent/CollectibleBehaviorSqueezable.cs-191-					return;
+Vintagestory.GameContent/CollectibleBehaviorSqueezable.cs-192-				}
+Vintagestory.GameContent/CollectibleBehaviorSqueezable.cs:193:				ItemStack liquidStack = new ItemStack(SqueezedLiquid, 99999);
+Vintagestory.GameContent/CollectibleBehaviorSqueezable.cs-194-				if (block is BlockLiquidContainerTopOpened blockLiquidContainerTopOpened)
+Vintagestory.GameContent/CollectibleBehaviorSqueezable.cs-195-				{
+Vintagestory.GameContent/CollectibleBehaviorSqueezable.cs-196-					if (blockLiquidContainerTopOpened.TryPutLiquid(blockSel.Position, liquidStack, SqueezedLitres) == 0)
+Vintagestory.GameContent/CollectibleBehaviorSqueezable.cs-197-					{
+Vintagestory.GameContent/CollectibleBehaviorSqueezable.cs-198-						return;
+Vintagestory.GameContent/CollectibleBehaviorSqueezable.cs-199-					}
+Vintagestory.GameContent/CollectibleBehaviorSqueezable.cs-200-				}
+Vintagestory.GameContent/CollectibleBehaviorSqueezable.cs-201-				else if (block is BlockBarrel blockBarrel && world.BlockAccessor.GetBlockEntity(blockSel.Position) is BlockEntityBarrel blockEntityBarrel)
+Vintagestory.GameContent/CollectibleBehaviorSqueezable.cs-202-				{
+Vintagestory.GameContent/CollectibleBehaviorSqueezable.cs-203-					if (blockEntityBarrel.Sealed || blockBarrel.TryPutLiquid(blockSel.Position, liquidStack, SqueezedLitres) == 0)
+Vintagestory.GameContent/CollectibleBehaviorSqueezable.cs-204-					{
+Vintagestory.GameContent/CollectibleBehaviorSqueezable.cs-205-						return;
+Vintagestory.GameContent/CollectibleBehaviorSqueezable.cs-206-					}
+Vintagestory.GameContent/CollectibleBehaviorSqueezable.cs-207-				}
+Vintagestory.GameContent/CollectibleBehaviorSqueezable.cs-208-				else if (world.BlockAccessor.GetBlockEntity(blockSel.Position) is BlockEntityGroundStorage blockEntityGroundStorage)
+Vintagestory.GameContent/CollectibleBehaviorSqueezable.cs-209-				{
+Vintagestory.GameContent/CollectibleBehaviorSqueezable.cs-210-					ItemSlot slotAt = blockEntityGroundStorage.GetSlotAt(blockSel);
+Vintagestory.GameContent/CollectibleBehaviorSqueezable.cs-211-					if (slotAt != null && slotAt.Itemstack?.Block is BlockLiquidContainerTopOpened blockLiquidContainerTopOpened2 && CanSqueezeInto(world, blockLiquidContainerTopOpened2, null))
+Vintagestory.GameContent/CollectibleBehaviorSqueezable.cs-212-					{
+Vintagestory.GameContent/CollectibleBehaviorSqueezable.cs-213-						if (blockLiquidContainerTopOpened2.TryPutLiquid(slotAt.Itemstack, liquidStack, SqueezedLitres) == 0)
+Vintagestory.GameContent/CollectibleBehaviorSqueezable.cs-214-						{
+Vintagestory.GameContent/CollectibleBehaviorSqueezable.cs-215-							return;
+Vintagestory.GameContent/CollectibleBehaviorSqueezable.cs-216-						}
+Vintagestory.GameContent/CollectibleBehaviorSqueezable.cs-217-						blockEntityGroundStorage.MarkDirty(redrawOnClient: true);
+Vintagestory.GameContent/CollectibleBehaviorSqueezable.cs-218-					}
+--
+Vintagestory.GameContent/EntityLocust.cs-42-		}
+Vintagestory.GameContent/EntityLocust.cs-43-		num *= mul1 * mul2;
+Vintagestory.GameContent/EntityLocust.cs-44-		return num * (double)GameMath.Clamp(Stats.GetBlended("walkspeed"), 0f, 999f);
+Vintagestory.GameContent/EntityLocust.cs-45-	}
+Vintagestory.GameContent/EntityLocust.cs-46-
+Vintagestory.GameContent/EntityLocust.cs-47-	public override void OnGameTick(float dt)
+Vintagestory.GameContent/EntityLocust.cs-48-	{
+Vintagestory.GameContent/EntityLocust.cs-49-		base.OnGameTick(dt);
+Vintagestory.GameContent/EntityLocust.cs-50-		if (cnt++ > 2)
+Vintagestory.GameContent/EntityLocust.cs-51-		{
+Vintagestory.GameContent/EntityLocust.cs-52-			cnt = 0;
+Vintagestory.GameContent/EntityLocust.cs-53-			EntityPos pos = Pos;
+Vintagestory.GameContent/EntityLocust.cs:54:			int num = (int)(pos.InternalY + 0.009999999776482582);
+Vintagestory.GameContent/EntityLocust.cs-55-			int num2 = (int)(pos.InternalY - 0.05000000074505806);
+Vintagestory.GameContent/EntityLocust.cs-56-			if (num != num2)
+Vintagestory.GameContent/EntityLocust.cs-57-			{
+Vintagestory.GameContent/EntityLocust.cs-58-				Block blockRaw = World.BlockAccessor.GetBlockRaw((int)pos.X, num, (int)pos.Z);
+Vintagestory.GameContent/EntityLocust.cs-59-				Block blockRaw2 = World.BlockAccessor.GetBlockRaw((int)pos.X, num2, (int)pos.Z);
+Vintagestory.GameContent/EntityLocust.cs-60-				mul1 = ((blockRaw.Code == null || blockRaw.Code.Path.Contains("metalspike")) ? 1f : blockRaw.WalkSpeedMultiplier);
+Vintagestory.GameContent/EntityLocust.cs-61-				mul2 = ((blockRaw2.Code == null || blockRaw2.Code.Path.Contains("metalspike")) ? 1f : blockRaw2.WalkSpeedMultiplier);
+Vintagestory.GameContent/EntityLocust.cs-62-			}
+Vintagestory.GameContent/EntityLocust.cs-63-			else
+Vintagestory.GameContent/EntityLocust.cs-64-			{
+Vintagestory.GameContent/EntityLocust.cs-65-				Block blockRaw3 = World.BlockAccessor.GetBlockRaw((int)pos.X, num, (int)pos.Z);
+Vintagestory.GameContent/EntityLocust.cs-66-				mul1 = 1.0;
+Vintagestory.GameContent/EntityLocust.cs-67-				mul2 = ((blockRaw3.Code == null || blockRaw3.Code.Path.Contains("metalspike")) ? 1f : blockRaw3.WalkSpeedMultiplier);
+Vintagestory.GameContent/EntityLocust.cs-68-			}
+Vintagestory.GameContent/EntityLocust.cs-69-		}
+Vintagestory.GameContent/EntityLocust.cs-70-	}
+Vintagestory.GameContent/EntityLocust.cs-71-
+Vintagestory.GameContent/EntityLocust.cs-72-	public override bool ReceiveDamage(DamageSource damageSource, float damage)
+Vintagestory.GameContent/EntityLocust.cs-73-	{
+Vintagestory.GameContent/EntityLocust.cs-74-		if (damageSource.GetCauseEntity() is EntityEidolon)
+Vintagestory.GameContent/EntityLocust.cs-75-		{
+Vintagestory.GameContent/EntityLocust.cs-76-			return false;
+Vintagestory.GameContent/EntityLocust.cs-77-		}
+Vintagestory.GameContent/EntityLocust.cs-78-		return base.ReceiveDamage(damageSource, damage);
+Vintagestory.GameContent/EntityLocust.cs-79-	}
+--
+Vintagestory.GameContent/AiTaskFlySwoopAttack.cs-255-		int num = (simplifiedOut ? (its / 3) : its);
+Vintagestory.GameContent/AiTaskFlySwoopAttack.cs-256-		Vec3d[] array = new Vec3d[its + num];
+Vintagestory.GameContent/AiTaskFlySwoopAttack.cs-257-		for (int i = 0; i < its; i++)
+Vintagestory.GameContent/AiTaskFlySwoopAttack.cs-258-		{
+Vintagestory.GameContent/AiTaskFlySwoopAttack.cs-259-			double num2 = (double)i / (double)its;
+Vintagestory.GameContent/AiTaskFlySwoopAttack.cs-260-			Vec3d vec3d7 = xYZ + num2 * vec3d5;
+Vintagestory.GameContent/AiTaskFlySwoopAttack.cs-261-			Vec3d vec3d8 = vec3d3 + num2 * vec3d6;
+Vintagestory.GameContent/AiTaskFlySwoopAttack.cs-262-			array[i] = (1.0 - num2) * vec3d7 + num2 * vec3d8;
+Vintagestory.GameContent/AiTaskFlySwoopAttack.cs-263-		}
+Vintagestory.GameContent/AiTaskFlySwoopAttack.cs-264-		xYZ = array[its - 1];
+Vintagestory.GameContent/AiTaskFlySwoopAttack.cs-265-		Vec3d vec3d9 = (entityPos.XYZ - pos.XYZ) * 1f;
+Vintagestory.GameContent/AiTaskFlySwoopAttack.cs-266-		Vec3d vec3d10 = (vec3d3 = new Vec3d(vec3d.X + vec3d9.X, vec3d.Y, vec3d.Z + vec3d9.Z));
+Vintagestory.GameContent/AiTaskFlySwoopAttack.cs:267:		vec3d4 = new Vec3d(vec3d.X + vec3d9.X * 1.2999999523162842, vec3d.Y + (beginAttackPos.Y - vec3d.Y) * 0.5, vec3d.Z + vec3d9.Z * 1.2999999523162842);
+Vintagestory.GameContent/AiTaskFlySwoopAttack.cs-268-		vec3d5 = vec3d10 - xYZ;
+Vintagestory.GameContent/AiTaskFlySwoopAttack.cs-269-		vec3d6 = vec3d4 - vec3d3;
+Vintagestory.GameContent/AiTaskFlySwoopAttack.cs-270-		for (int j = 0; j < num; j++)
+Vintagestory.GameContent/AiTaskFlySwoopAttack.cs-271-		{
+Vintagestory.GameContent/AiTaskFlySwoopAttack.cs-272-			double num3 = (double)j / (double)num;
+Vintagestory.GameContent/AiTaskFlySwoopAttack.cs-273-			Vec3d vec3d11 = xYZ + num3 * vec3d5;
+Vintagestory.GameContent/AiTaskFlySwoopAttack.cs-274-			Vec3d vec3d12 = vec3d3 + num3 * vec3d6;
+Vintagestory.GameContent/AiTaskFlySwoopAttack.cs-275-			array[its + j] = (1.0 - num3) * vec3d11 + num3 * vec3d12;
+Vintagestory.GameContent/AiTaskFlySwoopAttack.cs-276-		}
+Vintagestory.GameContent/AiTaskFlySwoopAttack.cs-277-		return array;
+Vintagestory.GameContent/AiTaskFlySwoopAttack.cs-278-	}
+Vintagestory.GameContent/AiTaskFlySwoopAttack.cs-279-
+Vintagestory.GameContent/AiTaskFlySwoopAttack.cs-280-	protected void attackEntities()
+Vintagestory.GameContent/AiTaskFlySwoopAttack.cs-281-	{
+Vintagestory.GameContent/AiTaskFlySwoopAttack.cs-282-		List<Entity> attackableEntities = new List<Entity>();
+Vintagestory.GameContent/AiTaskFlySwoopAttack.cs-283-		entity.Api.ModLoader.GetModSystem<EntityPartitioning>().GetNearestEntity(entity.Pos.XYZ, damageRange + 1f, (Entity e) =>
+Vintagestory.GameContent/AiTaskFlySwoopAttack.cs-284-		{
+Vintagestory.GameContent/AiTaskFlySwoopAttack.cs-285-			if (IsTargetableEntity(e, damageRange) && hasDirectContact(e, damageRange, damageRange) && !didDamageEntity.Contains(entity.EntityId))
+Vintagestory.GameContent/AiTaskFlySwoopAttack.cs-286-			{
+Vintagestory.GameContent/AiTaskFlySwoopAttack.cs-287-				attackableEntities.Add(e);
+Vintagestory.GameContent/AiTaskFlySwoopAttack.cs-288-			}
+Vintagestory.GameContent/AiTaskFlySwoopAttack.cs-289-			return false;
+Vintagestory.GameContent/AiTaskFlySwoopAttack.cs-290-		}, EnumEntitySearchType.Creatures);
+Vintagestory.GameContent/AiTaskFlySwoopAttack.cs-291-		foreach (Entity item in attackableEntities)
+Vintagestory.GameContent/AiTaskFlySwoopAttack.cs-292-		{
+--
+Vintagestory.GameContent/EntityElevator.cs-152-		base.OnGameTick(dt);
+Vintagestory.GameContent/EntityElevator.cs-153-	}
+Vintagestory.GameContent/EntityElevator.cs-154-
+Vintagestory.GameContent/EntityElevator.cs-155-	protected virtual void updatePosition(float dt)
+Vintagestory.GameContent/EntityElevator.cs-156-	{
+Vintagestory.GameContent/EntityElevator.cs-157-		dt = Math.Min(0.5f, dt);
+Vintagestory.GameContent/EntityElevator.cs-158-		if (ElevatorSys == null || ElevatorSys.ControlPositions.Count == 0)
+Vintagestory.GameContent/EntityElevator.cs-159-		{
+Vintagestory.GameContent/EntityElevator.cs-160-			return;
+Vintagestory.GameContent/EntityElevator.cs-161-		}
+Vintagestory.GameContent/EntityElevator.cs-162-		int num = ElevatorSys.ControlPositions[CurrentStopIndex];
+Vintagestory.GameContent/EntityElevator.cs-163-		double num2 = Math.Abs(Pos.Y - (double)num);
+Vintagestory.GameContent/EntityElevator.cs:164:		if (num2 >= 0.019999999552965164)
+Vintagestory.GameContent/EntityElevator.cs-165-		{
+Vintagestory.GameContent/EntityElevator.cs-166-			if (isMovingDown && currentHeight != (int)Pos.Y)
+Vintagestory.GameContent/EntityElevator.cs-167-			{
+Vintagestory.GameContent/EntityElevator.cs-168-				SetGround(Pos.AsBlockPos, (int)Pos.Y);
+Vintagestory.GameContent/EntityElevator.cs-169-				UnSetGround(Pos.AsBlockPos, currentHeight);
+Vintagestory.GameContent/EntityElevator.cs-170-				currentHeight = (int)Pos.Y;
+Vintagestory.GameContent/EntityElevator.cs-171-			}
+Vintagestory.GameContent/EntityElevator.cs-172-			else if (!IsMoving)
+Vintagestory.GameContent/EntityElevator.cs-173-			{
+Vintagestory.GameContent/EntityElevator.cs-174-				UnSetGround(Pos.AsBlockPos, ElevatorSys.ControlPositions[lastStopIndex]);
+Vintagestory.GameContent/EntityElevator.cs-175-			}
+Vintagestory.GameContent/EntityElevator.cs-176-			double num3 = Math.Max(0.5, Math.Clamp(num2, 0.0, 1.0));
+Vintagestory.GameContent/EntityElevator.cs-177-			if (Pos.Y < (double)num)
+Vintagestory.GameContent/EntityElevator.cs-178-			{
+Vintagestory.GameContent/EntityElevator.cs-179-				Pos.Y += (double)(dt * SpeedMultiplier) * num3;
+Vintagestory.GameContent/EntityElevator.cs-180-				isMovingUp = true;
+Vintagestory.GameContent/EntityElevator.cs-181-			}
+Vintagestory.GameContent/EntityElevator.cs-182-			else
+Vintagestory.GameContent/EntityElevator.cs-183-			{
+Vintagestory.GameContent/EntityElevator.cs-184-				Pos.Y -= (double)(dt * SpeedMultiplier) * num3;
+Vintagestory.GameContent/EntityElevator.cs-185-				isMovingDown = true;
+Vintagestory.GameContent/EntityElevator.cs-186-			}
+Vintagestory.GameContent/EntityElevator.cs-187-		}
+Vintagestory.GameContent/EntityElevator.cs-188-		else
+Vintagestory.GameContent/EntityElevator.cs-189-		{
+--
+Vintagestory.GameContent/BlockEntitySoilNutrition.cs-245-	}
+Vintagestory.GameContent/BlockEntitySoilNutrition.cs-246-
+Vintagestory.GameContent/BlockEntitySoilNutrition.cs-247-	protected bool updateMoistureLevel(double totalDays, float waterDistance)
+Vintagestory.GameContent/BlockEntitySoilNutrition.cs-248-	{
+Vintagestory.GameContent/BlockEntitySoilNutrition.cs-249-		bool skyExposed = Api.World.BlockAccessor.GetRainMapHeightAt(Pos.X, Pos.Z) <= Pos.Y + RainHeightOffset;
+Vintagestory.GameContent/BlockEntitySoilNutrition.cs-250-		return updateMoistureLevel(totalDays, waterDistance, skyExposed);
+Vintagestory.GameContent/BlockEntitySoilNutrition.cs-251-	}
+Vintagestory.GameContent/BlockEntitySoilNutrition.cs-252-
+Vintagestory.GameContent/BlockEntitySoilNutrition.cs-253-	protected bool updateMoistureLevel(double totalDays, float waterDistance, bool skyExposed, ClimateCondition baseClimate = null)
+Vintagestory.GameContent/BlockEntitySoilNutrition.cs-254-	{
+Vintagestory.GameContent/BlockEntitySoilNutrition.cs-255-		float num = GameMath.Clamp(1f - waterDistance / 4f, 0f, 1f);
+Vintagestory.GameContent/BlockEntitySoilNutrition.cs-256-		double num2 = Math.Min((totalDays - lastMoistureLevelUpdateTotalDays) * (double)Api.World.Calendar.HoursPerDay, totalHoursWaterRetention);
+Vintagestory.GameContent/BlockEntitySoilNutrition.cs:257:		if (num2 < 0.029999999329447746)
+Vintagestory.GameContent/BlockEntitySoilNutrition.cs-258-		{
+Vintagestory.GameContent/BlockEntitySoilNutrition.cs-259-			if (num2 < 0.0)
+Vintagestory.GameContent/BlockEntitySoilNutrition.cs-260-			{
+Vintagestory.GameContent/BlockEntitySoilNutrition.cs-261-				lastMoistureLevelUpdateTotalDays = totalDays;
+Vintagestory.GameContent/BlockEntitySoilNutrition.cs-262-				return false;
+Vintagestory.GameContent/BlockEntitySoilNutrition.cs-263-			}
+Vintagestory.GameContent/BlockEntitySoilNutrition.cs-264-			moistureLevel = Math.Max(moistureLevel, num);
+Vintagestory.GameContent/BlockEntitySoilNutrition.cs-265-			return false;
+Vintagestory.GameContent/BlockEntitySoilNutrition.cs-266-		}
+Vintagestory.GameContent/BlockEntitySoilNutrition.cs-267-		tmpPos.Set((double)Pos.X + 0.5, (double)Pos.Y + 0.5, (double)Pos.Z + 0.5);
+Vintagestory.GameContent/BlockEntitySoilNutrition.cs-268-		moistureLevel = Math.Max(num, moistureLevel - (float)num2 / totalHoursWaterRetention);
+Vintagestory.GameContent/BlockEntitySoilNutrition.cs-269-		if (skyExposed)
+Vintagestory.GameContent/BlockEntitySoilNutrition.cs-270-		{
+Vintagestory.GameContent/BlockEntitySoilNutrition.cs-271-			if (baseClimate == null && num2 > 0.0)
+Vintagestory.GameContent/BlockEntitySoilNutrition.cs-272-			{
+Vintagestory.GameContent/BlockEntitySoilNutrition.cs-273-				baseClimate = Api.World.BlockAccessor.GetClimateAt(Pos, EnumGetClimateMode.WorldGenValues, totalDays - num2 / (double)Api.World.Calendar.HoursPerDay / 2.0);
+Vintagestory.GameContent/BlockEntitySoilNutrition.cs-274-			}
+Vintagestory.GameContent/BlockEntitySoilNutrition.cs-275-			while (num2 > 0.0)
+Vintagestory.GameContent/BlockEntitySoilNutrition.cs-276-			{
+Vintagestory.GameContent/BlockEntitySoilNutrition.cs-277-				double num3 = msFarming.Wsys.GetPrecipitation(Pos, totalDays - num2 / (double)Api.World.Calendar.HoursPerDay, baseClimate);
+Vintagestory.GameContent/BlockEntitySoilNutrition.cs-278-				moistureLevel = GameMath.Clamp(moistureLevel + (float)num3 / 3f, 0f, 1f);
+Vintagestory.GameContent/BlockEntitySoilNutrition.cs-279-				num2--;
+Vintagestory.GameContent/BlockEntitySoilNutrition.cs-280-			}
+Vintagestory.GameContent/BlockEntitySoilNutrition.cs-281-		}
+Vintagestory.GameContent/BlockEntitySoilNutrition.cs-282-		lastMoistureLevelUpdateTotalDays = totalDays;
+--
+Vintagestory.GameContent/DisableRecipeRegisteringSystem.cs-1-using Vintagestory.API.Common;
+Vintagestory.GameContent/DisableRecipeRegisteringSystem.cs-2-
+Vintagestory.GameContent/DisableRecipeRegisteringSystem.cs-3-namespace Vintagestory.GameContent;
+Vintagestory.GameContent/DisableRecipeRegisteringSystem.cs-4-
+Vintagestory.GameContent/DisableRecipeRegisteringSystem.cs-5-public class DisableRecipeRegisteringSystem : ModSystem
+Vintagestory.GameContent/DisableRecipeRegisteringSystem.cs-6-{
+Vintagestory.GameContent/DisableRecipeRegisteringSystem.cs-7-	public override double ExecuteOrder()
+Vintagestory.GameContent/DisableRecipeRegisteringSystem.cs-8-	{
+Vintagestory.GameContent/DisableRecipeRegisteringSystem.cs:9:		return 99999.0;
+Vintagestory.GameContent/DisableRecipeRegisteringSystem.cs-10-	}
+Vintagestory.GameContent/DisableRecipeRegisteringSystem.cs-11-
+Vintagestory.GameContent/DisableRecipeRegisteringSystem.cs-12-	public override bool ShouldLoad(EnumAppSide forSide)
+Vintagestory.GameContent/DisableRecipeRegisteringSystem.cs-13-	{
+Vintagestory.GameContent/DisableRecipeRegisteringSystem.cs-14-		return forSide == EnumAppSide.Server;
+Vintagestory.GameContent/DisableRecipeRegisteringSystem.cs-15-	}
+Vintagestory.GameContent/DisableRecipeRegisteringSystem.cs-16-
+Vintagestory.GameContent/DisableRecipeRegisteringSystem.cs-17-	public override void AssetsFinalize(ICoreAPI api)
+Vintagestory.GameContent/DisableRecipeRegisteringSystem.cs-18-	{
+Vintagestory.GameContent/DisableRecipeRegisteringSystem.cs-19-		RecipeRegistrySystem.canRegister = false;
+Vintagestory.GameContent/DisableRecipeRegisteringSystem.cs-20-	}
+Vintagestory.GameContent/DisableRecipeRegisteringSystem.cs-21-}
+--
+Vintagestory.GameContent/BlockEntityKnappingSurface.cs-165-	}
+Vintagestory.GameContent/BlockEntityKnappingSurface.cs-166-
+Vintagestory.GameContent/BlockEntityKnappingSurface.cs-167-	private void spawnParticles(Vec3d pos)
+Vintagestory.GameContent/BlockEntityKnappingSurface.cs-168-	{
+Vintagestory.GameContent/BlockEntityKnappingSurface.cs-169-		Random rand = Api.World.Rand;
+Vintagestory.GameContent/BlockEntityKnappingSurface.cs-170-		for (int i = 0; i < 3; i++)
+Vintagestory.GameContent/BlockEntityKnappingSurface.cs-171-		{
+Vintagestory.GameContent/BlockEntityKnappingSurface.cs-172-			Api.World.SpawnParticles(new SimpleParticleProperties
+Vintagestory.GameContent/BlockEntityKnappingSurface.cs-173-			{
+Vintagestory.GameContent/BlockEntityKnappingSurface.cs-174-				MinQuantity = 1f,
+Vintagestory.GameContent/BlockEntityKnappingSurface.cs-175-				AddQuantity = 2f,
+Vintagestory.GameContent/BlockEntityKnappingSurface.cs-176-				Color = BaseMaterial.Collectible.GetRandomColor(Api as ICoreClientAPI, BaseMaterial),
+Vintagestory.GameContent/BlockEntityKnappingSurface.cs:177:				MinPos = new Vec3d(pos.X, pos.Y + 0.0625 + 0.009999999776482582, pos.Z),
+Vintagestory.GameContent/BlockEntityKnappingSurface.cs:178:				AddPos = new Vec3d(0.0625, 0.009999999776482582, 0.0625),
+Vintagestory.GameContent/BlockEntityKnappingSurface.cs-179-				MinVelocity = new Vec3f(0f, 1f, 0f),
+Vintagestory.GameContent/BlockEntityKnappingSurface.cs-180-				AddVelocity = new Vec3f(4f * ((float)rand.NextDouble() - 0.5f), 1f * ((float)rand.NextDouble() - 0.5f), 4f * ((float)rand.NextDouble() - 0.5f)),
+Vintagestory.GameContent/BlockEntityKnappingSurface.cs-181-				LifeLength = 0.2f,
+Vintagestory.GameContent/BlockEntityKnappingSurface.cs-182-				GravityEffect = 1f,
+Vintagestory.GameContent/BlockEntityKnappingSurface.cs-183-				MinSize = 0.1f,
+Vintagestory.GameContent/BlockEntityKnappingSurface.cs-184-				MaxSize = 0.4f,
+Vintagestory.GameContent/BlockEntityKnappingSurface.cs-185-				ParticleModel = EnumParticleModel.Cube,
+Vintagestory.GameContent/BlockEntityKnappingSurface.cs-186-				SizeEvolve = new EvolvingNatFloat(EnumTransformFunction.LINEAR, -0.15f)
+Vintagestory.GameContent/BlockEntityKnappingSurface.cs-187-			});
+Vintagestory.GameContent/BlockEntityKnappingSurface.cs-188-		}
+Vintagestory.GameContent/BlockEntityKnappingSurface.cs-189-	}
+Vintagestory.GameContent/BlockEntityKnappingSurface.cs-190-
+Vintagestory.GameContent/BlockEntityKnappingSurface.cs-191-	private bool MatchesRecipe()
+Vintagestory.GameContent/BlockEntityKnappingSurface.cs-192-	{
+Vintagestory.GameContent/BlockEntityKnappingSurface.cs-193-		if (SelectedRecipe == null)
+Vintagestory.GameContent/BlockEntityKnappingSurface.cs-194-		{
+Vintagestory.GameContent/BlockEntityKnappingSurface.cs-195-			return false;
+Vintagestory.GameContent/BlockEntityKnappingSurface.cs-196-		}
+Vintagestory.GameContent/BlockEntityKnappingSurface.cs-197-		for (int i = 0; i < 16; i++)
+Vintagestory.GameContent/BlockEntityKnappingSurface.cs-198-		{
+Vintagestory.GameContent/BlockEntityKnappingSurface.cs-199-			for (int j = 0; j < 16; j++)
+Vintagestory.GameContent/BlockEntityKnappingSurface.cs-200-			{
+Vintagestory.GameContent/BlockEntityKnappingSurface.cs-201-				if (Voxels[i, j] != SelectedRecipe.Voxels[i, 0, j])
+Vintagestory.GameContent/BlockEntityKnappingSurface.cs-202-				{
+Vintagestory.GameContent/BlockEntityKnappingSurface.cs-203-					return false;
+--
+Vintagestory.GameContent/BlockEntityIngotMold.cs-838-			ContentsRight.ResolveBlockOrItem(worldForResolving);
+Vintagestory.GameContent/BlockEntityIngotMold.cs-839-		}
+Vintagestory.GameContent/BlockEntityIngotMold.cs-840-		QuantityMolds = tree.GetInt("quantityMolds");
+Vintagestory.GameContent/BlockEntityIngotMold.cs-841-		ShatteredLeft = tree.GetBool("shatteredLeft");
+Vintagestory.GameContent/BlockEntityIngotMold.cs-842-		ShatteredRight = tree.GetBool("shatteredRight");
+Vintagestory.GameContent/BlockEntityIngotMold.cs-843-		MeshAngle = tree.GetFloat("meshAngle");
+Vintagestory.GameContent/BlockEntityIngotMold.cs-844-		MoldLeft = tree.GetItemstack("moldLeft");
+Vintagestory.GameContent/BlockEntityIngotMold.cs-845-		if (worldForResolving != null && MoldLeft == null)
+Vintagestory.GameContent/BlockEntityIngotMold.cs-846-		{
+Vintagestory.GameContent/BlockEntityIngotMold.cs-847-			MoldLeft = new ItemStack(Block);
+Vintagestory.GameContent/BlockEntityIngotMold.cs-848-			if (ShatteredLeft)
+Vintagestory.GameContent/BlockEntityIngotMold.cs-849-			{
+Vintagestory.GameContent/BlockEntityIngotMold.cs:850:				FillLevelLeft = (int)((double)FillLevelLeft * (0.699999988079071 + worldForResolving.Rand.NextDouble() * 0.10000000149011612));
+Vintagestory.GameContent/BlockEntityIngotMold.cs-851-			}
+Vintagestory.GameContent/BlockEntityIngotMold.cs-852-			if (QuantityMolds > 1 && ShatteredRight)
+Vintagestory.GameContent/BlockEntityIngotMold.cs-853-			{
+Vintagestory.GameContent/BlockEntityIngotMold.cs:854:				FillLevelRight = (int)((double)FillLevelRight * (0.699999988079071 + worldForResolving.Rand.NextDouble() * 0.10000000149011612));
+Vintagestory.GameContent/BlockEntityIngotMold.cs-855-			}
+Vintagestory.GameContent/BlockEntityIngotMold.cs-856-		}
+Vintagestory.GameContent/BlockEntityIngotMold.cs-857-		if (worldForResolving != null && MoldLeft != null)
+Vintagestory.GameContent/BlockEntityIngotMold.cs-858-		{
+Vintagestory.GameContent/BlockEntityIngotMold.cs-859-			MoldLeft.ResolveBlockOrItem(worldForResolving);
+Vintagestory.GameContent/BlockEntityIngotMold.cs-860-		}
+Vintagestory.GameContent/BlockEntityIngotMold.cs-861-		MoldRight = tree.GetItemstack("moldRight", (QuantityMolds > 1) ? new ItemStack(Block) : null);
+Vintagestory.GameContent/BlockEntityIngotMold.cs-862-		if (worldForResolving != null && MoldRight != null)
+Vintagestory.GameContent/BlockEntityIngotMold.cs-863-		{
+Vintagestory.GameContent/BlockEntityIngotMold.cs-864-			MoldRight.ResolveBlockOrItem(worldForResolving);
+Vintagestory.GameContent/BlockEntityIngotMold.cs-865-		}
+Vintagestory.GameContent/BlockEntityIngotMold.cs-866-		UpdateIngotRenderer();
+Vintagestory.GameContent/BlockEntityIngotMold.cs-867-		ICoreAPI api = Api;
+Vintagestory.GameContent/BlockEntityIngotMold.cs-868-		if (api != null && api.Side == EnumAppSide.Client)
+Vintagestory.GameContent/BlockEntityIngotMold.cs-869-		{
+Vintagestory.GameContent/BlockEntityIngotMold.cs-870-			GenMeshes();
+Vintagestory.GameContent/BlockEntityIngotMold.cs-871-			Api.World.BlockAccessor.MarkBlockDirty(Pos);
+Vintagestory.GameContent/BlockEntityIngotMold.cs-872-		}
+Vintagestory.GameContent/BlockEntityIngotMold.cs-873-	}
+Vintagestory.GameContent/BlockEntityIngotMold.cs-874-
+Vintagestory.GameContent/BlockEntityIngotMold.cs-875-	public override void ToTreeAttributes(ITreeAttribute tree)
+Vintagestory.GameContent/BlockEntityIngotMold.cs-876-	{
+Vintagestory.GameContent/BlockEntityIngotMold.cs-877-		base.ToTreeAttributes(tree);
+Vintagestory.GameContent/BlockEntityIngotMold.cs-878-		tree.SetItemstack("contentsLeft", ContentsLeft);
+Vintagestory.GameContent/BlockEntityIngotMold.cs-879-		tree.SetInt("fillLevelLeft", FillLevelLeft);
+--
+Vintagestory.GameContent/BlockEntityIngotMold.cs-967-		(shatterRight ? MoldRight : MoldLeft)?.Block.SpawnBlockBrokenParticles(Pos);
+Vintagestory.GameContent/BlockEntityIngotMold.cs-968-		(shatterRight ? MoldRight : MoldLeft)?.Block.SpawnBlockBrokenParticles(Pos);
+Vintagestory.GameContent/BlockEntityIngotMold.cs-969-		(shatterRight ? ref ShatteredRight : ref ShatteredLeft) = true;
+Vintagestory.GameContent/BlockEntityIngotMold.cs-970-		MarkDirty(redrawOnClient: true);
+Vintagestory.GameContent/BlockEntityIngotMold.cs-971-	}
+Vintagestory.GameContent/BlockEntityIngotMold.cs-972-
+Vintagestory.GameContent/BlockEntityIngotMold.cs-973-	public void CoolNow(float amountRel, OnStackToCool onStackToCoolCallback)
+Vintagestory.GameContent/BlockEntityIngotMold.cs-974-	{
+Vintagestory.GameContent/BlockEntityIngotMold.cs-975-		float num = Math.Max(0f, amountRel - 0.6f) * Math.Max(TemperatureLeft - 250f, 0f) / 5000f;
+Vintagestory.GameContent/BlockEntityIngotMold.cs-976-		float num2 = Math.Max(0f, amountRel - 0.6f) * Math.Max(TemperatureRight - 250f, 0f) / 5000f;
+Vintagestory.GameContent/BlockEntityIngotMold.cs-977-		if (Api.World.Rand.NextDouble() < (double)num)
+Vintagestory.GameContent/BlockEntityIngotMold.cs-978-		{
+Vintagestory.GameContent/BlockEntityIngotMold.cs:979:			FillLevelLeft = (int)((double)FillLevelLeft * (0.699999988079071 + Api.World.Rand.NextDouble() * 0.10000000149011612));
+Vintagestory.GameContent/BlockEntityIngotMold.cs-980-			ContentsLeft?.Collectible.SetTemperature(Api.World, ContentsLeft, 20f, delayCooldown: false);
+Vintagestory.GameContent/BlockEntityIngotMold.cs-981-			ShatterMoldSided(shatterRight: false);
+Vintagestory.GameContent/BlockEntityIngotMold.cs-982-		}
+Vintagestory.GameContent/BlockEntityIngotMold.cs-983-		else if (ContentsLeft != null)
+Vintagestory.GameContent/BlockEntityIngotMold.cs-984-		{
+Vintagestory.GameContent/BlockEntityIngotMold.cs-985-			float temperatureLeft = TemperatureLeft;
+Vintagestory.GameContent/BlockEntityIngotMold.cs-986-			if (temperatureLeft > 120f)
+Vintagestory.GameContent/BlockEntityIngotMold.cs-987-			{
+Vintagestory.GameContent/BlockEntityIngotMold.cs-988-				Api.World.PlaySoundAt(new AssetLocation("sounds/effect/extinguish"), Pos, -0.4, null, randomizePitch: false, 16f);
+Vintagestory.GameContent/BlockEntityIngotMold.cs-989-			}
+Vintagestory.GameContent/BlockEntityIngotMold.cs-990-			ContentsLeft.Collectible.SetTemperature(Api.World, ContentsLeft, Math.Max(20f, temperatureLeft - amountRel * 20f), delayCooldown: false);
+Vintagestory.GameContent/BlockEntityIngotMold.cs-991-			MarkDirty(redrawOnClient: true);
+Vintagestory.GameContent/BlockEntityIngotMold.cs-992-		}
+Vintagestory.GameContent/BlockEntityIngotMold.cs-993-		if (Api.World.Rand.NextDouble() < (double)num2)
+Vintagestory.GameContent/BlockEntityIngotMold.cs-994-		{
+Vintagestory.GameContent/BlockEntityIngotMold.cs:995:			FillLevelRight = (int)((double)FillLevelRight * (0.699999988079071 + Api.World.Rand.NextDouble() * 0.10000000149011612));
+Vintagestory.GameContent/BlockEntityIngotMold.cs-996-			ContentsRight?.Collectible.SetTemperature(Api.World, ContentsRight, 20f, delayCooldown: false);
+Vintagestory.GameContent/BlockEntityIngotMold.cs-997-			ShatterMoldSided(shatterRight: true);
+Vintagestory.GameContent/BlockEntityIngotMold.cs-998-		}
+Vintagestory.GameContent/BlockEntityIngotMold.cs-999-		else if (ContentsRight != null)
+Vintagestory.GameContent/BlockEntityIngotMold.cs-1000-		{
+Vintagestory.GameContent/BlockEntityIngotMold.cs-1001-			float temperatureRight = TemperatureRight;
+Vintagestory.GameContent/BlockEntityIngotMold.cs-1002-			if (temperatureRight > 120f)
+Vintagestory.GameContent/BlockEntityIngotMold.cs-1003-			{
+Vintagestory.GameContent/BlockEntityIngotMold.cs-1004-				Api.World.PlaySoundAt(new AssetLocation("sounds/effect/extinguish"), Pos, -0.5, null, randomizePitch: false, 16f);
+Vintagestory.GameContent/BlockEntityIngotMold.cs-1005-			}
+Vintagestory.GameContent/BlockEntityIngotMold.cs-1006-			ContentsRight.Collectible.SetTemperature(Api.World, ContentsRight, Math.Max(20f, temperatureRight - amountRel * 20f), delayCooldown: false);
+Vintagestory.GameContent/BlockEntityIngotMold.cs-1007-			MarkDirty(redrawOnClient: true);
+Vintagestory.GameContent/BlockEntityIngotMold.cs-1008-		}
+Vintagestory.GameContent/BlockEntityIngotMold.cs-1009-	}
+Vintagestory.GameContent/BlockEntityIngotMold.cs-1010-
+Vintagestory.GameContent/BlockEntityIngotMold.cs-1011-	public void OnTransformed(IWorldAccessor worldAccessor, ITreeAttribute tree, int degreeRotation, Dictionary<int, AssetLocation> oldBlockIdMapping, Dictionary<int, AssetLocation> oldItemIdMapping, EnumAxis? flipAxis)
+Vintagestory.GameContent/BlockEntityIngotMold.cs-1012-	{
+Vintagestory.GameContent/BlockEntityIngotMold.cs-1013-		MeshAngle = tree.GetFloat("meshAngle");
+Vintagestory.GameContent/BlockEntityIngotMold.cs-1014-		MeshAngle -= (float)degreeRotation * ((float)Math.PI / 180f);
+Vintagestory.GameContent/BlockEntityIngotMold.cs-1015-		tree.SetFloat("meshAngle", MeshAngle);
+Vintagestory.GameContent/BlockEntityIngotMold.cs-1016-	}
+Vintagestory.GameContent/BlockEntityIngotMold.cs-1017-}
+--
+Vintagestory.GameContent/PlacedBeam.cs-14-	public Vec3f End;
+Vintagestory.GameContent/PlacedBeam.cs-15-
+Vintagestory.GameContent/PlacedBeam.cs-16-	[ProtoMember(3)]
+Vintagestory.GameContent/PlacedBeam.cs-17-	public int BlockId;
+Vintagestory.GameContent/PlacedBeam.cs-18-
+Vintagestory.GameContent/PlacedBeam.cs-19-	[ProtoMember(4)]
+Vintagestory.GameContent/PlacedBeam.cs-20-	public int FacingIndex;
+Vintagestory.GameContent/PlacedBeam.cs-21-
+Vintagestory.GameContent/PlacedBeam.cs-22-	private Block block;
+Vintagestory.GameContent/PlacedBeam.cs-23-
+Vintagestory.GameContent/PlacedBeam.cs-24-	public float RemainingResistance;
+Vintagestory.GameContent/PlacedBeam.cs-25-
+Vintagestory.GameContent/PlacedBeam.cs:26:	public long LastModifiedMilliseconds = -999999L;
+Vintagestory.GameContent/PlacedBeam.cs-27-
+Vintagestory.GameContent/PlacedBeam.cs-28-	public float SlumpPerMeter;
+Vintagestory.GameContent/PlacedBeam.cs-29-
+Vintagestory.GameContent/PlacedBeam.cs-30-	public Block Block
+Vintagestory.GameContent/PlacedBeam.cs-31-	{
+Vintagestory.GameContent/PlacedBeam.cs-32-		get
+Vintagestory.GameContent/PlacedBeam.cs-33-		{
+Vintagestory.GameContent/PlacedBeam.cs-34-			return block;
+Vintagestory.GameContent/PlacedBeam.cs-35-		}
+Vintagestory.GameContent/PlacedBeam.cs-36-		set
+Vintagestory.GameContent/PlacedBeam.cs-37-		{
+Vintagestory.GameContent/PlacedBeam.cs-38-			block = value;
+Vintagestory.GameContent/PlacedBeam.cs-39-			SlumpPerMeter = block.Attributes?["slumpPerMeter"].AsFloat() ?? 0f;
+Vintagestory.GameContent/PlacedBeam.cs-40-		}
+Vintagestory.GameContent/PlacedBeam.cs-41-	}
+Vintagestory.GameContent/PlacedBeam.cs-42-}
+--
+Vintagestory.GameContent/RecipeRegistrySystem.cs-78-		CookingRecipe cookingRecipe = jrec.ToObject<CookingRecipe>(loc.Domain);
+Vintagestory.GameContent/RecipeRegistrySystem.cs-79-		if (cookingRecipe.Enabled)
+Vintagestory.GameContent/RecipeRegistrySystem.cs-80-		{
+Vintagestory.GameContent/RecipeRegistrySystem.cs-81-			cookingRecipe.Resolve(sapi.World, "cooking recipe " + loc);
+Vintagestory.GameContent/RecipeRegistrySystem.cs-82-			RegisterCookingRecipe(cookingRecipe);
+Vintagestory.GameContent/RecipeRegistrySystem.cs-83-		}
+Vintagestory.GameContent/RecipeRegistrySystem.cs-84-	}
+Vintagestory.GameContent/RecipeRegistrySystem.cs-85-
+Vintagestory.GameContent/RecipeRegistrySystem.cs-86-	public void RegisterCookingRecipe(CookingRecipe recipe)
+Vintagestory.GameContent/RecipeRegistrySystem.cs-87-	{
+Vintagestory.GameContent/RecipeRegistrySystem.cs-88-		if (!canRegister)
+Vintagestory.GameContent/RecipeRegistrySystem.cs-89-		{
+Vintagestory.GameContent/RecipeRegistrySystem.cs:90:			throw new InvalidOperationException("Coding error: Can no long register cooking recipes. Register them during AssetsLoad/AssetsFinalize and with ExecuteOrder < 99999");
+Vintagestory.GameContent/RecipeRegistrySystem.cs-91-		}
+Vintagestory.GameContent/RecipeRegistrySystem.cs-92-		CookingRecipes.Add(recipe);
+Vintagestory.GameContent/RecipeRegistrySystem.cs-93-	}
+Vintagestory.GameContent/RecipeRegistrySystem.cs-94-
+Vintagestory.GameContent/RecipeRegistrySystem.cs-95-	public void RegisterBarrelRecipe(BarrelRecipe recipe)
+Vintagestory.GameContent/RecipeRegistrySystem.cs-96-	{
+Vintagestory.GameContent/RecipeRegistrySystem.cs-97-		if (!canRegister)
+Vintagestory.GameContent/RecipeRegistrySystem.cs-98-		{
+Vintagestory.GameContent/RecipeRegistrySystem.cs:99:			throw new InvalidOperationException("Coding error: Can no long register cooking recipes. Register them during AssetsLoad/AssetsFinalize and with ExecuteOrder < 99999");
+Vintagestory.GameContent/RecipeRegistrySystem.cs-100-		}
+Vintagestory.GameContent/RecipeRegistrySystem.cs-101-		if (recipe.Code == null)
+Vintagestory.GameContent/RecipeRegistrySystem.cs-102-		{
+Vintagestory.GameContent/RecipeRegistrySystem.cs-103-			throw new ArgumentException("Barrel recipes must have a non-null code! (choose freely)");
+Vintagestory.GameContent/RecipeRegistrySystem.cs-104-		}
+Vintagestory.GameContent/RecipeRegistrySystem.cs-105-		BarrelRecipeIngredient[] ingredients = recipe.Ingredients;
+Vintagestory.GameContent/RecipeRegistrySystem.cs-106-		foreach (BarrelRecipeIngredient barrelRecipeIngredient in ingredients)
+Vintagestory.GameContent/RecipeRegistrySystem.cs-107-		{
+Vintagestory.GameContent/RecipeRegistrySystem.cs-108-			if (barrelRecipeIngredient.ConsumeQuantity.HasValue && barrelRecipeIngredient.ConsumeQuantity > barrelRecipeIngredient.Quantity)
+Vintagestory.GameContent/RecipeRegistrySystem.cs-109-			{
+Vintagestory.GameContent/RecipeRegistrySystem.cs-110-				throw new ArgumentException("Barrel recipe with code {0} has an ingredient with ConsumeQuantity > Quantity. Not a valid recipe!");
+Vintagestory.GameContent/RecipeRegistrySystem.cs-111-			}
+Vintagestory.GameContent/RecipeRegistrySystem.cs-112-		}
+Vintagestory.GameContent/RecipeRegistrySystem.cs-113-		BarrelRecipes.Add(recipe);
+Vintagestory.GameContent/RecipeRegistrySystem.cs-114-	}
+Vintagestory.GameContent/RecipeRegistrySystem.cs-115-
+Vintagestory.GameContent/RecipeRegistrySystem.cs-116-	public void RegisterMetalAlloy(AlloyRecipe alloy)
+Vintagestory.GameContent/RecipeRegistrySystem.cs-117-	{
+Vintagestory.GameContent/RecipeRegistrySystem.cs-118-		if (!canRegister)
+Vintagestory.GameContent/RecipeRegistrySystem.cs-119-		{
+Vintagestory.GameContent/RecipeRegistrySystem.cs:120:			throw new InvalidOperationException("Coding error: Can no long register cooking recipes. Register them during AssetsLoad/AssetsFinalize and with ExecuteOrder < 99999");
+Vintagestory.GameContent/RecipeRegistrySystem.cs-121-		}
+Vintagestory.GameContent/RecipeRegistrySystem.cs-122-		MetalAlloys.Add(alloy);
+Vintagestory.GameContent/RecipeRegistrySystem.cs-123-	}
+Vintagestory.GameContent/RecipeRegistrySystem.cs-124-
+Vintagestory.GameContent/RecipeRegistrySystem.cs-125-	public void RegisterClayFormingRecipe(ClayFormingRecipe recipe)
+Vintagestory.GameContent/RecipeRegistrySystem.cs-126-	{
+Vintagestory.GameContent/RecipeRegistrySystem.cs-127-		if (!canRegister)
+Vintagestory.GameContent/RecipeRegistrySystem.cs-128-		{
+Vintagestory.GameContent/RecipeRegistrySystem.cs:129:			throw new InvalidOperationException("Coding error: Can no long register cooking recipes. Register them during AssetsLoad/AssetsFinalize and with ExecuteOrder < 99999");
+Vintagestory.GameContent/RecipeRegistrySystem.cs-130-		}
+Vintagestory.GameContent/RecipeRegistrySystem.cs-131-		recipe.RecipeId = ClayFormingRecipes.Count + 1;
+Vintagestory.GameContent/RecipeRegistrySystem.cs-132-		ClayFormingRecipes.Add(recipe);
+Vintagestory.GameContent/RecipeRegistrySystem.cs-133-	}
+Vintagestory.GameContent/RecipeRegistrySystem.cs-134-
+Vintagestory.GameContent/RecipeRegistrySystem.cs-135-	public void RegisterSmithingRecipe(SmithingRecipe recipe)
+Vintagestory.GameContent/RecipeRegistrySystem.cs-136-	{
+Vintagestory.GameContent/RecipeRegistrySystem.cs-137-		if (!canRegister)
+Vintagestory.GameContent/RecipeRegistrySystem.cs-138-		{
+Vintagestory.GameContent/RecipeRegistrySystem.cs:139:			throw new InvalidOperationException("Coding error: Can no long register cooking recipes. Register them during AssetsLoad/AssetsFinalize and with ExecuteOrder < 99999");
+Vintagestory.GameContent/RecipeRegistrySystem.cs-140-		}
+Vintagestory.GameContent/RecipeRegistrySystem.cs-141-		recipe.RecipeId = SmithingRecipes.Count + 1;
+Vintagestory.GameContent/RecipeRegistrySystem.cs-142-		if (recipe.Code == null)
+Vintagestory.GameContent/RecipeRegistrySystem.cs-143-		{
+Vintagestory.GameContent/RecipeRegistrySystem.cs-144-			api.Logger.Warning("Smithing recipe with output {0} has no code. For 1.23 all smithing recipes need to have a unique, unchanging code", recipe.Output.Code);
+Vintagestory.GameContent/RecipeRegistrySystem.cs-145-		}
+Vintagestory.GameContent/RecipeRegistrySystem.cs-146-		else if (SmithingRecipes.FirstOrDefault((SmithingRecipe r) => r.Code == recipe.Code) != null)
+Vintagestory.GameContent/RecipeRegistrySystem.cs-147-		{
+Vintagestory.GameContent/RecipeRegistrySystem.cs-148-			api.Logger.Warning("Smithing recipe with output {0} has a code that is already used by another recipe. For 1.23 all smithing recipes need to have a unique, unchanging code", recipe.Output.Code);
+Vintagestory.GameContent/RecipeRegistrySystem.cs-149-		}
+Vintagestory.GameContent/RecipeRegistrySystem.cs-150-		SmithingRecipes.Add(recipe);
+Vintagestory.GameContent/RecipeRegistrySystem.cs-151-	}
+Vintagestory.GameContent/RecipeRegistrySystem.cs-152-
+Vintagestory.GameContent/RecipeRegistrySystem.cs-153-	public void RegisterKnappingRecipe(KnappingRecipe recipe)
+Vintagestory.GameContent/RecipeRegistrySystem.cs-154-	{
+Vintagestory.GameContent/RecipeRegistrySystem.cs-155-		if (!canRegister)
+Vintagestory.GameContent/RecipeRegistrySystem.cs-156-		{
+Vintagestory.GameContent/RecipeRegistrySystem.cs:157:			throw new InvalidOperationException("Coding error: Can no long register cooking recipes. Register them during AssetsLoad/AssetsFinalize and with ExecuteOrder < 99999");
+Vintagestory.GameContent/RecipeRegistrySystem.cs-158-		}
+Vintagestory.GameContent/RecipeRegistrySystem.cs-159-		recipe.RecipeId = KnappingRecipes.Count + 1;
+Vintagestory.GameContent/RecipeRegistrySystem.cs-160-		KnappingRecipes.Add(recipe);
+Vintagestory.GameContent/RecipeRegistrySystem.cs-161-	}
+Vintagestory.GameContent/RecipeRegistrySystem.cs-162-}
+--
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-309-		float num = deltaTime / 3f;
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-310-		double num2 = stabilityOffset + (double)tempStabilitySystem.GetTemporalStability(entity.Pos.X, entity.Pos.Y, entity.Pos.Z);
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-311-		entity.Attributes.SetDouble("tempStabChangeVelocity", TempStabChangeVelocity);
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-312-		double num3 = ((TempStabChangeVelocity > 0.0) ? (TempStabChangeVelocity / 200.0) : (TempStabChangeVelocity / 800.0));
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-313-		double num4 = (OwnStability = GameMath.Clamp(OwnStability + num3, 0.0, 1.0));
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-314-		TempStabChangeVelocity = (hereTempStabChangeVelocity - TempStabChangeVelocity) * (double)deltaTime;
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-315-		float glitchEffectExtraStrength = tempStabilitySystem.GetGlitchEffectExtraStrength();
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-316-		double num6 = Math.Max(0.0, Math.Max(0.0, (0.20000000298023224 - num4) * 1.0 / 0.20000000298023224) + (double)glitchEffectExtraStrength);
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-317-		glitchEffectStrength += (num6 - glitchEffectStrength) * (double)num;
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-318-		glitchEffectStrength = GameMath.Clamp(glitchEffectStrength, 0.0, 1.100000023841858);
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-319-		double num7 = Math.Max(0.0, Math.Max(0.0, (0.30000001192092896 - num4) * 1.0 / 0.30000001192092896) + (double)glitchEffectExtraStrength);
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-320-		fogEffectStrength += (num7 - fogEffectStrength) * (double)num;
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs:321:		fogEffectStrength = GameMath.Clamp(fogEffectStrength, 0.0, 0.8999999761581421);
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-322-		double num8 = Math.Max(0.0, Math.Max(0.0, (0.30000001192092896 - num4) * 1.0 / 0.30000001192092896) + (double)glitchEffectExtraStrength);
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-323-		rustPrecipColorStrength += (num8 - rustPrecipColorStrength) * (double)num;
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-324-		rustPrecipColorStrength = GameMath.Clamp(rustPrecipColorStrength, 0.0, 1.0);
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-325-		if (precipParticleSys != null)
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-326-		{
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-327-			precipParticleSys.rainParticleColor = ColorUtil.ColorOverlay(WeatherSimulationParticles.waterColor, WeatherSimulationParticles.lowStabColor, (float)rustPrecipColorStrength);
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-328-		}
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-329-		hereTempStabChangeVelocity = num2 - 1.0;
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-330-		oneSecAccum += deltaTime;
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-331-		if (oneSecAccum > 1f)
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-332-		{
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-333-			oneSecAccum = 0f;
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-334-			updateSoundsAndEffects(num2, Math.Max(0.0, num4 - (double)(1.5f * glitchEffectExtraStrength)));
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-335-		}
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-336-		threeSecAccum += deltaTime;
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-337-		if (threeSecAccum > 4f)
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-338-		{
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-339-			threeSecAccum = 0f;
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-340-			if (entity.World.Side == EnumAppSide.Server && num4 < 0.13)
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-341-			{
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-342-				entity.ReceiveDamage(new DamageSource
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-343-				{
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-344-					DamageTier = 0,
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-345-					Source = EnumDamageSource.Machine,
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-346-					Type = EnumDamageType.Poison
+--
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-387-		}
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-388-		double num11 = fogEffectStrength * Math.Abs(fogNoise.Noise(0.0, (float)capi.InWorldEllapsedMilliseconds / 1000f)) / 60.0;
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-389-		rainfogAmbient.FogDensity.Value = 0.05f + (float)num11;
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-390-	}
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-391-
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-392-	private void updateSoundsAndEffects(double hereStability, double ownStability)
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-393-	{
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-394-		if (!isSelf || tempStabSoundDrain == null)
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-395-		{
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-396-			return;
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-397-		}
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-398-		float num = 3f;
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs:399:		if (hereStability < 0.949999988079071 && ownStability < 0.6499999761581421)
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-400-		{
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-401-			if (!tempStabSoundDrain.IsPlaying)
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-402-			{
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-403-				tempStabSoundDrain.Start();
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-404-			}
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-405-			tempStabSoundDrain.FadeTo(Math.Min(1.0, 3.0 * (1.0 - hereStability)), 0.95f * num, (ILoadedSound s) =>
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-406-			{
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-407-			});
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-408-		}
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-409-		else
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-410-		{
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-411-			tempStabSoundDrain.FadeTo(0.0, 0.95f * num, (ILoadedSound s) =>
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-412-			{
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-413-				tempStabSoundDrain.Stop();
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-414-			});
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-415-		}
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs:416:		SurfaceMusicTrack.ShouldPlayMusic = ownStability > 0.44999998807907104;
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-417-		CaveMusicTrack.ShouldPlayCaveMusic = ownStability > 0.20000000298023224;
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-418-		if (ownStability < 0.4000000059604645)
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-419-		{
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-420-			if (!tempStabSoundLow.IsPlaying)
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-421-			{
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-422-				tempStabSoundLow.Start();
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-423-			}
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-424-			float val = (0.4f - (float)ownStability) * 1f / 0.4f;
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-425-			tempStabSoundLow.FadeTo(Math.Min(1f, val), 0.95f * num, (ILoadedSound s) =>
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-426-			{
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-427-			});
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-428-		}
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-429-		else
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-430-		{
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-431-			tempStabSoundLow.FadeTo(0.0, 0.95f * num, (ILoadedSound s) =>
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-432-			{
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-433-				tempStabSoundLow.Stop();
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-434-			});
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-435-		}
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-436-		if (ownStability < 0.25)
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-437-		{
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-438-			if (!tempStabSoundVeryLow.IsPlaying)
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-439-			{
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-440-				tempStabSoundVeryLow.Start();
+Vintagestory.GameContent/EntityBehaviorTemporalStabilityAffected.cs-441-			}
+--
+Vintagestory.GameContent/BlockSmeltedContainer.cs-40-	public override string GetHeldTpUseAnimation(ItemSlot activeHotbarSlot, Entity forEntity)
+Vintagestory.GameContent/BlockSmeltedContainer.cs-41-	{
+Vintagestory.GameContent/BlockSmeltedContainer.cs-42-		return "pour";
+Vintagestory.GameContent/BlockSmeltedContainer.cs-43-	}
+Vintagestory.GameContent/BlockSmeltedContainer.cs-44-
+Vintagestory.GameContent/BlockSmeltedContainer.cs-45-	public override void OnHeldIdle(ItemSlot slot, EntityAgent byEntity)
+Vintagestory.GameContent/BlockSmeltedContainer.cs-46-	{
+Vintagestory.GameContent/BlockSmeltedContainer.cs-47-		if (byEntity.World is IClientWorldAccessor && byEntity.World.Rand.NextDouble() < 0.02)
+Vintagestory.GameContent/BlockSmeltedContainer.cs-48-		{
+Vintagestory.GameContent/BlockSmeltedContainer.cs-49-			KeyValuePair<ItemStack, int> contents = GetContents(byEntity.World, slot.Itemstack);
+Vintagestory.GameContent/BlockSmeltedContainer.cs-50-			if (contents.Key != null && !HasSolidifed(slot.Itemstack, contents.Key, byEntity.World))
+Vintagestory.GameContent/BlockSmeltedContainer.cs-51-			{
+Vintagestory.GameContent/BlockSmeltedContainer.cs:52:				Vec3d vec3d = byEntity.Pos.XYZ.Add(byEntity.LocalEyePos.X, byEntity.LocalEyePos.Y - 0.5, byEntity.LocalEyePos.Z).Ahead(0.30000001192092896, byEntity.Pos.Pitch, byEntity.Pos.Yaw).Ahead(0.4699999988079071, 0f, byEntity.Pos.Yaw + (float)Math.PI / 2f);
+Vintagestory.GameContent/BlockSmeltedContainer.cs-53-				smokeHeld.MinPos = vec3d.AddCopy(-0.05, -0.05, -0.05);
+Vintagestory.GameContent/BlockSmeltedContainer.cs-54-				byEntity.World.SpawnParticles(smokeHeld);
+Vintagestory.GameContent/BlockSmeltedContainer.cs-55-			}
+Vintagestory.GameContent/BlockSmeltedContainer.cs-56-		}
+Vintagestory.GameContent/BlockSmeltedContainer.cs-57-	}
+Vintagestory.GameContent/BlockSmeltedContainer.cs-58-
+Vintagestory.GameContent/BlockSmeltedContainer.cs-59-	public override void OnHeldInteractStart(ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handHandling)
+Vintagestory.GameContent/BlockSmeltedContainer.cs-60-	{
+Vintagestory.GameContent/BlockSmeltedContainer.cs-61-		if (blockSel == null)
+Vintagestory.GameContent/BlockSmeltedContainer.cs-62-		{
+Vintagestory.GameContent/BlockSmeltedContainer.cs-63-			return;
+Vintagestory.GameContent/BlockSmeltedContainer.cs-64-		}
+Vintagestory.GameContent/BlockSmeltedContainer.cs-65-		ILiquidMetalSink liquidMetalSink = byEntity.World.BlockAccessor.GetBlockEntity(blockSel.Position) as ILiquidMetalSink;
+Vintagestory.GameContent/BlockSmeltedContainer.cs-66-		if (liquidMetalSink != null)
+Vintagestory.GameContent/BlockSmeltedContainer.cs-67-		{
+Vintagestory.GameContent/BlockSmeltedContainer.cs-68-			handHandling = EnumHandHandling.PreventDefault;
+Vintagestory.GameContent/BlockSmeltedContainer.cs-69-		}
+Vintagestory.GameContent/BlockSmeltedContainer.cs-70-		if (liquidMetalSink != null && liquidMetalSink.CanReceiveAny)
+Vintagestory.GameContent/BlockSmeltedContainer.cs-71-		{
+Vintagestory.GameContent/BlockSmeltedContainer.cs-72-			KeyValuePair<ItemStack, int> contents = GetContents(byEntity.World, slot.Itemstack);
+Vintagestory.GameContent/BlockSmeltedContainer.cs-73-			if (contents.Key == null)
+Vintagestory.GameContent/BlockSmeltedContainer.cs-74-			{
+Vintagestory.GameContent/BlockSmeltedContainer.cs-75-				string domainAndPath = Attributes["emptiedBlockCode"].AsString();
+Vintagestory.GameContent/BlockSmeltedContainer.cs-76-				slot.Itemstack = new ItemStack(byEntity.World.GetBlock(AssetLocation.Create(domainAndPath, Code.Domain)));
+Vintagestory.GameContent/BlockSmeltedContainer.cs-77-				slot.MarkDirty();
+--
+Vintagestory.GameContent/FruitingBushState.cs-21-	public double TransitionHoursLeft;
+Vintagestory.GameContent/FruitingBushState.cs-22-
+Vintagestory.GameContent/FruitingBushState.cs-23-	private EnumFruitingBushGrowthState growthstate;
+Vintagestory.GameContent/FruitingBushState.cs-24-
+Vintagestory.GameContent/FruitingBushState.cs-25-	public string[] Traits = Array.Empty<string>();
+Vintagestory.GameContent/FruitingBushState.cs-26-
+Vintagestory.GameContent/FruitingBushState.cs-27-	public EnumFruitingBushHealthState PrevHealthState;
+Vintagestory.GameContent/FruitingBushState.cs-28-
+Vintagestory.GameContent/FruitingBushState.cs-29-	private EnumFruitingBushHealthState? wildBushState;
+Vintagestory.GameContent/FruitingBushState.cs-30-
+Vintagestory.GameContent/FruitingBushState.cs-31-	public bool MeshDirty;
+Vintagestory.GameContent/FruitingBushState.cs-32-
+Vintagestory.GameContent/FruitingBushState.cs:33:	public double LastCuttingTakenTotalDays = -99999.0;
+Vintagestory.GameContent/FruitingBushState.cs-34-
+Vintagestory.GameContent/FruitingBushState.cs-35-	public EnumFruitingBushGrowthState Growthstate
+Vintagestory.GameContent/FruitingBushState.cs-36-	{
+Vintagestory.GameContent/FruitingBushState.cs-37-		get
+Vintagestory.GameContent/FruitingBushState.cs-38-		{
+Vintagestory.GameContent/FruitingBushState.cs-39-			return growthstate;
+Vintagestory.GameContent/FruitingBushState.cs-40-		}
+Vintagestory.GameContent/FruitingBushState.cs-41-		set
+Vintagestory.GameContent/FruitingBushState.cs-42-		{
+Vintagestory.GameContent/FruitingBushState.cs-43-			if (value != growthstate)
+Vintagestory.GameContent/FruitingBushState.cs-44-			{
+Vintagestory.GameContent/FruitingBushState.cs-45-				MeshDirty = true;
+Vintagestory.GameContent/FruitingBushState.cs-46-			}
+Vintagestory.GameContent/FruitingBushState.cs-47-			growthstate = value;
+Vintagestory.GameContent/FruitingBushState.cs-48-		}
+Vintagestory.GameContent/FruitingBushState.cs-49-	}
+Vintagestory.GameContent/FruitingBushState.cs-50-
+Vintagestory.GameContent/FruitingBushState.cs-51-	public EnumFruitingBushHealthState? WildBushState
+Vintagestory.GameContent/FruitingBushState.cs-52-	{
+Vintagestory.GameContent/FruitingBushState.cs-53-		get
+Vintagestory.GameContent/FruitingBushState.cs-54-		{
+Vintagestory.GameContent/FruitingBushState.cs-55-			return wildBushState;
+Vintagestory.GameContent/FruitingBushState.cs-56-		}
+Vintagestory.GameContent/FruitingBushState.cs-57-		set
+Vintagestory.GameContent/FruitingBushState.cs-58-		{
+Vintagestory.GameContent/FruitingBushState.cs-59-			if (value != wildBushState)
+Vintagestory.GameContent/FruitingBushState.cs-60-			{
+Vintagestory.GameContent/FruitingBushState.cs-61-				MeshDirty = true;
+Vintagestory.GameContent/FruitingBushState.cs-62-			}
+Vintagestory.GameContent/FruitingBushState.cs-63-			wildBushState = value;
+Vintagestory.GameContent/FruitingBushState.cs-64-		}
+Vintagestory.GameContent/FruitingBushState.cs-65-	}
+Vintagestory.GameContent/FruitingBushState.cs-66-
+Vintagestory.GameContent/FruitingBushState.cs-67-	public void FromTreeAttributes(ITreeAttribute tree, IWorldAccessor worldAccessForResolve)
+Vintagestory.GameContent/FruitingBushState.cs-68-	{
+Vintagestory.GameContent/FruitingBushState.cs-69-		PlantedTotalDays = tree.GetDouble("plantedTotalDays");
+Vintagestory.GameContent/FruitingBushState.cs-70-		MatureTotalDays = tree.GetDouble("matureTotalDays");
+Vintagestory.GameContent/FruitingBushState.cs:71:		LastCuttingTakenTotalDays = tree.GetDouble("lastCuttingTakenTotalDays", -99999.0);
+Vintagestory.GameContent/FruitingBushState.cs-72-		TransitionHoursLeft = tree.GetDouble("transitionHoursLeft");
+Vintagestory.GameContent/FruitingBushState.cs-73-		Growthstate = (EnumFruitingBushGrowthState)tree.GetInt("growthState");
+Vintagestory.GameContent/FruitingBushState.cs-74-		if (tree.HasAttribute("traits"))
+Vintagestory.GameContent/FruitingBushState.cs-75-		{
+Vintagestory.GameContent/FruitingBushState.cs-76-			if (tree.GetString("traits").Length == 0)
+Vintagestory.GameContent/FruitingBushState.cs-77-			{
+Vintagestory.GameContent/FruitingBushState.cs-78-				Traits = Array.Empty<string>();
+Vintagestory.GameContent/FruitingBushState.cs-79-			}
+Vintagestory.GameContent/FruitingBushState.cs-80-			Traits = tree.GetString("traits").Split(",", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+Vintagestory.GameContent/FruitingBushState.cs-81-		}
+Vintagestory.GameContent/FruitingBushState.cs-82-		else
+Vintagestory.GameContent/FruitingBushState.cs-83-		{
+Vintagestory.GameContent/FruitingBushState.cs-84-			Traits = Array.Empty<string>();
+Vintagestory.GameContent/FruitingBushState.cs-85-		}
+Vintagestory.GameContent/FruitingBushState.cs-86-		WildBushState = null;
+Vintagestory.GameContent/FruitingBushState.cs-87-		if (tree.HasAttribute("wildBushState"))
+Vintagestory.GameContent/FruitingBushState.cs-88-		{
+Vintagestory.GameContent/FruitingBushState.cs-89-			WildBushState = (EnumFruitingBushHealthState)tree.GetInt("wildBushState");
+Vintagestory.GameContent/FruitingBushState.cs-90-		}
+Vintagestory.GameContent/FruitingBushState.cs-91-	}
+Vintagestory.GameContent/FruitingBushState.cs-92-
+Vintagestory.GameContent/FruitingBushState.cs-93-	public void ToTreeAttributes(ITreeAttribute tree)
+Vintagestory.GameContent/FruitingBushState.cs-94-	{
+Vintagestory.GameContent/FruitingBushState.cs-95-		tree.SetDouble("plantedTotalDays", PlantedTotalDays);
+Vintagestory.GameContent/FruitingBushState.cs-96-		tree.SetDouble("matureTotalDays", MatureTotalDays);
+--
+Vintagestory.GameContent/BlockEntitySignRenderer.cs-77-			config = new TextAreaConfig();
+Vintagestory.GameContent/BlockEntitySignRenderer.cs-78-		}
+Vintagestory.GameContent/BlockEntitySignRenderer.cs-79-		fontSize = config.FontSize;
+Vintagestory.GameContent/BlockEntitySignRenderer.cs-80-		QuadWidth = config.textVoxelWidth / 16f;
+Vintagestory.GameContent/BlockEntitySignRenderer.cs-81-		QuadHeight = config.textVoxelHeight / 16f;
+Vintagestory.GameContent/BlockEntitySignRenderer.cs-82-		verticalAlign = config.VerticalAlign;
+Vintagestory.GameContent/BlockEntitySignRenderer.cs-83-		TextWidth = config.MaxWidth;
+Vintagestory.GameContent/BlockEntitySignRenderer.cs-84-		font = new CairoFont(fontSize, config.FontName, blackColor);
+Vintagestory.GameContent/BlockEntitySignRenderer.cs-85-		if (config.BoldFont)
+Vintagestory.GameContent/BlockEntitySignRenderer.cs-86-		{
+Vintagestory.GameContent/BlockEntitySignRenderer.cs-87-			font.WithWeight(FontWeight.Bold);
+Vintagestory.GameContent/BlockEntitySignRenderer.cs-88-		}
+Vintagestory.GameContent/BlockEntitySignRenderer.cs:89:		font.LineHeightMultiplier = 0.8999999761581421;
+Vintagestory.GameContent/BlockEntitySignRenderer.cs-90-		api.Event.RegisterRenderer(this, EnumRenderStage.Opaque, "sign");
+Vintagestory.GameContent/BlockEntitySignRenderer.cs-91-		MeshData quad = QuadMeshUtil.GetQuad();
+Vintagestory.GameContent/BlockEntitySignRenderer.cs-92-		quad.Uv = new float[8] { 1f, 1f, 0f, 1f, 0f, 0f, 1f, 0f };
+Vintagestory.GameContent/BlockEntitySignRenderer.cs-93-		quad.Rgba = new byte[16];
+Vintagestory.GameContent/BlockEntitySignRenderer.cs-94-		quad.Rgba.Fill(byte.MaxValue);
+Vintagestory.GameContent/BlockEntitySignRenderer.cs-95-		quadModelRef = api.Render.UploadMesh(quad);
+Vintagestory.GameContent/BlockEntitySignRenderer.cs-96-		Block block = api.World.BlockAccessor.GetBlock(pos);
+Vintagestory.GameContent/BlockEntitySignRenderer.cs-97-		BlockFacing blockFacing = BlockFacing.FromCode(block.LastCodePart());
+Vintagestory.GameContent/BlockEntitySignRenderer.cs-98-		if (blockFacing != null)
+Vintagestory.GameContent/BlockEntitySignRenderer.cs-99-		{
+Vintagestory.GameContent/BlockEntitySignRenderer.cs-100-			float num = ((block.Variant["attachment"] == "wall") ? 0.22f : 0f);
+Vintagestory.GameContent/BlockEntitySignRenderer.cs-101-			translateY = 0.5625f;
+Vintagestory.GameContent/BlockEntitySignRenderer.cs-102-			switch (blockFacing.Index)
+Vintagestory.GameContent/BlockEntitySignRenderer.cs-103-			{
+Vintagestory.GameContent/BlockEntitySignRenderer.cs-104-			case 0:
+Vintagestory.GameContent/BlockEntitySignRenderer.cs-105-				translateX = 0.5f;
+Vintagestory.GameContent/BlockEntitySignRenderer.cs-106-				translateZ = 0.29000002f - num;
+Vintagestory.GameContent/BlockEntitySignRenderer.cs-107-				rotY = 180f;
+Vintagestory.GameContent/BlockEntitySignRenderer.cs-108-				break;
+Vintagestory.GameContent/BlockEntitySignRenderer.cs-109-			case 1:
+Vintagestory.GameContent/BlockEntitySignRenderer.cs-110-				translateX = 0.71f + num;
+Vintagestory.GameContent/BlockEntitySignRenderer.cs-111-				translateZ = 0.5f;
+Vintagestory.GameContent/BlockEntitySignRenderer.cs-112-				rotY = 90f;
+Vintagestory.GameContent/BlockEntitySignRenderer.cs-113-				break;
+Vintagestory.GameContent/BlockEntitySignRenderer.cs-114-			case 2:
+--
+Vintagestory.GameContent/CookingRecipe.cs-61-		}
+Vintagestory.GameContent/CookingRecipe.cs-62-		return new VanillaCookingRecipeNames().GetNameForIngredients(worldForResolve, Code, inputStacks);
+Vintagestory.GameContent/CookingRecipe.cs-63-	}
+Vintagestory.GameContent/CookingRecipe.cs-64-
+Vintagestory.GameContent/CookingRecipe.cs-65-	public bool Matches(ItemStack?[] inputStacks, ref int quantityServings)
+Vintagestory.GameContent/CookingRecipe.cs-66-	{
+Vintagestory.GameContent/CookingRecipe.cs-67-		if (Ingredients == null)
+Vintagestory.GameContent/CookingRecipe.cs-68-		{
+Vintagestory.GameContent/CookingRecipe.cs-69-			return false;
+Vintagestory.GameContent/CookingRecipe.cs-70-		}
+Vintagestory.GameContent/CookingRecipe.cs-71-		List<ItemStack> list = new List<ItemStack>(inputStacks);
+Vintagestory.GameContent/CookingRecipe.cs-72-		List<CookingRecipeIngredient> list2 = Ingredients.ToList();
+Vintagestory.GameContent/CookingRecipe.cs:73:		int num = 99999;
+Vintagestory.GameContent/CookingRecipe.cs-74-		int[] array = new int[list2.Count];
+Vintagestory.GameContent/CookingRecipe.cs-75-		for (int i = 0; i < array.Length; i++)
+Vintagestory.GameContent/CookingRecipe.cs-76-		{
+Vintagestory.GameContent/CookingRecipe.cs-77-			array[i] = 0;
+Vintagestory.GameContent/CookingRecipe.cs-78-		}
+Vintagestory.GameContent/CookingRecipe.cs-79-		while (list.Count > 0)
+Vintagestory.GameContent/CookingRecipe.cs-80-		{
+Vintagestory.GameContent/CookingRecipe.cs-81-			ItemStack itemStack = list[0];
+Vintagestory.GameContent/CookingRecipe.cs-82-			list.RemoveAt(0);
+Vintagestory.GameContent/CookingRecipe.cs-83-			if (itemStack == null)
+Vintagestory.GameContent/CookingRecipe.cs-84-			{
+Vintagestory.GameContent/CookingRecipe.cs-85-				continue;
+Vintagestory.GameContent/CookingRecipe.cs-86-			}
+Vintagestory.GameContent/CookingRecipe.cs-87-			bool flag = false;
+Vintagestory.GameContent/CookingRecipe.cs-88-			for (int j = 0; j < list2.Count; j++)
+Vintagestory.GameContent/CookingRecipe.cs-89-			{
+Vintagestory.GameContent/CookingRecipe.cs-90-				CookingRecipeIngredient cookingRecipeIngredient = list2[j];
+Vintagestory.GameContent/CookingRecipe.cs-91-				CookingRecipeStack matchingStack = cookingRecipeIngredient.GetMatchingStack(itemStack);
+Vintagestory.GameContent/CookingRecipe.cs-92-				if (matchingStack != null && array[j] < cookingRecipeIngredient.MaxQuantity)
+Vintagestory.GameContent/CookingRecipe.cs-93-				{
+Vintagestory.GameContent/CookingRecipe.cs-94-					int val = itemStack.StackSize / matchingStack.StackSize;
+Vintagestory.GameContent/CookingRecipe.cs-95-					WaterTightContainableProps containableProps = BlockLiquidContainerBase.GetContainableProps(itemStack);
+Vintagestory.GameContent/CookingRecipe.cs-96-					if (containableProps != null)
+Vintagestory.GameContent/CookingRecipe.cs-97-					{
+Vintagestory.GameContent/CookingRecipe.cs-98-						val = (int)((float)(itemStack.StackSize / matchingStack.StackSize) / containableProps.ItemsPerLitre / cookingRecipeIngredient.PortionSizeLitres);
+--
+Vintagestory.GameContent/EntityBehaviorMortallyWoundable.cs-155-		if (!entity.Alive || entity.ShouldDespawn || HealthState == EnumEntityHealthState.Normal || entity.World.Side == EnumAppSide.Client)
+Vintagestory.GameContent/EntityBehaviorMortallyWoundable.cs-156-		{
+Vintagestory.GameContent/EntityBehaviorMortallyWoundable.cs-157-			return;
+Vintagestory.GameContent/EntityBehaviorMortallyWoundable.cs-158-		}
+Vintagestory.GameContent/EntityBehaviorMortallyWoundable.cs-159-		if (HealthState == EnumEntityHealthState.Recovering && (!entity.AnimManager.IsAnimationActive("wounded-stand") || entity.AnimManager.GetAnimationState("wounded-stand").AnimProgress > 0.9f))
+Vintagestory.GameContent/EntityBehaviorMortallyWoundable.cs-160-		{
+Vintagestory.GameContent/EntityBehaviorMortallyWoundable.cs-161-			HealthState = EnumEntityHealthState.Normal;
+Vintagestory.GameContent/EntityBehaviorMortallyWoundable.cs-162-		}
+Vintagestory.GameContent/EntityBehaviorMortallyWoundable.cs-163-		if (entity.World.Rand.NextDouble() < 0.03 && HealthState == EnumEntityHealthState.MortallyWounded && entity.World.Calendar.TotalHours > MortallyWoundedTotalHours + (double)remainAliveHours)
+Vintagestory.GameContent/EntityBehaviorMortallyWoundable.cs-164-		{
+Vintagestory.GameContent/EntityBehaviorMortallyWoundable.cs-165-			Die();
+Vintagestory.GameContent/EntityBehaviorMortallyWoundable.cs-166-		}
+Vintagestory.GameContent/EntityBehaviorMortallyWoundable.cs:167:		if ((entity.World.Calendar.TotalHours - MortallyWoundedTotalHours) / (double)remainAliveHours > 0.8299999833106995)
+Vintagestory.GameContent/EntityBehaviorMortallyWoundable.cs-168-		{
+Vintagestory.GameContent/EntityBehaviorMortallyWoundable.cs-169-			if (entity.AnimManager.IsAnimationActive("wounded-idle"))
+Vintagestory.GameContent/EntityBehaviorMortallyWoundable.cs-170-			{
+Vintagestory.GameContent/EntityBehaviorMortallyWoundable.cs-171-				entity.AnimManager.StopAnimation("wounded-idle");
+Vintagestory.GameContent/EntityBehaviorMortallyWoundable.cs-172-				entity.AnimManager.StartAnimation("wounded-resthead");
+Vintagestory.GameContent/EntityBehaviorMortallyWoundable.cs-173-			}
+Vintagestory.GameContent/EntityBehaviorMortallyWoundable.cs-174-			return;
+Vintagestory.GameContent/EntityBehaviorMortallyWoundable.cs-175-		}
+Vintagestory.GameContent/EntityBehaviorMortallyWoundable.cs-176-		accum += deltaTime;
+Vintagestory.GameContent/EntityBehaviorMortallyWoundable.cs-177-		if (accum > 7f && entity.World.Rand.NextDouble() < 0.005)
+Vintagestory.GameContent/EntityBehaviorMortallyWoundable.cs-178-		{
+Vintagestory.GameContent/EntityBehaviorMortallyWoundable.cs-179-			string[] array = new string[3] { "wounded-look", "wounded-spasm", "wounded-trystand" };
+Vintagestory.GameContent/EntityBehaviorMortallyWoundable.cs-180-			entity.AnimManager.StartAnimation(array[entity.World.Rand.Next(array.Length)]);
+Vintagestory.GameContent/EntityBehaviorMortallyWoundable.cs-181-			accum = 0f;
+Vintagestory.GameContent/EntityBehaviorMortallyWoundable.cs-182-		}
+Vintagestory.GameContent/EntityBehaviorMortallyWoundable.cs-183-	}
+Vintagestory.GameContent/EntityBehaviorMortallyWoundable.cs-184-
+Vintagestory.GameContent/EntityBehaviorMortallyWoundable.cs-185-	public override void OnEntityReceiveDamage(DamageSource damageSource, ref float damage)
+Vintagestory.GameContent/EntityBehaviorMortallyWoundable.cs-186-	{
+Vintagestory.GameContent/EntityBehaviorMortallyWoundable.cs-187-		if (entity.World.Side == EnumAppSide.Client)
+Vintagestory.GameContent/EntityBehaviorMortallyWoundable.cs-188-		{
+Vintagestory.GameContent/EntityBehaviorMortallyWoundable.cs-189-			return;
+Vintagestory.GameContent/EntityBehaviorMortallyWoundable.cs-190-		}
+Vintagestory.GameContent/EntityBehaviorMortallyWoundable.cs-191-		if (ebh.Health - damage <= 0f && HealthState == EnumEntityHealthState.Normal)
+Vintagestory.GameContent/EntityBehaviorMortallyWoundable.cs-192-		{
+--
+Vintagestory.GameContent/BlockWaterfall.cs-103-	}
+Vintagestory.GameContent/BlockWaterfall.cs-104-
+Vintagestory.GameContent/BlockWaterfall.cs-105-	public override float GetTraversalCost(BlockPos pos, EnumAICreatureType creatureType)
+Vintagestory.GameContent/BlockWaterfall.cs-106-	{
+Vintagestory.GameContent/BlockWaterfall.cs-107-		if (creatureType == EnumAICreatureType.SeaCreature && !isBoiling)
+Vintagestory.GameContent/BlockWaterfall.cs-108-		{
+Vintagestory.GameContent/BlockWaterfall.cs-109-			return 0f;
+Vintagestory.GameContent/BlockWaterfall.cs-110-		}
+Vintagestory.GameContent/BlockWaterfall.cs-111-		if (!isBoiling || creatureType == EnumAICreatureType.HeatProofCreature)
+Vintagestory.GameContent/BlockWaterfall.cs-112-		{
+Vintagestory.GameContent/BlockWaterfall.cs-113-			return 5f;
+Vintagestory.GameContent/BlockWaterfall.cs-114-		}
+Vintagestory.GameContent/BlockWaterfall.cs:115:		return 99999f;
+Vintagestory.GameContent/BlockWaterfall.cs-116-	}
+Vintagestory.GameContent/BlockWaterfall.cs-117-}
+--
+Vintagestory.GameContent/ModSystemSupportBeamPlacer.cs-447-
+Vintagestory.GameContent/ModSystemSupportBeamPlacer.cs-448-	private void chunkremove(BlockPos blockpos, StartEnd startend)
+Vintagestory.GameContent/ModSystemSupportBeamPlacer.cs-449-	{
+Vintagestory.GameContent/ModSystemSupportBeamPlacer.cs-450-		GetSbData(blockpos)?.Beams.Remove(startend);
+Vintagestory.GameContent/ModSystemSupportBeamPlacer.cs-451-	}
+Vintagestory.GameContent/ModSystemSupportBeamPlacer.cs-452-
+Vintagestory.GameContent/ModSystemSupportBeamPlacer.cs-453-	public double GetStableMostBeam(BlockPos blockpos, out StartEnd beamstartend)
+Vintagestory.GameContent/ModSystemSupportBeamPlacer.cs-454-	{
+Vintagestory.GameContent/ModSystemSupportBeamPlacer.cs-455-		SupportBeamsData sbData = GetSbData(blockpos);
+Vintagestory.GameContent/ModSystemSupportBeamPlacer.cs-456-		if (sbData.Beams == null || sbData.Beams.Count == 0)
+Vintagestory.GameContent/ModSystemSupportBeamPlacer.cs-457-		{
+Vintagestory.GameContent/ModSystemSupportBeamPlacer.cs-458-			beamstartend = null;
+Vintagestory.GameContent/ModSystemSupportBeamPlacer.cs:459:			return 99999.0;
+Vintagestory.GameContent/ModSystemSupportBeamPlacer.cs-460-		}
+Vintagestory.GameContent/ModSystemSupportBeamPlacer.cs:461:		double num = 99999.0;
+Vintagestory.GameContent/ModSystemSupportBeamPlacer.cs-462-		StartEnd startEnd = null;
+Vintagestory.GameContent/ModSystemSupportBeamPlacer.cs-463-		Vec3d point = blockpos.ToVec3d();
+Vintagestory.GameContent/ModSystemSupportBeamPlacer.cs-464-		foreach (StartEnd beam in sbData.Beams)
+Vintagestory.GameContent/ModSystemSupportBeamPlacer.cs-465-		{
+Vintagestory.GameContent/ModSystemSupportBeamPlacer.cs-466-			bool num2;
+Vintagestory.GameContent/ModSystemSupportBeamPlacer.cs-467-			if (!((beam.Start - beam.End).Length() * 1.5 < Math.Abs(beam.End.Y - beam.Start.Y)))
+Vintagestory.GameContent/ModSystemSupportBeamPlacer.cs-468-			{
+Vintagestory.GameContent/ModSystemSupportBeamPlacer.cs-469-				if (!isBeamStableAt(beam.Start))
+Vintagestory.GameContent/ModSystemSupportBeamPlacer.cs-470-				{
+Vintagestory.GameContent/ModSystemSupportBeamPlacer.cs-471-					continue;
+Vintagestory.GameContent/ModSystemSupportBeamPlacer.cs-472-				}
+Vintagestory.GameContent/ModSystemSupportBeamPlacer.cs-473-				num2 = isBeamStableAt(beam.End);
+Vintagestory.GameContent/ModSystemSupportBeamPlacer.cs-474-			}
+Vintagestory.GameContent/ModSystemSupportBeamPlacer.cs-475-			else
+Vintagestory.GameContent/ModSystemSupportBeamPlacer.cs-476-			{
+Vintagestory.GameContent/ModSystemSupportBeamPlacer.cs-477-				if (isBeamStableAt(beam.Start))
+Vintagestory.GameContent/ModSystemSupportBeamPlacer.cs-478-				{
+Vintagestory.GameContent/ModSystemSupportBeamPlacer.cs-479-					goto IL_00de;
+Vintagestory.GameContent/ModSystemSupportBeamPlacer.cs-480-				}
+Vintagestory.GameContent/ModSystemSupportBeamPlacer.cs-481-				num2 = isBeamStableAt(beam.End);
+Vintagestory.GameContent/ModSystemSupportBeamPlacer.cs-482-			}
+Vintagestory.GameContent/ModSystemSupportBeamPlacer.cs-483-			if (!num2)
+Vintagestory.GameContent/ModSystemSupportBeamPlacer.cs-484-			{
+Vintagestory.GameContent/ModSystemSupportBeamPlacer.cs-485-				continue;
+Vintagestory.GameContent/ModSystemSupportBeamPlacer.cs-486-			}
+--
+Vintagestory.GameContent/AiTaskButterflyWander.cs-77-			ReadjustFlyHeight();
+Vintagestory.GameContent/AiTaskButterflyWander.cs-78-		}
+Vintagestory.GameContent/AiTaskButterflyWander.cs-79-		wanderDuration -= dt;
+Vintagestory.GameContent/AiTaskButterflyWander.cs-80-		double num = GameMath.Clamp(desiredYPos - entity.Pos.Y, -1.0, 1.0);
+Vintagestory.GameContent/AiTaskButterflyWander.cs-81-		float val = GameMath.AngleRadDistance(desiredYaw, entity.Pos.Yaw);
+Vintagestory.GameContent/AiTaskButterflyWander.cs-82-		if (!entity.FeetInLiquid)
+Vintagestory.GameContent/AiTaskButterflyWander.cs-83-		{
+Vintagestory.GameContent/AiTaskButterflyWander.cs-84-			entity.Pos.Yaw += GameMath.Clamp(val, (0f - curTurnRadPerSec) * dt * ((num < 0.0) ? 0.25f : 1f), curTurnRadPerSec * dt * ((num < 0.0) ? 0.25f : 1f));
+Vintagestory.GameContent/AiTaskButterflyWander.cs-85-			entity.Pos.Yaw = entity.Pos.Yaw % ((float)Math.PI * 2f);
+Vintagestory.GameContent/AiTaskButterflyWander.cs-86-		}
+Vintagestory.GameContent/AiTaskButterflyWander.cs-87-		else if (entity.World.Rand.NextDouble() < 0.001)
+Vintagestory.GameContent/AiTaskButterflyWander.cs-88-		{
+Vintagestory.GameContent/AiTaskButterflyWander.cs:89:			entity.Pos.Motion.Y = 0.019999999552965164;
+Vintagestory.GameContent/AiTaskButterflyWander.cs-90-		}
+Vintagestory.GameContent/AiTaskButterflyWander.cs-91-		double z = Math.Cos(entity.Pos.Yaw);
+Vintagestory.GameContent/AiTaskButterflyWander.cs-92-		double x = Math.Sin(entity.Pos.Yaw);
+Vintagestory.GameContent/AiTaskButterflyWander.cs-93-		entity.Controls.WalkVector.Set(x, num, z);
+Vintagestory.GameContent/AiTaskButterflyWander.cs-94-		entity.Controls.WalkVector.Mul(moveSpeed);
+Vintagestory.GameContent/AiTaskButterflyWander.cs-95-		if (num < 0.0)
+Vintagestory.GameContent/AiTaskButterflyWander.cs-96-		{
+Vintagestory.GameContent/AiTaskButterflyWander.cs-97-			entity.Controls.WalkVector.Mul(0.75);
+Vintagestory.GameContent/AiTaskButterflyWander.cs-98-		}
+Vintagestory.GameContent/AiTaskButterflyWander.cs-99-		if (entity.Swimming)
+Vintagestory.GameContent/AiTaskButterflyWander.cs-100-		{
+Vintagestory.GameContent/AiTaskButterflyWander.cs-101-			entity.Controls.WalkVector.Y = 2f * moveSpeed;
+Vintagestory.GameContent/AiTaskButterflyWander.cs-102-			entity.Controls.FlyVector.Y = 2f * moveSpeed;
+Vintagestory.GameContent/AiTaskButterflyWander.cs-103-		}
