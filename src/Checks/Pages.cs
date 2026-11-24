@@ -96,7 +96,11 @@ namespace VintageDoctor
                     break;
                 case Checks.TopicCrash: Checks.Guarded(x, "crash", () => Checks.Crash(x, true)); if (!(server && x.SameProcess)) Checks.Guarded(x, "shutdown", () => Checks.Shutdown(x)); break;
                 case Checks.TopicStartup: Checks.Guarded(x, "startup", () => Checks.Startup(x, true)); break;
-                case Checks.TopicLog: Checks.Guarded(x, "log", () => Checks.Log(x, true, arg.Length > 0 && arg != "all" ? arg : null)); break;
+                case Checks.TopicLog:
+                    Checks.Guarded(x, "log", () => Checks.Log(x, true, arg.Length > 0 && arg != "all" ? arg : null));
+                    // The log's errors about formatting tags are on their own card, with whose text each was.
+                    if (x.Ev.Log?.TagErrors.Count > 0) Checks.Guarded(x, "tags", () => Checks.TextTagsCheck(x, true, arg.Length > 0 && arg != "all" ? arg : null));
+                    break;
                 case Checks.TopicMods: Checks.Guarded(x, "mods", () => Checks.ModsPage(x)); break;
                 case Checks.TopicMod:
                     if (arg.Length == 0) Checks.Guarded(x, "mods", () => Checks.ModsPage(x));
@@ -117,6 +121,7 @@ namespace VintageDoctor
                     break;
                 case Checks.TopicClashes:
                     Checks.Guarded(x, "clashes", () => Checks.Clashes(x, true));
+                    Checks.Guarded(x, "tags", () => Checks.TextTagsCheck(x, true));
                     if (server || !x.Doctor.ServerAnswers) Checks.Guarded(x, "conflicts", () => Checks.Conflicts(x));
                     if (!(server && x.SameProcess)) Checks.Guarded(x, "patches", () => Checks.CodePatches(x, false));
                     if (server) Checks.Guarded(x, "jsonpatches", () => Checks.JsonPatchOverlaps(x));
@@ -167,6 +172,7 @@ namespace VintageDoctor
             { "targets-optional-why", 'm' }, { "notadded-why", 'm' }, { "guest-timeout", 'm' },
             { "gui-scanning-long", '-' }, { "questions-console", '-' }, { "btn-crash", '-' }, { "btn-crash-all", '-' }, { "btn-open-logs", '-' },
             { "api-help", '-' }, { "api-counts", '-' }, { "guest-fix-working", '-' },
+            { "tags-mod", 'm' }, { "tags-mod-maybe", 'm' }, { "tags-nomod", 'm' }, { "tags-ok", 'm' }, { "tags-why", '-' }, { "tags-advice-nomod", '-' }, { "tags-lang-why", '-' },
         };
         // log-texts-end
 
@@ -328,6 +334,7 @@ namespace VintageDoctor
             Checks.Guarded(x, "conflicts", () => Checks.Conflicts(x));
             Checks.Guarded(x, "jsonpatches", () => Checks.JsonPatchOverlaps(x));
             Checks.Guarded(x, "names", () => Checks.MissingNames(x));
+            Checks.Guarded(x, "tags", () => Checks.TextTagsCheck(x, false));
             if (!x.SameProcess)
             {
                 Checks.Guarded(x, "patches", () => Checks.CodePatches(x, false));
@@ -354,6 +361,7 @@ namespace VintageDoctor
                 Checks.Guarded(x, "conflicts", () => Checks.Conflicts(x));
                 Checks.Guarded(x, "names", () => Checks.MissingNames(x));
             }
+            Checks.Guarded(x, "tags", () => Checks.TextTagsCheck(x, false));
             Checks.Guarded(x, "patches", () => Checks.CodePatches(x, false));
             Checks.Guarded(x, "changes", () => Checks.Changes(x, false));
             Checks.Guarded(x, "modchecks", () => Checks.ModChecks(x));

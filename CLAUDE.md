@@ -48,5 +48,11 @@ and fixes what it can. More is in the "vintage story mods" project doc `claude/v
   that says "log" or "crash report" and isn't in it. Don't add the button by hand in a check; add the text to the table.
 - **Code patches** (`Checks.CodePatches`): one card per set of mods that patch the same method, the methods under it
   with what each mod does there. The example mod patches `SelfTest.SharedPlace` so the test run has a real shared place.
+- **Formatting tags** (1.5.0, `src/Core/TextTags.cs`, `Checks.TextTagsCheck`): `TextTags.Errors` mirrors the game's
+  `VtmlParser.Tokenize` and gives its error messages word for word, so an error in the log is matched to the lang
+  entry that makes exactly it. The log reader sets those errors aside (`LogScan.TagErrors`). The sick server has the
+  real thing: `tests/mods/DoctorCrashy` runs the game's parser on two texts that are also in doctorsick's lang file.
+- **Window:** `VintageDoctorSystem.Landing` sends another mod's open-request with no argument to the check-up;
+  `GuiDialogDoctor.FoldedAtFirst` decides which sections start folded.
 - **Nothing client-side has been seen by a session** (the window, the hotkey, the frame-rate and settings checks):
   CI only runs a server. Say so when reporting, and ask the user to look.

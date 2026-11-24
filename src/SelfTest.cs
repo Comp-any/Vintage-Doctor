@@ -131,6 +131,8 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             t.Guard("the pages", () => PagesOnRealServer(t, doctor, sapi, folder));
             t.Guard("opening logs", () => OpeningLogs(t, doctor, sapi, folder));
             t.Guard("code patches", () => SharedPatches(t, doctor, sapi));
+            t.Guard("formatting tags", () => FormattingTags(t, doctor, sapi, folder));
+            t.Guard("where the window opens, and folded sections", () => WindowRules(t));
             t.Guard("the example mods", () => Examples(t, doctor, sapi, folder));
             if (ci) t.Guard("fixes on the real server", () => RealFixes(t, doctor, sapi));
             else t.Skip("fixes on the real server", "only with SelfTestOnStart");
@@ -847,6 +849,19 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             t.Check("sick: a config file cut short, and whose it is", files.Contains("The config file doctorcrashy.json can't be read (most likely Doctor Crashy's)"), First(files, "doctorcrashy.json"));
             t.Check("sick: the crash report left by an earlier session", crash.Contains("The game crashed (11/21/2026 05:56:18): NullReferenceException"), First(crash, "crashed"));
             t.Check("sick: the crash is explained and its trace shown", crash.Contains("used something that wasn't there") && crash.Contains("FrameProfilerUtil.End()"));
+            // Formatting tags out of place: the test mod had the game's own parser read two of doctorsick's texts.
+            {
+                var tagged = ev.Log?.TagErrors ?? new List<(string, string)>();
+                string lever = TextTags.Errors("Pull the lever -> the gate opens")[0].message, hot = TextTags.Errors("<strong>Hot!</font> Don't touch")[0].message;   // font-ok: the test mod's text
+                t.Check("sick: the game's errors about formatting tags are read from its log, and are word for word what the doctor expects", tagged.Any(e => e.Item2 == lever) && tagged.Any(e => e.Item2 == hot),
+                    string.Join(" | ", tagged.Select(e => e.Item2)));
+                string doctorSick = Under(checkup, "Doctor Sick");
+                t.Check("sick: on the check-up they are traced to doctorsick's texts, under that mod, with the texts' keys", doctorSick.Contains("Doctor Sick's texts have formatting tags out of place: 2 error(s)")
+                    && doctorSick.Contains("doctorsick:lever-help") && doctorSick.Contains("doctorsick:hot-warning") && !doctorSick.Contains("doctorsick:fine-text"), First(doctorSick, "formatting tags") + " / " + First(doctorSick, "lever-help"));
+                t.Check("sick: and they aren't counted again as errors no mod could be named for", !log.Contains("Found closing tag"), First(log, "Found closing tag"));
+                // Whether the game wrote the whole text to a debug log is what this run finds out: said, not asserted.
+                t.Check("sick: the debug log was looked in for the texts themselves", true, ev.TagTexts.Count + " text(s) found there: " + string.Join(" | ", ev.TagTexts.Values.Take(2)));
+            }
             // The same pages as the world's side of a single-player game builds them: there the logs are on the
             // player's own computer, and what speaks of one has a button that opens it.
             {
@@ -1182,6 +1197,69 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
                 && buttons.Contains("|server-main.log|") && !both.Lines.Any(l => l.Text == "From the world's side:"), both.Lines.Count(l => l.Text.Contains("No errors in the log this session.")) + " card(s): " + buttons);
 
             string x_(string key) => Vintagestory.API.Config.Lang.GetL("en", "vintagedoctor:" + key);
+        }
+
+        /// <summary>
+        /// Formatting tags out of place (1.5.0): the game's errors read the way the game writes them, and traced to
+        /// the text, and so the mod, they came from. The sick server has the real thing (a test mod makes the game's
+        /// own parser write them).
+        /// </summary>
+        static void FormattingTags(Run_ t, VintageDoctorSystem doctor, ICoreServerAPI sapi, string folder)
+        {
+            string Msgs(string text) => string.Join(" | ", TextTags.Errors(text).Select(e => e.message));
+            const string tail = " See debug log for full text.";
+            t.Check("tags: a > on its own is found where the game finds it, in the game's words", Msgs("Pull the lever -> the gate opens")
+                == "Found closing tag char > but no tag was opened at 16. Use &gt;/&lt; if you want to display them as plain characters." + tail, Msgs("Pull the lever -> the gate opens"));
+            t.Check("tags: a closing tag that doesn't match the one open", Msgs("<strong>Hot!</font> Don't touch") == "Found closing tag <font> at position 18 but <strong> should be closed first." + tail, Msgs("<strong>Hot!</font> Don't touch"));
+            t.Check("tags: a closing tag never opened", Msgs("done</i>") == "Found closing tag <i> at position 7 but it was never opened." + tail, Msgs("done</i>"));
+            t.Check("tags: what the game reads fine is fine", Msgs("A <strong>proper</strong> text, &gt; written out<br><icon name=x/> and <font color=\"#fff\">this</font>") == "", Msgs("A <strong>proper</strong> text"));
+            t.Check("tags: as in the game, a > on its own then counts as a tag left open", Msgs("a > b </x>") == "Found closing tag char > but no tag was opened at 2. Use &gt;/&lt; if you want to display them as plain characters." + tail
+                + " | Found closing tag <x> at position 9 but <> should be closed first." + tail, Msgs("a > b </x>"));
+            t.Check("tags: an error's kind and place are read back from its words", TextTags.Kind(TextTags.Errors("x -> y")[0].message) == ">" && TextTags.Position(TextTags.Errors("x -> y")[0].message) == 3
+                && TextTags.Kind(TextTags.Errors("<b>x</i>")[0].message) == "</i><b>" && !TextTags.IsTagError("Found closing tags everywhere") && TextTags.IsTagError(TextTags.Errors("x -> y")[0].message));
+            string fixture = "1.1.2026 10:00:00 [Error] " + TextTags.Errors("x -> y")[0].message + "\n1.1.2026 10:00:01 [Error] " + TextTags.Errors("x -> y")[0].message + "\n1.1.2026 10:00:02 [Error] [somemod] a real error\n";
+            LogScan scanned = LogScan.FromText(fixture, doctor.Snapshot());
+            t.Check("tags: the log reader sets the game's tag errors aside, each time, and doesn't count them among the errors", scanned.TagErrors.Count == 2 && scanned.Issues.Count == 1, scanned.TagErrors.Count + " / " + scanned.Issues.Count);
+
+            // Whose they are: made-up texts of made-up mods, and made-up errors in the log.
+            string Run(string[] errors, Dictionary<string, string> shown, params (string key, string text)[] texts)
+            {
+                var ev = new Evidence { Side = EnumAppSide.Server, Mods = doctor.Snapshot(), Log = LogScan.FromText("", doctor.Snapshot()) };
+                foreach (string e in errors) ev.Log.TagErrors.Add(("1.1.2026 10:00:00", e));
+                if (shown != null) ev.TagTexts = shown;
+                var x = new DoctorContext { Doctor = doctor, Api = sapi, Side = EnumAppSide.Server, LanguageCode = "en", Topic = Checks.TopicClashes, Ev = ev, ListAll = true };
+                Checks.TextTagsCheck(x, true, null, TextTags.Scan(texts.Select(p => new KeyValuePair<string, string>(p.key, p.text))));
+                return x.R.PlainText(sapi.World);
+            }
+            string err = TextTags.Errors("Press it -> done")[0].message;
+            string exact = Run(new[] { err, err }, null, ("alpha:help", "Press it -> done"), ("alpha:other", "a <b>x</i>"), ("beta:fine", "all good"));
+            t.Check("tags: errors that fit one mod's text word for word are that mod's, with the text's key and what is wrong",
+                exact.Contains("alpha's texts have formatting tags out of place: 2 error(s) about them in the log this session") && exact.Contains("alpha:help: a > with no < before it, at character 10: Press it -> done")
+                && exact.Contains("Also alpha:other: </i> while <b> is still open") && !exact.Contains("beta"), exact.Replace("\n", " / "));
+            string moved = Run(new[] { TextTags.Errors("Name: Press it -> done")[0].message }, null, ("alpha:help", "Press it -> done"));
+            t.Check("tags: the same mistake at another place (something was put in front) is that mod's too, as likely", moved.Contains("alpha's texts are the likely cause of 1 error(s)") && moved.Contains("(likely"), moved.Replace("\n", " / "));
+            string shownIn = Run(new[] { err }, new Dictionary<string, string> { [err] = "Press it -> done" }, ("alpha:help", "Press it -> done"), ("gamma:same", "Press it -> done!"));
+            t.Check("tags: with the text the debug log held, the one text it is decides", shownIn.Contains("alpha's texts have formatting tags out of place") && !shownIn.Contains("gamma's texts have"), shownIn.Replace("\n", " / "));
+            string nobody = Run(new[] { err }, new Dictionary<string, string> { [err] = "Press it -> done" });
+            t.Check("tags: an error no mod's text fits is said as such, with the text shown and where to find it", nobody.Contains("1 error(s) about formatting tags in the log this session that no mod could be named for")
+                && nobody.Contains("Press it -> done") && nobody.Contains("server-debug.log"), nobody.Replace("\n", " / "));
+            string quiet = Run(new string[0], null, ("alpha:help", "Press it -> done"));
+            t.Check("tags: a mod's texts that would make the error, with none in the log, are something to know", quiet.Contains("• alpha: 1 of its texts have formatting tags out of place") && !quiet.Contains("⚠"), quiet.Replace("\n", " / "));
+            string clean = Run(new string[0], null, ("alpha:help", "all good"));
+            t.Check("tags: nothing out of place, and the check-up says so", clean.Contains("No formatting tags out of place"), clean.Replace("\n", " / "));
+            // The real texts of the mods on this server.
+            List<BrokenText> real = TextTags.LangProblems();
+            File.WriteAllText(Path.Combine(folder, "formatting-tags-in-lang.txt"), string.Join("\n", real.Select(b => b.Key + " | " + b.Message + " | " + b.Text.Replace("\n", "\\n"))));
+            t.Check("tags: every text of the game and its mods was read", real != null, real.Count + " text(s) with tags out of place, by domain: " + string.Join(", ", real.GroupBy(b => b.Domain).Select(g => g.Key + " " + g.Count())));
+        }
+
+        /// <summary>Where the window opens when another mod asks, and which sections of the check-up start folded (1.5.0).</summary>
+        static void WindowRules(Run_ t)
+        {
+            t.Check("window: a mod's key or command with nothing more said opens the check-up, not the mod's page", VintageDoctorSystem.Landing("emc", "") == Pages.Overview && VintageDoctorSystem.Landing("farrelief", " ") == Pages.Overview);
+            t.Check("window: asked for something in particular, it opens that", VintageDoctorSystem.Landing("emc", "machines") == "emc" && VintageDoctorSystem.Landing("crash", "") == "crash" && VintageDoctorSystem.Landing("mods", "") == "mods");
+            t.Check("window: a mod's section starts folded when nothing in it needs attention, and open when something does; the game's starts open",
+                GuiDialogDoctor.FoldedAtFirst("carryon", 0) && !GuiDialogDoctor.FoldedAtFirst("carryon", 2) && !GuiDialogDoctor.FoldedAtFirst(DoctorReport.GameSection, 0) && GuiDialogDoctor.FoldedAtFirst(DoctorReport.RestSection, 0));
         }
 
         /// <summary>

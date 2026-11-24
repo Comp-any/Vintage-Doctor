@@ -21,7 +21,8 @@ You get a check-up: one card per check.
 - The check-up runs every check each time, and is laid out **by mod**: first a section for the game itself (crashes,
   lag, the Mods folder, the world), then one for each mod with something against it or something to offer, worst
   first, then one card for the mods nothing was found against.
-- The list next to *Run checks again* shows one mod's section alone.
+- The list next to *Run checks again* shows one mod's section alone. Each section folds from its heading; a mod's
+  section with nothing to look at starts folded.
 - Wherever a card or a page speaks of a log, a button opens it in your text editor: *Open client-main.log*, *Open
   server-crash.log*, or *Open the Logs folder* where it is the logs as a whole. (The game's window may stay in front:
   the file is behind it.) A server that is another computer can't offer that; its log's errors are on the doctor's
@@ -43,6 +44,7 @@ server's findings are shown to its admins only, under "On the server:".
 | **The Mods folder** | Zips that can't be opened, mods zipped inside a folder or inside another zip, zips with `\` in their file names (nothing in them loads on Linux and Mac), source code downloaded instead of a release, `.rar` and `.7z` files, downloads that didn't finish, mods made for a newer game. |
 | **Config files** | Files in `ModConfig` that are empty or no longer valid JSON, and whose they are. |
 | **Lag** | The server's tick times, your frame rate, what's loaded, memory. **Measure where the time goes** runs the game's own profiler for 20 seconds and shows the time by part of the game and by mod. |
+| **Texts with formatting tags out of place** | The game's "Found closing tag" errors (from chat, item descriptions, the handbook) traced to the mod and the text that makes them, by reading every mod's texts the way the game does. |
 | **Mods against each other** | Which mods change the game's code, and for every place two of them change: which place, which mods, and what each does there (runs before the game's code, after it, or rewrites it); JSON patches from different mods on the same thing; files that two mods both replace (only one copy is used); recipes with the same ingredients that make different things; the same code library in two mods; mods that say they clash; your mods' versions against the server's. |
 | **Mods against themselves** | Blocks and items that name code no loaded mod has (they exist but do nothing); two things added under the same name (only the first exists); files of a mod the game couldn't read; a mod whose blocks and items never arrived; code in a mod that calls itself a content mod (the game leaves it out); a `.dll` in a subfolder (the game refuses the mod); patches for files that are no longer there; mods that ship whole copies of the game's files from an older version; mods with their own copy of a library the game has; mods with code made for an older game that have errors now; things that show a code instead of a name. |
 | **The world** | Free disk space where it is saved; blocks and items left by mods that are gone; time running at another pace. |

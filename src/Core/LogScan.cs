@@ -96,6 +96,11 @@ namespace VintageDoctor
         /// <summary>"Server overloaded. A tick took Nms": when and how long.</summary>
         public readonly List<(string time, long ms)> Overloads = new List<(string, long)>();
         public bool CompileFailed;
+        /// <summary>
+        /// The game's errors about formatting tags in a text it showed ("Found closing tag char > but no tag was
+        /// opened at 12..."), each time with when. Not counted among the errors: <see cref="TextTags"/> finds whose they are.
+        /// </summary>
+        public readonly List<(string time, string message)> TagErrors = new List<(string, string)>();
 
         public IEnumerable<LogIssue> For(string modId) => Issues.Where(i => string.Equals(i.Mod, modId, StringComparison.OrdinalIgnoreCase));
 
@@ -391,6 +396,7 @@ namespace VintageDoctor
                 }
                 // The line after "Failed resolving …" says the same about the whole recipe: one count is enough.
                 if (text.Contains("contains an ingredient that cannot be resolved")) continue;
+                if (tag == null && TextTags.IsTagError(text)) { TagErrors.Add((e.Time, text.Trim())); continue; }
                 Match ov = Overload.Match(text);
                 if (ov.Success) { if (long.TryParse(ov.Groups[1].Value, out long ms)) Overloads.Add((e.Time, ms)); continue; }
 

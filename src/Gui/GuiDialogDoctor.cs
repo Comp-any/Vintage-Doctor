@@ -117,6 +117,13 @@ namespace VintageDoctor
         readonly HashSet<State> hidden = new HashSet<State>();
         /// <summary>On the check-up: the one section shown (a mod's id, or the game's), picked from the list at the top. Null for all of them.</summary>
         string modFilter;
+        /// <summary>
+        /// On the check-up: sections the player folded or unfolded by clicking their heading (true: folded). Kept
+        /// while the window is open; a section nobody clicked is folded when it has no warnings or problems.
+        /// </summary>
+        readonly Dictionary<string, bool> foldedByHand = new Dictionary<string, bool>(StringComparer.Ordinal);
+        /// <summary>For each section of the page shown: how many checks, warnings and problems it has.</summary>
+        readonly Dictionary<string, (int checks, int warn, int fail)> sectionCounts = new Dictionary<string, (int, int, int)>(StringComparer.Ordinal);
         bool busy;
         string busyText;
         DateTime receivedAt = DateTime.Now;
@@ -279,6 +286,11 @@ namespace VintageDoctor
             List<Entry> entries = modFilter == null ? all : all.Where(e => string.IsNullOrEmpty(e.Section) || e.Section == modFilter).ToList();
             // A card that is under two mods is one check.
             List<Entry> counted = entries.Where(e => e.Kind == Kind.Check).GroupBy(e => (e.State, e.Plain)).Select(g => g.First()).ToList();
+            sectionCounts.Clear();
+            foreach (var g in all.Where(e => e.Kind == Kind.Check && !string.IsNullOrEmpty(e.Section)).GroupBy(e => e.Section))
+                sectionCounts[g.Key] = (g.Count(), g.Count(e => e.State == State.Warn), g.Count(e => e.State == State.Fail));
+            // A folded section shows its heading only (with what is in it); the list at the top showing one section shows it whole.
+            if (modFilter == null) entries = entries.Where(e => e.Kind == Kind.Heading || string.IsNullOrEmpty(e.Section) || !Folded(e.Section)).ToList();
             int ok = counted.Count(e => e.State == State.Ok);
             int warn = counted.Count(e => e.State == State.Warn);
             int fail = counted.Count(e => e.State == State.Fail);
@@ -447,7 +459,33 @@ namespace VintageDoctor
                     {
                         CairoFont f = CairoFont.WhiteSmallishText().WithColor(Gold).WithWeight(FontWeight.Bold);
                         y += 6;
-                        y = AddRow(c, parent, e.Plain, f, 2, y);
+                        // On the check-up a section's heading folds and unfolds it: a drawn triangle in front, and
+                        // when folded, what is in it after the name.
+                        bool foldable = modFilter == null && !string.IsNullOrEmpty(e.Section) && sectionCounts.ContainsKey(e.Section);
+                        if (!foldable)
+                        {
+                            y = AddRow(c, parent, e.Plain, f, 2, y);
+                        }
+                        else
+                        {
+                            bool folded = Folded(e.Section);
+                            double top = y;
+                            var parts = new List<RichTextComponentBase> { new RichTextComponent(capi, e.Plain, f) { VerticalAlign = EnumVerticalAlign.Middle } };
+                            if (folded)
+                            {
+                                var (checks, warn, fail) = sectionCounts[e.Section];
+                                string what = warn + fail == 0 ? Lang.Get("vintagedoctor:gui-folded-fine", checks) : Lang.Get("vintagedoctor:gui-folded", checks, warn, fail);
+                                parts.Add(new RichTextComponent(capi, "   " + GameFont.Drawable(what), CairoFont.WhiteDetailText().WithColor(new double[] { 0.72, 0.72, 0.72, 1 })) { VerticalAlign = EnumVerticalAlign.Middle });
+                            }
+                            double h = TextHeight(f, e.Plain, CardW - 24);
+                            c.AddRichtext(parts.ToArray(), In(parent, ElementBounds.Fixed(22, y, CardW - 22, h + 2)));
+                            double rowH = h;
+                            ElementBounds tri = In(parent, ElementBounds.Fixed(2, top, 18, rowH));
+                            Canvas(c, tri, (ctx, b) => DrawTriangle(ctx, GuiElement.scaled(9), b.OuterHeight / 2, !folded, Gold));
+                            string key = e.Section;
+                            c.AddInteractiveElement(new GuiElementHotspot(capi, In(parent, ElementBounds.Fixed(CardX, top, CardW, rowH)), () => ToggleSection(key)));
+                            y += h;
+                        }
                         ElementBounds line = In(parent, ElementBounds.Fixed(CardX, y - 2, CardW, 2));
                         Canvas(c, line, (ctx, b) => { ctx.SetSourceRGBA(Gold[0], Gold[1], Gold[2], 0.35); ctx.Rectangle(0, 0, b.OuterWidth, GuiElement.scaled(1)); ctx.Fill(); });
                         return y + 6;
@@ -725,6 +763,38 @@ namespace VintageDoctor
             ctx.Fill();
         }
 
+        /// <summary>A small triangle centred on (tx, cy): pointing right when closed, down when open.</summary>
+        static void DrawTriangle(Context ctx, double tx, double cy, bool open, double[] colour)
+        {
+            double s = GuiElement.scaled(5);
+            ctx.NewPath();
+            if (open) { ctx.MoveTo(tx - s, cy - s * 0.6); ctx.LineTo(tx + s, cy - s * 0.6); ctx.LineTo(tx, cy + s * 0.8); }
+            else { ctx.MoveTo(tx - s * 0.6, cy - s); ctx.LineTo(tx + s * 0.8, cy); ctx.LineTo(tx - s * 0.6, cy + s); }
+            ctx.ClosePath();
+            ctx.SetSourceRGBA(colour[0], colour[1], colour[2], colour[3]);
+            ctx.Fill();
+        }
+
+        /// <summary>Whether a section of the check-up is folded: as the player left it, else folded when nothing in it needs attention.</summary>
+        bool Folded(string section)
+        {
+            if (string.IsNullOrEmpty(section)) return false;
+            if (foldedByHand.TryGetValue(section, out bool byHand)) return byHand;
+            return FoldedAtFirst(section, sectionCounts.TryGetValue(section, out var n) ? n.warn + n.fail : 0);
+        }
+
+        /// <summary>
+        /// A mod's section (and the one for the mods nothing was found against) starts folded when it has no warnings
+        /// or problems; the game's own, with the doctor's pages in it, starts open.
+        /// </summary>
+        internal static bool FoldedAtFirst(string section, int needAttention) => section != DoctorReport.GameSection && needAttention == 0;
+
+        void ToggleSection(string section)
+        {
+            foldedByHand[section] = !Folded(section);
+            Recompose();
+        }
+
         static void DrawCheckCard(Context ctx, ElementBounds b, double[] colour, double headH, bool open, bool canOpen, List<(double x, double y)> arrows)
         {
             DrawCard(ctx, b, colour, CardBg);
@@ -751,16 +821,7 @@ namespace VintageDoctor
             ctx.LineWidth = GuiElement.scaled(1);
             ctx.Stroke();
             // Left of the dot, a small triangle on a card that opens: pointing right while closed, down while open.
-            if (canOpen)
-            {
-                double tx = GuiElement.scaled(19), s = GuiElement.scaled(5);
-                ctx.NewPath();
-                if (open) { ctx.MoveTo(tx - s, cy - s * 0.6); ctx.LineTo(tx + s, cy - s * 0.6); ctx.LineTo(tx, cy + s * 0.8); }
-                else { ctx.MoveTo(tx - s * 0.6, cy - s); ctx.LineTo(tx + s * 0.8, cy); ctx.LineTo(tx - s * 0.6, cy + s); }
-                ctx.ClosePath();
-                ctx.SetSourceRGBA(0.85, 0.8, 0.7, 1);
-                ctx.Fill();
-            }
+            if (canOpen) DrawTriangle(ctx, GuiElement.scaled(19), cy, open, new[] { 0.85, 0.8, 0.7, 1 });
             // An arrow before each line that says what to do.
             if (open && arrows != null)
             {

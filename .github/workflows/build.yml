@@ -172,6 +172,9 @@ jobs:
           cp "$data"/ModData/vintagedoctor/selftest/*.txt results/sick/ 2>/dev/null
           cp "$data/ModData/vintagedoctor/selftest/selftest.txt" results/selftest-sick.txt 2>/dev/null
           cp "$data/Logs/server-main.log" results/sick-server-main.log 2>/dev/null
+          # Which of the server's logs got the full text of a broken formatting tag (the game's VerboseDebug line).
+          ls -la "$data/Logs/" > results/sick-server-logs-list.txt 2>/dev/null || true
+          grep -n -A2 "Found closing tag" "$data"/Logs/*.log > results/sick-server-tag-lines.txt 2>/dev/null || true
           cp "$data/ModData/vintagedoctor/startup-checkup.txt" results/sick-startup-checkup.txt 2>/dev/null
           ls -la "$data/Mods" > results/sick-mods-after-fixes.txt
           find "$data/ModData/vintagedoctor/backups" -type f 2>/dev/null | sed "s#$data/##" > results/sick-backups.txt

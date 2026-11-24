@@ -449,9 +449,24 @@ namespace VintageDoctor
                 IPlayer player = null;
                 string uid = tree.GetString("player");
                 if (api.Side == EnumAppSide.Server && !string.IsNullOrEmpty(uid)) player = api.World.PlayerByUid(uid);
-                tree.SetBool("opened", OpenPage(tree.GetString("topic") ?? "", tree.GetString("argument") ?? "", player));
+                string topic = tree.GetString("topic") ?? "", argument = tree.GetString("argument") ?? "";
+                tree.SetBool("opened", OpenPage(Landing(topic, argument), argument, player));
             }
             catch (Exception e) { api.Logger.Warning("[vintagedoctor] A mod asked to open the window and that failed: {0}", e.Message); }
+        }
+
+        /// <summary>
+        /// Where the window opens when a mod asks for it (1.5.0). A mod's own key or command that opens the doctor
+        /// at the mod's page with nothing more said (Vintage-E's Ctrl+H) lands on the check-up, where that mod's
+        /// section has the button for its page, so the doctor always starts at its main page. Asked for something
+        /// in particular (a page of the doctor's own, or the mod's page with an argument: "/emc diagnose machines"),
+        /// it opens that.
+        /// </summary>
+        internal static string Landing(string topic, string argument)
+        {
+            string canonical = Pages.Canonical(topic);
+            if (string.IsNullOrWhiteSpace(argument) && !Pages.Topics.Contains(canonical)) return Pages.Overview;
+            return topic;
         }
 
         public bool OpenPage(string topic, string argument = "", IPlayer player = null)

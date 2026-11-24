@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.5.0
+
+Whose texts make the game's "Found closing tag" errors, the doctor always opening at its main page, and folding sections.
+
+- **Formatting tags out of place, and whose they are.** The game reads < and > in texts (chat, item descriptions, tooltips, the handbook) as formatting tags, and writes "Found closing tag char > but no tag was opened at 12..." to the log each time a text has a > on its own or a closing tag that doesn't match. The error never says whose text it was. The doctor now reads every mod's texts the way the game does, matches each error to the text that makes exactly that error, and says so on a card in that mod's section: "Some Mod's texts have formatting tags out of place: 14 error(s) about them in the log this session", with each text's key in the mod's lang file, what is wrong in it and where, and what its author should change. When the same mistake sits at another place (something was put in front of the text) it says "likely". It also reads the debug and chat logs for the text the game showed, when they have it.
+- Mods whose texts would make such errors, with none in the log yet, get a card to know; errors no mod's text fits get one card of their own with the text shown and where the whole of it is.
+- These errors are no longer counted among the log's other errors "no mod could be named for".
+- **The doctor opens at its main page.** When another mod opens the doctor with nothing more said (Vintage-E's Ctrl+H or `/emc diagnose` on its own), the window opens at the check-up, where that mod's section has the button for its pages, instead of at the mod's page. Asked for something in particular (`/emc diagnose machines`), it still opens that.
+- **Sections fold.** Each section of the check-up folds and unfolds from its heading (a triangle in front of it). A mod's section with no warnings or problems starts folded, with what is in it after the name ("4 check(s), nothing to look at"); one with something to look at starts open, and so does the game's. The list at the top that shows one mod alone shows it whole. What you fold or unfold stays so while the window is open.
+- For mod authors: `vintagedoctor:open` with an empty argument opens the check-up (see [docs/api.md](docs/api.md)).
+- Not seen in a real game by the session that made it: the folding in the window, and the window opening at the check-up from Vintage-E's key. The tests run a server, where the pages are checked as text; there the formatting-tag errors were made by the game's own parser and traced to the test mod's texts.
+
 ## 1.4.0
 
 Logs open from where the doctor speaks of them, and the page about code patches says who shares what.

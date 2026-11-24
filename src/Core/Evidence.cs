@@ -189,6 +189,8 @@ namespace VintageDoctor
         public CrashScan Crash;
         public FolderScan Folder;
         public ConfigScan Configs;
+        /// <summary>For the log's errors about formatting tags: the text the game was showing, by error, where the debug or chat log had it.</summary>
+        public Dictionary<string, string> TagTexts = new Dictionary<string, string>(StringComparer.Ordinal);
         public long ReadMilliseconds;
 
         public static string LogFile(EnumAppSide side) => System.IO.Path.Combine(GamePaths.Logs, side == EnumAppSide.Client ? "client-main.log" : "server-main.log");
@@ -224,6 +226,8 @@ namespace VintageDoctor
             try { mods?.IndexTypes(); } catch { }
             ev.Log = LogScan.Read(LogFile(side), mods);
             ev.Crash = CrashScan.Read(CrashFile(side), mods);
+            if (ev.Log?.TagErrors.Count > 0)
+                ev.TagTexts = TextTags.ShownTexts(GamePaths.Logs, side == EnumAppSide.Client ? "client" : "server", ev.Log.TagErrors.Select(t => t.message).Distinct().ToList());
             if (files)
             {
                 try { ev.Folder = FolderScan.Read(ModFolders(mods), mods); } catch (Exception e) { ev.Folder = new FolderScan(); ev.Folder.Errors.Add(e.Message); }

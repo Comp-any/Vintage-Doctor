@@ -339,6 +339,7 @@ namespace VintageDoctor
             }
             // Its code patches.
             HarmonyFor(x, m);
+            try { TextTagsCheck(x, false, m.Id); } catch { }
             Conflicts(x, m.Id);
             // Measured time, if a run was made.
             TickProfile p = x.Doctor.Profile;

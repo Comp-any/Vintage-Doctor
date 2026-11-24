@@ -397,6 +397,11 @@ bool opened = tree.GetBool("opened");            // false: fall back to your own
 
 On the server this only works for players whose own game has the doctor too; `opened` tells you.
 
+Since 1.5.0, an `argument` left empty opens the doctor's **check-up** instead of your page: the doctor always starts
+at its main page, where your mod's section has the button for your page. Give an argument to open your page itself
+(Vintage-E's Ctrl+H opens the check-up; `/emc diagnose machines` opens its machines page). The C# `OpenPage` opens
+exactly what it is given.
+
 **Which side.** The server's doctor and the one in each player's game ask separately, and the window shows both
 halves. Offer your page on the side that knows (usually the server) and leave the other side silent: the doctor
 doesn't put anything in its place.
