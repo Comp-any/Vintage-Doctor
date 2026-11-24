@@ -24,7 +24,7 @@ namespace VintageDoctor
     /// </summary>
     public static class TextTags
     {
-        const string Tail = " See debug log for full text.";
+        const string SeeDebug = " See debug log for full text.";
         static readonly Regex ErrorRx = new Regex(@"^Found closing tag (?:char > but no tag was opened at (\d+)\.|<([^>]*)> at position (\d+) but (?:it was never opened|<([^>]*)> should be closed first)\.)", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
         public static bool IsTagError(string message) => message != null && message.StartsWith("Found closing tag ", StringComparison.Ordinal) && ErrorRx.IsMatch(message);
@@ -48,15 +48,15 @@ namespace VintageDoctor
                 if (c == '<') { inside = true; continue; }
                 if (c == '>')
                 {
-                    if (!inside) found.Add(("Found closing tag char > but no tag was opened at " + pos + ". Use &gt;/&lt; if you want to display them as plain characters." + Tail, pos));
+                    if (!inside) found.Add(("Found closing tag char > but no tag was opened at " + pos + ". Use &gt;/&lt; if you want to display them as plain characters." + SeeDebug, pos));
                     inside = false;
                     string t = tag.ToString();
                     tag.Clear();
                     if (t.Length > 0 && t[0] == '/')
                     {
                         string name = t.Substring(1);
-                        if (stack.Count == 0) found.Add(("Found closing tag <" + name + "> at position " + pos + " but it was never opened." + Tail, pos));
-                        else if (stack.Peek() != name) found.Add(("Found closing tag <" + name + "> at position " + pos + " but <" + stack.Peek() + "> should be closed first." + Tail, pos));
+                        if (stack.Count == 0) found.Add(("Found closing tag <" + name + "> at position " + pos + " but it was never opened." + SeeDebug, pos));
+                        else if (stack.Peek() != name) found.Add(("Found closing tag <" + name + "> at position " + pos + " but <" + stack.Peek() + "> should be closed first." + SeeDebug, pos));
                         if (stack.Count > 0) stack.Pop();
                         continue;
                     }
