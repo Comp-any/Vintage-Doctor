@@ -305,6 +305,25 @@ namespace VintageDoctor
             dialog.TryOpen();
         }
 
+        /// <summary>
+        /// Opens a file with whatever the computer opens such files with (a text editor, for a log). On Windows that
+        /// is asked of the system directly, so a path with spaces in it works; elsewhere, and if that fails, the
+        /// game's own way of opening a folder or an address does it (xdg-open, open).
+        /// </summary>
+        void OpenFile(string file)
+        {
+            try
+            {
+                if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
+                {
+                    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(file) { UseShellExecute = true });
+                    return;
+                }
+            }
+            catch (Exception e) { capi.Logger.Notification("[vintagedoctor] Windows wouldn't open {0} ({1}); trying the game's way.", System.IO.Path.GetFileName(file), e.Message); }
+            NetUtil.OpenUrlInBrowser(file);
+        }
+
         /// <summary>A button pressed in the window.</summary>
         void OnWindowAction(string kind, string target, string arg)
         {
@@ -324,8 +343,26 @@ namespace VintageDoctor
                         break;
                     case "folder":
                         {
-                            string path = target == "logs" ? GamePaths.Logs : target == "mods" ? GamePaths.DataPathMods : target == "modconfig" ? GamePaths.ModConfig : target == "doctor" ? DataFolder : null;
-                            if (path != null) NetUtil.OpenUrlInBrowser(path);
+                            string path = target == DoctorReport.LogsFolder ? GamePaths.Logs : target == "mods" ? GamePaths.DataPathMods : target == "modconfig" ? GamePaths.ModConfig : target == "doctor" ? DataFolder : null;
+                            if (path == null) break;
+                            // One file of the folder (a log), when it is there; the folder when it isn't (no crash
+                            // report was ever written, say). The name may come from a server or another mod: only a
+                            // plain log or text file's name gets as far as being opened.
+                            if (!string.IsNullOrEmpty(arg) && DoctorReport.OpenableFile(arg))
+                            {
+                                string file = System.IO.Path.Combine(path, arg);
+                                if (System.IO.File.Exists(file))
+                                {
+                                    OpenFile(file);
+                                    dialog?.SetIdle(Lang.Get("vintagedoctor:gui-opened", arg));
+                                    break;
+                                }
+                                NetUtil.OpenUrlInBrowser(path);
+                                dialog?.SetIdle(Lang.Get("vintagedoctor:gui-nofile", arg));
+                                break;
+                            }
+                            NetUtil.OpenUrlInBrowser(path);
+                            dialog?.SetIdle(Lang.Get("vintagedoctor:gui-opened-folder"));
                             break;
                         }
                 }

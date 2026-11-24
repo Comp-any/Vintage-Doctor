@@ -129,6 +129,8 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             t.Guard("the API", () => Api(t, doctor, sapi));
             t.Guard("mods as guests", () => Guests(t, doctor, sapi));
             t.Guard("the pages", () => PagesOnRealServer(t, doctor, sapi, folder));
+            t.Guard("opening logs", () => OpeningLogs(t, doctor, sapi, folder));
+            t.Guard("code patches", () => SharedPatches(t, doctor, sapi));
             t.Guard("the example mods", () => Examples(t, doctor, sapi, folder));
             if (ci) t.Guard("fixes on the real server", () => RealFixes(t, doctor, sapi));
             else t.Skip("fixes on the real server", "only with SelfTestOnStart");
@@ -497,7 +499,7 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
         static void Api(Run_ t, VintageDoctorSystem doctor, ICoreServerAPI sapi)
         {
             IDoctorApi api = DoctorApi.Get(sapi);
-            t.Check("api: other mods can find the doctor", api != null && api.ApiVersion == 2 && api.DoctorVersion == doctor.DoctorVersion);
+            t.Check("api: other mods can find the doctor", api != null && api.ApiVersion == 3 && api.DoctorVersion == doctor.DoctorVersion);
             if (api == null) return;
             const string me = "doctorselftest";
             bool fixRan = false;
@@ -845,6 +847,28 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             t.Check("sick: a config file cut short, and whose it is", files.Contains("The config file doctorcrashy.json can't be read (most likely Doctor Crashy's)"), First(files, "doctorcrashy.json"));
             t.Check("sick: the crash report left by an earlier session", crash.Contains("The game crashed (11/21/2026 05:56:18): NullReferenceException"), First(crash, "crashed"));
             t.Check("sick: the crash is explained and its trace shown", crash.Contains("used something that wasn't there") && crash.Contains("FrameProfilerUtil.End()"));
+            // The same pages as the world's side of a single-player game builds them: there the logs are on the
+            // player's own computer, and what speaks of one has a button that opens it.
+            {
+                string Built(string topic, string arg)
+                {
+                    var c = new DoctorContext { Doctor = doctor, Api = sapi, Side = EnumAppSide.Server, LanguageCode = "en", Topic = topic, Argument = arg, Ev = ev, SameProcess = true };
+                    Pages.Build(c);
+                    string text = string.Join("\n", c.R.Lines.Select(l => new string(' ', l.Indent * 2) + l.Text));
+                    File.WriteAllText(Path.Combine(folder, "sick-single-player-" + topic + (arg.Length > 0 ? "-" + arg : "") + ".txt"), text);
+                    return text;
+                }
+                const string crashButton = "{{folder|logs|server-crash.log|Open server-crash.log}}", logButton = "{{folder|logs|server-main.log|Open server-main.log}}";
+                string spCrash = Built(Checks.TopicCrash, ""), spLog = Built(Checks.TopicLog, ""), spMods = Built(Checks.TopicMods, ""), spUp = Built(Pages.Overview, ""), spMod = Built(Checks.TopicMod, "doctorcrashy");
+                string[] crashLines = spCrash.Split('\n');
+                t.Check("sick: the crash reports' page has a button that opens server-crash.log at its top and on the latest crash", crashLines.Length > 1 && crashLines[1].Trim() == crashButton
+                    && crashLines.Count(l => l.Contains(crashButton)) == 2, crashLines.Length > 1 ? crashLines[1] + " (" + crashLines.Count(l => l.Contains(crashButton)) + " in all)" : spCrash);
+                t.Check("sick: the log's page has one that opens server-main.log at its top", spLog.Split('\n').Length > 1 && spLog.Split('\n')[1].Trim() == logButton, First(spLog, "{{folder"));
+                t.Check("sick: on the check-up, the card for a mod's errors in the log has it next to the button for the doctor's own page of them",
+                    spUp.Split('\n').Any(l => l.Contains("{{open|log|doctorcrashy|") && l.Contains(logButton)), First(spUp, "{{open|log|doctorcrashy|"));
+                t.Check("sick: in the list of mods, a mod with errors in the log has it too", spMods.Split('\n').Any(l => l.Contains("{{open|mod|doctorcrashy|") && l.Contains(logButton)), First(spMods, "{{open|mod|doctorcrashy|"));
+                t.Check("sick: this server's own pages, which its players would read from another computer, have none", !crash.Contains("Open server-crash.log") && !log.Contains("Open server-main.log") && !checkup.Contains("Open server-"));
+            }
             t.Check("sick: the same error three times is one kind, counted against its mod", log.Contains("×3 [Error] [doctorcrashy] a made-up error") && log.Contains("Doctor Crashy: 1 kind(s) of errors"), First(log, "Doctor Crashy"));
             t.Check("sick: the mods page puts the broken mod first", mods.Contains("Doctor Crashy 1.0.0: 1 error(s) while starting"), First(mods, "Doctor Crashy"));
             t.Check("sick: the broken mod's own page has all of it and offers to switch it off", crashy.Contains("threw an error while starting") && crashy.Contains("doctorcrashy.json can't be read")
@@ -999,6 +1023,188 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             t.Check("real: the bug report was saved", File.Exists(Path.Combine(doctor.DataFolder, "bug-report-server.txt")));
         }
 
+        /// <summary>
+        /// A place for code patches to meet, for the test run only: the example mod patches it (its code runs after
+        /// it) and the self-test patches it too (before it), so the page about code patches has a real place that
+        /// two mods share to show.
+        /// </summary>
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+        public static int SharedPlace() => 1;
+        public static void BeforeSharedPlace() { }
+
+        /// <summary>
+        /// Wherever a page speaks of a log there is a button that opens it (1.4.0): the file where one log is meant,
+        /// the Logs folder for the logs as a whole. Only on the player's own computer: a server that is another
+        /// computer (as this test's is) has nothing the player could open, so the pages are built here as single
+        /// player would build them, too.
+        /// </summary>
+        static void OpeningLogs(Run_ t, VintageDoctorSystem doctor, ICoreServerAPI sapi, string folder)
+        {
+            Evidence ev = doctor.EvidenceNow(false);
+            DoctorContext New(EnumAppSide side, bool sameComputer, string topic) => new DoctorContext { Doctor = doctor, Api = sapi, Side = side, LanguageCode = "en", Topic = topic, Ev = ev, SameProcess = sameComputer };
+            // The files a line's buttons open ("folder" for the Logs folder itself).
+            IEnumerable<string> Opens(DoctorLine l) => DoctorReport.ActionToken.Matches(l.Text ?? "").Cast<System.Text.RegularExpressions.Match>()
+                .Where(m => m.Groups[1].Value == "folder" && m.Groups[2].Value == DoctorReport.LogsFolder).Select(m => m.Groups[3].Value.Length == 0 ? "folder" : m.Groups[3].Value);
+            // What the buttons of a card (or of a line by itself) open: the line with these words, and what is under it.
+            string Of(DoctorContext c, string words)
+            {
+                int i = c.R.Lines.FindIndex(l => (l.Text ?? "").Contains(words));
+                if (i < 0) return "(no line says '" + words + "')";
+                var found = new List<string>();
+                for (int k = i; k < c.R.Lines.Count; k++)
+                {
+                    DoctorLine l = c.R.Lines[k];
+                    bool buttonsOnly = DoctorReport.ActionToken.Replace(l.Text ?? "", "").Trim().Length == 0;
+                    if (k > i && (l.Style == DoctorLineStyle.Heading || !(l.Indent > 0 || l.Style == DoctorLineStyle.Note || buttonsOnly))) break;
+                    found.AddRange(Opens(l));
+                }
+                return string.Join("+", found.OrderBy(f => f, StringComparer.Ordinal));
+            }
+            bool Offers(DoctorContext c) => c.R.Lines.Any(l => (l.Text ?? "").Contains("{{folder|"));
+
+            t.Check("logs: only a plain log or text file's name is ever opened", DoctorReport.OpenableFile("client-main.log") && DoctorReport.OpenableFile("server-main-2.log") && DoctorReport.OpenableFile("notes.txt")
+                && !DoctorReport.OpenableFile("../client-main.log") && !DoctorReport.OpenableFile("a/b.log") && !DoctorReport.OpenableFile("a\\b.log") && !DoctorReport.OpenableFile("evil.exe")
+                && !DoctorReport.OpenableFile("x.log.exe") && !DoctorReport.OpenableFile(".log") && !DoctorReport.OpenableFile("") && !DoctorReport.OpenableFile(null) && !DoctorReport.OpenableFile("a b.log") && !DoctorReport.OpenableFile("C:x.log"));
+
+            // A page put together by hand, with every way a log is spoken of.
+            void Write(DoctorContext x)
+            {
+                x.Section(x.T("sec-log"));
+                x.Line(x.T("log-summary", 1, 2, 3, 4, x.MainLogName), DoctorLineStyle.Note);
+                x.Warn(x.T("log-errors", 2, 5, 1));
+                x.Explain(x.T("log-errors-why"));
+                x.LinkButton(Checks.TopicLog, "", x.T("btn-log"));
+                x.Ok(x.T("crash-none"));
+                x.Info("A mod's card: see server-debug.log, and client-main.log on your side");
+                x.Info("An oak log is worth nothing, the catalogue is long and so is the backlog");
+                x.Warn("Some Mod 1.0: " + x.T("mods-crashes", 2) + ", " + x.T("mods-errors", 3));
+                x.Info("A card that has its button already");
+                x.Detail("from its author, who names " + x.MainLogName);
+                x.LogButton();
+                Pages.LogButtons(x);
+            }
+            DoctorContext here = New(EnumAppSide.Server, true, Checks.TopicLog);
+            Write(here);
+            File.WriteAllText(Path.Combine(folder, "log-buttons.txt"), string.Join("\n", here.R.Lines.Select(l => new string(' ', l.Indent * 2) + l.Text)));
+            t.Check("logs: the log's own page has one button for its file, under its heading, however often the page names it",
+                Of(here, x_("sec-log")) == "server-main.log" && here.R.Lines.Count > 1 && Opens(here.R.Lines[1]).SequenceEqual(new[] { "server-main.log" }), Of(here, x_("sec-log")));
+            t.Check("logs: a card that speaks of the log gets a button that opens it, next to the buttons it has",
+                Of(here, "kind(s) of errors in the log this session") == "server-main.log" && here.R.Lines.Any(l => l.Text.Contains("{{open|log|") && l.Text.Contains("{{folder|logs|server-main.log|Open server-main.log}}")),
+                Of(here, "kind(s) of errors in the log this session"));
+            t.Check("logs: where it is the logs as a whole, or a file that may not be there, the button opens the Logs folder", Of(here, "No crash reports") == "folder"
+                && here.R.Lines.Any(l => l.Text.Contains("{{folder|logs||Open the Logs folder}}")), Of(here, "No crash reports"));
+            t.Check("logs: a log named by its file gets a button whoever wrote the line, and a wooden log gets none", Of(here, "A mod's card") == "client-main.log+server-debug.log" && Of(here, "An oak log") == "",
+                Of(here, "A mod's card") + " / " + Of(here, "An oak log"));
+            // (The crash reports' file only where there is one: this server may never have crashed.)
+            bool crashed = ev.Crash == null || ev.Crash.Found;
+            t.Check("logs: a card about a mod's crashes and its errors opens the crash reports and the log", Of(here, "Some Mod 1.0") == (crashed ? "server-crash.log+server-main.log" : "server-main.log"), Of(here, "Some Mod 1.0") + (crashed ? "" : " (no crash reports here)"));
+            t.Check("logs: a card that has the button already keeps the one", Of(here, "A card that has its button already") == "server-main.log", Of(here, "A card that has its button already"));
+            string once = string.Join("\n", here.R.Lines.Select(l => l.Text));
+            Pages.LogButtons(here);
+            t.Check("logs: looking twice adds nothing", string.Join("\n", here.R.Lines.Select(l => l.Text)) == once);
+            DoctorContext away = New(EnumAppSide.Server, false, Checks.TopicLog);
+            Write(away);
+            t.Check("logs: a server that is another computer offers no buttons for its files", !Offers(away), string.Join(" | ", away.R.Lines.Where(l => l.Text.Contains("{{folder|")).Select(l => l.Text).Take(3)));
+            DoctorContext game = New(EnumAppSide.Client, false, Checks.TopicLog);
+            Write(game);
+            t.Check("logs: the player's game opens its own log, and not a server's by name when that server is elsewhere",
+                Of(game, "kind(s) of errors in the log this session") == "client-main.log" && Of(game, "A mod's card") == "client-main.log" && Of(game, "Some Mod 1.0") == (crashed ? "client-crash.log+client-main.log" : "client-main.log"),
+                Of(game, "kind(s) of errors in the log this session") + " / " + Of(game, "A mod's card") + " / " + Of(game, "Some Mod 1.0"));
+
+            // The real pages, as the world's side of a single-player game builds them, and as this server does.
+            foreach (bool sp in new[] { true, false })
+            {
+                var built = new Dictionary<string, DoctorContext>();
+                foreach (string topic in new[] { Checks.TopicLog, Checks.TopicCrash, Checks.TopicStartup, Checks.TopicMods, Pages.Overview })
+                {
+                    DoctorContext c = New(EnumAppSide.Server, sp, topic);
+                    Pages.Build(c);
+                    built[topic] = c;
+                    if (sp) File.WriteAllText(Path.Combine(folder, "single-player-" + topic + ".txt"), string.Join("\n", c.R.Lines.Select(l => new string(' ', l.Indent * 2) + l.Text)));
+                }
+                if (!sp)
+                {
+                    t.Check("logs: on this server, which is another computer to its players, the real pages offer none either", !built.Values.Any(Offers),
+                        string.Join(" | ", built.Values.SelectMany(c => c.R.Lines).Where(l => l.Text.Contains("{{folder|")).Select(l => l.Text).Take(3)));
+                    continue;
+                }
+                t.Check("logs: the real page of the log has the button for server-main.log at its top", Of(built[Checks.TopicLog], x_("sec-log")) == "server-main.log", Of(built[Checks.TopicLog], x_("sec-log")));
+                t.Check("logs: the real page of crash reports has the one for server-crash.log, or for the folder when there never was a crash",
+                    crashed ? Of(built[Checks.TopicCrash], x_("sec-crash")) == "server-crash.log" && Of(built[Checks.TopicCrash], "The game crashed").Contains("server-crash.log")
+                        : Of(built[Checks.TopicCrash], x_("sec-crash")) == "folder" && Of(built[Checks.TopicCrash], "No crash reports") == "folder",
+                    Of(built[Checks.TopicCrash], x_("sec-crash")) + " / " + Of(built[Checks.TopicCrash], "No crash reports") + " / " + Of(built[Checks.TopicCrash], "The game crashed"));
+                t.Check("logs: the real page of the start-up, which is read from the log, has it too", Of(built[Checks.TopicStartup], x_("sec-startup")) == "server-main.log", Of(built[Checks.TopicStartup], x_("sec-startup")));
+                // Every card of the check-up that says "the log" or "crash report" has a button for one or the other.
+                DoctorContext up = built[Pages.Overview];
+                var without = new List<string>();
+                int spoken = 0;
+                for (int i = 0; i < up.R.Lines.Count; i++)
+                {
+                    DoctorLine l = up.R.Lines[i];
+                    if (l.Style != DoctorLineStyle.Check || l.Indent != 0) continue;
+                    string title = DoctorReport.ActionToken.Replace(l.Text ?? "", "");
+                    if (!System.Text.RegularExpressions.Regex.IsMatch(title, @"\bin the log\b|\b[Cc]rash reports?\b")) continue;
+                    spoken++;
+                    bool has = false;
+                    for (int k = i; k < up.R.Lines.Count && (k == i || up.R.Lines[k].Indent > 0 || up.R.Lines[k].Style == DoctorLineStyle.Note); k++) has |= Opens(up.R.Lines[k]).Any();
+                    if (!has) without.Add(title);
+                }
+                t.Check("logs: on the real check-up every card that speaks of the log or of crash reports has a button for it", spoken > 0 && without.Count == 0, spoken + " such card(s); without: " + string.Join(" | ", without.Take(4)));
+            }
+
+            // Both sides of a single-player game find "no errors in the log": said once, with a button for each side's log.
+            var mine = new DoctorReport();
+            var worlds = new DoctorReport();
+            void Clean(DoctorReport r, string file)
+            {
+                r.Lines.Add(new DoctorLine { Text = DoctorReport.OkMark + " No errors in the log this session.", Style = DoctorLineStyle.Check, Section = DoctorReport.GameSection });
+                r.Lines.Add(new DoctorLine { Text = DoctorReport.FileIn(DoctorReport.LogsFolder, file, "Open " + file), Style = DoctorLineStyle.Text, Indent = 1, Section = DoctorReport.GameSection });
+            }
+            Clean(mine, "client-main.log");
+            Clean(worlds, "server-main.log");
+            var both = new DoctorReport();
+            var bothX = new DoctorContext { Doctor = doctor, Api = sapi, Side = EnumAppSide.Server, LanguageCode = "en", Topic = Pages.Overview, Ev = ev, R = both };
+            Pages.Arrange(bothX, new List<(DoctorReport half, string note)> { (mine, null), (worlds, "From the world's side:") }, null, true, true);
+            string buttons = both.Lines.FirstOrDefault(l => l.Text.Contains("|client-main.log|"))?.Text ?? "";
+            t.Check("logs: what both sides found alike is one card with a button for each side's log", both.Lines.Count(l => l.Text.Contains("No errors in the log this session.")) == 1
+                && buttons.Contains("|server-main.log|") && !both.Lines.Any(l => l.Text == "From the world's side:"), both.Lines.Count(l => l.Text.Contains("No errors in the log this session.")) + " card(s): " + buttons);
+
+            string x_(string key) => Vintagestory.API.Config.Lang.GetL("en", "vintagedoctor:" + key);
+        }
+
+        /// <summary>
+        /// The page about code patches says which places more than one mod changes, which mods, and what each does
+        /// there (1.4.0). With made-up patches here; the example mods' test has a real one.
+        /// </summary>
+        static void SharedPatches(Run_ t, VintageDoctorSystem doctor, ICoreServerAPI sapi)
+        {
+            Evidence ev = doctor.EvidenceNow(false);
+            DoctorContext New() => new DoctorContext { Doctor = doctor, Api = sapi, Side = EnumAppSide.Server, LanguageCode = "en", Topic = Checks.TopicPatches, Ev = ev };
+            var hurt = new Checks.PatchedMethod { Name = "EntityPlayer.OnHurt" };
+            hurt.Add("alpha", 'b'); hurt.Add("beta", 'a');
+            var tick = new Checks.PatchedMethod { Name = "BlockEntityChest.OnTick" };
+            tick.Add("alpha", 'r'); tick.Add("beta", 'r'); tick.Add("beta", 'a');
+            var three = new Checks.PatchedMethod { Name = "Thing.Done" };
+            three.Add("alpha", 'a'); three.Add("beta", 'e'); three.Add("gamma", 'a');
+            var alone = new Checks.PatchedMethod { Name = "Alone.Here" };
+            alone.Add("gamma", 'a');
+            DoctorContext x = New();
+            Checks.CodePatches(x, true, new List<Checks.PatchedMethod> { hurt, tick, three, alone });
+            string page = x.R.PlainText(sapi.World);
+            t.Check("patches: how many mods change the game's code, and in how many places", page.Contains("3 mod(s) change the game's code in 4 place(s)") && page.Contains("alpha (3)") && page.Contains("gamma (2)"), First(page, "mod(s) change"));
+            t.Check("patches: a place two mods change is named, with the mods and what each does there",
+                page.Contains("alpha and beta change the same 2 place(s) in the game's code") && page.Contains("EntityPlayer.OnHurt: alpha (runs before it), beta (runs after it)")
+                && page.Contains("BlockEntityChest.OnTick: alpha (rewrites it), beta (rewrites it, runs after it)"), page.Replace("\n", " / "));
+            t.Check("patches: three mods at one place are named too", page.Contains("alpha, beta and gamma change the same 1 place(s) in the game's code")
+                && page.Contains("Thing.Done: alpha (runs after it), beta (steps in when it ends or fails), gamma (runs after it)"), First(page, "Thing.Done"));
+            t.Check("patches: two mods rewriting the same piece of code is a warning, the rest is to know", x.R.Lines.Any(l => l.Text.StartsWith(DoctorReport.WarnMark, StringComparison.Ordinal) && l.Text.Contains("alpha and beta"))
+                && x.R.Lines.Any(l => l.Text.StartsWith(DoctorReport.InfoMark, StringComparison.Ordinal) && l.Text.Contains("alpha, beta and gamma")) && x.R.Warnings == 1);
+            DoctorContext none = New();
+            none.ListAll = true;
+            Checks.CodePatches(none, false, new List<Checks.PatchedMethod> { alone });
+            t.Check("patches: when no two mods meet, the check-up says so", none.R.PlainText(sapi.World).Contains("No two mods change the same place in the game's code."), none.R.PlainText(sapi.World).Replace("\n", " / "));
+        }
+
         /// <summary>The two example mods from the repository's example folder, when the test run loaded them: the API as a real mod uses it.</summary>
         static void Examples(Run_ t, VintageDoctorSystem doctor, ICoreServerAPI sapi, string folder)
         {
@@ -1042,6 +1248,28 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             string pipes = doctor.BuildPage(ev, null, "en", "example-pipes", "").PlainText(sapi.World);
             t.Check("example: a page in code with its own heading and three buttons on a line", pipes.Contains("== The example pipes ==") && !pipes.Contains("My example pipes leak")
                 && pipes.Contains("The pumps (/doctor example-pumps) The tanks (/doctor example-tanks) Restart the pumps (/doctor fix doctorexample:unjam all)"), pipes.Replace("\n", " / "));
+            // A real place two mods patch: the example mod's patch on SharedPlace, and one made here.
+            try
+            {
+                new HarmonyLib.Harmony("vintagedoctor.selftest").Patch(typeof(SelfTest).GetMethod(nameof(SharedPlace)), prefix: new HarmonyLib.HarmonyMethod(typeof(SelfTest).GetMethod(nameof(BeforeSharedPlace))));
+                string patches = doctor.BuildPage(ev, null, "en", Checks.TopicPatches, "").PlainText(sapi.World);
+                File.WriteAllText(Path.Combine(folder, "page-patches-shared.txt"), patches);
+                t.Check("example: a place in the code that two real mods patch is named, with both mods and what each does there",
+                    patches.Contains("Doctor Example and Vintage Doctor change the same 1 place(s) in the game's code") && patches.Contains("SelfTest.SharedPlace: Doctor Example (runs after it), Vintage Doctor (runs before it)"),
+                    First(patches, "SharedPlace") + " / " + First(patches, "change the same"));
+                string its = doctor.BuildPage(ev, null, "en", Checks.TopicMod, "doctorexample").PlainText(sapi.World);
+                t.Check("example: the mod's own page says which of its places another mod is at", its.Contains("SelfTest.SharedPlace: runs after it; also changed by Vintage Doctor (runs before it)"), First(its, "SharedPlace"));
+                string upNow = doctor.CheckUp(doctor.BuildPage(ev, null, "en", Pages.Overview, ""), ev, null, "en").PlainText(sapi.World);
+                t.Check("example: on the check-up that card is under both mods, not the game's", Under(upNow, "Doctor Example 1").Contains("change the same 1 place(s)") && Under(upNow, "Vintage Doctor " + doctor.DoctorVersion).Contains("change the same 1 place(s)")
+                    && !Under(upNow, "The game (").Contains("change the same 1 place(s)"), First(Under(upNow, "Doctor Example 1"), "change the same") + " / " + First(Under(upNow, "Vintage Doctor " + doctor.DoctorVersion), "change the same"));
+            }
+            catch (Exception e) { t.Check("example: a place in the code that two real mods patch", false, e.GetType().Name + ": " + e.Message); }
+            // The API's own button for the log (API 3): there when the log is on the player's computer.
+            var sp = new DoctorContext { Doctor = doctor, Api = sapi, Side = EnumAppSide.Server, LanguageCode = "en", Topic = Pages.Overview, Ev = ev, SameProcess = true };
+            Pages.Build(sp);
+            int said = sp.R.Lines.FindIndex(l => l.Text.Contains("kind(s) of messages from the example mod this session"));
+            t.Check("example: a mod's check asks for a button that opens the log", said >= 0 && said + 1 < sp.R.Lines.Count && sp.R.Lines[said + 1].Text.Contains("{{folder|logs|server-main.log|Open server-main.log}}"),
+                said < 0 ? "no such card" : sp.R.Lines[Math.Min(said + 1, sp.R.Lines.Count - 1)].Text);
             string api = doctor.BuildPage(ev, null, "en", Pages.Api, "").PlainText(sapi.World);
             File.WriteAllText(Path.Combine(folder, "page-api-with-examples.txt"), api);
             t.Check("example: the page for mod authors lists what was handed over", api.Contains("doctorexample:pumps") && api.Contains("doctorexamplejson:config/vintagedoctor.json"));

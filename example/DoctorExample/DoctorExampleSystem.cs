@@ -23,7 +23,11 @@ namespace DoctorExample
 
             // Way 1: the doctor's own API. Vintage Doctor is not a requirement of this mod, so its types are only
             // touched in a class of their own, and only when the doctor is installed.
-            if (api.ModLoader.IsModEnabled("vintagedoctor")) WithDoctor.Register(api);
+            if (api.ModLoader.IsModEnabled("vintagedoctor"))
+            {
+                WithDoctor.Register(api);
+                SharedPatchForTheTest.Apply(api);
+            }
 
             // Way 2: the event bus. No reference to the doctor at all; if it isn't installed, nobody asks.
             api.Event.RegisterEventBusListener(OnDoctorCollects, 0.5, "vintagedoctor:collect");
@@ -179,7 +183,46 @@ namespace DoctorExample
 
             // What Vintage Doctor 1.2.0 added is used from a class of its own too, so an older doctor isn't asked for it.
             if (doctor.ApiVersion >= 2) WithDoctor2.Register(doctor);
+            if (doctor.ApiVersion >= 3) WithDoctor3.Register(doctor);
         }
+    }
+
+    /// <summary>What needs API version 3 (Vintage Doctor 1.4.0).</summary>
+    static class WithDoctor3
+    {
+        public static void Register(IDoctorApi doctor)
+        {
+            // A finding about what the mod wrote into the log, with a button that opens that log on the player's
+            // computer. (A finding that names a log by its file, "server-main.log", gets the button without asking.)
+            doctor.RegisterCheck(new DoctorCheck("doctorexample", "doctorexample:log", ctx =>
+            {
+                int mine = ctx.LogIssues("doctorexample").Count;
+                if (mine == 0) return;
+                ctx.Info(mine + " kind(s) of messages from the example mod this session");
+                ctx.LogButton();
+            }));
+        }
+    }
+
+    /// <summary>
+    /// Only for the doctor's own test run, and nothing a real mod needs to copy: a Harmony patch that does nothing,
+    /// on a method the doctor keeps for the purpose. The doctor's self-test patches the same method, so its page
+    /// about code patches has a place that two mods share to show.
+    /// </summary>
+    static class SharedPatchForTheTest
+    {
+        public static void Apply(ICoreAPI api)
+        {
+            try
+            {
+                System.Reflection.MethodInfo place = HarmonyLib.AccessTools.Method("VintageDoctor.SelfTest:SharedPlace");
+                if (place == null) return;
+                new HarmonyLib.Harmony("doctorexample").Patch(place, postfix: new HarmonyLib.HarmonyMethod(typeof(SharedPatchForTheTest), nameof(After)));
+            }
+            catch (System.Exception e) { api.Logger.Notification("[doctorexample] The test's code patch wasn't made: {0}", e.Message); }
+        }
+
+        public static void After() { }
     }
 
     /// <summary>What needs API version 2 (Vintage Doctor 1.2.0).</summary>

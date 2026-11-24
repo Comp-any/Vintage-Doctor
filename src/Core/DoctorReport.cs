@@ -80,6 +80,24 @@ namespace VintageDoctor
         public static string Url(string url, string label) => Token("url", url, "", label);
         public static string Copy(string text, string label) => Token("copy", text, "", label);
         public static string Folder(string which, string label) => Token("folder", which, "", label);
+        /// <summary>
+        /// A button that opens one file of a folder on the player's computer ("logs", "client-main.log"). It is a
+        /// folder button with the file as its argument, so a window from before 1.4.0 opens the folder instead.
+        /// </summary>
+        public static string FileIn(string which, string file, string label) => Token("folder", which, file ?? "", label);
+        /// <summary>The Logs folder's key in a folder button.</summary>
+        public const string LogsFolder = "logs";
+
+        /// <summary>
+        /// Whether a name is a file the window may open from one of the game's folders: a plain name (no folder in
+        /// it) of a log or text file. The name can come from a server or another mod, so nothing else is opened.
+        /// </summary>
+        public static bool OpenableFile(string name)
+        {
+            if (string.IsNullOrEmpty(name) || name.Length > 80) return false;
+            return SafeFileName.IsMatch(name) && name.IndexOf("..", StringComparison.Ordinal) < 0;
+        }
+        static readonly Regex SafeFileName = new Regex(@"^[A-Za-z0-9][A-Za-z0-9._-]*\.(log|txt)$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
         public static string Ref(CollectibleObject c)
         {

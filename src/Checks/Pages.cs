@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
 using VintageDoctor.API;
@@ -90,6 +91,7 @@ namespace VintageDoctor
                     // Every check, each with its result, then filed under the mods the results are about.
                     x.ListAll = true;
                     if (server) ServerOverview(x); else ClientOverview(x);
+                    LogButtons(x);
                     BySection(x);
                     break;
                 case Checks.TopicCrash: Checks.Guarded(x, "crash", () => Checks.Crash(x, true)); if (!(server && x.SameProcess)) Checks.Guarded(x, "shutdown", () => Checks.Shutdown(x)); break;
@@ -138,6 +140,162 @@ namespace VintageDoctor
                         x.Owner = null;
                         break;
                     }
+            }
+            if (topic != Overview) LogButtons(x);
+        }
+
+        // ---------------------------------------------------------------- a button for every log that is spoken of
+
+        // log-texts-begin
+        // Which of the doctor's own texts speak of a log, and of which: 'm' this side's log (client-main.log or
+        // server-main.log), 'c' its crash reports, 'f' the Logs folder as a whole, '-' the word is there but there is
+        // nothing to open (a command, a button's own words, a status line). A card or line holding such a text gets a
+        // button that opens the file or the folder (LogButtons). tools/check_lang.py reads this table and fails on a
+        // text that says "log" or "crash report" and isn't in it, so a new one can't be forgotten. A "sec-" text is
+        // a heading and only looked for in headings.
+        static readonly Dictionary<string, char> LogTexts = new Dictionary<string, char>(StringComparer.Ordinal)
+        {
+            { "sec-log", 'm' }, { "sec-log-mod", 'm' }, { "sec-startup", 'm' }, { "sec-crash", 'c' },
+            { "crash-none", 'f' }, { "crash-none-why", 'f' }, { "crash-unreadable", 'c' }, { "crash-older", 'c' },
+            { "unclean-title", 'f' }, { "unclean-why", 'f' }, { "log-nofile", 'f' },
+            { "start-clean-why", 'm' }, { "start-compile-why", 'm' },
+            { "log-clean", 'm' }, { "log-clean-warnings", 'm' }, { "log-clean-mod", 'm' }, { "log-errors", 'm' }, { "log-errors-why", 'm' },
+            { "log-errors-mod", 'm' }, { "log-errors-nomod", 'm' }, { "log-truncated", 'm' }, { "log-summary", 'm' },
+            { "mods-crashes", 'c' }, { "mods-errors", 'm' }, { "mod-crashes", 'c' },
+            { "world-disk-why", 'f' }, { "world-disk-advice", 'f' },
+            { "item-inlog", 'm' }, { "item-notinlog", 'm' },
+            { "targets-optional-why", 'm' }, { "notadded-why", 'm' }, { "guest-timeout", 'm' },
+            { "gui-scanning-long", '-' }, { "questions-console", '-' }, { "btn-crash", '-' }, { "btn-crash-all", '-' }, { "btn-open-logs", '-' },
+            { "api-help", '-' }, { "api-counts", '-' }, { "guest-fix-working", '-' },
+        };
+        // log-texts-end
+
+        /// <summary>A log named by its file: "client-main.log", "server-debug.log", "server-main-2.log".</summary>
+        static readonly Regex LogFileName = new Regex(@"\b(client|server)-[a-z]+(?:-\d+)?\.log\b", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+        static readonly Dictionary<string, List<(Regex rx, char kind, bool heading)>> logPatterns = new Dictionary<string, List<(Regex, char, bool)>>(StringComparer.Ordinal);
+
+        /// <summary>The texts of <see cref="LogTexts"/> in a language, each as a pattern that finds it in a line whatever values were put into it.</summary>
+        static List<(Regex rx, char kind, bool heading)> LogPatterns(DoctorContext x)
+        {
+            string lang = x.LanguageCode ?? "en";
+            lock (logPatterns)
+            {
+                if (logPatterns.TryGetValue(lang, out var known)) return known;
+                var list = new List<(Regex, char, bool)>();
+                const string hole = "\u0001";   // font-ok: stands for a value while the pattern is made, never drawn
+                object[] holes = Enumerable.Repeat((object)hole, 10).ToArray();
+                foreach (var kv in LogTexts)
+                {
+                    if (kv.Value == '-') continue;
+                    // A value at either end adds nothing to a pattern that is looked for anywhere in a line.
+                    string text = (x.T(kv.Key, holes) ?? "").Trim(hole[0], ' ');
+                    // A text that is nearly all values would be found in every line.
+                    if (text.Replace(hole, "").Trim().Length < 6) continue;
+                    try { list.Add((new Regex(Regex.Escape(text).Replace(hole, ".*?"), RegexOptions.CultureInvariant | RegexOptions.Singleline), kv.Value, kv.Key.StartsWith("sec-", StringComparison.Ordinal))); }
+                    catch { }
+                }
+                logPatterns[lang] = list;
+                return list;
+            }
+        }
+
+        static bool IsCard(DoctorLine l) => l.Style == DoctorLineStyle.Check && l.Indent == 0;
+
+        /// <summary>The files that a line's buttons for the Logs folder open ("" for the folder itself).</summary>
+        static IEnumerable<(string file, string token)> LogTokens(string text)
+        {
+            if (string.IsNullOrEmpty(text) || text.IndexOf("{{folder|", StringComparison.Ordinal) < 0) yield break;
+            foreach (Match m in DoctorReport.ActionToken.Matches(text))
+            {
+                if (m.Groups[1].Value == "folder" && m.Groups[2].Value == DoctorReport.LogsFolder) yield return (m.Groups[3].Value, m.Value);
+            }
+        }
+
+        static bool OnlyButtons(string text) => !string.IsNullOrEmpty(text) && text.IndexOf("{{", StringComparison.Ordinal) >= 0 && DoctorReport.ActionToken.Replace(text, "").Trim().Length == 0;
+
+        /// <summary>
+        /// Puts buttons at the end of a card (lines <paramref name="start"/> up to <paramref name="end"/>), or under a
+        /// line that stands by itself: on the card's last line when that is a line of buttons already, else on a
+        /// line of their own. Returns how many lines that added.
+        /// </summary>
+        static int Attach(List<DoctorLine> lines, int start, int end, bool card, IEnumerable<string> tokens)
+        {
+            string text = string.Join(" ", tokens.Where(t => !string.IsNullOrEmpty(t)));
+            if (text.Length == 0) return 0;
+            DoctorLine last = lines[end - 1];
+            if (card && end - 1 > start && last.Style == DoctorLineStyle.Text && OnlyButtons(last.Text)) { last.Text += " " + text; return 0; }
+            lines.Insert(end, new DoctorLine { Text = text, Style = DoctorLineStyle.Text, Indent = card ? 1 : 0, Section = lines[start].Section });
+            return 1;
+        }
+
+        /// <summary>
+        /// Gives every card and line that speaks of a log a button that opens it: the file where one log is meant,
+        /// the Logs folder where it is the logs as a whole (or a file that may not be there). A log is spoken of by
+        /// one of the doctor's own texts (<see cref="LogTexts"/>) or by its file's name, whoever wrote the line. A
+        /// card that has the button already is left alone, so doing this twice adds nothing. On a server that is
+        /// another computer there is nothing the player could open, and nothing is added.
+        /// </summary>
+        public static void LogButtons(DoctorContext x)
+        {
+            if (x == null || x.Compact || !x.OnPlayersComputer) return;
+            List<DoctorLine> lines = x.R.Lines;
+            List<(Regex rx, char kind, bool heading)> patterns = LogPatterns(x);
+            string side = x.Side == EnumAppSide.Client ? "client" : "server";
+            // A file that isn't there (no crash was ever written down) has nothing to show: its folder then.
+            string mainLog = x.Ev?.Log != null && !x.Ev.Log.Found ? "" : x.MainLogName, crashLog = x.Ev?.Crash != null && !x.Ev.Crash.Found ? "" : x.CrashLogName;
+            // In single player both sides' logs are in the one Logs folder.
+            bool bothHere = x.SameProcess || (x.Api as Vintagestory.API.Client.ICoreClientAPI)?.IsSinglePlayer == true;
+
+            // Outside the cards one button of a kind is enough for a page (the log's own page names its file twice).
+            var loose = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            for (int i = 0; i < lines.Count;)
+            {
+                int end = i + 1;
+                if (IsCard(lines[i])) { while (end < lines.Count && IsDetail(lines[end])) end++; }
+                else foreach (var (file, _) in LogTokens(lines[i].Text)) loose.Add(file);
+                i = end;
+            }
+
+            for (int i = 0; i < lines.Count;)
+            {
+                bool card = IsCard(lines[i]);
+                int end = i + 1;
+                if (card) { while (end < lines.Count && IsDetail(lines[end])) end++; }
+                var want = new List<string>();
+                var have = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                for (int k = i; k < end; k++)
+                {
+                    string text = lines[k].Text ?? "";
+                    if (text.IndexOf("{{", StringComparison.Ordinal) >= 0)
+                    {
+                        foreach (var (file, _) in LogTokens(text)) have.Add(file);
+                        // A button's own words don't count: "Every error and warning" leads to a page, not to a file.
+                        text = DoctorReport.ActionToken.Replace(text, " ");
+                    }
+                    if (text.Length < 6) continue;
+                    foreach (Match m in LogFileName.Matches(text))
+                    {
+                        if ((bothHere || m.Groups[1].Value == side) && !want.Contains(m.Value)) want.Add(m.Value);
+                    }
+                    bool heading = lines[k].Style == DoctorLineStyle.Heading;
+                    foreach (var (rx, kind, headingOnly) in patterns)
+                    {
+                        if (headingOnly != heading || !rx.IsMatch(text)) continue;
+                        string file = kind == 'm' ? mainLog : kind == 'c' ? crashLog : "";
+                        if (!want.Contains(file)) want.Add(file);
+                    }
+                }
+                // The folder says nothing next to a file from it.
+                if (want.Count > 1) want.Remove("");
+                var add = new List<string>();
+                foreach (string file in want)
+                {
+                    if (file.Length == 0 ? have.Count > 0 : have.Contains(file)) continue;
+                    if (!card && !loose.Add(file)) continue;
+                    add.Add(x.LogToken(file));
+                }
+                if (add.Count > 0) end += Attach(lines, i, end, card, add);
+                i = end;
             }
         }
 
@@ -266,7 +424,7 @@ namespace VintageDoctor
                 string text = lines[i].Text ?? "";
                 words.Append(text).Append('\n');
                 if (text.IndexOf("{{", StringComparison.Ordinal) < 0) continue;
-                foreach (System.Text.RegularExpressions.Match m in DoctorReport.ActionToken.Matches(text))
+                foreach (Match m in DoctorReport.ActionToken.Matches(text))
                 {
                     string kind = m.Groups[1].Value, target = m.Groups[2].Value, arg = m.Groups[3].Value;
                     if (kind == "open" && target == Checks.TopicMod) Add(arg);
@@ -433,19 +591,31 @@ namespace VintageDoctor
                 string title = Title(key);
                 r.Lines.Add(new DoctorLine { Text = title, Style = DoctorLineStyle.Heading, Section = key });
                 ModEntry mod = key == DoctorReport.GameSection ? null : x.Ev?.Mods?.Get(key);
-                var said = new HashSet<string>(StringComparer.Ordinal);
+                var said = new Dictionary<string, DoctorLine>(StringComparer.Ordinal);
                 for (int h = 0; h < halves.Count; h++)
                 {
                     List<DoctorLine> all = cards[key][h];
                     if (all == null || all.Count == 0) continue;
                     // What both sides found alike (no crash reports, a clean log) is said once.
+                    // Each side has its own log, though: the one card keeps the buttons for both.
                     var list = new List<DoctorLine>();
                     bool again = false;
+                    DoctorLine first = null;
                     foreach (DoctorLine l in all)
                     {
-                        if (l.Style == DoctorLineStyle.Check && l.Indent == 0) again = !said.Add(l.Text);
+                        if (IsCard(l))
+                        {
+                            again = said.TryGetValue(l.Text, out first);
+                            if (!again) said[l.Text] = l;
+                        }
                         else if (!IsDetail(l)) again = false;
-                        if (!again) list.Add(l);
+                        if (!again) { list.Add(l); continue; }
+                        int at = first == null ? -1 : r.Lines.IndexOf(first);
+                        if (at < 0) continue;
+                        int end = at + 1;
+                        while (end < r.Lines.Count && IsDetail(r.Lines[end])) end++;
+                        var there = new HashSet<string>(r.Lines.Skip(at).Take(end - at).SelectMany(o => LogTokens(o.Text)).Select(o => o.file), StringComparer.OrdinalIgnoreCase);
+                        Attach(r.Lines, at, end, true, LogTokens(l.Text).Where(o => there.Add(o.file)).Select(o => o.token).ToList());
                     }
                     if (list.Count == 0) continue;
                     // Plain text, not a note: the window takes a note under a card for one of the card's details.

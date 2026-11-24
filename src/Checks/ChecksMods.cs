@@ -384,10 +384,23 @@ namespace VintageDoctor
 
         // ---------------------------------------------------------------- code patches (Harmony) and JSON patches
 
-        sealed class PatchedMethod
+        internal sealed class PatchedMethod
         {
             public string Name;
             public List<string> Owners = new List<string>(), Transpilers = new List<string>(), Prefixes = new List<string>();
+            /// <summary>
+            /// What each mod's patches do at this place, a letter each: 'b' runs before the game's code, 'a' after it,
+            /// 'r' rewrites it, 'e' steps in when it ends or fails.
+            /// </summary>
+            public Dictionary<string, string> How = new Dictionary<string, string>(StringComparer.Ordinal);
+
+            public void Add(string owner, char how)
+            {
+                if (!Owners.Contains(owner)) Owners.Add(owner);
+                if (how == 'b' && !Prefixes.Contains(owner)) Prefixes.Add(owner);
+                if (how == 'r' && !Transpilers.Contains(owner)) Transpilers.Add(owner);
+                How[owner] = How.TryGetValue(owner, out string had) ? (had.IndexOf(how) >= 0 ? had : had + how) : how.ToString();
+            }
         }
 
         /// <summary>Every game method a mod has patched, and whose patches they are (a patch's owner is traced to its mod by its code).</summary>
@@ -407,16 +420,37 @@ namespace VintageDoctor
                 Patches info = Harmony.GetPatchInfo(method);
                 if (info == null) continue;
                 var pm = new PatchedMethod { Name = method.DeclaringType.Name + "." + method.Name };
-                foreach (Patch p in info.Prefixes) { string o = Owner(p); pm.Owners.Add(o); pm.Prefixes.Add(o); }
-                foreach (Patch p in info.Postfixes) pm.Owners.Add(Owner(p));
-                foreach (Patch p in info.Transpilers) { string o = Owner(p); pm.Owners.Add(o); pm.Transpilers.Add(o); }
-                foreach (Patch p in info.Finalizers) pm.Owners.Add(Owner(p));
-                pm.Owners = pm.Owners.Distinct().ToList();
-                pm.Transpilers = pm.Transpilers.Distinct().ToList();
-                pm.Prefixes = pm.Prefixes.Distinct().ToList();
+                foreach (Patch p in info.Prefixes) pm.Add(Owner(p), 'b');
+                foreach (Patch p in info.Postfixes) pm.Add(Owner(p), 'a');
+                foreach (Patch p in info.Transpilers) pm.Add(Owner(p), 'r');
+                foreach (Patch p in info.Finalizers) pm.Add(Owner(p), 'e');
                 if (pm.Owners.Count > 0) list.Add(pm);
             }
             return list;
+        }
+
+        /// <summary>"runs before it, runs after it": what a mod's patches do at a place.</summary>
+        static string HowWords(DoctorContext x, PatchedMethod m, string owner)
+        {
+            m.How.TryGetValue(owner, out string how);
+            var parts = new List<string>();
+            foreach (char c in how ?? "") parts.Add(c == 'b' ? x.T("patch-before") : c == 'a' ? x.T("patch-after") : c == 'r' ? x.T("patch-rewrites") : x.T("patch-ends"));
+            return string.Join(", ", parts);
+        }
+
+        /// <summary>"Carry On (runs before it)".</summary>
+        static string WhoHow(DoctorContext x, PatchedMethod m, string owner)
+        {
+            string how = HowWords(x, m, owner);
+            return x.ModName(owner) + (how.Length > 0 ? " (" + how + ")" : "");
+        }
+
+        /// <summary>"A", "A and B", "A, B and C".</summary>
+        static string NameList(DoctorContext x, IList<string> names)
+        {
+            if (names.Count == 0) return "?";
+            if (names.Count == 1) return names[0];
+            return x.T("list-and", string.Join(", ", names.Take(names.Count - 1)), names[names.Count - 1]);
         }
 
         public static void CodePatches(DoctorContext x, bool full)
@@ -425,24 +459,45 @@ namespace VintageDoctor
             List<PatchedMethod> methods;
             try { methods = PatchedMethods(x); }
             catch (Exception e) { x.Info(x.T("patches-error", e.Message)); return; }
-            var owners = methods.SelectMany(m => m.Owners).GroupBy(o => o).OrderByDescending(g => g.Count()).ToList();
-            var rewritten = methods.Where(m => m.Transpilers.Count >= 2).ToList();
-            var shared = methods.Where(m => m.Owners.Count >= 2).OrderByDescending(m => m.Owners.Count).ToList();
+            CodePatches(x, full, methods);
+        }
+
+        /// <summary>
+        /// The page from what was read: who changes the game's code and how much, and then, for the places more than
+        /// one mod changes, which place it is, which mods, and what each does there.
+        /// </summary>
+        internal static void CodePatches(DoctorContext x, bool full, List<PatchedMethod> methods)
+        {
             if (methods.Count == 0) { x.Ok(x.T("patches-none")); return; }
-            if (rewritten.Count > 0)
-            {
-                x.Warn(x.T("patches-rewritten", rewritten.Count));
-                foreach (PatchedMethod m in rewritten.Take(full ? 30 : 5)) x.Detail(m.Name + ": " + string.Join(", ", m.Transpilers.Select(x.ModName)));
-                x.Explain(x.T("patches-rewritten-why"));
-            }
-            x.Info(x.T("patches-title", owners.Count, methods.Count, shared.Count));
-            x.Detail(string.Join(", ", owners.Take(full ? 60 : 8).Select(g => x.ModName(g.Key) + " (" + g.Count() + ")")));
-            if (full)
-            {
-                foreach (PatchedMethod m in shared.Take(40)) x.Detail(m.Name + ": " + string.Join(", ", m.Owners.Select(x.ModName)), 2);
-            }
+            var owners = methods.SelectMany(m => m.Owners).GroupBy(o => o).OrderByDescending(g => g.Count()).ToList();
+            x.Info(x.T("patches-title", owners.Count, methods.Count));
+            x.Detail(string.Join(", ", owners.Take(full ? 60 : 8).Select(g => x.ModName(g.Key) + " (" + g.Count() + ")")) + (owners.Count > (full ? 60 : 8) ? ", ..." : ""));
             x.Explain(x.T("patches-why"));
             if (!full) x.LinkButton(TopicPatches, "", x.T("btn-patches"));
+
+            var shared = methods.Where(m => m.Owners.Count >= 2).ToList();
+            if (shared.Count == 0) { if (Listed(x, full)) x.Ok(x.T("patches-shared-none")); return; }
+            // One card for each set of mods that meet somewhere: the mods in its title, the places under it.
+            var groups = shared.GroupBy(m => string.Join("|", m.Owners.OrderBy(o => o, StringComparer.Ordinal)))
+                .OrderByDescending(g => g.Any(m => m.Transpilers.Count >= 2)).ThenByDescending(g => g.Count()).ToList();
+            int most = full ? 40 : 12, places = full ? 40 : 8;
+            foreach (var g in groups.Take(most))
+            {
+                List<string> who = g.First().Owners.OrderBy(o => x.ModName(o), StringComparer.OrdinalIgnoreCase).ToList();
+                bool rewritten = g.Any(m => m.Transpilers.Count >= 2);
+                string title = x.T("patches-shared", NameList(x, who.Select(x.ModName).ToList()), g.Count());
+                if (rewritten) x.Warn(title); else x.Info(title);
+                x.About(who.Where(o => x.Ev.Mods?.Get(o) != null).ToArray());
+                foreach (PatchedMethod m in g.OrderByDescending(m => m.Transpilers.Count).ThenBy(m => m.Name, StringComparer.Ordinal).Take(places))
+                    x.Detail(m.Name + ": " + string.Join(", ", who.Select(o => WhoHow(x, m, o))));
+                if (g.Count() > places) x.Detail(x.T("more-lines", g.Count() - places));
+                x.Explain(rewritten ? x.T("patches-rewritten-why") : x.T("patches-shared-why"));
+            }
+            if (groups.Count > most)
+            {
+                x.Info(x.T("patches-shared-more", groups.Count - most));
+                if (!full) x.LinkButton(TopicPatches, "", x.T("btn-patches"));
+            }
         }
 
         static void HarmonyFor(DoctorContext x, ModEntry m)
@@ -451,11 +506,16 @@ namespace VintageDoctor
             {
                 var mine = PatchedMethods(x).Where(pm => pm.Owners.Contains(m.Id)).ToList();
                 if (mine.Count == 0) return;
-                var shared = mine.Where(pm => pm.Owners.Count >= 2).ToList();
+                var shared = mine.Where(pm => pm.Owners.Count >= 2).OrderBy(pm => pm.Name, StringComparer.Ordinal).ToList();
+                var alone = mine.Where(pm => pm.Owners.Count < 2).OrderBy(pm => pm.Name, StringComparer.Ordinal).ToList();
                 x.Info(x.T("mod-harmony", mine.Count, shared.Count));
-                foreach (PatchedMethod pm in mine.Take(12)) x.Detail(pm.Name + (pm.Owners.Count >= 2 ? ": " + string.Join(", ", pm.Owners.Where(o => o != m.Id).Select(x.ModName)) : ""));
-                if (mine.Count > 12) x.Detail(x.T("more-lines", mine.Count - 12));
-                x.Explain(x.T("patches-why"));
+                // The shared ones first and all of them: which place, what this mod does there, and who else is at it.
+                foreach (PatchedMethod pm in shared.Take(30))
+                    x.Detail(pm.Name + ": " + HowWords(x, pm, m.Id) + "; " + x.T("mod-harmony-also", string.Join(", ", pm.Owners.Where(o => o != m.Id).Select(o => WhoHow(x, pm, o)))));
+                foreach (PatchedMethod pm in alone.Take(12)) x.Detail(pm.Name + ": " + HowWords(x, pm, m.Id));
+                int more = Math.Max(0, shared.Count - 30) + Math.Max(0, alone.Count - 12);
+                if (more > 0) x.Detail(x.T("more-lines", more));
+                x.Explain(shared.Count > 0 ? x.T("patches-shared-why") : x.T("patches-why"));
             }
             catch { }
         }

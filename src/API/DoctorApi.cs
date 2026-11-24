@@ -221,6 +221,14 @@ namespace VintageDoctor.API
         void UrlButton(string url, string label);
         /// <summary>A button that copies text to the player's clipboard.</summary>
         void CopyButton(string text, string label);
+        /// <summary>
+        /// (API 3) A button under the last finding that opens a log on the player's computer: this side's own
+        /// ("client-main.log" or "server-main.log") when no name is given, another file of the game's Logs folder
+        /// by its name ("server-debug.log"), or the folder itself for "". On a server that is another computer
+        /// there is no button: its files can't be opened from the player's. A finding that names a log file in its
+        /// words gets this button by itself.
+        /// </summary>
+        void LogButton(string file = null);
         /// <summary>A heading; findings after it are grouped under it.</summary>
         void Section(string heading);
         /// <summary>

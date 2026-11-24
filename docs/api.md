@@ -240,11 +240,11 @@ Don't list `vintagedoctor` under `dependencies` in your modinfo.json unless you 
 | `Unregister(modId)` | Takes everything of your mod away again. |
 | `RegisterClientFacts(modId, collect)` | (API 2, on the player's side) Something your server-side checks need to know about this player's game. `collect(topic, argument)` returns bytes (64 KB at most); they travel with each request and your check reads them with `ctx.ClientFacts(modId)`. |
 | `OpenPage(topic, argument, player)` | (API 2) Opens the doctor's window at a page. On the server it asks that player's game; false when their game doesn't have the doctor. |
-| `DoctorVersion`, `ApiVersion` | `ApiVersion` is 2 since Vintage Doctor 1.2.0 (1 before). It only goes up when something is added; nothing is removed. |
+| `DoctorVersion`, `ApiVersion` | `ApiVersion` is 3 since Vintage Doctor 1.4.0 (2 since 1.2.0, 1 before). It only goes up when something is added; nothing is removed. |
 
-Everything marked "API 2" needs Vintage Doctor 1.2.0. If your mod should also work with an older doctor, check
-`ApiVersion >= 2` and keep the code that uses those members in a class of its own, as the example mod does
-(`WithDoctor2`).
+Everything marked "API 2" needs Vintage Doctor 1.2.0, and "API 3" needs 1.4.0. If your mod should also work with an
+older doctor, check `ApiVersion >= 2` (or `>= 3`) and keep the code that uses those members in a class of its own, as
+the example mod does (`WithDoctor2`, `WithDoctor3`).
 
 **`DoctorCheck`** has, since API 2, `Pages`: the pages the check runs on. (`Deep` is still there so older mods load, but
 does nothing since 1.3.0: there is no second round of checks any more.) Left empty it runs on the
@@ -263,6 +263,7 @@ question above it as one.
 | `FixButton(fixId, argument, label)` | A button that runs a registered fix, then shows the page again. |
 | `LinkButton(topic, argument, label)` | A button to another page: `"mod"` with a mod id, `"item"` with a code, `"log"`, a topic of yours... |
 | `UrlButton(url, label)`, `CopyButton(text, label)` | Open a web page; copy text to the clipboard. |
+| `LogButton(file = null)` | (API 3) A button that opens a log on the player's computer, in whatever opens text files there: this side's own log (`client-main.log` or `server-main.log`) when no name is given, another file of the game's Logs folder by its name (`"server-debug.log"`), or the folder itself for `""`. On a server that is another computer no button is made: the player couldn't open its files. |
 | `Section(heading)` | A heading (in a page of your own). |
 | `ItemRef(collectible)` | Text that shows as the block's or item's icon and name, and opens its page when clicked. |
 | `Translate(key, args)` | A text from your lang file in the asking player's language. |
@@ -330,9 +331,18 @@ Inside a line:
   built the page, then shows the page again with the result at the top. Write `{{fix|c:bus:<fix id>|...}}` for a fix
   that has to run on the player's side (opening a window of yours, say).
 - `{{url|<address>||<label>}}` opens a web page, `{{copy|<text>||<label>}}` copies text.
+- `{{folder|logs|<file>|<label>}}` (1.4.0) opens a file of the game's Logs folder on the player's computer
+  (`server-main.log`, `client-debug.log`; only a plain `.log` or `.txt` name), and `{{folder|logs||<label>}}` the
+  folder. A doctor before 1.4.0 opens the folder for both. You rarely need to write it: naming the file in the
+  line is enough (below), and then the button is only there where the file is on the player's computer.
 - `[[item:game:ingot-copper]]` or `[[block:...]]` shows the thing's icon and name.
 
 Labels and arguments can't contain `{`, `}` or `|`.
+
+**Logs get a button by themselves (1.4.0).** A card or line that names a log by its file (`server-main.log`,
+`client-debug.log`, `server-crash.log`), in a finding, a page or a known problem's words, gets a button that opens
+that file, whichever way it was handed over. Nothing to do for it, and nothing happens for other words (a wooden log
+stays a log). It is only added where the file is on the player's computer.
 
 **Pages and fixes that take a while.** A page handler runs on the game's main thread and must return quickly. When
 the page needs more (reading files, working something out on another thread), say so and deliver later:

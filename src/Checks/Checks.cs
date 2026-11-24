@@ -176,7 +176,7 @@ namespace VintageDoctor
                 foreach (string id in culprits.Take(3)) ModButtons(x, id, x.Ev.Mods?.Get(id) != null);
             }
             else x.Advice(x.T("crash-advice-nomod"));
-            if (latest) x.Buttons(DoctorReport.Open("bugreport", "", x.T("btn-bugreport")), x.FolderToken("logs", x.T("btn-open-logs")));
+            if (latest) x.Buttons(DoctorReport.Open("bugreport", "", x.T("btn-bugreport")), x.LogToken(x.CrashLogName));
         }
 
         static string ShortType(string type)

@@ -171,7 +171,33 @@ namespace VintageDoctor
         public string PlayerFixToken(string fixId, string argument, string label) => DoctorReport.Fix(Side == EnumAppSide.Server && SameProcess ? 'c' : SideChar, fixId, argument, label);
 
         /// <summary>A button that opens a folder on the player's computer; nothing when the folder is on a server somewhere else.</summary>
-        public string FolderToken(string which, string label) => Side == EnumAppSide.Server && !SameProcess ? null : DoctorReport.Folder(which, label);
+        public string FolderToken(string which, string label) => OnPlayersComputer ? DoctorReport.Folder(which, label) : null;
+
+        /// <summary>Whether this side's files are on the asker's own computer: their game, or the server inside it (single player).</summary>
+        public bool OnPlayersComputer => !(Side == EnumAppSide.Server && !SameProcess);
+
+        /// <summary>This side's log ("client-main.log", "server-main.log") and its crash reports.</summary>
+        public string MainLogName => Side == EnumAppSide.Client ? "client-main.log" : "server-main.log";
+        public string CrashLogName => Side == EnumAppSide.Client ? "client-crash.log" : "server-crash.log";
+
+        /// <summary>
+        /// A button that opens a file of the Logs folder on the player's computer (this side's log when no name is
+        /// given), or the folder itself for "". Nothing when the logs are on a server somewhere else.
+        /// </summary>
+        public string LogToken(string file = null)
+        {
+            if (!OnPlayersComputer) return null;
+            if (file == null) file = MainLogName;
+            if (file.Length == 0 || !DoctorReport.OpenableFile(file)) return DoctorReport.Folder(DoctorReport.LogsFolder, T("btn-open-logs"));
+            return DoctorReport.FileIn(DoctorReport.LogsFolder, file, T("btn-open-file", file));
+        }
+
+        public void LogButton(string file = null)
+        {
+            if (Compact) return;
+            string token = LogToken(file);
+            if (token != null) R.Add(token, DoctorLineStyle.Text, 1);
+        }
 
         /// <summary>Added to each heading ("your game", "the server"), since the window shows both halves of a page one under the other.</summary>
         public string SideLabel;

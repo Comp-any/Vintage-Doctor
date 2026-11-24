@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.4.0
+
+Logs open from where the doctor speaks of them, and the page about code patches says who shares what.
+
+- **A button that opens the log, wherever a log is spoken of.** A card or a page that refers to the log has *Open client-main.log* (or *server-main.log* for the world's side of a single-player game); one that refers to crash reports has *Open client-crash.log*; where it is the logs as a whole, or a file that may not exist yet, *Open the Logs folder*. The file opens in whatever your computer opens text files with. The game's window may stay in front of it, and the doctor's window says so when it has opened one.
+- That covers the pages of the log, of start-up and of crashes (the button is at the top), the cards for each mod's errors, a mod's page, the list of mods, an item's page, and any card from another mod that names a log by its file.
+- In single player, where both sides found the same ("no errors in the log"), the one card has a button for each side's log.
+- A server that is another computer can't offer its files to your computer, so its cards have no such button: what is in its log is on the doctor's own page of it, as before.
+- **Which mods change the same place in the game's code, and what each does there.** The page about code patches used to say "2 shared with another mod" and leave it at that on the check-up. Now every set of mods that meet gets a card of its own: the mods in its title, and under it each place by name with what each mod does to it (runs before the game's code, runs after it, rewrites it, steps in when it ends or fails). On the check-up the card is in the sections of the mods it names. Two mods rewriting the same piece of code is a warning; the rest is to know.
+- A mod's own page lists the places it shares first, each with who else is at it.
+- For mod authors: `ctx.LogButton()` (API version 3) puts that button under a finding, `{{folder|logs|<file>|<label>}}` writes it into a line of a page, and a finding that names a log by its file gets it without asking. See [docs/api.md](docs/api.md).
+- For whoever works on the doctor: a text that says "log" or "crash report" has to say in one table which file its button opens (`LogTexts` in `src/Checks/Pages.cs`); `tools/check_lang.py` fails until it does, so a new text can't be left without its button.
+- Not seen in a real game by the session that made it: the buttons in the window, and the file opening on Windows, Linux and macOS. The tests run a server, where the pages and their buttons are checked as text.
+
 ## 1.3.0
 
 The check-up is one page by mod, and nothing on it needs a character the game can't draw.

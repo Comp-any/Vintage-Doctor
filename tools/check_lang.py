@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Checks that every text the code asks for is in assets/vintagedoctor/lang/en.json with as many {n} places as the
-code gives values, that no text sits there unused, and that no text uses a character the game may not be able to
-draw (tools/game-font-chars.txt: an arrow or a tick would show as an empty box). Run from the repository's top
-folder; exits 1 on a problem. With --list, prints every key the code uses and how many values it gives."""
+code gives values, that no text sits there unused, that no text uses a character the game may not be able to
+draw (tools/game-font-chars.txt: an arrow or a tick would show as an empty box), and that every text that speaks
+of a log is in the table that gives it a button to open that log (LogTexts in src/Checks/Pages.cs). Run from the
+repository's top folder; exits 1 on a problem. With --list, prints every key the code uses and how many values it gives."""
 import glob, json, re, sys
 
 def drawable():
@@ -66,6 +67,13 @@ WHY = ["why-sameassembly", "why-missingassembly", "why-version", "why-harmony", 
        "why-savecorrupt", "why-fileaccess", "why-graphics", "why-network", "why-null", "why-bug", "why-native", "why-badimage", "why-duplicate", "why-packaging"]
 NOT_TEXTS = {"collect", "fix", "topics", "page", "deliver", "clientfacts", "open", "about"}  # event names such as "vintagedoctor:collect"
 
+def log_texts():
+    """The table in src/Checks/Pages.cs of the texts that speak of a log and which one a button should open: {key: kind}."""
+    source = open("src/Checks/Pages.cs", encoding="utf-8").read()
+    start, end = source.find("// log-texts-begin"), source.find("// log-texts-end")
+    if start < 0 or end < start: return None
+    return dict(re.findall(r"""\{\s*"([a-z0-9-]+)"\s*,\s*'(.)'\s*\}""", source[start:end]))
+
 def main():
     used = {}
     for path in glob.glob("src/**/*.cs", recursive=True):
@@ -98,6 +106,17 @@ def main():
             if "font-ok:" in line: continue
             bad = undrawable(''.join(literals(line.rstrip("\n"))), ok)
             if bad: problems.append(f"{path}:{number}: the game's font may not have {', '.join(bad)} (write it another way, or let GameFont.Drawable do it)")
+    # A text that speaks of a log gets a button that opens it (Pages.LogButtons): the table there says which.
+    table = log_texts()
+    if not table: problems.append("src/Checks/Pages.cs: the table of the texts that speak of a log (log-texts-begin ... log-texts-end) is gone")
+    else:
+        for key, text in sorted(lang.items()):
+            if re.search(r"(?i)\blogs?\b|\bcrash reports?\b", text) and key not in table:
+                problems.append(f"{key}: the text speaks of a log; say in LogTexts (src/Checks/Pages.cs) which one its button opens: "
+                                "'m' this side's log, 'c' its crash reports, 'f' the Logs folder, '-' nothing to open")
+        for key, kind in sorted(table.items()):
+            if key not in lang: problems.append(f"LogTexts (src/Checks/Pages.cs): {key} is not a text")
+            if kind not in "mcf-": problems.append(f"LogTexts (src/Checks/Pages.cs): {key} has '{kind}', which is none of m, c, f and -")
     for p in problems: print(p)
     print(f"{len(used)} texts used, {len(lang)} in the file, {len(problems)} problems")
     return 1 if problems else 0

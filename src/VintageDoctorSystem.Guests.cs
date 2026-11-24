@@ -271,6 +271,8 @@ namespace VintageDoctor
                 if (tree == null) x.R.Lines.Insert(Math.Min(at, x.R.Lines.Count), new DoctorLine { Text = DoctorReport.WarnMark + " " + x.T("guest-timeout", name), Style = DoctorLineStyle.Check });
                 else if (AppendGuestLines(x, tree, at) == 0)
                     x.R.Lines.Insert(Math.Min(at, x.R.Lines.Count), new DoctorLine { Text = DoctorReport.InfoMark + " " + x.T("guest-empty", name), Style = DoctorLineStyle.Check });
+                // What came late may speak of a log too (and "didn't answer" does).
+                Pages.LogButtons(x);
                 w.PageThen?.Invoke(x.R);
             }
             catch (Exception e) { api.Logger.Error("[vintagedoctor] Finishing a page or fix a mod delivered later failed: {0}", e); }

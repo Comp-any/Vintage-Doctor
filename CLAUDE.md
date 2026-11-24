@@ -40,5 +40,13 @@ and fixes what it can. More is in the "vintage story mods" project doc `claude/v
   then the mods nothing was found against. The window's list at the top shows one section alone. There is no
   "deeper" round: every check runs every time, so anything slow is done off the main thread or remembered
   (`ZipHealth`, `CountNames`, the patch targets). A check that finds nothing says so on the check-up (`Listed`).
+- **A log that is spoken of gets a button that opens it** (1.4.0). `Pages.LogButtons` runs over every finished page:
+  a card or line holding one of the doctor's own texts that speak of a log, or naming a log by its file
+  (`server-debug.log`), gets `{{folder|logs|<file>|label}}` (the folder for `''`), only where the file is on the
+  player's computer (`x.OnPlayersComputer`). Which text opens what is the table `LogTexts` in `src/Checks/Pages.cs`
+  ('m' this side's log, 'c' its crash reports, 'f' the folder, '-' nothing); `tools/check_lang.py` fails on a text
+  that says "log" or "crash report" and isn't in it. Don't add the button by hand in a check; add the text to the table.
+- **Code patches** (`Checks.CodePatches`): one card per set of mods that patch the same method, the methods under it
+  with what each mod does there. The example mod patches `SelfTest.SharedPlace` so the test run has a real shared place.
 - **Nothing client-side has been seen by a session** (the window, the hotkey, the frame-rate and settings checks):
   CI only runs a server. Say so when reporting, and ask the user to look.

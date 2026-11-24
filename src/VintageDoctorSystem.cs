@@ -50,7 +50,7 @@ namespace VintageDoctor
         public bool IsDedicated { get; private set; }
 
         public string DoctorVersion => Mod?.Info?.Version ?? "?";
-        public int ApiVersion => 2;
+        public int ApiVersion => 3;
 
         // What this session started from (read once per side at start).
         public SessionRecord PreviousSession { get; private set; }

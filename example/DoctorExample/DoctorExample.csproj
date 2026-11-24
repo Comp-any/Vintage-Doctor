@@ -16,6 +16,11 @@
       <HintPath>$(VINTAGE_STORY)/VintagestoryAPI.dll</HintPath>
       <Private>false</Private>
     </Reference>
+    <!-- Only for the patch that the doctor's own test run uses (SharedPatchForTheTest). -->
+    <Reference Include="0Harmony">
+      <HintPath>$(VINTAGE_STORY)/Lib/0Harmony.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
     <Reference Include="VintageDoctor">
       <HintPath>../../bin/Release/Mods/vintagedoctor/VintageDoctor.dll</HintPath>
       <Private>false</Private>
