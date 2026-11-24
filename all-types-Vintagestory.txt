@@ -1,0 +1,2 @@
+Vintagestory/ClientLinux.cs
+Properties/AssemblyInfo.cs

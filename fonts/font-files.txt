@@ -1,0 +1,11 @@
+assets/game/fonts/Lora-Bold.ttf
+assets/game/fonts/Montserrat-Bold.ttf
+assets/game/fonts/Almendra-Bold.ttf
+assets/game/fonts/Lora-Regular.ttf
+assets/game/fonts/Montserrat-Regular.ttf
+assets/game/fonts/Almendra-Regular.ttf
+assets/game/fonts/Montserrat-Italic.ttf
+assets/game/fonts/Almendra-Italic.ttf
+assets/game/fonts/Lora-BoldItalic.ttf
+assets/game/fonts/Almendra-BoldItalic.ttf
+assets/game/fonts/Lora-Italic.ttf

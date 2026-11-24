@@ -1,0 +1,38 @@
+Vintagestory.API.Server/ICoreServerAPI.cs-114-	void RegisterItem(Item item);
+Vintagestory.API.Server/ICoreServerAPI.cs-115-
+Vintagestory.API.Server/ICoreServerAPI.cs-116-	/// <summary>
+Vintagestory.API.Server/ICoreServerAPI.cs-117-	/// Register a new Block. Must happen before server runphase LoadGame. These are sent to the client during connect, so only need to register them on the server side.
+Vintagestory.API.Server/ICoreServerAPI.cs-118-	/// </summary>
+Vintagestory.API.Server/ICoreServerAPI.cs-119-	/// <param name="block">BlockType to register. The Server assigns a block id and sets block.blockId</param>
+Vintagestory.API.Server/ICoreServerAPI.cs-120-	void RegisterBlock(Block block);
+Vintagestory.API.Server/ICoreServerAPI.cs-121-
+Vintagestory.API.Server/ICoreServerAPI.cs-122-	/// <summary>
+Vintagestory.API.Server/ICoreServerAPI.cs-123-	/// Registers a new crafting recipe. These are sent to the client during connect, so only need to register them on the server side.
+Vintagestory.API.Server/ICoreServerAPI.cs-124-	/// </summary>
+Vintagestory.API.Server/ICoreServerAPI.cs-125-	/// <param name="recipe"></param>
+Vintagestory.API.Server/ICoreServerAPI.cs:126:	void RegisterCraftingRecipe(GridRecipe recipe);
+Vintagestory.API.Server/ICoreServerAPI.cs-127-
+Vintagestory.API.Server/ICoreServerAPI.cs-128-	/// <summary>
+Vintagestory.API.Server/ICoreServerAPI.cs-129-	/// Registers a new tree generator
+Vintagestory.API.Server/ICoreServerAPI.cs-130-	/// </summary>
+Vintagestory.API.Server/ICoreServerAPI.cs-131-	/// <param name="generatorCode"></param>
+Vintagestory.API.Server/ICoreServerAPI.cs-132-	/// <param name="gen"></param>
+Vintagestory.API.Server/ICoreServerAPI.cs-133-	void RegisterTreeGenerator(AssetLocation generatorCode, ITreeGenerator gen);
+Vintagestory.API.Server/ICoreServerAPI.cs-134-
+Vintagestory.API.Server/ICoreServerAPI.cs-135-	/// <summary>
+Vintagestory.API.Server/ICoreServerAPI.cs-136-	/// Registers a new tree generator
+Vintagestory.API.Server/ICoreServerAPI.cs-137-	/// </summary>
+Vintagestory.API.Server/ICoreServerAPI.cs-138-	/// <param name="generatorCode"></param>
+Vintagestory.API.Server/ICoreServerAPI.cs-139-	/// <param name="genhandler"></param>
+Vintagestory.API.Server/ICoreServerAPI.cs-140-	void RegisterTreeGenerator(AssetLocation generatorCode, GrowTreeDelegate genhandler);
+Vintagestory.API.Server/ICoreServerAPI.cs-141-
+Vintagestory.API.Server/ICoreServerAPI.cs-142-	/// <summary>
+Vintagestory.API.Server/ICoreServerAPI.cs-143-	/// Registers a chat command. When registered on the client you access the command by prefixing a dot (.), on the server it's a slash (/)
+Vintagestory.API.Server/ICoreServerAPI.cs-144-	/// </summary>
+Vintagestory.API.Server/ICoreServerAPI.cs-145-	/// <param name="chatcommand"></param>
+Vintagestory.API.Server/ICoreServerAPI.cs-146-	/// <returns></returns>
+Vintagestory.API.Server/ICoreServerAPI.cs-147-	[Obsolete("Use ChatCommand subapi instead")]
+Vintagestory.API.Server/ICoreServerAPI.cs-148-	bool RegisterCommand(ServerChatCommand chatcommand);
+Vintagestory.API.Server/ICoreServerAPI.cs-149-
+Vintagestory.API.Server/ICoreServerAPI.cs-150-	/// <summary>
+Vintagestory.API.Server/ICoreServerAPI.cs-151-	/// Registers a chat command. When registered on the client you access the command by prefixing a dot (.), on the server it's a slash (/)

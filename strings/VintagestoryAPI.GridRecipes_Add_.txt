@@ -1,0 +1,38 @@
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-311-		Queue<GridRecipe> queue = new Queue<GridRecipe>(gridRecipes);
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-312-		bool allResolved = false;
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-313-		while (!allResolved)
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-314-		{
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-315-			allResolved = true;
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-316-			int count = queue.Count;
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-317-			while (count-- > 0)
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-318-			{
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-319-				GridRecipe gridRecipe = queue.Dequeue();
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-320-				Dictionary<int, ItemStack[]> unnamedIngredients = null;
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-321-				if (ResolveIngredients(ref unnamedIngredients, queue, gridRecipe, ref allResolved, allStacks, fixedRand))
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-322-				{
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs:323:					resolvedGridRecipes.Add(new GridRecipeAndUnnamedIngredients
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-324-					{
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-325-						Recipe = gridRecipe,
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-326-						UnnamedIngredients = unnamedIngredients
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-327-					});
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-328-				}
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-329-			}
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-330-		}
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-331-	}
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-332-
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-333-	private bool ResolveIngredients(ref Dictionary<int, ItemStack[]>? unnamedIngredients, Queue<GridRecipe> halfResolvedRecipes, GridRecipe toTestRecipe, ref bool allResolved, ItemStack[]? allStacks, Random fixedRand)
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-334-	{
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-335-		bool result = true;
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-336-		if (toTestRecipe.ResolvedIngredients == null)
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-337-		{
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-338-			return false;
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-339-		}
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-340-		for (int i = 0; i < toTestRecipe.ResolvedIngredients.Length; i++)
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-341-		{
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-342-			CraftingRecipeIngredient craftingRecipeIngredient = toTestRecipe.ResolvedIngredients[i];
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-343-			if (craftingRecipeIngredient == null || craftingRecipeIngredient.MatchingType == EnumRecipeMatchType.Exact)
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-344-			{
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-345-				continue;
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-346-			}
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-347-			allResolved = false;
+Vintagestory.API.Client/SlideshowGridRecipeTextComponent.cs-348-			result = false;

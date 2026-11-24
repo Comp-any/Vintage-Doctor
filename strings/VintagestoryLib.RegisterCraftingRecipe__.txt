@@ -1,0 +1,38 @@
+Vintagestory.Server/ServerCoreAPI.cs-125-	}
+Vintagestory.Server/ServerCoreAPI.cs-126-
+Vintagestory.Server/ServerCoreAPI.cs-127-	public void RegisterItem(Item item)
+Vintagestory.Server/ServerCoreAPI.cs-128-	{
+Vintagestory.Server/ServerCoreAPI.cs-129-		server.RegisterItem(item);
+Vintagestory.Server/ServerCoreAPI.cs-130-	}
+Vintagestory.Server/ServerCoreAPI.cs-131-
+Vintagestory.Server/ServerCoreAPI.cs-132-	public void RegisterBlock(Block block)
+Vintagestory.Server/ServerCoreAPI.cs-133-	{
+Vintagestory.Server/ServerCoreAPI.cs-134-		server.RegisterBlock(block);
+Vintagestory.Server/ServerCoreAPI.cs-135-	}
+Vintagestory.Server/ServerCoreAPI.cs-136-
+Vintagestory.Server/ServerCoreAPI.cs:137:	public void RegisterCraftingRecipe(GridRecipe recipe)
+Vintagestory.Server/ServerCoreAPI.cs-138-	{
+Vintagestory.Server/ServerCoreAPI.cs-139-		server.GridRecipes.Add(recipe);
+Vintagestory.Server/ServerCoreAPI.cs-140-	}
+Vintagestory.Server/ServerCoreAPI.cs-141-
+Vintagestory.Server/ServerCoreAPI.cs-142-	public void RegisterTreeGenerator(AssetLocation generatorCode, ITreeGenerator gen)
+Vintagestory.Server/ServerCoreAPI.cs-143-	{
+Vintagestory.Server/ServerCoreAPI.cs-144-		server.TreeGeneratorsByTreeCode[generatorCode] = gen;
+Vintagestory.Server/ServerCoreAPI.cs-145-	}
+Vintagestory.Server/ServerCoreAPI.cs-146-
+Vintagestory.Server/ServerCoreAPI.cs-147-	public void RegisterTreeGenerator(AssetLocation generatorCode, GrowTreeDelegate dele)
+Vintagestory.Server/ServerCoreAPI.cs-148-	{
+Vintagestory.Server/ServerCoreAPI.cs-149-		server.TreeGeneratorsByTreeCode[generatorCode] = new TreeGenWrapper
+Vintagestory.Server/ServerCoreAPI.cs-150-		{
+Vintagestory.Server/ServerCoreAPI.cs-151-			dele = dele
+Vintagestory.Server/ServerCoreAPI.cs-152-		};
+Vintagestory.Server/ServerCoreAPI.cs-153-	}
+Vintagestory.Server/ServerCoreAPI.cs-154-
+Vintagestory.Server/ServerCoreAPI.cs-155-	public override void RegisterColorMap(ColorMap map)
+Vintagestory.Server/ServerCoreAPI.cs-156-	{
+Vintagestory.Server/ServerCoreAPI.cs-157-		server.ColorMaps[map.Code] = map;
+Vintagestory.Server/ServerCoreAPI.cs-158-	}
+Vintagestory.Server/ServerCoreAPI.cs-159-
+Vintagestory.Server/ServerCoreAPI.cs-160-	public bool RegisterCommand(ServerChatCommand chatcommand)
+Vintagestory.Server/ServerCoreAPI.cs-161-	{
+Vintagestory.Server/ServerCoreAPI.cs-162-		return commandapi.RegisterCommand(chatcommand);

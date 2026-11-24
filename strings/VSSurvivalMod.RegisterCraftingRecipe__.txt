@@ -1,0 +1,38 @@
+Vintagestory.ServerMods/RecipeLoader.cs-20-		return forSide == EnumAppSide.Server;
+Vintagestory.ServerMods/RecipeLoader.cs-21-	}
+Vintagestory.ServerMods/RecipeLoader.cs-22-
+Vintagestory.ServerMods/RecipeLoader.cs-23-	public override void AssetsLoaded(ICoreAPI api)
+Vintagestory.ServerMods/RecipeLoader.cs-24-	{
+Vintagestory.ServerMods/RecipeLoader.cs-25-		ICoreServerAPI serverApi = api as ICoreServerAPI;
+Vintagestory.ServerMods/RecipeLoader.cs-26-		if (serverApi != null)
+Vintagestory.ServerMods/RecipeLoader.cs-27-		{
+Vintagestory.ServerMods/RecipeLoader.cs-28-			bool classExclusiveRecipes = serverApi.World.Config.GetBool("classExclusiveRecipes", defaultValue: true);
+Vintagestory.ServerMods/RecipeLoader.cs-29-			LoadAlloyRecipes(serverApi);
+Vintagestory.ServerMods/RecipeLoader.cs-30-			LoadRecipes<GridRecipe>(serverApi, "grid", "recipes/grid", classExclusiveRecipes, (IRecipeBase r) =>
+Vintagestory.ServerMods/RecipeLoader.cs-31-			{
+Vintagestory.ServerMods/RecipeLoader.cs:32:				serverApi.RegisterCraftingRecipe(r as GridRecipe);
+Vintagestory.ServerMods/RecipeLoader.cs-33-			});
+Vintagestory.ServerMods/RecipeLoader.cs-34-			api.Logger.StoryEvent(Lang.Get("Grand inventions..."));
+Vintagestory.ServerMods/RecipeLoader.cs-35-			LoadRecipes<SmithingRecipe>(serverApi, "smithing", "recipes/smithing", classExclusiveRecipes, (IRecipeBase r) =>
+Vintagestory.ServerMods/RecipeLoader.cs-36-			{
+Vintagestory.ServerMods/RecipeLoader.cs-37-				serverApi.RegisterSmithingRecipe(r as SmithingRecipe);
+Vintagestory.ServerMods/RecipeLoader.cs-38-			});
+Vintagestory.ServerMods/RecipeLoader.cs-39-			serverApi.World.Logger.StoryEvent(Lang.Get("Burning sparks..."));
+Vintagestory.ServerMods/RecipeLoader.cs-40-			LoadRecipes<ClayFormingRecipe>(serverApi, "clay forming", "recipes/clayforming", classExclusiveRecipes, (IRecipeBase r) =>
+Vintagestory.ServerMods/RecipeLoader.cs-41-			{
+Vintagestory.ServerMods/RecipeLoader.cs-42-				serverApi.RegisterClayFormingRecipe(r as ClayFormingRecipe);
+Vintagestory.ServerMods/RecipeLoader.cs-43-			});
+Vintagestory.ServerMods/RecipeLoader.cs-44-			serverApi.World.Logger.StoryEvent(Lang.Get("Molded forms..."));
+Vintagestory.ServerMods/RecipeLoader.cs-45-			LoadRecipes<KnappingRecipe>(serverApi, "knapping", "recipes/knapping", classExclusiveRecipes, (IRecipeBase r) =>
+Vintagestory.ServerMods/RecipeLoader.cs-46-			{
+Vintagestory.ServerMods/RecipeLoader.cs-47-				serverApi.RegisterKnappingRecipe(r as KnappingRecipe);
+Vintagestory.ServerMods/RecipeLoader.cs-48-			});
+Vintagestory.ServerMods/RecipeLoader.cs-49-			serverApi.World.Logger.StoryEvent(Lang.Get("Simple tools..."));
+Vintagestory.ServerMods/RecipeLoader.cs-50-			LoadRecipes<BarrelRecipe>(serverApi, "barrel recipe", "recipes/barrel", classExclusiveRecipes, (IRecipeBase r) =>
+Vintagestory.ServerMods/RecipeLoader.cs-51-			{
+Vintagestory.ServerMods/RecipeLoader.cs-52-				serverApi.RegisterBarrelRecipe(r as BarrelRecipe);
+Vintagestory.ServerMods/RecipeLoader.cs-53-			});
+Vintagestory.ServerMods/RecipeLoader.cs-54-		}
+Vintagestory.ServerMods/RecipeLoader.cs-55-	}
+Vintagestory.ServerMods/RecipeLoader.cs-56-
+Vintagestory.ServerMods/RecipeLoader.cs-57-	public static void LoadAlloyRecipes(ICoreServerAPI api)
