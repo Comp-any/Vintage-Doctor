@@ -1,0 +1,42 @@
+== Doctor Example ==
+• Doctor Example 1.0.0, by demonic69
+  Mod id doctorexample; Code mod; runs on: Server; file doctorexample
+  Shows how a mod hands Vintage Doctor its own checks and fixes. Only for trying the API out.
+  Find Doctor Example on the Mod DB (https://mods.vintagestory.at/list/mod?text=Doctor%20Example)
+✓ Everything it needs is there (1).
+  The game: wants 1.22.0 or newer, this is 1.22.7
+• It changes the game's code in 1 place(s), 0 of them shared with other mods
+  SelfTest.SharedPlace: runs after it
+  Mods patch the game's own code where it offers no other way in. It is normal, but it is also what breaks first when the game updates, and two mods patching the same place can get in each other's way.
+• Doctor Example (JSON) and Doctor Example don't get on
+  Nothing is really wrong: the two example mods say they clash so the doctor has a clash to show.
+  Doctor Example (JSON) says so itself (in its vintagedoctor.json).
+  Doctor Example (JSON)'s page (/doctor mod doctorexamplejson) Doctor Example's page (/doctor mod doctorexample)
+
+== Checks from your mods ==
+• Doctor Example: 1 kind(s) of messages from the example mod this session
+⚠ Doctor Example: 3 example pumps are jammed
+  pump at 10 5 10
+  A pump jams when its outlet is blocked.
+  → Clear the outlets, or let the doctor restart the pumps.
+  Restart the example pumps (/doctor fix doctorexample:unjam all)
+  1 message(s) from this mod in the log
+• Doctor Example: 2 example tanks are half empty
+  tank at 10 3 10
+  tank at 12 3 10
+  → Fill them from a pump.
+  Fill the example tanks (/doctor fix bus:doctorexample:fill)
+• Doctor Example: The example mod started
+  reported with ReportIncident
+  Last at 2026-11-24 06:04.
+
+== Errors and warnings from Doctor Example ==
+⚠ Doctor Example: An example pump jammed
+  [doctorexample] pump 3 jammed (a made-up warning from the example mod)
+  This line in the log comes from the example mod; the JSON example mod knows what it means.
+  → Nothing to do: it is only an example.
+  Start the example's config afresh (/doctor fix doctorexamplejson:pump-jammed/fix)
+✓ Nothing from Doctor Example in the log this session.
+
+== Next ==
+Switch Doctor Example off (/doctor fix doctor:disable-mod doctorexample) A report about Doctor Example (/doctor bugreport doctorexample) Every mod at a glance (/doctor mods) Back to the check-up (/doctor)

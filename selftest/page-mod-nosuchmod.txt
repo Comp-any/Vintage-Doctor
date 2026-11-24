@@ -1,0 +1,4 @@
+== nosuchmod ==
+• No mod called 'nosuchmod' is loaded, and none is in the Mods folder.
+  Find nosuchmod on the Mod DB (https://mods.vintagestory.at/list/mod?text=nosuchmod)
+  Every mod at a glance (/doctor mods)

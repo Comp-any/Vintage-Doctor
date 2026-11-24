@@ -1,0 +1,3 @@
+== What changed since last time ==
+• This is the first session the doctor has seen here, so there is nothing to compare with yet.
+  From now on it notes the mods and their versions at every start, and shows here what changed.

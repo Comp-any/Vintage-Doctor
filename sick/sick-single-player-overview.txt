@@ -1,0 +1,99 @@
+The world (the game's built-in server)
+⚠ The game crashed (11/21/2026 05:56:18): NullReferenceException
+  System.NullReferenceException: Object reference not set to an instance of an object.
+  The code used something that wasn't there. That is a bug in the code named in the trace; nothing you set up wrong.
+  The game didn't name a mod and no mod's code is in the trace, so this may be the game itself, a mod that changes the game's code without showing in the trace, or the computer (memory, graphics driver).
+    at Vintagestory.API.Common.FrameProfilerUtil.End() in VintagestoryApi\Common\FrameProfilerUtil.cs:line 213
+    at Vintagestory.Server.ServerMain.Process() in VintagestoryLib\Server\ServerMain.cs:line 941
+    at Vintagestory.Server.ServerProgram.Main() in VintagestoryLib\Server\ServerProgram.cs:line 156
+    at Vintagestory.ClientNative.CrashReporter.Start(ThreadStart start) in VintagestoryLib\Client\ClientPlatform\ClientNative\CrashReporter.cs:line 95
+  → If it happens again, try without the mods you added or updated last, and post the report on the game's forum or Discord.
+  {{open|bugreport||Put together a report to post}} {{folder|logs|server-crash.log|Open server-crash.log}}
+✖ 5 file(s) in the Mods folder aren't mods the game can load: doctor-sick-corrupt.zip, doctor-sick-nested.zip, doctor-sick-notamod.zip, doctor-sick-wrapped.zip, doctor-sick-straydll.zip
+  doctor-sick-corrupt.zip: the zip is damaged
+  doctor-sick-nested.zip: the mod sits one folder down inside it (in 'Nested-main')
+  doctor-sick-notamod.zip: it has no modinfo.json, so it isn't a mod
+  doctor-sick-wrapped.zip: it holds another zip (doctorwrapped_1.0.0.zip) instead of the mod
+  doctor-sick-straydll.zip: it has code in the wrong place (lib/Helper.dll)
+  The game tries everything in the Mods folder at every start, and reports an error for each of these. The Mods folder page says what each one is and offers the fix.
+  {{open|files||The Mods folder and config files}}
+✖ Doctor Crashy threw an error while starting: Method not found: 'Void Vintagestory.API.Common.DoesNotExist.Gone()'.
+  An exception was thrown when trying to start the mod:
+    Method not found: 'Void Vintagestory.API.Common.DoesNotExist.Gone()'.
+    at DoctorCrashy.DoctorCrashySystem.StartServerSide(ICoreServerAPI api) in /home/<user>/work/Vintage-Doctor/Vintage-Doctor/tests/mods/DoctorCrashy/DoctorCrashySystem.cs:line 21
+    at Vintagestory.Common.ModLoader.TryRunModPhase(Mod mod, ModSystem system, ICoreAPI api, ModRunPhase phase) in VintagestoryLib\Common\API\ModLoader.cs:line 680
+    Not started: DoctorCrashy.DoctorCrashySystem
+  The mod calls something that doesn't exist in this version of the game (or of another mod it uses): it was built for a different version. Update the mod, or use the game version it was made for.
+  → Look for an update of Doctor Crashy that fits this game version, check it has every mod it needs, or switch it off. Its author needs the lines above.
+  {{open|mod|doctorcrashy|Doctor Crashy's page}} {{fix|c:doctor:disable-mod|doctorcrashy|Switch Doctor Crashy off}}
+⚠ 1 mod(s) are in the Mods folder more than once
+  doctordup: 'doctordup_1.0.0.zip', 'doctordup_1.1.0.zip', loaded: v1.1.0
+  The game loads only the newest copy. The spare copies are harmless but confusing, and a spare copy of a mod with code can stop it loading at all.
+  {{open|files||The Mods folder and config files}}
+⚠ 2 JSON patch(es) didn't apply: Doctor Sick (2)
+    Patch 0 (target: game:itemtypes/resource/ingot.json) in doctorsick:patches/bad.json failed because supplied path /doesnotexist/deeper/still is invalid: The json path /doesnotexist/deeper/still was not found. No such element 'doesnotexist' at the root path
+  A patch is how one mod changes another's (or the game's) blocks, items and recipes. One that doesn't fit is skipped, so that change isn't in the game: the thing it was for behaves as if the mod weren't there.
+  → Usually the patching mod is made for another version of what it patches. Its author can fix the patch; an update may already have.
+• 1 recipe(s) or drop(s) name things that don't exist, by the mod of the missing thing: doctorsick (1)
+    doctorsick:doesnotexist
+  The game skips those recipes. Usually the mod expects another mod (or another version of one) to be installed.
+  {{open|startup||Everything from start-up}}
+⚠ Doctor Sick: 6 kind(s) of errors in the log this session (6 line(s))
+  Syntax error in json file 'doctorsick:itemtypes/broken.json': Failed deserializing broken.json: Unexpected end when reading token. Path ''.
+  Item with code doctorsick:ghost has defined an item class DoctorGhostItem, but no such class registered. Will ignore.
+  Failed registering item doctorsick:ghost:
+  ... and 3 more
+  An error in the log doesn't always show in the game, but each is something that didn't work as its author meant. The ones that repeat, and the ones from a mod you're having trouble with, are the ones to look at.
+  {{open|log|doctorsick|Doctor Sick's errors and warnings}} {{folder|logs|server-main.log|Open server-main.log}}
+⚠ Doctor Crashy: 1 kind(s) of errors in the log this session (3 line(s))
+  ×3 [doctorcrashy] a made-up error from the broken test mod
+  An error in the log doesn't always show in the game, but each is something that didn't work as its author meant. The ones that repeat, and the ones from a mod you're having trouble with, are the ones to look at.
+  {{open|log|doctorcrashy|Doctor Crashy's errors and warnings}} {{folder|logs|server-main.log|Open server-main.log}}
+✓ The server keeps up: a tick every 33.3 ms (30 a second).
+  Last minute: average 33.3 ms, 95% under 34 ms, worst 35 ms (121 ticks).
+  {{fix|s:doctor:profile|20|Measure where the time goes (20 seconds)}}
+✓ 45 creatures and things loaded (0 items on the ground), 392 chunks, 0 player(s).
+  Most of: game:hare 15, game:chicken 12, game:fox 6, game:deer 5, game:pig 2
+  392 chunks loaded for 0 player(s).
+✓ 13.9 GB free where the world is saved.
+  The save file is 4 KB.
+✓ Nothing in this world comes from a mod that isn't installed.
+✓ Time runs at the normal pace.
+✖ Doctor Sick: 2 block(s) or item(s) need code that isn't in the game (DoctorGhostItem, DoctorGhostBehavior, DoctorGhostBlock, DoctorGhostEntity)
+  doctorsick:ghost (its code: DoctorGhostItem)
+  doctorsick:ghost (a behaviour: DoctorGhostBehavior)
+  doctorsick:ghostblock (its code: DoctorGhostBlock)
+  doctorsick:ghostblock (its data code: DoctorGhostEntity)
+  Each of these names a piece of code that should make it work, and no loaded mod has that code: the mod's own code didn't load, it needs another mod that isn't installed, or this version of the mod doesn't match its files. They are in the game but act like plain blocks and items: machines don't open, tools don't do their job.
+  → Update the mod and install every mod its page lists as required. For a mod of your own: the name in the file has to be exactly the one given to RegisterBlockClass, RegisterItemClass or RegisterBlockEntityClass.
+  {{open|mod|doctorsick|Doctor Sick's page}}
+⚠ Doctor Sick: 1 block(s) or item(s) couldn't be added to the game
+  doctorsick:ghost
+  The game refused them while loading. Most often something with the same name was already there: two mods, or two files of one mod, add a thing with the same name, and only the first one exists. The log has the game's reason for each.
+  {{open|mod|doctorsick|Doctor Sick's page}} {{folder|logs|server-main.log|Open server-main.log}}
+⚠ Doctor Sick: 1 of its files couldn't be read, so what they describe isn't in the game
+  doctorsick:itemtypes/broken.json
+  Each of these files has a mistake in it (most often a missing comma or bracket) or uses something this version of the game doesn't know, and the game skipped the whole file: the blocks, items or recipes in it don't exist. The mod's page has the game's own error for each, with the place.
+  {{open|mod|doctorsick|Doctor Sick's page}}
+⚠ Doctor Sick tries to change 1 file(s) that aren't there
+  game:itemtypes/doctor-no-such-file.json
+  A patch changes one thing inside another file. These files don't exist in this version of the game (or of the mod they belong to): they were renamed, moved or removed in an update, and the mod hasn't caught up. Whatever those patches were for doesn't happen.
+  {{open|mod|doctorsick|Doctor Sick's page}}
+• Doctor Sick has 1 patch(es) for mods that aren't installed (doctornosuchmod)
+  That is how one mod supports another, and harmless: the game writes each one into the log as an error, but nothing is missing.
+  {{folder|logs|server-main.log|Open server-main.log}}
+⚠ 1 recipe(s) have exactly the same ingredients as another recipe that makes something else
+  [[item:game:flint]], [[item:game:stick]]:
+    [[item:game:flint]] ×2  (Doctor Sick, recipes/grid/shadow-b.json)
+    [[item:game:stick]] ×2  (Doctor Sick, recipes/grid/shadow-a.json)
+  The crafting grid can only offer one result for one set of ingredients, so only one of each pair can ever be crafted. This happens when two mods each add a recipe without knowing of the other.
+  → Many mods can switch single recipes off in their config. Otherwise tell both authors: one of them has to change an ingredient.
+  {{open|clashes||All clashes between mods}}
+✓ 3 JSON patches in 2 files, no two mods replacing the same thing.
+✓ Every mod's blocks and items have names.
+⚠ Doctor Sick's texts have formatting tags out of place: 2 error(s) about them in the log this session
+  doctorsick:lever-help: a > with no < before it, at character 16: Pull the lever -> the gate opens
+  doctorsick:hot-warning: </font> while <strong> is still open, at character 18: <strong>Hot!</font> Don't touch
+  The game reads < and > in texts (chat, item descriptions, tooltips, the handbook) as formatting tags. A > on its own, or a closing tag that doesn't match, makes it write an error every time the text is shown; the text is usually still shown. The error never says whose text it was, so the doctor reads every mod's texts the way the game does and finds the ones that make that very error. The whole text is also in server-debug.log, on the line after each error.
+  → Tell Doctor Sick's author which texts these are (the names above are their keys in the mod's lang file): a > that isn't part of a tag has to be written &gt;, and a < as &lt;.
+  {{open|mod|doctorsick|Doctor Sick's page}} {{folder|logs|server-main.log|Open server-main.log}} {{folder|logs|server-debug.log|Open server-debug.log}}

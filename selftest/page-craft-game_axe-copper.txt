@@ -1,0 +1,3 @@
+== Why can't I craft it? ==
+• There is no block or item 'game:axe-copper' in this game.
+  The doctor then lists every crafting-grid recipe that makes it and what stands in the way.

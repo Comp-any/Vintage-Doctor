@@ -1,0 +1,16 @@
+Errors and warnings in the log
+{{folder|logs|server-main.log|Open server-main.log}}
+1 kind(s) of errors (2 line(s)) and 3 kind(s) of warnings (4 line(s)) in server-main.log, most frequent first. The same message counts once however often it was written.
+⚠ 2 kind(s) of errors in the log this session (5 line(s)), and 1 kind(s) of warnings
+  An error in the log doesn't always show in the game, but each is something that didn't work as its author meant. The ones that repeat, and the ones from a mod you're having trouble with, are the ones to look at.
+  {{open|log||Every error and warning}} {{folder|logs|server-main.log|Open server-main.log}}
+✓ No crash reports: the game hasn't crashed on this side.
+  {{folder|logs||Open the Logs folder}}
+• A mod's card: see server-debug.log, and client-main.log on your side
+  {{folder|logs|server-debug.log|Open server-debug.log}} {{folder|logs|client-main.log|Open client-main.log}}
+• An oak log is worth nothing, the catalogue is long and so is the backlog
+⚠ Some Mod 1.0: named in 2 crash report(s), 3 kind(s) of errors in the log
+  {{folder|logs|server-crash.log|Open server-crash.log}} {{folder|logs|server-main.log|Open server-main.log}}
+• A card that has its button already
+  from its author, who names server-main.log
+  {{folder|logs|server-main.log|Open server-main.log}}
