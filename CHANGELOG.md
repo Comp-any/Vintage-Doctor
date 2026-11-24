@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.6.2
+
+- **The doctor's own command help caused a formatting error.** The help of `.doctor` and `/doctor` said `mod <id>`, and the game shows command help as formatted text, so it read `<id>` as a tag and wrote "Found closing tag <font> ... but <id> should be closed first" to the log (found by the doctor itself, in a real game). The help and the doctor's other usage texts now write `[mod id]`, and the doctor's texts are checked for this when it is built.
+- **Commands' help is checked too.** The formatting-tag card now also looks at every chat command's help, and at texts that open a tag and never close it (harmless alone, an error once the game puts the text inside its own formatting), and names them: "the help of the command .something".
+
 ## 1.6.1
 
 - **The check-up's sections are coloured by what is in them,** which is also the order they are in: a mod with a problem has a red heading, one with a warning an orange one, the rest the usual gold. In the list of mods at the top, the same mods are marked [x] and [!].

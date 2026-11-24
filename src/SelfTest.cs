@@ -1248,6 +1248,20 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             t.Check("tags: a mod's texts that would make the error, with none in the log, are something to know", quiet.Contains("• alpha: 1 of its texts have formatting tags out of place") && !quiet.Contains("⚠"), quiet.Replace("\n", " / "));
             string clean = Run(new string[0], null, ("alpha:help", "all good"));
             t.Check("tags: nothing out of place, and the check-up says so", clean.Contains("No formatting tags out of place"), clean.Replace("\n", " / "));
+            // A command's help with a tag left open: the game wraps the help in its own formatting, so "<id>" there
+            // makes "</font> ... but <id> should be closed first" (seen in a real game with the doctor's own .doctor help, 1.6.1).
+            t.Check("tags: a tag left open is found", TextTags.Unclosed("mod <id>, log [what]").SequenceEqual(new[] { "id" }) && TextTags.Unclosed("a <b>x</b>").Count == 0 && TextTags.Errors("mod <id>, log").Count == 0);
+            string help = "A test command: /doctortagtest mod " + "<" + "id" + ">";
+            sapi.ChatCommands.Create("doctortagtest").WithDescription(help).RequiresPrivilege(Privilege.controlserver).HandleWith(_ => TextCommandResult.Success());
+            {
+                var ev = new Evidence { Side = EnumAppSide.Server, Mods = doctor.Snapshot(), Log = LogScan.FromText("", doctor.Snapshot()) };
+                ev.Log.TagErrors.Add(("1.1.2026 10:00:00", "Found closing tag <font> at position 5366 but <id> should be closed first. See debug log for full text."));
+                var x = new DoctorContext { Doctor = doctor, Api = sapi, Side = EnumAppSide.Server, LanguageCode = "en", Topic = Checks.TopicClashes, Ev = ev, ListAll = true };
+                Checks.TextTagsCheck(x, true, null, TextTags.CommandProblems(sapi));
+                string page = x.R.PlainText(sapi.World);
+                t.Check("tags: an error from a command's help is traced to that command", page.Contains("the help of the command /doctortagtest: <id> is opened and never closed") && page.Contains("(likely"), page.Replace("\n", " / "));
+                t.Check("tags: the doctor's own commands' help has no tag left open", !TextTags.CommandProblems(sapi).Any(b => b.Command == "/doctor"), string.Join(" | ", TextTags.CommandProblems(sapi).Select(b => b.Command)));
+            }
             // The real texts of the mods on this server.
             List<BrokenText> real = TextTags.LangProblems();
             File.WriteAllText(Path.Combine(folder, "formatting-tags-in-lang.txt"), string.Join("\n", real.Select(b => b.Key + " | " + b.Message + " | " + b.Text.Replace("\n", "\\n"))));

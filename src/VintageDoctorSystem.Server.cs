@@ -188,7 +188,7 @@ namespace VintageDoctor
         {
             var parsers = api.ChatCommands.Parsers;
             api.ChatCommands.Create("doctor")
-                .WithDescription("Vintage Doctor: find out what's wrong with the game and its mods. /doctor opens the check-up; /doctor crash, perf, mods, mod <id>, log, files, world... open one page; /doctor fix <id> [argument] does a fix.")
+                .WithDescription("Vintage Doctor: find out what's wrong with the game and its mods. /doctor opens the check-up; /doctor crash, perf, mods, mod [mod id], log, files, world... open one page; /doctor fix [id] [argument] does a fix.")
                 .RequiresPrivilege(Privilege.chat)
                 .WithArgs(parsers.OptionalWord("page"), parsers.OptionalAll("what"))
                 .HandleWith(OnCommand);
@@ -235,7 +235,7 @@ namespace VintageDoctor
                 if (topic.Equals("fix", StringComparison.OrdinalIgnoreCase))
                 {
                     string[] parts = arg.Split(new[] { ' ' }, 2);
-                    if (parts[0].Length == 0) return TextCommandResult.Error(Lang.GetL(lang, "vintagedoctor:cmd-fix-usage"));
+                    if (parts[0].Length == 0) return TextCommandResult.Error(ChatSafe(Lang.GetL(lang, "vintagedoctor:cmd-fix-usage")));
                     string now = null;
                     RunFixThen(parts[0], parts.Length > 1 ? parts[1] : "", player, lang, ev, null, outcome =>
                     {

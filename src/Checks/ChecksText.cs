@@ -27,6 +27,11 @@ namespace VintageDoctor
         }
 
         /// <summary>What is wrong with a text, in words, with a piece of it around the place.</summary>
+        /// <summary>A text's name: its lang key, or "the help of the command .doctor".</summary>
+        static string TagName(DoctorContext x, BrokenText b) => b.Command != null ? x.T("tags-command", b.Command) : b.Key;
+
+        static string TagWhat(DoctorContext x, BrokenText b) => b.Message != null ? TagWhat(x, b.Message, b.Text) : x.T("tags-what-open", string.Join("> <", b.Unclosed)) + ": " + TextTags.Around(b.Text, b.Text.IndexOf("<" + b.Unclosed[0], StringComparison.Ordinal));
+
         static string TagWhat(DoctorContext x, string message, string text)
         {
             var (what, a, b) = TextTags.Describe(message);
@@ -45,7 +50,7 @@ namespace VintageDoctor
         public static void TextTagsCheck(DoctorContext x, bool full, string onlyMod = null)
         {
             if (full && onlyMod == null) x.Section(x.T("sec-tags"));
-            List<BrokenText> broken = TextTags.LangProblems();
+            List<BrokenText> broken = TextTags.LangProblems().Concat(TextTags.CommandProblems(x.Api)).ToList();
             TextTagsCheck(x, full, onlyMod, broken);
         }
 
@@ -61,8 +66,10 @@ namespace VintageDoctor
                 foreach (BrokenText b in broken)
                 {
                     bool same = s.Shown != null ? s.Shown == b.Text || (b.Text.Length >= 8 && s.Shown.Contains(b.Text)) : TextTags.Errors(b.Text).Any(e => e.message == g.Key);
+                    // A text that leaves <y> open makes "</x> while <y> is still open" once the game wraps it in its own formatting.
+                    var (what, _, top) = TextTags.Describe(g.Key);
                     if (same) s.Exact.Add(b);
-                    else if (TextTags.Errors(b.Text).Any(e => TextTags.Kind(e.message) == kind)) s.Alike.Add(b);
+                    else if (TextTags.Errors(b.Text).Any(e => TextTags.Kind(e.message) == kind) || (what == "first" && b.Unclosed.Contains(top))) s.Alike.Add(b);
                 }
                 // Whose: the texts it fits word for word, if they are one mod's; else the ones alike, if one mod's;
                 // else a mod the shown text names.
@@ -89,8 +96,8 @@ namespace VintageDoctor
                 x.Warn(sure ? x.T("tags-mod", x.ModName(g.Key), times) : x.T("tags-mod-maybe", x.ModName(g.Key), times));
                 x.About(g.Key);
                 TagDetails(x, g.ToList(), full, g.Key);
-                foreach (BrokenText b in broken.Where(b => TagOwner(x, b.Domain) == g.Key && !g.Any(s => s.Exact.Contains(b) || s.Alike.Contains(b))).Take(full ? 12 : 3))
-                    x.Detail(x.T("tags-also", b.Key, TagWhat(x, b.Message, b.Text)));
+                foreach (BrokenText b in broken.Where(b => b.Message != null && TagOwner(x, b.Domain) == g.Key && !g.Any(s => s.Exact.Contains(b) || s.Alike.Contains(b))).Take(full ? 12 : 3))
+                    x.Detail(x.T("tags-also", TagName(x, b), TagWhat(x, b)));
                 x.Explain(x.T("tags-why", x.Side == Vintagestory.API.Common.EnumAppSide.Client ? "client-debug.log" : "server-debug.log"));
                 x.Advice(x.T("tags-advice", x.ModName(g.Key)));
                 if (x.Ev.Mods?.Get(g.Key) != null) ModButtons(x, g.Key, false);
@@ -106,18 +113,18 @@ namespace VintageDoctor
                 x.Advice(x.T("tags-advice-nomod", x.Side == Vintagestory.API.Common.EnumAppSide.Client ? "client-debug.log" : "server-debug.log"));
             }
             // Texts that would make the same errors, from mods nothing in the log was traced to: to know.
-            foreach (var g in broken.GroupBy(b => TagOwner(x, b.Domain)).OrderBy(g => x.ModName(g.Key), StringComparer.OrdinalIgnoreCase))
+            foreach (var g in broken.Where(b => b.Message != null && b.Command == null).GroupBy(b => TagOwner(x, b.Domain)).OrderBy(g => x.ModName(g.Key), StringComparer.OrdinalIgnoreCase))
             {
                 if (g.Key == DoctorReport.GameSection || cardsFor.Contains(g.Key)) continue;
                 if (onlyMod != null && !string.Equals(g.Key, onlyMod, StringComparison.OrdinalIgnoreCase)) continue;
                 x.Info(x.T("tags-lang", x.ModName(g.Key), g.Count()));
                 x.About(g.Key);
-                foreach (BrokenText b in g.Take(full ? 12 : 3)) x.Detail(x.T("tags-also", b.Key, TagWhat(x, b.Message, b.Text)));
+                foreach (BrokenText b in g.Take(full ? 12 : 3)) x.Detail(x.T("tags-also", TagName(x, b), TagWhat(x, b)));
                 if (g.Count() > (full ? 12 : 3)) x.Detail(x.T("more-lines", g.Count() - (full ? 12 : 3)));
                 x.Explain(x.T("tags-lang-why"));
                 x.Advice(x.T("tags-advice", x.ModName(g.Key)));
             }
-            if (logged.Count == 0 && cardsFor.Count == 0 && !broken.Any(b => TagOwner(x, b.Domain) != DoctorReport.GameSection) && onlyMod == null && Listed(x, full))
+            if (logged.Count == 0 && cardsFor.Count == 0 && !broken.Any(b => b.Message != null && b.Command == null && TagOwner(x, b.Domain) != DoctorReport.GameSection) && onlyMod == null && Listed(x, full))
                 x.Ok(x.T("tags-ok"));
         }
 
@@ -127,7 +134,7 @@ namespace VintageDoctor
             {
                 BrokenText text = s.Exact.FirstOrDefault(b => mod == null || TagOwner(x, b.Domain) == mod) ?? s.Alike.FirstOrDefault(b => mod == null || TagOwner(x, b.Domain) == mod);
                 string times = s.Times > 1 ? "×" + s.Times + " " : "";
-                if (text != null) x.Detail(times + x.T("tags-text", text.Key, TagWhat(x, s.Message, text.Text)) + (s.Exact.Contains(text) ? "" : " " + x.T("tags-likely")));
+                if (text != null) x.Detail(times + x.T("tags-text", TagName(x, text), text.Message == null ? TagWhat(x, text) : TagWhat(x, s.Message, text.Text)) + (s.Exact.Contains(text) ? "" : " " + x.T("tags-likely")));
                 else x.Detail(times + TagWhat(x, s.Message, s.Shown));
                 if (s.Shown != null && text == null) x.Detail(x.T("tags-shown", TextTags.Around(s.Shown, TextTags.Position(s.Message), 60, 60)), 2);
             }

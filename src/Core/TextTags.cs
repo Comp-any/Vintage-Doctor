@@ -12,6 +12,10 @@ namespace VintageDoctor
     {
         public string Key, Domain, Text, Message;
         public int Position;
+        /// <summary>Tags it opens and never closes ("id" for "mod &lt;id&gt;"): harmless alone, an error once the game puts the text inside its own formatting.</summary>
+        public List<string> Unclosed = new List<string>();
+        /// <summary>Not a lang entry but the help of a command (its name, "/doctor").</summary>
+        public string Command;
     }
 
     /// <summary>
@@ -35,7 +39,17 @@ namespace VintageDoctor
         /// a tag, '&gt;' ends one; a '&gt;' outside a tag is an error (and, as in the game, then counts as opening a tag
         /// without a name); "&lt;/x&gt;" must close the tag opened last; "&lt;br&gt;" and "&lt;x/&gt;" open nothing.
         /// </summary>
-        public static List<(string message, int pos)> Errors(string vtml)
+        public static List<(string message, int pos)> Errors(string vtml) => Errors(vtml, null);
+
+        /// <summary>The tags a text opens and never closes, by name ("id" for "&lt;id&gt;"); the game says nothing about those until the text sits inside other formatting.</summary>
+        public static List<string> Unclosed(string vtml)
+        {
+            var open = new List<string>();
+            Errors(vtml, open);
+            return open.Where(n => n.Length > 0 && n.All(c => char.IsLetter(c))).ToList();
+        }
+
+        static List<(string message, int pos)> Errors(string vtml, List<string> leftOpen)
         {
             var found = new List<(string, int)>();
             if (string.IsNullOrEmpty(vtml) || vtml.IndexOf('>') < 0) return found;
@@ -69,6 +83,7 @@ namespace VintageDoctor
                 }
                 if (inside) tag.Append(c);
             }
+            if (leftOpen != null) leftOpen.AddRange(stack.Reverse());
             return found;
         }
 
@@ -147,11 +162,41 @@ namespace VintageDoctor
             foreach (var kv in entries ?? Enumerable.Empty<KeyValuePair<string, string>>())
             {
                 if (string.IsNullOrEmpty(kv.Value) || kv.Value.IndexOf('>') < 0) continue;
-                List<(string message, int pos)> errors = Errors(kv.Value);
-                if (errors.Count == 0) continue;
+                var open = new List<string>();
+                List<(string message, int pos)> errors = Errors(kv.Value, open);
+                open = open.Where(n => n.Length > 0 && n.All(char.IsLetter)).ToList();
+                if (errors.Count == 0 && open.Count == 0) continue;
                 int colon = (kv.Key ?? "").IndexOf(':');
-                list.Add(new BrokenText { Key = kv.Key, Domain = colon > 0 ? kv.Key.Substring(0, colon) : "game", Text = kv.Value, Message = errors[0].message, Position = errors[0].pos });
+                list.Add(new BrokenText { Key = kv.Key, Domain = colon > 0 ? kv.Key.Substring(0, colon) : "game", Text = kv.Value, Message = errors.Count > 0 ? errors[0].message : null, Position = errors.Count > 0 ? errors[0].pos : -1, Unclosed = open });
             }
+            return list;
+        }
+
+        /// <summary>
+        /// The help of every chat command (its description and more), which the game shows as formatted text inside
+        /// its own ("&lt;code&gt;.doctor ...&lt;/code&gt;: description"): a "&lt;id&gt;" in it is a tag left open there.
+        /// </summary>
+        public static List<BrokenText> CommandProblems(Vintagestory.API.Common.ICoreAPI api)
+        {
+            var list = new List<BrokenText>();
+            try
+            {
+                foreach (var kv in api.ChatCommands)
+                {
+                    Vintagestory.API.Common.IChatCommand c = kv.Value;
+                    if (c == null) continue;
+                    foreach (string text in new[] { c.Description, c.AdditionalInformation })
+                    {
+                        if (string.IsNullOrEmpty(text) || (text.IndexOf('>') < 0 && text.IndexOf('<') < 0)) continue;
+                        foreach (BrokenText b in Scan(new[] { new KeyValuePair<string, string>("game:command-" + kv.Key, text) }))
+                        {
+                            b.Command = (api.Side == Vintagestory.API.Common.EnumAppSide.Client ? "." : "/") + kv.Key;
+                            list.Add(b);
+                        }
+                    }
+                }
+            }
+            catch { }
             return list;
         }
 

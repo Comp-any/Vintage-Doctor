@@ -117,6 +117,18 @@ def main():
         for key, kind in sorted(table.items()):
             if key not in lang: problems.append(f"LogTexts (src/Checks/Pages.cs): {key} is not a text")
             if kind not in "mcf-": problems.append(f"LogTexts (src/Checks/Pages.cs): {key} has '{kind}', which is none of m, c, f and -")
+    # The game reads < and > as formatting tags wherever it shows text as formatted (chat, the command help,
+    # tooltips): a "<mod id>" there is a tag that never closes, and the game logs an error each time. So no
+    # placeholder in angle brackets in a text or a command's description: [mod id] instead.
+    placeholder = re.compile(r"<[A-Za-z][A-Za-z ]*>")
+    for key, text in sorted(lang.items()):
+        if key.startswith("tags-"): continue   # these explain tags, and are only shown in the doctor's own window
+        if placeholder.search(text) or " > " in text: problems.append(f"{key}: < or > in the text; the game reads them as formatting tags in chat and help (write [mod id], or say it in words)")
+    for path in sorted(glob.glob("src/**/*.cs", recursive=True)):
+        for number, line in enumerate(open(path, encoding="utf-8"), 1):
+            if ".WithDescription(" in line or ".WithAdditionalInformation(" in line or ".WithExamples(" in line:
+                if any(c in t for t in literals(line) for c in "<>"):
+                    problems.append(f"{path}:{number}: < or > in a command's help text; the game shows it as formatted text (write [id])")
     for p in problems: print(p)
     print(f"{len(used)} texts used, {len(lang)} in the file, {len(problems)} problems")
     return 1 if problems else 0

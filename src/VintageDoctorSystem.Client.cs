@@ -56,7 +56,7 @@ namespace VintageDoctor
             api.Input.SetHotKeyHandler(Hotkey, _ => ToggleDoctor());
 
             api.ChatCommands.Create("doctor")
-                .WithDescription("Vintage Doctor: open the check-up (.doctor), one page (.doctor crash, perf, mods, mod <id>, log, files...) or do a fix on this computer (.doctor fix <id> [argument])")
+                .WithDescription("Vintage Doctor: open the check-up (.doctor), one page (.doctor crash, perf, mods, mod [mod id], log, files...) or do a fix on this computer (.doctor fix [id] [argument])")
                 .WithArgs(api.ChatCommands.Parsers.OptionalWord("page"), api.ChatCommands.Parsers.OptionalAll("what"))
                 .HandleWith(OnClientCommand);
 
@@ -95,7 +95,7 @@ namespace VintageDoctor
             if (topic.Equals("fix", StringComparison.OrdinalIgnoreCase))
             {
                 string[] parts = arg.Split(new[] { ' ' }, 2);
-                if (parts[0].Length == 0) return TextCommandResult.Error(Lang.Get("vintagedoctor:cmd-fix-usage"));
+                if (parts[0].Length == 0) return TextCommandResult.Error(ChatSafe(Lang.Get("vintagedoctor:cmd-fix-usage")));
                 OpenDoctor(pending?.Topic ?? Pages.Overview, pending?.Arg ?? "", "c:" + parts[0], parts.Length > 1 ? parts[1] : "");
                 return TextCommandResult.Success();
             }
