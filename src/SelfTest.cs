@@ -1290,6 +1290,8 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             t.Check("window: asked for something in particular, it opens that", VintageDoctorSystem.Landing("emc", "machines") == "emc" && VintageDoctorSystem.Landing("crash", "") == "crash" && VintageDoctorSystem.Landing("mods", "") == "mods");
             t.Check("window: a mod's section starts folded when nothing in it needs attention, and open when something does; the game's starts open",
                 GuiDialogDoctor.FoldedAtFirst("carryon", 0) && !GuiDialogDoctor.FoldedAtFirst("carryon", 2) && !GuiDialogDoctor.FoldedAtFirst(DoctorReport.GameSection, 0) && GuiDialogDoctor.FoldedAtFirst(DoctorReport.RestSection, 0));
+            t.Check("window: a section is coloured, and marked in the list of mods, by the worst in it", GuiDialogDoctor.Worst(1, 3) == 2 && GuiDialogDoctor.Worst(0, 3) == 1 && GuiDialogDoctor.Worst(0, 0) == 0
+                && GuiDialogDoctor.ListName("Carry On 1.14.3", 1, 0) == "[x] Carry On 1.14.3" && GuiDialogDoctor.ListName("Carry On 1.14.3", 0, 2) == "[!] Carry On 1.14.3" && GuiDialogDoctor.ListName("Carry On 1.14.3", 0, 0) == "Carry On 1.14.3");
         }
 
         /// <summary>

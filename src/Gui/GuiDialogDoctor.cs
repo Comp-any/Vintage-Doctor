@@ -316,7 +316,7 @@ namespace VintageDoctor
             // The list of mods sits between the chips and Run checks again, right-aligned next to Run. With big counts
             // the chips grow into them, so then the two go on a row of their own under the chips.
             string[] filterValues = new[] { "" }.Concat(sections.Select(sec => sec.key)).ToArray();
-            string[] filterNames = new[] { Lang.Get("vintagedoctor:gui-allmods") }.Concat(sections.Select(sec => sec.name)).ToArray();
+            string[] filterNames = new[] { Lang.Get("vintagedoctor:gui-allmods") }.Concat(sections.Select(sec => sectionCounts.TryGetValue(sec.key, out var n) ? ListName(sec.name, n.fail, n.warn) : sec.name)).ToArray();
             CairoFont filterFont = CairoFont.WhiteSmallText();
             double filterW = sections.Count == 0 ? 0 : Math.Min(280, Math.Max(150, filterNames.Max(name => TextWidth(filterFont, name)) + 46));
             double chipsEnd = chips.Count == 0 ? 0 : chips[chips.Count - 1].x + chips[chips.Count - 1].w;
@@ -457,7 +457,7 @@ namespace VintageDoctor
             {
                 case Kind.Heading:
                     {
-                        CairoFont f = CairoFont.WhiteSmallishText().WithColor(Gold).WithWeight(FontWeight.Bold);
+                        CairoFont f = CairoFont.WhiteSmallishText().WithColor(SectionColour(e.Section)).WithWeight(FontWeight.Bold);
                         y += 6;
                         // On the check-up a section's heading folds and unfolds it: a drawn triangle in front, and
                         // when folded, what is in it after the name.
@@ -481,13 +481,15 @@ namespace VintageDoctor
                             c.AddRichtext(parts.ToArray(), In(parent, ElementBounds.Fixed(22, y, CardW - 22, h + 2)));
                             double rowH = h;
                             ElementBounds tri = In(parent, ElementBounds.Fixed(2, top, 18, rowH));
-                            Canvas(c, tri, (ctx, b) => DrawTriangle(ctx, GuiElement.scaled(9), b.OuterHeight / 2, !folded, Gold));
+                            double[] triColour = SectionColour(e.Section);
+                            Canvas(c, tri, (ctx, b) => DrawTriangle(ctx, GuiElement.scaled(9), b.OuterHeight / 2, !folded, triColour));
                             string key = e.Section;
                             c.AddInteractiveElement(new GuiElementHotspot(capi, In(parent, ElementBounds.Fixed(CardX, top, CardW, rowH)), () => ToggleSection(key)));
                             y += h;
                         }
                         ElementBounds line = In(parent, ElementBounds.Fixed(CardX, y - 2, CardW, 2));
-                        Canvas(c, line, (ctx, b) => { ctx.SetSourceRGBA(Gold[0], Gold[1], Gold[2], 0.35); ctx.Rectangle(0, 0, b.OuterWidth, GuiElement.scaled(1)); ctx.Fill(); });
+                        double[] lineColour = SectionColour(e.Section);
+                        Canvas(c, line, (ctx, b) => { ctx.SetSourceRGBA(lineColour[0], lineColour[1], lineColour[2], 0.35); ctx.Rectangle(0, 0, b.OuterWidth, GuiElement.scaled(1)); ctx.Fill(); });
                         return y + 6;
                     }
                 case Kind.Banner:
@@ -773,6 +775,26 @@ namespace VintageDoctor
             ctx.ClosePath();
             ctx.SetSourceRGBA(colour[0], colour[1], colour[2], colour[3]);
             ctx.Fill();
+        }
+
+        /// <summary>
+        /// A check-up section's heading in the colour of the worst in it: red with a problem, orange with a warning,
+        /// gold otherwise, the way the cards are coloured. That is also the order the sections are in.
+        /// </summary>
+        double[] SectionColour(string section)
+        {
+            if (string.IsNullOrEmpty(section) || !sectionCounts.TryGetValue(section, out var n)) return Gold;
+            return Worst(n.fail, n.warn) == 2 ? Red : Worst(n.fail, n.warn) == 1 ? Orange : Gold;
+        }
+
+        /// <summary>2 with a problem, 1 with a warning, 0 otherwise.</summary>
+        internal static int Worst(int problems, int warnings) => problems > 0 ? 2 : warnings > 0 ? 1 : 0;
+
+        /// <summary>A section's name in the list of mods: marked [x] or [!] like a card, since the list can't colour one entry.</summary>
+        internal static string ListName(string name, int problems, int warnings)
+        {
+            int w = Worst(problems, warnings);
+            return w == 2 ? GameFont.Problem + " " + name : w == 1 ? GameFont.Warn + " " + name : name;
         }
 
         /// <summary>Whether a section of the check-up is folded: as the player left it, else folded when nothing in it needs attention.</summary>

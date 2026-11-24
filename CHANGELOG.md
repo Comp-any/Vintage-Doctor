@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.6.1
+
+- **The check-up's sections are coloured by what is in them,** which is also the order they are in: a mod with a problem has a red heading, one with a warning an orange one, the rest the usual gold. In the list of mods at the top, the same mods are marked [x] and [!].
+
 ## 1.6.0
 
 - **A mod that closes the game on purpose can say so.** Vintage Auto Update restarts or quits the game to finish installing updates, and the doctor then reported "The game didn't close properly last time". A mod now tells the doctor just before (`vintagedoctor:closing`, with its name and why), and the next start says "Vintage Auto Update closed the game last time (time), on purpose: restarting to install 3 mod update(s)" as something to know, not a warning. Vintage Auto Update does this from its 0.9.1.
