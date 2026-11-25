@@ -262,23 +262,32 @@ wrong. It reads the same log, Mods folder and config files a player's game would
 
 ### Getting the doctor
 
-Its repo is private, so the runner can't download it anonymously. Copy `.github/scripts/get-doctor.sh` from
-Vintage-E, Far Relief or Vintage Computer into the mod's repo. It prints the path of the zip to install:
-- With the organisation secret `DOCTOR_TOKEN`, it downloads the newest release, the one players have.
-- Without it, or when the download fails, it uses the saved copy in `tools/vendor/vintagedoctor/`. Keep one there.
-- It writes which one it used to `$DOCTOR_NOTE` (default `ci/doctor-version.txt`). Copy that into the results and
-  check it when reading them: "saved copy" while the secret should be there means the token needs renewing.
-- A new repo must be added to the secret's repository list: Comp-any organisation settings, then Secrets and
-  variables, then Actions.
+The repo `Comp-any/Vintage-Doctor` is **public** (since 2026-11-25), so a run can download the newest release without
+any secret:
 
 ```yaml
 - name: Install Vintage Doctor
   env:
-    DOCTOR_TOKEN: ${{ secrets.DOCTOR_TOKEN }}     # the step needs it in its env, or the script can't see it
+    GH_TOKEN: ${{ github.token }}     # the run's own token: not needed for a public repo, but it lifts GitHub's
+                                      # limit of 60 anonymous API requests an hour, which shared runners can hit
   run: |
-    vd=$(DOCTOR_NOTE=results/doctor-version.txt bash .github/scripts/get-doctor.sh)
-    [ -n "$vd" ] && cp "$vd" "$DATA/Mods/"
+    tag=$(gh api repos/Comp-any/Vintage-Doctor/releases/latest --jq .tag_name)
+    gh release download "$tag" -R Comp-any/Vintage-Doctor -p 'vintagedoctor_*.zip' -D "$DATA/Mods/"
+    echo "Vintage Doctor $tag" > results/doctor-version.txt
 ```
+
+Without `gh`, `curl -fsSL https://api.github.com/repos/Comp-any/Vintage-Doctor/releases/latest` gives the release,
+and the zip's `browser_download_url` downloads with no token at all.
+
+Write which version was tested into the results (`doctor-version.txt`) and check it when reading them.
+
+The mods that already test with the doctor (Vintage-E, Far Relief, Vintage Computer) use
+`.github/scripts/get-doctor.sh`, written while the repo was private:
+- With the organisation secret `DOCTOR_TOKEN` it downloads the newest release.
+- Without it, or when the download fails, it falls back to the saved copy in `tools/vendor/vintagedoctor/`.
+
+The token is no longer needed for that. Until the script learns to download without it, an expired or missing token
+quietly means testing against the saved copy, which `doctor-version.txt` shows as "saved copy".
 
 ### What the doctor does on its own after start-up
 
