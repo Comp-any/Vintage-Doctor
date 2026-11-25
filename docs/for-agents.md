@@ -249,36 +249,141 @@ of "didn't close properly". Vintage Auto Update does this (0.9.1+).
 - **`Vintagestory.API.Common` has its own `Func<,>`.** Write `System.Func`; forgetting it has failed builds twice.
 - **`\uXXXX` written through the Write tool arrives as the character itself.** Write such escapes from a script.
 
-## 8. Building, testing, publishing (no .NET or game in a session)
+## 8. Using the doctor in a mod's smoke run (CI)
 
-- **CI does everything.** `.github/workflows/build.yml` runs on pushes to `main`, `work/**`, `ci/**`. It:
-  - checks texts and JSON;
-  - compiles against the real 1.22.7 server;
-  - runs a normal server (the mod, both example mods, carryon, configlib, primitivesurvival) with the self-test
-    (`src/SelfTest.cs`);
-  - runs a **sick server** with deliberately broken mods (`tests/mods`, `tools/ci_sick_server.py`).
-- **Results** go to the branch `ci-results-<branch>`: `selftest.txt`, `selftest-sick.txt`, every page as text, logs,
-  the zip. Job logs can't be read from a session, so read that branch.
-- **A new kind of problem gets a sick-server case** and an assertion in `SelfTest.SickServer`. Read what the game
-  really logged (`sick-server-main.log`) before guessing its wording.
-- **Game internals** were read from decompiled code: `gh workflow run decompile.yml -f types=... -f strings=...
-  -f resultsBranch=...`, output on that branch. Re-check them on a new game version.
-- **Work on a `work/...` branch**, read the results, fast-forward `main`.
-- **Publish:**
-  1. bump `version` in `modinfo.json` and `<Version>` in `VintageDoctor.csproj`;
-  2. add `## <version>` to `CHANGELOG.md`;
-  3. merge to main;
-  4. run `gh workflow run build.yml -R Comp-any/Vintage-Doctor --ref main -f release=true`.
+When a mod is built in CI, start a real server with the mod **and Vintage Doctor** and let the doctor say what is
+wrong. It reads the same log, Mods folder and config files a player's game would, so it catches things a build can't:
+- a mod that throws while starting, or a requirement missing or too old;
+- patches that didn't apply, and recipes naming things that don't exist;
+- classes or behaviours the game couldn't find, and things registered twice;
+- broken files in the zip, and the mod's errors in the log;
+- clashes with the other mods loaded;
+- whatever the mod itself hands the doctor (its own sanity checks, its page and its fixes).
 
-  Publish every version whose run passes, without asking.
-- **Waiting on a run:** `timeout 30 gh run watch <id> -R Comp-any/Vintage-Doctor --interval 30 --exit-status`,
-  repeated. Never the default interval, never an `until` loop on `gh api` (the account's GitHub limit is shared).
-- **Nothing client-side runs in CI** (the window, hotkey, frame-rate checks, chat). Say so when reporting, and ask the
-  user to look in a real game.
-- **Other mods' CI** (Vintage-E, Far Relief, Vintage Computer) installs the newest doctor release through
-  `.github/scripts/get-doctor.sh`, using the org secret `DOCTOR_TOKEN`, and falls back to `tools/vendor/vintagedoctor/`.
-  - `doctor-version.txt` in their results says which version they tested.
-  - "saved copy" while the secret should exist means the token needs renewing.
+### Getting the doctor
+
+Its repo is private, so the runner can't download it anonymously. Copy `.github/scripts/get-doctor.sh` from
+Vintage-E, Far Relief or Vintage Computer into the mod's repo. It prints the path of the zip to install:
+- With the organisation secret `DOCTOR_TOKEN`, it downloads the newest release, the one players have.
+- Without it, or when the download fails, it uses the saved copy in `tools/vendor/vintagedoctor/`. Keep one there.
+- It writes which one it used to `$DOCTOR_NOTE` (default `ci/doctor-version.txt`). Copy that into the results and
+  check it when reading them: "saved copy" while the secret should be there means the token needs renewing.
+- A new repo must be added to the secret's repository list: Comp-any organisation settings, then Secrets and
+  variables, then Actions.
+
+```yaml
+- name: Install Vintage Doctor
+  env:
+    DOCTOR_TOKEN: ${{ secrets.DOCTOR_TOKEN }}     # the step needs it in its env, or the script can't see it
+  run: |
+    vd=$(DOCTOR_NOTE=results/doctor-version.txt bash .github/scripts/get-doctor.sh)
+    [ -n "$vd" ] && cp "$vd" "$DATA/Mods/"
+```
+
+### What the doctor does on its own after start-up
+
+About 4 seconds after the server reaches `RunGame`, the doctor runs the whole check-up and:
+- writes **`<data>/ModData/vintagedoctor/startup-checkup.txt`**, the check-up laid out by mod, as text;
+- writes one line to `server-main.log`:
+  - `[vintagedoctor] Check-up after start-up: N problem(s), M warning(s). Type /doctor to see them.`, or
+  - `[vintagedoctor] Check-up after start-up: nothing wrong (... ms ...)`.
+
+So the smallest smoke run needs no commands:
+1. Wait for that log line, without `sleep`: poll the log in a loop that gives up after a time limit.
+2. Read your mod's section of `startup-checkup.txt`.
+3. Stop the server.
+
+The file looks like this:
+
+```
+== The game (Vintage Story 1.22.7) ==
+✓ All 11 mod(s) loaded and started without the game reporting a problem.
+...
+== My Mod 1.2.3 ==
+⚠ 2 tanks are leaking
+  tank at 10 3 10
+  → Seal them with resin.
+  Seal them (/doctor fix mymod:seal all)
+...
+== The other mods ==
+```
+
+- **Marks:** `✖` a problem, `⚠` a warning, `•` to know, `✓` passed, `→` advice. A button shows as its words with
+  the command it runs, in brackets.
+- **Your section** starts at `== <your mod's name> <version> ==` and ends at the next line starting with `== `. A mod
+  the game didn't load gets `== <name> (not loaded) ==`.
+- **Since 1.3.0 a card under its mod's own heading doesn't start with the mod's name.** Accept both forms if the
+  run may meet an older doctor.
+
+A useful rule for failing the build:
+- any `✖` line in your section;
+- `(not loaded)` after your mod's name;
+- any `✖` in the game's section that names your mod id or name.
+
+Treat `⚠` as something to read, or fail on it too if your mod should be clean.
+
+```bash
+# wait for the check-up (polling a local file; give up after 3 minutes)
+timeout 180 bash -c 'until grep -q "\[vintagedoctor\] Check-up after start-up" "$DATA/Logs/server-main.log"; do sleep 2; done'
+up="$DATA/ModData/vintagedoctor/startup-checkup.txt"
+mine=$(awk -v h="== My Mod " 'index($0,h)==1{on=1;print;next} /^== /{on=0} on' "$up")
+echo "$mine" > results/doctor-my-mod.txt
+if echo "$mine" | grep -q "^✖\|(not loaded)"; then echo "Vintage Doctor found a problem with My Mod"; exit 1; fi
+```
+
+### Asking for more pages
+
+Every page is a server command, and the server builds it as text. Each page built is also saved to
+**`<data>/ModData/vintagedoctor/last-report-server.txt`**, replaced each time.
+
+Useful pages:
+- `/doctor`: the check-up again, later (after the world ran a while);
+- `/doctor mod <modid>`: everything about your mod;
+- `/doctor log <modid>`: its errors and warnings, grouped;
+- `/doctor startup`, `/doctor clashes`, `/doctor patches`;
+- `/doctor <your page>` and `/doctor <your page> <argument>`, if your mod adds one (5.4);
+- `/doctor fix <fix id> [argument]`: runs a fix.
+  - The result is written to the log as `[vintagedoctor] /doctor fix <id>`, with what happened on the next line.
+  - A fix that answers `later` writes the same when it is done.
+
+There are two ways to send those commands:
+- **Through the server's console input.** Start the server with its standard input on a pipe you can write to,
+  and write the command followed by a newline.
+- **From your mod's own self-test** (a test command or config switch of yours). Run the command with the game's
+  `api.ChatCommands.ExecuteUnparsed("/doctor mod mymod", args)` with a console caller (`EnumCallerType.Console`,
+  privileges `*`), then read the reply or `last-report-server.txt`. Vintage-E and Vintage Computer do it this way.
+
+After each command, wait for the file to change before reading it. A page a mod builds later (`later = true`) is
+written when it is delivered.
+
+### Testing your mod's handover to the doctor
+
+If your mod hands the doctor checks, a page or fixes (section 5), test them in the same run:
+- Your findings must appear in your section of the check-up.
+- `/doctor <your page>` must return your page.
+- Each fix must say it worked in the log.
+- Test without the doctor too: your mod must start and behave the same when `vintagedoctor` isn't installed. Run
+  the same smoke test once without the zip, or test your bus handlers directly.
+
+### Keep what the doctor said
+
+Copy these into the run's results (a results branch, since a session can't read job logs):
+- `startup-checkup.txt` and `last-report-server.txt`;
+- `doctor-version.txt`;
+- the server's `server-main.log`.
+
+That way whoever reads the results sees exactly what the doctor saw.
+
+### What a smoke run can't show
+
+A server has no player's game, so nothing on the player's side is checked:
+- the window, the hotkey;
+- the frame rate and graphics settings;
+- the client log and the chat;
+- client-side fixes.
+
+Say so when reporting, and ask the user to look in a real game. A dedicated server is also "another computer" to
+its players, so its pages have no buttons that open log files.
 
 ## 9. Mods that use it
 
