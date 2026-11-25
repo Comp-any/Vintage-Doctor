@@ -281,13 +281,17 @@ and the zip's `browser_download_url` downloads with no token at all.
 
 Write which version was tested into the results (`doctor-version.txt`) and check it when reading them.
 
-The mods that already test with the doctor (Vintage-E, Far Relief, Vintage Computer) use
-`.github/scripts/get-doctor.sh`, written while the repo was private:
-- With the organisation secret `DOCTOR_TOKEN` it downloads the newest release.
-- Without it, or when the download fails, it falls back to the saved copy in `tools/vendor/vintagedoctor/`.
+The mods that test with the doctor (Vintage-E, Far Relief, Vintage Computer, Vintage Doors) share
+`.github/scripts/get-doctor.sh`, which does this without any token. Copy it into a new mod:
+- It follows `github.com/Comp-any/Vintage-Doctor/releases/latest` to the newest tag and downloads
+  `vintagedoctor_<version>.zip` by its public link. That isn't the API, so GitHub's limit of 60 anonymous requests
+  an hour doesn't apply.
+- A token in `DOCTOR_TOKEN`, `GH_TOKEN` or `GITHUB_TOKEN`, if set, is used for the API instead.
+- If the download fails, it falls back to the copy in `tools/vendor/vintagedoctor/`.
+- It prints the zip's path, and writes which one it used to `$DOCTOR_NOTE` (default `ci/doctor-version.txt`).
+  "saved copy" there means the download failed.
 
-The token is no longer needed for that. Until the script learns to download without it, an expired or missing token
-quietly means testing against the saved copy, which `doctor-version.txt` shows as "saved copy".
+The `DOCTOR_TOKEN` organisation secret is no longer needed.
 
 ### What the doctor does on its own after start-up
 
