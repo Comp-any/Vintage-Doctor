@@ -1,0 +1,8 @@
+== Mods that change the game's code ==
+• 2 mod(s) change the game's code in 2 place(s)
+  Carry On (1), Doctor Example (1)
+  Mods patch the game's own code where it offers no other way in. It is normal, but it is also what breaks first when the game updates, and two mods patching the same place can get in each other's way.
+✓ No two mods change the same place in the game's code.
+
+== Mods changing the same thing ==
+✓ 33 JSON patches in 85 files, no two mods replacing the same thing.

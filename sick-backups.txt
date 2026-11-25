@@ -1,0 +1,10 @@
+ModData/vintagedoctor/backups/2026-11-25_08-31-23/doctor-sick-packed.rar
+ModData/vintagedoctor/backups/2026-11-25_08-31-23/doctor-sick-wrapped.zip
+ModData/vintagedoctor/backups/2026-11-25_08-31-23/doctorcrashy.json
+ModData/vintagedoctor/backups/2026-11-25_08-31-23/doctor-sick-nested.zip
+ModData/vintagedoctor/backups/2026-11-25_08-31-23/doctor-sick-corrupt.zip
+ModData/vintagedoctor/backups/2026-11-25_08-31-23/doctor-sick-backslash.zip
+ModData/vintagedoctor/backups/2026-11-25_08-31-23/doctordup_1.0.0.zip
+ModData/vintagedoctor/backups/2026-11-25_08-31-23/doctor-sick-straydll.zip
+ModData/vintagedoctor/backups/2026-11-25_08-31-23/doctor-sick-notamod.zip
+ModData/vintagedoctor/backups/2026-11-25_08-31-23/doctor-sick-bundled.zip

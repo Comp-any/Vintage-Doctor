@@ -1,0 +1,503 @@
+25.11.2026 08:30:55 [Server Notification] Server logger started.
+25.11.2026 08:30:55 [Server Notification] Game Version: v1.22.7 (Stable)
+25.11.2026 08:30:55 [Server Notification] C# Framework: .net 10.0.15
+25.11.2026 08:30:55 [Server Notification] Zstd Version: 1.5.7
+25.11.2026 08:30:55 [Server Notification] Operating System: Linux (Ubuntu 26.04.1 LTS) [Kernel 7.0.0.1016]
+25.11.2026 08:30:55 [Server Notification] CPU Cores: 4
+25.11.2026 08:30:55 [Server Notification] CPU: Intel(R) Xeon(R) 6975P-C
+25.11.2026 08:30:55 [Server Notification] Available RAM: 15700 MB
+25.11.2026 08:30:55 [Server Event] Launching server...
+25.11.2026 08:30:55 [Server Event] Server v1.22.7, network v1.22.6, api v1.22.0
+25.11.2026 08:30:55 [Server Notification] Entering runphase Initialization
+25.11.2026 08:30:55 [Server Event] Loading configuration...
+25.11.2026 08:30:55 [Server Notification] Entering runphase Configuration
+25.11.2026 08:30:55 [Server Notification] serverconfig.json not found, creating new one
+25.11.2026 08:30:55 [Server Notification] Loading savegame
+25.11.2026 08:30:55 [Server Notification] Create new save game data. Playstyle: surviveandbuild
+25.11.2026 08:30:55 [Server Notification] Savegame ~/work/Vintage-Doctor/Vintage-Doctor/data-sick/Saves/default.vcdbs loaded
+25.11.2026 08:30:55 [Server Notification] World size = 1024000 256 1024000
+25.11.2026 08:30:55 [Server Notification] Start discovering assets
+25.11.2026 08:30:55 [Server Notification] Found 2 base assets in category blocktypes
+25.11.2026 08:30:55 [Server Notification] Found 0 base assets in category itemtypes
+25.11.2026 08:30:55 [Server Notification] Found 35 base assets in category lang
+25.11.2026 08:30:55 [Server Notification] Found 0 base assets in category patches
+25.11.2026 08:30:55 [Server Notification] Found 24 base assets in category config
+25.11.2026 08:30:55 [Server Notification] Found 0 base assets in category worldproperties
+25.11.2026 08:30:55 [Server Notification] Found 1 base assets in category sounds
+25.11.2026 08:30:55 [Server Notification] Found 230 base assets in category shapes
+25.11.2026 08:30:55 [Server Notification] Found 21 base assets in category textures
+25.11.2026 08:30:55 [Server Notification] Found 0 base assets in category recipes
+25.11.2026 08:30:55 [Server Notification] Found 0 base assets in category worldgen
+25.11.2026 08:30:55 [Server Notification] Found 3 base assets in category entities
+25.11.2026 08:30:55 [Server Notification] Found 316 base assets in total
+25.11.2026 08:30:55 [Server Event] Building assets...
+25.11.2026 08:30:55 [Server Notification] Entering runphase LoadAssets
+25.11.2026 08:30:55 [Server Notification] Will search the following paths for mods:
+25.11.2026 08:30:55 [Server Notification]     ~/work/Vintage-Doctor/Vintage-Doctor/vs/Mods
+25.11.2026 08:30:55 [Server Notification]     ~/work/Vintage-Doctor/Vintage-Doctor/data-sick/Mods
+25.11.2026 08:30:55 [Server Error] [doctor-sick-corrupt.zip] An exception was thrown trying to to load the ModInfo:
+25.11.2026 08:30:55 [Server Error] [doctor-sick-corrupt.zip] Exception: Cannot find central directory
+   at ICSharpCode.SharpZipLib.Zip.ZipFile.ReadEntries()
+   at ICSharpCode.SharpZipLib.Zip.ZipFile..ctor(String name, StringCodec stringCodec)
+   at Vintagestory.Common.ModContainer.LoadModInfo(ModCompilationContext compilationContext, ModAssemblyLoader loader) in VintagestoryLib\Common\API\ModContainer.cs:line 332
+25.11.2026 08:30:55 [Server Error] [doctor-sick-nested.zip] An exception was thrown trying to to load the ModInfo:
+25.11.2026 08:30:55 [Server Error] [doctor-sick-nested.zip] Exception: Object reference not set to an instance of an object.
+   at Vintagestory.Common.ModContainer.LoadModInfo(ModCompilationContext compilationContext, ModAssemblyLoader loader) in VintagestoryLib\Common\API\ModContainer.cs:line 344
+25.11.2026 08:30:55 [Server Error] [doctor-sick-notamod.zip] An exception was thrown trying to to load the ModInfo:
+25.11.2026 08:30:55 [Server Error] [doctor-sick-notamod.zip] Exception: Object reference not set to an instance of an object.
+   at Vintagestory.Common.ModContainer.LoadModInfo(ModCompilationContext compilationContext, ModAssemblyLoader loader) in VintagestoryLib\Common\API\ModContainer.cs:line 344
+25.11.2026 08:30:55 [Server Error] [doctor-sick-wrapped.zip] An exception was thrown trying to to load the ModInfo:
+25.11.2026 08:30:55 [Server Error] [doctor-sick-wrapped.zip] Exception: Object reference not set to an instance of an object.
+   at Vintagestory.Common.ModContainer.LoadModInfo(ModCompilationContext compilationContext, ModAssemblyLoader loader) in VintagestoryLib\Common\API\ModContainer.cs:line 344
+25.11.2026 08:30:55 [Server Notification] Found 17 mods (4 disabled)
+25.11.2026 08:30:55 [Server Warning] Multiple mods share the mod ID 'doctordup' ('doctordup_1.0.0.zip', 'doctordup_1.1.0.zip'). Will only load the highest version one - v1.1.0.
+25.11.2026 08:30:55 [Server Notification] Mods, sorted by dependency: game, doctorsickslash, doctorsickbundled, doctorsickold, doctorsickshared, doctorsickstray, doctorcrashy, doctordup, doctorsick, vintagedoctor, creative, survival
+25.11.2026 08:30:55 [Server Error] [doctorsickstray] File 'Helper.dll' is not in the mod's root folder. Won't load this mod. If you need to ship unmanaged dlls, put them in the native/ folder.
+25.11.2026 08:30:55 [Server Warning] [doctorsickbundled] Is a Content mod, but .cs or .dll files were found. These will be ignored.
+25.11.2026 08:30:55 [Server Warning] [doctorsickshared] Is a Content mod, but .cs or .dll files were found. These will be ignored.
+25.11.2026 08:30:55 [Server Notification] Instantiated 150 mod systems from 11 enabled mods
+25.11.2026 08:30:55 [Server Notification] External Origins in load order: modorigin@~/work/Vintage-Doctor/Vintage-Doctor/vs/assets/creative/, modorigin@~/work/Vintage-Doctor/Vintage-Doctor/vs/assets/survival/, mod@doctor-sick-old.zip, mod@doctorsick, mod@vintagedoctor_1.7.0.zip
+25.11.2026 08:30:55 [Server Notification] Found 542 external assets in category blocktypes
+25.11.2026 08:30:55 [Server Notification] Found 318 external assets in category itemtypes
+25.11.2026 08:30:55 [Server Notification] Found 2 external assets in category lang
+25.11.2026 08:30:55 [Server Notification] Found 12 external assets in category patches
+25.11.2026 08:30:55 [Server Notification] Found 130 external assets in category config
+25.11.2026 08:30:55 [Server Notification] Found 25 external assets in category worldproperties
+25.11.2026 08:30:55 [Server Notification] Found 1 external assets in category sounds
+25.11.2026 08:30:55 [Server Notification] Found 6123 external assets in category shapes
+25.11.2026 08:30:55 [Server Notification] Found 25 external assets in category textures
+25.11.2026 08:30:55 [Server Notification] Found 422 external assets in category recipes
+25.11.2026 08:30:55 [Server Notification] Found 1455 external assets in category worldgen
+25.11.2026 08:30:55 [Server Notification] Found 74 external assets in category entities
+25.11.2026 08:30:55 [Server Notification] Found 0 external assets in category compatibility
+25.11.2026 08:30:55 [Server Notification] Reloaded lang file with mod assets
+25.11.2026 08:30:56 [Server Notification] Compatibility lib: 0 assets added, 0 assets replaced.
+25.11.2026 08:30:56 [Server Error] Patch 0 (target: game:itemtypes/resource/ingot.json) in doctorsick:patches/bad.json failed because supplied path /doesnotexist/deeper/still is invalid: The json path /doesnotexist/deeper/still was not found. No such element 'doesnotexist' at the root path
+25.11.2026 08:30:56 [Server Error] Patch 0 in doctorsick:patches/missing.json: File game:itemtypes/doctor-no-such-file.json not found
+25.11.2026 08:30:56 [Server Error] Patch 1 in doctorsick:patches/missing.json: File doctornosuchmod:itemtypes/thing.json not found
+25.11.2026 08:30:56 [Server Notification] JsonPatch Loader: 17 patches total, successfully applied 14 patches, missing files on 2 patches, unmet conditions on 23 patches, had errors on 1 patches
+25.11.2026 08:30:56 [Server Error] Syntax error in json file 'doctorsick:itemtypes/broken.json': Failed deserializing broken.json: Unexpected end when reading token. Path ''.
+25.11.2026 08:30:58 [Server Error] Item with code doctorsick:ghost has defined an item class DoctorGhostItem, but no such class registered. Will ignore.
+25.11.2026 08:30:58 [Server Warning] Collectible behavior DoctorGhostBehavior for item doctorsick:ghost not found
+25.11.2026 08:30:58 [Server Error] Failed registering item doctorsick:ghost:
+25.11.2026 08:30:58 [Server Error] Exception: Attempted to register Item with code doctorsick:ghost, but an item with such code already exists. Must use a unique code
+   at Vintagestory.Server.ServerMain.RegisterItem(Item item) in VintagestoryLib\Server\ServerMain.cs:line 1980
+   at Vintagestory.Server.ServerCoreAPI.RegisterItem(Item item) in VintagestoryLib\Server\API\ServerCoreAPI.cs:line 132
+   at Vintagestory.ServerMods.NoObf.ModRegistryObjectTypeLoader.<LoadItems>b__14_0(List`1 variants) in VSEssentials\Loading\RegistryObjectTypeLoader.cs:line 253
+25.11.2026 08:30:58 [Server Notification] Loaded 4470 unique items
+25.11.2026 08:31:02 [Server Error] Block with code doctorsick:ghostblock has defined a block class DoctorGhostBlock, no such class registered. Will ignore.
+25.11.2026 08:31:02 [Server Error] Block with code doctorsick:ghostblock has defined a block entity class DoctorGhostEntity, no such class registered. Will ignore.
+25.11.2026 08:31:02 [Server Notification] Loaded 14090 unique blocks
+25.11.2026 08:31:02 [Server Notification] Loaded 820 unique entitiess
+25.11.2026 08:31:02 [Server Notification] BlockLoader: Entities, Blocks and Items loaded
+25.11.2026 08:31:02 [Server Event] Remapping blocks and items...
+25.11.2026 08:31:02 [Server Debug] Block IDs not found in savegame.
+25.11.2026 08:31:02 [Server Debug] Found 0 missing blocks
+25.11.2026 08:31:02 [Server Debug] Added 14092 new blocks to the mapping
+25.11.2026 08:31:02 [Server Debug] Block IDs have been written to savegame. Saved max BlockID was 14091
+25.11.2026 08:31:02 [Server Debug] ItemID Remapper: Begin
+25.11.2026 08:31:02 [Server Debug] Item IDs not found in savegame.
+25.11.2026 08:31:02 [Server Debug] Found 0 Item requiring remapping
+25.11.2026 08:31:02 [Server Debug] Found 0 missing Items
+25.11.2026 08:31:02 [Server Debug] Added 4469 new Items to the mapping
+25.11.2026 08:31:02 [Server Debug] Item IDs have been written to savegame
+25.11.2026 08:31:02 [Server Event] 15 cooking recipes loaded
+25.11.2026 08:31:02 [Server Event] 9 metal alloys loaded
+25.11.2026 08:31:03 [Server Warning] Failed resolving crafting recipe ingredient with code doctorsick:doesnotexist in Grid recipe
+25.11.2026 08:31:03 [Server Error] Grid Recipe with output 'game:stick' contains an ingredient that cannot be resolved: Item code doctorsick:doesnotexist
+25.11.2026 08:31:03 [Server Event] 1155 grid recipes loaded from 271 files, failed to resolve 1 recipes
+25.11.2026 08:31:03 [Server Event] 44 smithing recipes loaded from 43 files
+25.11.2026 08:31:03 [Server Event] 31 clay forming recipes loaded from 31 files
+25.11.2026 08:31:03 [Server Event] 12 knapping recipes loaded from 12 files
+25.11.2026 08:31:03 [Server Event] 90 barrel recipe recipes loaded from 41 files
+25.11.2026 08:31:04 [Server Notification] Tags registry was locked.
+25.11.2026 08:31:04 [Server Notification] Entering runphase AssetsFinalize
+25.11.2026 08:31:04 [Server Event] Server assets loaded, parsed, registered and finalized
+25.11.2026 08:31:04 [Server Event] Initialising systems...
+25.11.2026 08:31:04 [Server Notification] Entering runphase LoadGamePre
+25.11.2026 08:31:04 [Server Notification] Reloaded 19 weather patterns, 5 wind patterns and 5 weather events
+25.11.2026 08:31:04 [Server Error] [doctorcrashy] a made-up error from the broken test mod
+25.11.2026 08:31:04 [Server Error] [doctorcrashy] a made-up error from the broken test mod
+25.11.2026 08:31:04 [Server Error] [doctorcrashy] a made-up error from the broken test mod
+25.11.2026 08:31:04 [Server Error] Found closing tag char > but no tag was opened at 16. Use &gt;/&lt; if you want to display them as plain characters. See debug log for full text.
+25.11.2026 08:31:04 [Server Error] Found closing tag <font> at position 18 but <strong> should be closed first. See debug log for full text.
+25.11.2026 08:31:04 [Server Error] [doctorcrashy] An exception was thrown when trying to start the mod:
+25.11.2026 08:31:04 [Server Error] [doctorcrashy] Exception: Method not found: 'Void Vintagestory.API.Common.DoesNotExist.Gone()'.
+   at DoctorCrashy.DoctorCrashySystem.StartServerSide(ICoreServerAPI api) in /home/runner/work/Vintage-Doctor/Vintage-Doctor/tests/mods/DoctorCrashy/DoctorCrashySystem.cs:line 21
+   at Vintagestory.Common.ModLoader.TryRunModPhase(Mod mod, ModSystem system, ICoreAPI api, ModRunPhase phase) in VintagestoryLib\Common\API\ModLoader.cs:line 680
+25.11.2026 08:31:04 [Server Error] Failed to start system DoctorCrashy.DoctorCrashySystem
+25.11.2026 08:31:04 [Server Notification] Started 126 systems on Server:
+25.11.2026 08:31:04 [Server Notification]     Mod 'VSEssentials.dll' (game):
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.ServerMods.Core
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.ServerMods.GenTerra
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.ServerMods.GenSnowLayer
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.EntityPartitioning
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ErrorReporter
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.ServerMods.GenTerraPostProcess
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.ServerMods.ModCompatiblityUtil
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.ServerMods.NoObf.ModJsonPatchLoader
+25.11.2026 08:31:04 [Server Notification]         FluffyClouds.FluffyCloudsModSystem
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.Systems.ModSystemTfEditFromAttributes
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.Essentials.PathfindSystem
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.Essentials.PathFindDebug
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.Essentials.PathfindingAsync
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.ServerMods.JsonExport
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.ServerMods.ModBasicBlocksLoader
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.ServerMods.GenMaps
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.ServerMods.GenRockStrataNew
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.ServerMods.GenHotSprings
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.ServerMods.GenCreatures
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.ServerMods.ModSystemWorldGenStructures
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ModSystemItemRendererOptimizer
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.AiRuntimeConfig
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ModSystemSyncHarvestableDropsToClient
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ModSystemEmotes
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.LeafBlockDecay
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.POIRegistry
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.RoomRegistry
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.WeatherSystemCommands
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.WeatherSystemServer
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.SystemRemotePlayerTracking
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.WorldMapManager
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.ServerMods.GenDeposits
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.ServerMods.NoObf.ModRegistryObjectTypeLoader
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.ServerMods.LoadColorMaps
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.ServerMods.GenCaves
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.ServerMods.GenStructures
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.ServerMods.WgenCommands
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.ServerMods.GenBlockLayers
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.ServerMods.GenPonds
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ClothManager
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.ServerMods.GenStructuresPosPass
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.ServerMods.GenVegetationAndPatches
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.ServerMods.GenRivulets
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.ServerMods.GenLightSurvival
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.CollectibleBuffDebug
+25.11.2026 08:31:04 [Server Notification]     Mod 'VSSurvivalMod.dll' (survival):
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ModSystemControlPoints
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.SurvivalCoreSystem
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.Systems.StoryLockableDoor
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.Client.NoObf.StoryGenFailedSystem
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.ServerMods.UpgradeTasks
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.ServerMods.ChiselBlockBulkSetMaterial
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.ServerMods.ModSystemDetailModeSync
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.ServerMods.NpcControl
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.ServerMods.ModSystemTiledDungeons
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ModSystemExplosionAffectedStability
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.MyceliumSystem
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ModsystemButterflySpawnCondsExtra
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ModSystemFishInstaFlee
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ModSystemCatchCreature
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.FishingSupportModSystem
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ModSystemGliding
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ModSystemSnowShoveling
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ModSystemSubTongsDurability
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ModSystemSwoopDev
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.Timeswitch
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ClutterBookshelfUtil
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ScreenshakeToClientModSystem
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ModSystemResoArchiveCommands
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.StoryStructuresSpawnConditions
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ModSystemNPCHairStyling
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ModSystemSkinnableAdditions
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ModSystemVillagerDebug
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ModSystemAuction
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ModSystemBlockReinforcement
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.Core
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ModSystemBoatingSoundAndRatlineStamina
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.CharacterSystem
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.CustomSpawnConditions
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.VariablesModSystem
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ModsystemElevator
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ActivityModSystem
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ActivityEditorSystem
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ModSystemFarming
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ModSystemCommandHandbook
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ModSystemTutorial
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.HeldItemMouseInputHandler
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ModSystemCorpseReturnTeleporter
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ModSystemNightVision
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.TobiasTeleporter
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ModJournal
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.LiquidItemStackRenderer
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ModSystemStructureLocator
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ModLootRandomizer
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ModSystemEntityOwnership
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ModSystemRifts
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ModSystemRiftWeather
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ModSleeping
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ModSystemSupportBeamPlacer
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.TeleporterManager
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ModTemperature
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.SystemTemporalStability
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.TemporalStabilityEffects
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ModSystemClimateSpecificTraderTypes
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ModSystemWearableStats
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ModSystemEditableBook
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.Mechanics.ModSystemWindTurbulence
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.Mechanics.MechanicalPowerMod
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.ServerMods.GenDungeons
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.GenStoryStructures
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.ServerMods.WgenCommandsExt
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.ServerMods.GenDevastationLayer
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.RecipeRegistrySystem
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.ServerMods.RecipeLoader
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ModSystemFishDepletion
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ModSystemWormGrunting
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ModSystemFireFromLightning
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ModSystemOreMap
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ModSystemSnowballs
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.HumanoidOutfits
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.ModSystemDevastationEffects
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.GameContent.DisableRecipeRegisteringSystem
+25.11.2026 08:31:04 [Server Notification]     Mod 'VSCreativeMod.dll' (creative):
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.ServerMods.Core
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.ServerMods.WorldEdit.WorldEdit
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.ServerMods.GenBlockLayersFlat
+25.11.2026 08:31:04 [Server Notification]         Vintagestory.ServerMods.GenLightCreative
+25.11.2026 08:31:04 [Server Notification]     Mod 'vintagedoctor_1.7.0.zip' (vintagedoctor):
+25.11.2026 08:31:04 [Server Notification]         VintageDoctor.VintageDoctorSystem
+25.11.2026 08:31:04 [Server Event] 26 traits loaded from 1 files
+25.11.2026 08:31:04 [Server Event] 6 classes loaded from 1 files
+25.11.2026 08:31:06 [Server Debug] Loading leaf block decay system
+25.11.2026 08:31:06 [Server Debug] Finished loading leaf block decay system
+25.11.2026 08:31:06 [Server Debug] Block simulation loaded blocks
+25.11.2026 08:31:06 [Server Debug] Block simulation loaded items
+25.11.2026 08:31:06 [Server Notification] Server map set
+25.11.2026 08:31:06 [Server Debug] Unique crafting ingredients count: 1888
+25.11.2026 08:31:06 [Server Notification] Entering runphase GameReady
+25.11.2026 08:31:06 [Server Notification] Entering runphase WorldReady
+25.11.2026 08:31:06 [Server Event] Starting world generators...
+25.11.2026 08:31:07 [Server Debug] Dungeon TileGenerator-big66-blastfurnace-main Setting RequireClosed to c-ur-smy,inc-dl-smy,c-ul-ste,inc-dr-ste,s-lr-wop,m-smy,m-ene,c-ul-wop,s-ud-ste,s-lr-smy,m-wop,s-ud-wop,c-dl-smy,inc-dr-smy,c-ul-smy,m-ste,inc-ur-ste,66gm,inc-dl-wop,s-lr-ste,s-ud-smy,c-ul-gec,,66gc-lp-rw,66gs-rp-lw,66gc-lp-lw,epstr-ud-ene,66gc-rp-lw,epstd-lr-ene,66gs-lp-lw,66gs-lp-rw,66gs-rp-rw,66gc-rp-rw,lpctd-ul-ene,lpctr-ul-ene,lpstd-lr-ene,lpstr-ud-ene,rpctr-ul-ene,rpstr-ud-ene,rpstd-lr-ene,rpctd-ul-ene
+25.11.2026 08:31:08 [Server Debug] Dungeon TileGenerator-big66-blastfurnace-main Setting RequireClosed to m-smy,m-ene,s-ud-ste,s-lr-smy,c-ur-smy,c-ul-ste,s-lr-wop,m-wop,s-ud-wop,c-ul-wop,inc-dr-smy,m-ste,c-ul-smy,inc-dl-smy,66gm,inc-dl-wop,s-lr-ste,s-ud-smy,c-ul-gec,,66gc-lp-lw,epstr-ud-ene,66gc-rp-lw,epstd-lr-ene,66gs-lp-lw,66gs-rp-lw,66gc-rp-rw,lpctd-ul-ene,lpctr-ul-ene,lpstd-lr-ene,lpstr-ud-ene,rpctr-ul-ene,rpstr-ud-ene,rpstd-lr-ene,rpctd-ul-ene
+25.11.2026 08:31:10 [Server Notification] Reloaded 35 tree generators
+25.11.2026 08:31:10 [Server Event] Loading 7x7x8 spawn chunks...
+25.11.2026 08:31:10 [Server Event] 0% (49 in queue)
+25.11.2026 08:31:11 [Server Notification] Dungeon with 92 schematics generated
+25.11.2026 08:31:11 [Server Debug] Dungeon refinerynew @: /tp =511523 84 =513000
+25.11.2026 08:31:12 [Server Event] 0% (49 in queue)
+25.11.2026 08:31:15 [Server Event] 0% (113 in queue)
+25.11.2026 08:31:17 [Server Event] 0% (156 in queue)
+25.11.2026 08:31:18 [Server Event] 0% (180 in queue)
+25.11.2026 08:31:19 [Server Event] Begin game ticking...
+25.11.2026 08:31:19 [Server Notification] Entering runphase RunGame
+25.11.2026 08:31:19 [Server Notification] Starting server threads
+25.11.2026 08:31:19 [Server Event] Dedicated Server now running on Port 42420 and all ips!
+25.11.2026 08:31:19 [Server Notification] Please be aware that as of 1.20, servers default configurations have changed - servers no longer register themselves to the public servers list and are invite-only (whitelisted) out of the box. If you desire so, you can enable server advertising with '/serverconfig advertise on' and disable the whitelist mode with '/serverconfig whitelistmode off'
+25.11.2026 08:31:23 [Server Notification] [vintagedoctor] Check-up after start-up: 9 problem(s), 19 warning(s). Type /doctor to see them.
+25.11.2026 08:31:23 [Server Notification] [vintagedoctor] Fix 'doctor:repack' (0/doctor-sick-backslash.zip) asked for by the console: Repacked doctor-sick-backslash.zip (2 file names changed); the original is in ModData/vintagedoctor/backups/2026-11-25_08-31-23/doctor-sick-backslash.zip. Restart the game for it to load.
+25.11.2026 08:31:23 [Server Notification] [vintagedoctor] Fix 'doctor:repack' (0/doctor-sick-nested.zip) asked for by the console: Repacked doctor-sick-nested.zip (2 file names changed); the original is in ModData/vintagedoctor/backups/2026-11-25_08-31-23/doctor-sick-nested.zip. Restart the game for it to load.
+25.11.2026 08:31:23 [Server Notification] [vintagedoctor] Fix 'doctor:unwrap' (0/doctor-sick-wrapped.zip) asked for by the console: Took out doctorwrapped_1.0.0.zip; the outer zip is in ModData/vintagedoctor/backups/2026-11-25_08-31-23/doctor-sick-wrapped.zip. Restart the game for it to load.
+25.11.2026 08:31:23 [Server Notification] [vintagedoctor] Fix 'doctor:move-file' (0/doctor-sick-notamod.zip) asked for by the console: Moved doctor-sick-notamod.zip to ModData/vintagedoctor/backups/2026-11-25_08-31-23/doctor-sick-notamod.zip.
+25.11.2026 08:31:23 [Server Notification] [vintagedoctor] Fix 'doctor:move-file' (0/doctor-sick-corrupt.zip) asked for by the console: Moved doctor-sick-corrupt.zip to ModData/vintagedoctor/backups/2026-11-25_08-31-23/doctor-sick-corrupt.zip.
+25.11.2026 08:31:23 [Server Notification] [vintagedoctor] Fix 'doctor:move-file' (0/doctor-sick-packed.rar) asked for by the console: Moved doctor-sick-packed.rar to ModData/vintagedoctor/backups/2026-11-25_08-31-23/doctor-sick-packed.rar.
+25.11.2026 08:31:23 [Server Notification] [vintagedoctor] Fix 'doctor:move-duplicates' (doctordup) asked for by the console: Kept doctordup_1.1.0.zip; moved doctordup_1.0.0.zip to ModData/vintagedoctor/backups/2026-11-25_08-31-23.
+25.11.2026 08:31:23 [Server Notification] [vintagedoctor] Fix 'doctor:reset-config' (doctorcrashy.json) asked for by the console: Moved doctorcrashy.json to ModData/vintagedoctor/backups/2026-11-25_08-31-23/doctorcrashy.json. A fresh one is written the next time its mod starts (restart the game or the server).
+25.11.2026 08:31:23 [Server Notification] [vintagedoctor] Fix 'doctor:move-file' (0/doctordup_1.1.0.zip) asked for by the console: ⚠ doctordup_1.1.0.zip is a mod the game has loaded; switch it off instead of moving it.
+25.11.2026 08:31:23 [Server Notification] [vintagedoctor] Fix 'doctor:strip-libraries' (0/doctor-sick-bundled.zip) asked for by the console: doctor-sick-bundled.zip was written again without 0Harmony.dll. The original is in ModData/vintagedoctor/backups/2026-11-25_08-31-23/doctor-sick-bundled.zip. It takes effect the next time the game starts.
+25.11.2026 08:31:23 [Server Notification] [vintagedoctor] Fix 'doctor:strip-libraries' (0/doctor-sick-shared.zip) asked for by the console: ⚠ doctor-sick-shared.zip doesn't bring any library the game already has.
+25.11.2026 08:31:23 [Server Notification] [vintagedoctor] Fix 'doctor:move-file' (0/doctor-sick-straydll.zip) asked for by the console: Moved doctor-sick-straydll.zip to ModData/vintagedoctor/backups/2026-11-25_08-31-23/doctor-sick-straydll.zip.
+25.11.2026 08:31:23 [Server Notification] [vintagedoctor] Fix 'doctor:disable-mod' (doctorcrashy) asked for by the console: Doctor Crashy is switched off from the next server start (the world's list of disabled mods in serverconfig.json; take it out there to bring it back).
+25.11.2026 08:31:23 [Server Notification] [vintagedoctor self-test] Self-test: 62 passed, 0 failed
+25.11.2026 08:31:23 [Server Notification] Handling Console Command /doctor 
+25.11.2026 08:31:23 [Server Notification] == The game (Vintage Story 1.22.7) ==
+⚠ The game crashed (11/21/2026 05:56:18): NullReferenceException
+  System.NullReferenceException: Object reference not set to an instance of an object.
+  The code used something that wasn't there. That is a bug in the code named in the trace; nothing you set up wrong.
+  The game didn't name a mod and no mod's code is in the trace, so this may be the game itself, a mod that changes the game's code without showing in the trace, or the computer (memory, graphics driver).
+    at Vintagestory.API.Common.FrameProfilerUtil.End() in VintagestoryApi\Common\FrameProfilerUtil.cs:line 213
+    at Vintagestory.Server.ServerMain.Process() in VintagestoryLib\Server\ServerMain.cs:line 941
+    at Vintagestory.Server.ServerProgram.Main() in VintagestoryLib\Server\ServerProgram.cs:line 156
+    at Vintagestory.ClientNative.CrashReporter.Start(ThreadStart start) in VintagestoryLib\Client\ClientPlatform\ClientNative\CrashReporter.cs:line 95
+  → If it happens again, try without the mods you added or updated last, and post the report on the game's forum or Discord.
+  Put together a report to post (/doctor bugreport)
+✖ 5 file(s) in the Mods folder aren't mods the game can load: doctor-sick-corrupt.zip, doctor-sick-nested.zip, doctor-sick-notamod.zip, doctor-sick-wrapped.zip, doctorsickstray
+  doctor-sick-corrupt.zip: Cannot find central directory
+  doctor-sick-nested.zip: Object reference not set to an instance of an object.
+  doctor-sick-notamod.zip: Object reference not set to an instance of an object.
+  doctor-sick-wrapped.zip: Object reference not set to an instance of an object.
+  doctorsickstray: File 'Helper.dll' is not in the mod's root folder. Won't load this mod. If you need to ship unmanaged dlls, put them in the native/ folder.
+  The game tries everything in the Mods folder at every start, and reports an error for each of these. The Mods folder page says what each one is and offers the fix.
+  The Mods folder and config files (/doctor files)
+✓ 10 mod file(s) in 2 folder(s), nothing wrong with them.
+  Every file in 8 zip(s) was read to the end.
+✓ 3 config file(s) read without a problem.
+✓ The server keeps up: a tick every 33.2 ms (30 a second).
+  Last minute: average 33.2 ms, 95% under 34 ms, worst 34 ms (123 ticks).
+  Measure where the time goes (20 seconds) (/doctor fix doctor:profile 20)
+✓ 34 creatures and things loaded (0 items on the ground), 392 chunks, 0 player(s).
+  Most of: game:fox 12, game:fish 10, game:chicken 9, game:hare 2, game:armorstand 1
+  392 chunks loaded for 0 player(s).
+✓ Memory: the game holds 1.3 GB of the 15.3 GB it can use.
+  919.2 MB in the game's own objects; 10 full clean-ups so far; 4 processor threads.
+✓ 90.1 GB free where the world is saved.
+  The save file is 4 KB.
+✓ Nothing in this world comes from a mod that isn't installed.
+✓ Time runs at the normal pace.
+✓ 3 JSON patches in 2 files, no two mods replacing the same thing.
+✓ Every mod's blocks and items have names.
+✓ No mod changes the game's code.
+• This is the first session the doctor has seen here, so there is nothing to compare with yet.
+  From now on it notes the mods and their versions at every start, and shows here what changed.
+Pick what matches; each opens a page that looks into just that.
+The game crashed (/doctor crash)
+The game is slow or stutters (/doctor perf)
+A mod isn't working (/doctor mods)
+Something broke after I added or updated mods (/doctor changes)
+An item looks or acts wrong (hold it first) (/doctor item hand)
+The block I'm looking at looks or acts wrong (/doctor block)
+I can't craft something (/doctor craft hand)
+Show me what happened while the game started (/doctor startup)
+Show me every error and warning (/doctor log)
+Check my Mods folder and config files (/doctor files)
+Are any mods getting in each other's way? (/doctor clashes)
+Which mods change the game's code? (/doctor patches)
+Is my world all right? (/doctor world)
+Put together a report to post (/doctor bugreport)
+For mod authors: what mods told the doctor (/doctor api)
+
+== Doctor Crashy 1.0.0 ==
+✖ Doctor Crashy threw an error while starting: Method not found: 'Void Vintagestory.API.Common.DoesNotExist.Gone()'.
+  An exception was thrown when trying to start the mod:
+    Method not found: 'Void Vintagestory.API.Common.DoesNotExist.Gone()'.
+    at DoctorCrashy.DoctorCrashySystem.StartServerSide(ICoreServerAPI api) in /home/<user>/work/Vintage-Doctor/Vintage-Doctor/tests/mods/DoctorCrashy/DoctorCrashySystem.cs:line 21
+    at Vintagestory.Common.ModLoader.TryRunModPhase(Mod mod, ModSystem system, ICoreAPI api, ModRunPhase phase) in VintagestoryLib\Common\API\ModLoader.cs:line 680
+    Not started: DoctorCrashy.DoctorCrashySystem
+  The mod calls something that doesn't exist in this version of the game (or of another mod it uses): it was built for a different version. Update the mod, or use the game version it was made for.
+  → Look for an update of Doctor Crashy that fits this game version, check it has every mod it needs, or switch it off. Its author needs the lines above.
+  Doctor Crashy's page (/doctor mod doctorcrashy) Switch Doctor Crashy off (/doctor fix doctor:disable-mod doctorcrashy)
+⚠ 1 kind(s) of errors in the log this session (3 line(s))
+  ×3 [doctorcrashy] a made-up error from the broken test mod
+  An error in the log doesn't always show in the game, but each is something that didn't work as its author meant. The ones that repeat, and the ones from a mod you're having trouble with, are the ones to look at.
+  Doctor Crashy's errors and warnings (/doctor log doctorcrashy)
+⚠ 1 mod(s) with code were made for an older game than 1.22.7 and have errors now: Doctor Crashy (1.20.0)
+  Mods that add code are built against one version of the game. After a game update most keep working, but when one of them has errors, the version is the first suspect.
+  → Update these first. If there is no update, the mod's page or comments usually say whether it works on this version.
+  Doctor Crashy's page (/doctor mod doctorcrashy)
+Everything about Doctor Crashy (/doctor mod doctorcrashy)
+
+== Doctor Sick 1.0.0 ==
+⚠ 2 JSON patch(es) didn't apply: Doctor Sick (2)
+    Patch 0 (target: game:itemtypes/resource/ingot.json) in doctorsick:patches/bad.json failed because supplied path /doesnotexist/deeper/still is invalid: The json path /doesnotexist/deeper/still was not found. No such element 'doesnotexist' at the root path
+  A patch is how one mod changes another's (or the game's) blocks, items and recipes. One that doesn't fit is skipped, so that change isn't in the game: the thing it was for behaves as if the mod weren't there.
+  → Usually the patching mod is made for another version of what it patches. Its author can fix the patch; an update may already have.
+• 1 recipe(s) or drop(s) name things that don't exist, by the mod of the missing thing: doctorsick (1)
+    doctorsick:doesnotexist
+  The game skips those recipes. Usually the mod expects another mod (or another version of one) to be installed.
+  Everything from start-up (/doctor startup)
+⚠ 6 kind(s) of errors in the log this session (6 line(s))
+  Syntax error in json file 'doctorsick:itemtypes/broken.json': Failed deserializing broken.json: Unexpected end when reading token. Path ''.
+  Item with code doctorsick:ghost has defined an item class DoctorGhostItem, but no such class registered. Will ignore.
+  Failed registering item doctorsick:ghost:
+  ... and 3 more
+  An error in the log doesn't always show in the game, but each is something that didn't work as its author meant. The ones that repeat, and the ones from a mod you're having trouble with, are the ones to look at.
+  Doctor Sick's errors and warnings (/doctor log doctorsick)
+✖ 2 block(s) or item(s) need code that isn't in the game (DoctorGhostItem, DoctorGhostBehavior, DoctorGhostBlock, DoctorGhostEntity)
+  doctorsick:ghost (its code: DoctorGhostItem)
+  doctorsick:ghost (a behaviour: DoctorGhostBehavior)
+  doctorsick:ghostblock (its code: DoctorGhostBlock)
+  doctorsick:ghostblock (its data code: DoctorGhostEntity)
+  Each of these names a piece of code that should make it work, and no loaded mod has that code: the mod's own code didn't load, it needs another mod that isn't installed, or this version of the mod doesn't match its files. They are in the game but act like plain blocks and items: machines don't open, tools don't do their job.
+  → Update the mod and install every mod its page lists as required. For a mod of your own: the name in the file has to be exactly the one given to RegisterBlockClass, RegisterItemClass or RegisterBlockEntityClass.
+  Doctor Sick's page (/doctor mod doctorsick)
+⚠ 1 block(s) or item(s) couldn't be added to the game
+  doctorsick:ghost
+  The game refused them while loading. Most often something with the same name was already there: two mods, or two files of one mod, add a thing with the same name, and only the first one exists. The log has the game's reason for each.
+  Doctor Sick's page (/doctor mod doctorsick)
+⚠ 1 of its files couldn't be read, so what they describe isn't in the game
+  doctorsick:itemtypes/broken.json
+  Each of these files has a mistake in it (most often a missing comma or bracket) or uses something this version of the game doesn't know, and the game skipped the whole file: the blocks, items or recipes in it don't exist. The mod's page has the game's own error for each, with the place.
+  Doctor Sick's page (/doctor mod doctorsick)
+⚠ Doctor Sick tries to change 1 file(s) that aren't there
+  game:itemtypes/doctor-no-such-file.json
+  A patch changes one thing inside another file. These files don't exist in this version of the game (or of the mod they belong to): they were renamed, moved or removed in an update, and the mod hasn't caught up. Whatever those patches were for doesn't happen.
+  Doctor Sick's page (/doctor mod doctorsick)
+• Doctor Sick has 1 patch(es) for mods that aren't installed (doctornosuchmod)
+  That is how one mod supports another, and harmless: the game writes each one into the log as an error, but nothing is missing.
+⚠ 2 file(s) are replaced by more than one mod: only one copy of each is used
+  doctorsick:config/note.json: doctorsickold, Doctor Sick
+  game:recipes/grid/anchor.json: Doctor Sick, doctorsickold
+  When two mods ship the same file, the game takes one and drops the other without a word. One of these mods isn't doing all it was meant to. Which one wins depends on the order the game loads them in.
+  → Check both mods' pages for a note about each other. If they do the same job, keep one. Mods that change a file with a patch instead of replacing it can work side by side.
+• Doctor Sick replaces 1 of the game's own files outright
+  game:recipes/grid/anchor.json
+  A mod can change a file of the game with a patch (one value) or by shipping its own copy of the whole file. A whole copy also throws away whatever the game's updates and other mods' patches changed in that file, so it is the first thing to look at when something else stops working.
+⚠ 1 recipe(s) have exactly the same ingredients as another recipe that makes something else
+  Flint (game:flint), Stick (game:stick):
+    Flint (game:flint) ×2  (Doctor Sick, recipes/grid/shadow-b.json)
+    Stick (game:stick) ×2  (Doctor Sick, recipes/grid/shadow-a.json)
+  The crafting grid can only offer one result for one set of ingredients, so only one of each pair can ever be crafted. This happens when two mods each add a recipe without knowing of the other.
+  → Many mods can switch single recipes off in their config. Otherwise tell both authors: one of them has to change an ingredient.
+  All clashes between mods (/doctor clashes)
+⚠ Doctor Sick's texts have formatting tags out of place: 2 error(s) about them in the log this session
+  doctorsick:lever-help: a > with no < before it, at character 16: Pull the lever -> the gate opens
+  doctorsick:hot-warning: </font> while <strong> is still open, at character 18: <strong>Hot!</font> Don't touch
+  The game reads < and > in texts (chat, item descriptions, tooltips, the handbook) as formatting tags. A > on its own, or a closing tag that doesn't match, makes it write an error every time the text is shown; the text is usually still shown. The error never says whose text it was, so the doctor reads every mod's texts the way the game does and finds the ones that make that very error. The whole text is also in server-debug.log, on the line after each error.
+  → Tell Doctor Sick's author which texts these are (the names above are their keys in the mod's lang file): a > that isn't part of a tag has to be written &gt;, and a < as &lt;.
+  Doctor Sick's page (/doctor mod doctorsick)
+Everything about Doctor Sick (/doctor mod doctorsick)
+
+== doctordup 1.1.0 ==
+⚠ 1 mod(s) are in the Mods folder more than once
+  doctordup: 'doctordup_1.0.0.zip', 'doctordup_1.1.0.zip', loaded: v1.1.0
+  The game loads only the newest copy. The spare copies are harmless but confusing, and a spare copy of a mod with code can stop it loading at all.
+  The Mods folder and config files (/doctor files)
+Everything about doctordup (/doctor mod doctordup)
+
+== doctorsickbundled 1.0.0 ==
+⚠ doctorsickbundled has code in it (SickShared.dll) but calls itself a content mod, so the game leaves the code out
+  The game only runs code from mods whose modinfo.json says "type": "code". Whatever this mod's code was meant to do doesn't happen; its blocks, items and recipes still load.
+  → Tell the mod's author. Changing the type to "code" in the modinfo.json inside the zip puts it right.
+  doctorsickbundled's page (/doctor mod doctorsickbundled)
+• SickShared.dll is in more than one mod: doctorsickshared, doctorsickbundled.
+  The game loads a code library by name once. Whichever mod loads first decides the version; the other gets that copy too, and fails if it needed a different one.
+Everything about doctorsickbundled (/doctor mod doctorsickbundled)
+
+== doctorsickold 1.0.0 ==
+⚠ 2 file(s) are replaced by more than one mod: only one copy of each is used
+  doctorsick:config/note.json: doctorsickold, Doctor Sick
+  game:recipes/grid/anchor.json: Doctor Sick, doctorsickold
+  When two mods ship the same file, the game takes one and drops the other without a word. One of these mods isn't doing all it was meant to. Which one wins depends on the order the game loads them in.
+  → Check both mods' pages for a note about each other. If they do the same job, keep one. Mods that change a file with a patch instead of replacing it can work side by side.
+⚠ 1 mod(s) made for an older game replace 1 of the game's own files (the game is 1.22.7)
+  doctorsickold (made for 1.19.0): 1 file(s)
+    game:recipes/grid/anchor.json
+  These mods ship whole copies of the game's files as they were in an older version. Everything the game has changed in those files since is undone: recipes and items that went missing, things from the update that don't work, shaders that give a black screen or stop the game from starting.
+  → Look for an update of each. If something from the last game update is missing or broken, try without these mods first.
+  doctorsickold's page (/doctor mod doctorsickold)
+Everything about doctorsickold (/doctor mod doctorsickold)
+
+== doctorsickshared 1.0.0 ==
+⚠ doctorsickshared has code in it (SickShared.dll) but calls itself a content mod, so the game leaves the code out
+  The game only runs code from mods whose modinfo.json says "type": "code". Whatever this mod's code was meant to do doesn't happen; its blocks, items and recipes still load.
+  → Tell the mod's author. Changing the type to "code" in the modinfo.json inside the zip puts it right.
+  doctorsickshared's page (/doctor mod doctorsickshared)
+• SickShared.dll is in more than one mod: doctorsickshared, doctorsickbundled.
+  The game loads a code library by name once. Whichever mod loads first decides the version; the other gets that copy too, and fails if it needed a different one.
+Everything about doctorsickshared (/doctor mod doctorsickshared)
+
+== doctorsickslash 1.0.0 ==
+⚠ doctorsickslash has 1 block and item file(s), but none of its blocks or items are in the game
+  The mod loaded, but nothing it describes arrived: its files are in the wrong folders inside the zip, every one of them failed to load (the start-up page has the errors), or they are switched off in the mod's settings.
+  doctorsickslash's page (/doctor mod doctorsickslash)
+Everything about doctorsickslash (/doctor mod doctorsickslash)
+
+== The other mods ==
+✓ 1 mod(s) have nothing against them
+  Vintage Doctor
+Every mod at a glance (/doctor mods)
+Every page is a command: /doctor crash, perf, mods, mod [mod id], log [mod id], startup, files, patches, changes, world, item [code], craft [code], bugreport [mod id], api. A fix: /doctor fix [id] [argument].
+Saved to ModData/vintagedoctor/last-report-server.txt
+25.11.2026 08:31:23 [Server Notification] Handling Console Command /doctor mods
+25.11.2026 08:31:23 [Server Notification] == Every mod at a glance ==
+8 mod(s) loaded; 2 have something against them. A mod's page shows everything the doctor knows about it.
+✖ Doctor Crashy 1.0.0: 1 error(s) while starting, 1 kind(s) of errors in the log
+  Doctor Crashy's page (/doctor mod doctorcrashy) Switch Doctor Crashy off (/doctor fix doctor:disable-mod doctorcrashy)
+⚠ Doctor Sick 1.0.0: 6 kind(s) of errors in the log, 2 patch(es) that didn't apply, 1 kind(s) of warnings
+  Doctor Sick's page (/doctor mod doctorsick) Switch Doctor Sick off (/doctor fix doctor:disable-mod doctorsick)
+✓ 6 mod(s) have nothing against them
+  doctordup 1.1.0 (/doctor mod doctordup) doctorsickbundled 1.0.0 (/doctor mod doctorsickbundled) doctorsickold 1.0.0 (/doctor mod doctorsickold) doctorsickshared 1.0.0 (/doctor mod doctorsickshared) doctorsickslash 1.0.0 (/doctor mod doctorsickslash)
+  Vintage Doctor 1.7.0 (/doctor mod vintagedoctor)
+Saved to ModData/vintagedoctor/last-report-server.txt
+25.11.2026 08:31:23 [Server Warning] Server overloaded. A tick took 634ms to complete.
+25.11.2026 08:31:28 [Server Warning] Server overloaded. A tick took 679ms to complete.

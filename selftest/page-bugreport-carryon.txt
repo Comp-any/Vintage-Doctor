@@ -1,0 +1,22 @@
+== A report to post about Carry On ==
+Everything a mod's author or the game's forum needs, with addresses, player ids and user folders taken out. Read it over, then post it with what you were doing and what you expected.
+✓ Saved to ModData/vintagedoctor/bug-report-server-carryon.txt
+Copy this page (the button below) or attach the saved file.
+
+== The report ==
+Vintage Doctor 1.7.0 on Vintage Story v1.22.7 (Stable), dedicated server, 2026-11-25 08:30
+Linux (Ubuntu 26.04.1 LTS) [Kernel 7.0.0.1016]; Intel(R) Xeon(R) 6975P-C; 15700 MB RAM; .net 10.0.15
+About: Carry On 1.14.3 (carryon)
+
+Mods (5)
+carryon 1.14.3, doctorexample 1.0.0, doctorexamplejson 1.0.0, primitivesurvival 5.1.4, vintagedoctor 1.7.0
+
+Findings
+• Carry On 1.14.3, by copygirl, NerdScurvy
+  Mod id carryon; Code mod; runs on: Universal; file CarryOn-1.22.0_v1.14.3.zip
+✓ Everything it needs is there (1).
+  The game: wants 1.22.0 or newer, this is 1.22.7
+✓ Its config file(s) read fine: CarryOnConfig.json
+• It changes the game's code in 1 place(s), 0 of them shared with other mods
+  EntitySeat.onControls: runs before it
+✓ Nothing from Carry On in the log this session.

@@ -1,0 +1,9 @@
+== Why can't I craft it? ==
+Copper ingot (game:ingot-copper) is made by 1 crafting-grid recipe(s).
+✓ Recipe 1: Item tagged Required: 27, Forbidden:  (tool), Copper anvil (game:anvil-copper)
+  Recipe game:recipes/grid/ingot.json
+If the grid stays empty with a recipe that should work: check the exact variant of each ingredient (the wood or metal type), that tools are in the grid, and that no ingredient is a stack of a different kind than it looks.
+
+== What your mods say about it ==
+• Doctor Example: Example pumps are made of this
+  The example tanks (/doctor example-tanks)
