@@ -1,0 +1,52 @@
+The world (the game's built-in server)
+✓ No crash reports: the game hasn't crashed on this side.
+  {{folder|logs||Open the Logs folder}}
+⚠ 1 mod(s) were left out because something they need is missing: configlib (needs vsimgui@1.2.0)
+  The game doesn't load a mod whose requirements aren't met, so nothing of these mods is in the game.
+  → Install what they need (the name after 'needs' is a mod id, with the lowest version that will do), or remove them.
+  {{url|https://mods.vintagestory.at/list/mod?text=vsimgui||Find vsimgui on the Mod DB}}
+  {{open|startup||Everything from start-up}}
+⚠ Doctor Example: An example pump jammed
+  [doctorexample] pump 3 jammed (a made-up warning from the example mod)
+  This line in the log comes from the example mod; the JSON example mod knows what it means.
+  → Nothing to do: it is only an example.
+  {{fix|s:doctorexamplejson:pump-jammed/fix||Start the example's config afresh}}
+✓ No errors in the log this session (3 kind(s) of warnings, 5 line(s)).
+  {{open|log||Every error and warning}} {{folder|logs|server-main.log|Open server-main.log}}
+✓ The server keeps up: a tick every 33.2 ms (30 a second).
+  Last minute: average 33.2 ms, 95% under 34 ms, worst 34 ms (123 ticks).
+  {{fix|s:doctor:profile|20|Measure where the time goes (20 seconds)}}
+✓ 17 creatures and things loaded (0 items on the ground), 392 chunks, 0 player(s).
+  Most of: game:hare 12, game:fish 4, game:armorstand 1
+  392 chunks loaded for 0 player(s).
+✓ 86.3 GB free where the world is saved.
+  The save file is 4 KB.
+✓ Nothing in this world comes from a mod that isn't installed.
+✓ Time runs at the normal pace.
+✓ Every block and item that needs code has it.
+✓ No mod tries to change a file that isn't there.
+✓ No recipe from a mod has the same ingredients as another recipe that makes something else (13748 crafting recipes looked at).
+• Doctor Example (JSON) and Doctor Example don't get on
+  Nothing is really wrong: the two example mods say they clash so the doctor has a clash to show.
+  Doctor Example (JSON) says so itself (in its vintagedoctor.json).
+  {{open|mod|doctorexamplejson|Doctor Example (JSON)'s page}} {{open|mod|doctorexample|Doctor Example's page}}
+✓ 33 JSON patches in 85 files, no two mods replacing the same thing.
+✓ Every mod's blocks and items have names.
+✓ No formatting tags out of place: no errors about them in the log, and none in the mods' texts.
+  {{folder|logs|server-main.log|Open server-main.log}}
+• Doctor Example: 1 kind(s) of messages from the example mod this session
+  {{folder|logs|server-main.log|Open server-main.log}}
+⚠ Doctor Example: 3 example pumps are jammed
+  pump at 10 5 10
+  A pump jams when its outlet is blocked.
+  → Clear the outlets, or let the doctor restart the pumps.
+  {{fix|s:doctorexample:unjam|all|Restart the example pumps}}
+  1 message(s) from this mod in the log
+• Doctor Example: 2 example tanks are half empty
+  tank at 10 3 10
+  tank at 12 3 10
+  → Fill them from a pump.
+  {{fix|s:bus:doctorexample:fill||Fill the example tanks}}
+• Doctor Example: The example mod started
+  reported with ReportIncident
+  Last at 2026-11-26 16:43.

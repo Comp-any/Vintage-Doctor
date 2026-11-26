@@ -1,0 +1,12 @@
+  Determining projects to restore...
+  Restored /home/runner/work/Vintage-Doctor/Vintage-Doctor/VintageDoctor.csproj (in 84 ms).
+/home/runner/work/Vintage-Doctor/Vintage-Doctor/src/Core/TextTags.cs(26,21): warning CS0419: Ambiguous reference in cref attribute: 'Errors'. Assuming 'VintageDoctor.TextTags.Errors(string)', but could have also matched other overloads including 'VintageDoctor.TextTags.Errors(string, System.Collections.Generic.List<string>)'. [/home/runner/work/Vintage-Doctor/Vintage-Doctor/VintageDoctor.csproj]
+  VintageDoctor -> /home/runner/work/Vintage-Doctor/Vintage-Doctor/bin/Release/Mods/vintagedoctor/VintageDoctor.dll
+
+Build succeeded.
+
+/home/runner/work/Vintage-Doctor/Vintage-Doctor/src/Core/TextTags.cs(26,21): warning CS0419: Ambiguous reference in cref attribute: 'Errors'. Assuming 'VintageDoctor.TextTags.Errors(string)', but could have also matched other overloads including 'VintageDoctor.TextTags.Errors(string, System.Collections.Generic.List<string>)'. [/home/runner/work/Vintage-Doctor/Vintage-Doctor/VintageDoctor.csproj]
+    1 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:08.42

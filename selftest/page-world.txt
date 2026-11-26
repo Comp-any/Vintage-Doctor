@@ -1,0 +1,5 @@
+== The world and its save ==
+✓ 86.3 GB free where the world is saved.
+  The save file is 4 KB.
+✓ Nothing in this world comes from a mod that isn't installed.
+✓ Time runs at the normal pace.

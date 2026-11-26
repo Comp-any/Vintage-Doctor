@@ -1,0 +1,12 @@
+== Network traffic ==
+✓ Network: sending 0 B/s and receiving 0 B/s on average over the last 14 s, 0 player(s) online.
+  Since the server started: sent 1 KB, received 1 KB. Busiest second of the last minute: sent 0 B/s, received 0 B/s.
+  Measure again (20 s) (/doctor fix doctor:netmeasure 20)
+Last minute: sent (orange), received (blue): 0 B/s (avg 0 B/s, top 0 B/s) / 0 B/s (avg 0 B/s, top 0 B/s)
+
+== What the traffic is made of ==
+• Measured over 5 s (done at 2026-11-26 16:43): the server sent 1 KB and received 1 KB.
+  Each line: bytes a second, share, the kind of packet, how many. A packet sent to every player counts once here (the total above counts what really went out), so this says what the traffic is made of rather than how much each player gets. Block entities are inside the chunks' and block entity packets, so their lines aren't part of the shares.
+  19 B/s  85%  changed blocks (SetBlocks)  (1×)
+  3 B/s  15%  CalendarUpdate  (1×)
+• No mod sent any messages while measuring.

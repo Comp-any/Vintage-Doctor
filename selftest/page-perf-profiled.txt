@@ -1,0 +1,28 @@
+== Is the server keeping up? ==
+✓ The server keeps up: a tick every 41.6 ms (24 a second).
+  Last minute: average 41.6 ms, 95% under 34 ms, worst 2143 ms (342 ticks).
+  Measure where the time goes (20 seconds) (/doctor fix doctor:profile 20) The whole performance page (/doctor perf)
+✓ 1 creatures and things loaded (0 items on the ground), 80 chunks, 0 player(s).
+  Most of: game:armorstand 1
+  80 chunks loaded for 0 player(s).
+✓ Memory: the game holds 1.4 GB of the 15.6 GB it can use.
+  778.1 MB in the game's own objects; 13 full clean-ups so far; 4 processor threads.
+
+== Where the server's time goes ==
+• Measured for 5 seconds (129 ticks): 6.56 ms of work per tick, at 2026-11-26 16:43
+  The parts that took the most time, per tick. The name in square brackets is the mod the code belongs to; (N×) is how many of them ran each tick.
+  6.20 ms  95%  garbagecollector (no clients online)
+  0.06 ms  1%  Ticking: BlockEntityGenericTypedContainer
+  0.04 ms  1%  despawned-1-fish-freshwater-pickerel-chain-adult
+  0.03 ms  1%  Timer: DoctorExampleSystem [Doctor Example]
+  0.03 ms  0%  Ticking: VintageDoctorSystem [Vintage Doctor]
+• By mod: Doctor Example 0.03 ms, Vintage Doctor 0.03 ms
+  0.03 ms  1%  Doctor Example its page (/doctor mod doctorexample)
+  0.03 ms  0%  Vintage Doctor its page (/doctor mod vintagedoctor)
+  Only the work the game can tell apart by its code (things that tick, windows, timers) is counted against a mod; what a mod adds to creatures or to the world's generation isn't. A mod with many machines running is not broken for being first here.
+  Measure again (20 seconds) (/doctor fix doctor:profile 20)
+
+== Network traffic ==
+✓ Network: sending 0 B/s and receiving 0 B/s on average over the last 14 s, 0 player(s) online.
+  Since the server started: sent 1 KB, received 1 KB. Busiest second of the last minute: sent 0 B/s, received 0 B/s.
+  The network page (/doctor network)

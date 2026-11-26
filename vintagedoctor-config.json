@@ -1,0 +1,9 @@
+{
+  "ServerReportPrivilege": "controlserver",
+  "TellAdminsOnJoin": true,
+  "ScanAtStartup": true,
+  "IgnoreLogMessages": [],
+  "KnownProblems": [],
+  "AllowCommandFixes": true,
+  "SelfTestOnStart": true
+}
