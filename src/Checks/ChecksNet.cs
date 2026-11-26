@@ -115,7 +115,7 @@ namespace VintageDoctor
             long modBytes = channels.Sum(k => k.Bytes);
             if (modBytes > 0) kinds.Add(new NetWatch.Kind { Name = x.T("net-kind-mods"), Bytes = modBytes, Count = channels.Sum(k => k.Count) });
             // Block entities are part of the chunks' and block entities' packets already: listed apart, not counted twice in the shares.
-            long sum = Math.Max(1, Math.Max(total, kinds.Where(k => !k.Name.StartsWith("block entity ", StringComparison.Ordinal)).Sum(k => k.Bytes)));
+            long sum = Math.Max(1, kinds.Where(k => !k.Name.StartsWith("block entity ", StringComparison.Ordinal)).Sum(k => k.Bytes));
             int shown = 0;
             foreach (var k in kinds.OrderByDescending(k => k.Bytes))
             {

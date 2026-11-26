@@ -392,7 +392,8 @@ namespace VintageDoctor
                     lock (byChannel)
                     {
                         byChannel.TryGetValue(channel, out var v);
-                        byChannel[channel] = (v.count + to, v.bytes + (size + 8) * to);   // + the packet's own few bytes
+                        // Once a packet, however many players it goes to, as the game counts its own kinds.
+                        byChannel[channel] = (v.count + 1, v.bytes + size + 8);   // + the packet's own few bytes
                     }
                 }
                 catch { }
