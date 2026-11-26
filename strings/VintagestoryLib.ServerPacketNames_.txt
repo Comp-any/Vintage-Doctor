@@ -1,0 +1,134 @@
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-32-	private readonly bool packetDebug;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-33-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-34-	private bool doBenchmark;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-35-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-36-	private readonly SortedDictionary<int, int> packetBenchmark = new SortedDictionary<int, int>();
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-37-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-38-	private readonly SortedDictionary<int, int> udpPacketBenchmark = new SortedDictionary<int, int>();
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-39-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-40-	private bool commitingMinimalUpdate;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-41-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-42-	private readonly IClientNetworkChannel clientNetworkChannel;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-43-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs:44:	public static readonly Dictionary<int, string> ServerPacketNames;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-45-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-46-	public bool DidReceiveUdp;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-47-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-48-	private bool bulkPositions;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-49-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-50-	public override string Name => "nwp";
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-51-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-52-	public int TotalBytesReceivedAndReceiving => totalByteCount + game.MainNetClient.CurrentlyReceivingBytes;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-53-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-54-	static SystemNetworkProcess()
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-55-	{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs:56:		ServerPacketNames = new Dictionary<int, string>();
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-57-		FieldInfo[] fields = typeof(Packet_ServerIdEnum).GetFields();
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-58-		for (int i = 0; i < fields.Length; i++)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-59-		{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-60-			if ((fields[i].Attributes & FieldAttributes.Literal) != 0 && !(fields[i].FieldType != typeof(int)))
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-61-			{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs:62:				ServerPacketNames[(int)fields[i].GetValue(null)] = fields[i].Name;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-63-			}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-64-		}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-65-	}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-66-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-67-	public SystemNetworkProcess(ClientMain game)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-68-		: base(game)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-69-	{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-70-		totalByteCount = 0;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-71-		game.RegisterGameTickListener(UpdatePacketCount, 1000);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-72-		game.RegisterGameTickListener(ClientUdpTick, 15);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-73-		game.PacketHandlers[78] = HandleRequestPositionTcp;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-74-		game.PacketHandlers[79] = EnqueueUdpPacket;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-75-		game.PacketHandlers[80] = HandleEntitySpawnPosition;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-76-		game.PacketHandlers[81] = HandleDidReceiveUdp;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-77-		game.api.ChatCommands.Create("netbenchmark").WithDescription("Toggles network benchmarking").HandleWith(CmdBenchmark);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-78-		clientNetworkChannel = game.api.Network.RegisterChannel("EntityAnims");
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-79-		clientNetworkChannel.RegisterMessageType<AnimationPacket>().RegisterMessageType<BulkAnimationPacket>().RegisterMessageType<EntityTagPacket>()
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-80-			.SetMessageHandler<AnimationPacket>(HandleAnimationPacket)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-81-			.SetMessageHandler<BulkAnimationPacket>(HandleBulkAnimationPacket)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-82-			.SetMessageHandler<EntityTagPacket>(HandleTagPacket);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-83-		packetDebug = ClientSettings.Inst.Bool["packetDebug"];
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-84-	}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-85-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-86-	private void UdpConnectionRequestFromServer()
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-87-	{
+--
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-297-		totalUdpByteCount += udpByteCount;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-298-		deltaUdpByteCount += udpByteCount;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-299-	}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-300-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-301-	private TextCommandResult CmdBenchmark(TextCommandCallingArgs textCommandCallingArgs)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-302-	{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-303-		doBenchmark = !doBenchmark;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-304-		if (!doBenchmark)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-305-		{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-306-			StringBuilder stringBuilder = new StringBuilder();
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-307-			foreach (KeyValuePair<int, int> item in packetBenchmark)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-308-			{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs:309:				ServerPacketNames.TryGetValue(item.Key, out var value);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-310-				stringBuilder.AppendLine(value + ": " + ((item.Value > 9999) ? (((float)item.Value / 1024f).ToString("#.#") + "kb") : (item.Value + "b")));
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-311-			}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-312-			foreach (KeyValuePair<int, int> item2 in udpPacketBenchmark)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-313-			{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-314-				string text = item2.Key.ToString();
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-315-				stringBuilder.AppendLine(text + ": " + ((item2.Value > 9999) ? (((float)item2.Value / 1024f).ToString("#.#") + "kb") : (item2.Value + "b")));
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-316-			}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-317-			return TextCommandResult.Success(stringBuilder.ToString());
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-318-		}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-319-		packetBenchmark.Clear();
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-320-		return TextCommandResult.Success("Benchmarking started. Stop it after a while to get results.");
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-321-	}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-322-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-323-	private void UpdatePacketCount(float dt)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-324-	{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-325-		if (game.extendedDebugInfo)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-326-		{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-327-			string text = ((deltaByteCount > 1024) ? (((float)deltaByteCount / 1024f).ToString("0.0") + "kb/s") : (deltaByteCount + "b/s"));
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-328-			string text2 = ((deltaUdpByteCount > 1024) ? (((float)deltaUdpByteCount / 1024f).ToString("0.0") + "kb/s") : (deltaUdpByteCount + "b/s"));
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-329-			game.DebugScreenInfo["incomingbytes"] = "Network TCP/UDP: " + ((float)totalByteCount / 1024f).ToString("#.#", GlobalConstants.DefaultCultureInfo) + " kb, " + text + " / " + ((float)totalUdpByteCount / 1024f).ToString("#.#", GlobalConstants.DefaultCultureInfo) + " kb, " + text2;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-330-		}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-331-		else
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-332-		{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-333-			game.DebugScreenInfo["incomingbytes"] = "";
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-334-		}
+--
+Vintagestory.Server/CmdDebug.cs-565-		slot.MarkDirty();
+Vintagestory.Server/CmdDebug.cs-566-		return TextCommandResult.Success($"Stack Attribute {key}={itemstack.Attributes[key].ToString()} set.");
+Vintagestory.Server/CmdDebug.cs-567-	}
+Vintagestory.Server/CmdDebug.cs-568-
+Vintagestory.Server/CmdDebug.cs-569-	private TextCommandResult toggleNetworkBenchmarking(TextCommandCallingArgs args)
+Vintagestory.Server/CmdDebug.cs-570-	{
+Vintagestory.Server/CmdDebug.cs-571-		if (server.doNetBenchmark)
+Vintagestory.Server/CmdDebug.cs-572-		{
+Vintagestory.Server/CmdDebug.cs-573-			server.doNetBenchmark = false;
+Vintagestory.Server/CmdDebug.cs-574-			StringBuilder stringBuilder = new StringBuilder();
+Vintagestory.Server/CmdDebug.cs-575-			foreach (KeyValuePair<int, int> packetBenchmarkByte in server.packetBenchmarkBytes)
+Vintagestory.Server/CmdDebug.cs-576-			{
+Vintagestory.Server/CmdDebug.cs:577:				SystemNetworkProcess.ServerPacketNames.TryGetValue(packetBenchmarkByte.Key, out var value);
+Vintagestory.Server/CmdDebug.cs-578-				int num = server.packetBenchmark[packetBenchmarkByte.Key];
+Vintagestory.Server/CmdDebug.cs-579-				stringBuilder.AppendLine(num + "x " + value + ": " + ((packetBenchmarkByte.Value > 9999) ? (((float)packetBenchmarkByte.Value / 1024f).ToString("#.#") + "kb") : (packetBenchmarkByte.Value + "b")));
+Vintagestory.Server/CmdDebug.cs-580-			}
+Vintagestory.Server/CmdDebug.cs-581-			stringBuilder.AppendLine("-----");
+Vintagestory.Server/CmdDebug.cs-582-			foreach (KeyValuePair<string, int> packetBenchmarkBlockEntitiesByte in server.packetBenchmarkBlockEntitiesBytes)
+Vintagestory.Server/CmdDebug.cs-583-			{
+Vintagestory.Server/CmdDebug.cs-584-				string key = packetBenchmarkBlockEntitiesByte.Key;
+Vintagestory.Server/CmdDebug.cs-585-				stringBuilder.AppendLine("BE " + key + ": " + ((packetBenchmarkBlockEntitiesByte.Value > 9999) ? (((float)packetBenchmarkBlockEntitiesByte.Value / 1024f).ToString("#.#") + "kb") : (packetBenchmarkBlockEntitiesByte.Value + "b")));
+Vintagestory.Server/CmdDebug.cs-586-			}
+Vintagestory.Server/CmdDebug.cs-587-			stringBuilder.AppendLine("-----");
+Vintagestory.Server/CmdDebug.cs-588-			foreach (KeyValuePair<int, int> udpPacketBenchmarkByte in server.udpPacketBenchmarkBytes)
+Vintagestory.Server/CmdDebug.cs-589-			{
+Vintagestory.Server/CmdDebug.cs-590-				string text = udpPacketBenchmarkByte.Key.ToString();
+Vintagestory.Server/CmdDebug.cs-591-				int num2 = server.udpPacketBenchmark[udpPacketBenchmarkByte.Key];
+Vintagestory.Server/CmdDebug.cs-592-				stringBuilder.AppendLine(num2 + "x " + text + ": " + ((udpPacketBenchmarkByte.Value > 9999) ? (((float)udpPacketBenchmarkByte.Value / 1024f).ToString("#.#") + "kb") : (udpPacketBenchmarkByte.Value + "b")));
+Vintagestory.Server/CmdDebug.cs-593-			}
+Vintagestory.Server/CmdDebug.cs-594-			return TextCommandResult.Success(stringBuilder.ToString());
+Vintagestory.Server/CmdDebug.cs-595-		}
+Vintagestory.Server/CmdDebug.cs-596-		server.doNetBenchmark = true;
+Vintagestory.Server/CmdDebug.cs-597-		server.packetBenchmark.Clear();
+Vintagestory.Server/CmdDebug.cs-598-		server.packetBenchmarkBytes.Clear();
+Vintagestory.Server/CmdDebug.cs-599-		server.packetBenchmarkBlockEntitiesBytes.Clear();
+Vintagestory.Server/CmdDebug.cs-600-		server.udpPacketBenchmark.Clear();
+Vintagestory.Server/CmdDebug.cs-601-		server.udpPacketBenchmarkBytes.Clear();
+Vintagestory.Server/CmdDebug.cs-602-		return TextCommandResult.Success("Benchmarking started. Stop it after a while to get results.");

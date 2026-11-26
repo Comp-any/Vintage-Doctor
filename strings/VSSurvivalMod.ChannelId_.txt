@@ -1,0 +1,36 @@
+Vintagestory.GameContent/HeldItemMouseInputHandler.cs-1-using Vintagestory.API.Client;
+Vintagestory.GameContent/HeldItemMouseInputHandler.cs-2-using Vintagestory.API.Common;
+Vintagestory.GameContent/HeldItemMouseInputHandler.cs-3-using Vintagestory.API.Server;
+Vintagestory.GameContent/HeldItemMouseInputHandler.cs-4-
+Vintagestory.GameContent/HeldItemMouseInputHandler.cs-5-namespace Vintagestory.GameContent;
+Vintagestory.GameContent/HeldItemMouseInputHandler.cs-6-
+Vintagestory.GameContent/HeldItemMouseInputHandler.cs-7-public sealed class HeldItemMouseInputHandler : ModSystem
+Vintagestory.GameContent/HeldItemMouseInputHandler.cs-8-{
+Vintagestory.GameContent/HeldItemMouseInputHandler.cs-9-	private ICoreClientAPI? clientApi;
+Vintagestory.GameContent/HeldItemMouseInputHandler.cs-10-
+Vintagestory.GameContent/HeldItemMouseInputHandler.cs:11:	private const string networkChannelId = "HeldItemMouseInputHandler";
+Vintagestory.GameContent/HeldItemMouseInputHandler.cs-12-
+Vintagestory.GameContent/HeldItemMouseInputHandler.cs-13-	private IClientNetworkChannel? clientChannel;
+Vintagestory.GameContent/HeldItemMouseInputHandler.cs-14-
+Vintagestory.GameContent/HeldItemMouseInputHandler.cs-15-	public override void StartClientSide(ICoreClientAPI api)
+Vintagestory.GameContent/HeldItemMouseInputHandler.cs-16-	{
+Vintagestory.GameContent/HeldItemMouseInputHandler.cs-17-		clientApi = api;
+Vintagestory.GameContent/HeldItemMouseInputHandler.cs-18-		clientChannel = api.Network.RegisterChannel("HeldItemMouseInputHandler").RegisterMessageType<HeldItemMouseWheelEventPacket>();
+Vintagestory.GameContent/HeldItemMouseInputHandler.cs-19-		clientApi.Event.MouseWheelMove += OnMouseWheel;
+Vintagestory.GameContent/HeldItemMouseInputHandler.cs-20-	}
+Vintagestory.GameContent/HeldItemMouseInputHandler.cs-21-
+Vintagestory.GameContent/HeldItemMouseInputHandler.cs-22-	public override void StartServerSide(ICoreServerAPI api)
+Vintagestory.GameContent/HeldItemMouseInputHandler.cs-23-	{
+Vintagestory.GameContent/HeldItemMouseInputHandler.cs-24-		api.Network.RegisterChannel("HeldItemMouseInputHandler").RegisterMessageType<HeldItemMouseWheelEventPacket>().SetMessageHandler<HeldItemMouseWheelEventPacket>(PacketHandler);
+Vintagestory.GameContent/HeldItemMouseInputHandler.cs-25-	}
+Vintagestory.GameContent/HeldItemMouseInputHandler.cs-26-
+Vintagestory.GameContent/HeldItemMouseInputHandler.cs-27-	public void OnMouseWheel(MouseWheelEventArgs args)
+Vintagestory.GameContent/HeldItemMouseInputHandler.cs-28-	{
+Vintagestory.GameContent/HeldItemMouseInputHandler.cs-29-		EntityPlayer entityPlayer = clientApi?.World.Player.Entity;
+Vintagestory.GameContent/HeldItemMouseInputHandler.cs-30-		if (entityPlayer == null)
+Vintagestory.GameContent/HeldItemMouseInputHandler.cs-31-		{
+Vintagestory.GameContent/HeldItemMouseInputHandler.cs-32-			return;
+Vintagestory.GameContent/HeldItemMouseInputHandler.cs-33-		}
+Vintagestory.GameContent/HeldItemMouseInputHandler.cs-34-		ItemSlot activeHandItemSlot = entityPlayer.ActiveHandItemSlot;
+Vintagestory.GameContent/HeldItemMouseInputHandler.cs-35-		if (activeHandItemSlot == null)
+Vintagestory.GameContent/HeldItemMouseInputHandler.cs-36-		{

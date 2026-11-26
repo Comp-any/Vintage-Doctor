@@ -1,0 +1,739 @@
+Packet_NetworkChannels.cs-1-public class Packet_NetworkChannels
+Packet_NetworkChannels.cs-2-{
+Packet_NetworkChannels.cs:3:	public int[] ChannelIds;
+Packet_NetworkChannels.cs-4-
+Packet_NetworkChannels.cs:5:	public int ChannelIdsCount;
+Packet_NetworkChannels.cs-6-
+Packet_NetworkChannels.cs:7:	public int ChannelIdsLength;
+Packet_NetworkChannels.cs-8-
+Packet_NetworkChannels.cs-9-	public string[] ChannelNames;
+Packet_NetworkChannels.cs-10-
+Packet_NetworkChannels.cs-11-	public int ChannelNamesCount;
+Packet_NetworkChannels.cs-12-
+Packet_NetworkChannels.cs-13-	public int ChannelNamesLength;
+Packet_NetworkChannels.cs-14-
+Packet_NetworkChannels.cs-15-	public int[] ChannelUdpIds;
+Packet_NetworkChannels.cs-16-
+Packet_NetworkChannels.cs-17-	public int ChannelUdpIdsCount;
+Packet_NetworkChannels.cs-18-
+Packet_NetworkChannels.cs-19-	public int ChannelUdpIdsLength;
+Packet_NetworkChannels.cs-20-
+Packet_NetworkChannels.cs-21-	public string[] ChannelUdpNames;
+Packet_NetworkChannels.cs-22-
+Packet_NetworkChannels.cs-23-	public int ChannelUdpNamesCount;
+Packet_NetworkChannels.cs-24-
+Packet_NetworkChannels.cs-25-	public int ChannelUdpNamesLength;
+Packet_NetworkChannels.cs-26-
+Packet_NetworkChannels.cs:27:	public const int ChannelIdsFieldID = 1;
+Packet_NetworkChannels.cs-28-
+Packet_NetworkChannels.cs-29-	public const int ChannelNamesFieldID = 2;
+Packet_NetworkChannels.cs-30-
+Packet_NetworkChannels.cs-31-	public const int ChannelUdpIdsFieldID = 3;
+Packet_NetworkChannels.cs-32-
+Packet_NetworkChannels.cs-33-	public const int ChannelUdpNamesFieldID = 4;
+Packet_NetworkChannels.cs-34-
+Packet_NetworkChannels.cs-35-	public int size;
+Packet_NetworkChannels.cs-36-
+Packet_NetworkChannels.cs:37:	public int[] GetChannelIds()
+Packet_NetworkChannels.cs-38-	{
+Packet_NetworkChannels.cs:39:		return ChannelIds;
+Packet_NetworkChannels.cs-40-	}
+Packet_NetworkChannels.cs-41-
+Packet_NetworkChannels.cs:42:	public void SetChannelIds(int[] value, int count, int length)
+Packet_NetworkChannels.cs-43-	{
+Packet_NetworkChannels.cs:44:		ChannelIds = value;
+Packet_NetworkChannels.cs:45:		ChannelIdsCount = count;
+Packet_NetworkChannels.cs:46:		ChannelIdsLength = length;
+Packet_NetworkChannels.cs-47-	}
+Packet_NetworkChannels.cs-48-
+Packet_NetworkChannels.cs:49:	public void SetChannelIds(int[] value)
+Packet_NetworkChannels.cs-50-	{
+Packet_NetworkChannels.cs:51:		ChannelIds = value;
+Packet_NetworkChannels.cs:52:		ChannelIdsCount = value.Length;
+Packet_NetworkChannels.cs:53:		ChannelIdsLength = value.Length;
+Packet_NetworkChannels.cs-54-	}
+Packet_NetworkChannels.cs-55-
+Packet_NetworkChannels.cs:56:	public int GetChannelIdsCount()
+Packet_NetworkChannels.cs-57-	{
+Packet_NetworkChannels.cs:58:		return ChannelIdsCount;
+Packet_NetworkChannels.cs-59-	}
+Packet_NetworkChannels.cs-60-
+Packet_NetworkChannels.cs:61:	public void ChannelIdsAdd(int value)
+Packet_NetworkChannels.cs-62-	{
+Packet_NetworkChannels.cs:63:		if (ChannelIdsCount >= ChannelIdsLength)
+Packet_NetworkChannels.cs-64-		{
+Packet_NetworkChannels.cs:65:			if ((ChannelIdsLength *= 2) == 0)
+Packet_NetworkChannels.cs-66-			{
+Packet_NetworkChannels.cs:67:				ChannelIdsLength = 1;
+Packet_NetworkChannels.cs-68-			}
+Packet_NetworkChannels.cs:69:			int[] array = new int[ChannelIdsLength];
+Packet_NetworkChannels.cs:70:			for (int i = 0; i < ChannelIdsCount; i++)
+Packet_NetworkChannels.cs-71-			{
+Packet_NetworkChannels.cs:72:				array[i] = ChannelIds[i];
+Packet_NetworkChannels.cs-73-			}
+Packet_NetworkChannels.cs:74:			ChannelIds = array;
+Packet_NetworkChannels.cs-75-		}
+Packet_NetworkChannels.cs:76:		ChannelIds[ChannelIdsCount++] = value;
+Packet_NetworkChannels.cs-77-	}
+Packet_NetworkChannels.cs-78-
+Packet_NetworkChannels.cs-79-	public string[] GetChannelNames()
+Packet_NetworkChannels.cs-80-	{
+Packet_NetworkChannels.cs-81-		return ChannelNames;
+Packet_NetworkChannels.cs-82-	}
+Packet_NetworkChannels.cs-83-
+Packet_NetworkChannels.cs-84-	public void SetChannelNames(string[] value, int count, int length)
+Packet_NetworkChannels.cs-85-	{
+Packet_NetworkChannels.cs-86-		ChannelNames = value;
+Packet_NetworkChannels.cs-87-		ChannelNamesCount = count;
+Packet_NetworkChannels.cs-88-		ChannelNamesLength = length;
+Packet_NetworkChannels.cs-89-	}
+Packet_NetworkChannels.cs-90-
+Packet_NetworkChannels.cs-91-	public void SetChannelNames(string[] value)
+Packet_NetworkChannels.cs-92-	{
+Packet_NetworkChannels.cs-93-		ChannelNames = value;
+Packet_NetworkChannels.cs-94-		ChannelNamesCount = value.Length;
+Packet_NetworkChannels.cs-95-		ChannelNamesLength = value.Length;
+Packet_NetworkChannels.cs-96-	}
+Packet_NetworkChannels.cs-97-
+Packet_NetworkChannels.cs-98-	public int GetChannelNamesCount()
+Packet_NetworkChannels.cs-99-	{
+Packet_NetworkChannels.cs-100-		return ChannelNamesCount;
+Packet_NetworkChannels.cs-101-	}
+--
+Vintagestory.Client.NoObf/NetworkChannel.cs-75-		if (!messageTypes.TryGetValue(typeof(T), out var value))
+Vintagestory.Client.NoObf/NetworkChannel.cs-76-		{
+Vintagestory.Client.NoObf/NetworkChannel.cs-77-			throw new Exception("No such message type " + typeof(T)?.ToString() + " registered. Did you forgot to call RegisterMessageType?");
+Vintagestory.Client.NoObf/NetworkChannel.cs-78-		}
+Vintagestory.Client.NoObf/NetworkChannel.cs-79-		byte[] data;
+Vintagestory.Client.NoObf/NetworkChannel.cs-80-		using (MemoryStream memoryStream = new MemoryStream())
+Vintagestory.Client.NoObf/NetworkChannel.cs-81-		{
+Vintagestory.Client.NoObf/NetworkChannel.cs-82-			Serializer.Serialize((Stream)memoryStream, message);
+Vintagestory.Client.NoObf/NetworkChannel.cs-83-			data = memoryStream.ToArray();
+Vintagestory.Client.NoObf/NetworkChannel.cs-84-		}
+Vintagestory.Client.NoObf/NetworkChannel.cs-85-		Packet_CustomPacket packet_CustomPacket = new Packet_CustomPacket
+Vintagestory.Client.NoObf/NetworkChannel.cs-86-		{
+Vintagestory.Client.NoObf/NetworkChannel.cs:87:			ChannelId = channelId,
+Vintagestory.Client.NoObf/NetworkChannel.cs-88-			MessageId = value
+Vintagestory.Client.NoObf/NetworkChannel.cs-89-		};
+Vintagestory.Client.NoObf/NetworkChannel.cs-90-		packet_CustomPacket.SetData(data);
+Vintagestory.Client.NoObf/NetworkChannel.cs-91-		api.game.SendPacketClient(new Packet_Client
+Vintagestory.Client.NoObf/NetworkChannel.cs-92-		{
+Vintagestory.Client.NoObf/NetworkChannel.cs-93-			Id = 23,
+Vintagestory.Client.NoObf/NetworkChannel.cs-94-			CustomPacket = packet_CustomPacket
+Vintagestory.Client.NoObf/NetworkChannel.cs-95-		});
+Vintagestory.Client.NoObf/NetworkChannel.cs-96-	}
+Vintagestory.Client.NoObf/NetworkChannel.cs-97-}
+--
+Vintagestory.Client.NoObf/NetworkAPI.cs-15-namespace Vintagestory.Client.NoObf;
+Vintagestory.Client.NoObf/NetworkAPI.cs-16-
+Vintagestory.Client.NoObf/NetworkAPI.cs-17-public class NetworkAPI : ClientSystem, IClientNetworkAPI, INetworkAPI
+Vintagestory.Client.NoObf/NetworkAPI.cs-18-{
+Vintagestory.Client.NoObf/NetworkAPI.cs-19-	private Dictionary<int, NetworkChannel> clientchannels = new Dictionary<int, NetworkChannel>();
+Vintagestory.Client.NoObf/NetworkAPI.cs-20-
+Vintagestory.Client.NoObf/NetworkAPI.cs-21-	private Dictionary<int, UdpNetworkChannel> clientchannelsUdp = new Dictionary<int, UdpNetworkChannel>();
+Vintagestory.Client.NoObf/NetworkAPI.cs-22-
+Vintagestory.Client.NoObf/NetworkAPI.cs-23-	private Dictionary<int, NetworkChannel> channels = new Dictionary<int, NetworkChannel>();
+Vintagestory.Client.NoObf/NetworkAPI.cs-24-
+Vintagestory.Client.NoObf/NetworkAPI.cs-25-	private Dictionary<int, UdpNetworkChannel> channelsUdp = new Dictionary<int, UdpNetworkChannel>();
+Vintagestory.Client.NoObf/NetworkAPI.cs-26-
+Vintagestory.Client.NoObf/NetworkAPI.cs:27:	private int nextFreeChannelId;
+Vintagestory.Client.NoObf/NetworkAPI.cs-28-
+Vintagestory.Client.NoObf/NetworkAPI.cs:29:	private int nextFreeUdpChannelId;
+Vintagestory.Client.NoObf/NetworkAPI.cs-30-
+Vintagestory.Client.NoObf/NetworkAPI.cs-31-	private bool serverChannelsReceived;
+Vintagestory.Client.NoObf/NetworkAPI.cs-32-
+Vintagestory.Client.NoObf/NetworkAPI.cs-33-	private Queue<Packet_Server> earlyPackets = new Queue<Packet_Server>();
+Vintagestory.Client.NoObf/NetworkAPI.cs-34-
+Vintagestory.Client.NoObf/NetworkAPI.cs-35-	private Queue<Packet_CustomPacket> earlyUdpPackets = new Queue<Packet_CustomPacket>();
+Vintagestory.Client.NoObf/NetworkAPI.cs-36-
+Vintagestory.Client.NoObf/NetworkAPI.cs-37-	private FastMemoryStream mountStream;
+Vintagestory.Client.NoObf/NetworkAPI.cs-38-
+Vintagestory.Client.NoObf/NetworkAPI.cs-39-	public override string Name => "networkapi";
+Vintagestory.Client.NoObf/NetworkAPI.cs-40-
+Vintagestory.Client.NoObf/NetworkAPI.cs-41-	public NetworkAPI(ClientMain game)
+Vintagestory.Client.NoObf/NetworkAPI.cs-42-		: base(game)
+Vintagestory.Client.NoObf/NetworkAPI.cs-43-	{
+Vintagestory.Client.NoObf/NetworkAPI.cs-44-		game.PacketHandlers[55] = HandleCustomPacket;
+Vintagestory.Client.NoObf/NetworkAPI.cs-45-		game.PacketHandlers[56] = HandleChannelsPacket;
+Vintagestory.Client.NoObf/NetworkAPI.cs-46-		game.HandleCustomUdpPackets = HandleCustomUdpPacket;
+Vintagestory.Client.NoObf/NetworkAPI.cs-47-	}
+Vintagestory.Client.NoObf/NetworkAPI.cs-48-
+Vintagestory.Client.NoObf/NetworkAPI.cs-49-	public void SendPlayerNowReady()
+Vintagestory.Client.NoObf/NetworkAPI.cs-50-	{
+Vintagestory.Client.NoObf/NetworkAPI.cs-51-		if (!game.clientPlayingFired)
+Vintagestory.Client.NoObf/NetworkAPI.cs-52-		{
+Vintagestory.Client.NoObf/NetworkAPI.cs-53-			game.SendPacketClient(new Packet_Client
+Vintagestory.Client.NoObf/NetworkAPI.cs-54-			{
+--
+Vintagestory.Client.NoObf/NetworkAPI.cs-80-		Dictionary<int, NetworkChannel> dictionary = new Dictionary<int, NetworkChannel>();
+Vintagestory.Client.NoObf/NetworkAPI.cs-81-		Dictionary<int, UdpNetworkChannel> dictionary2 = new Dictionary<int, UdpNetworkChannel>();
+Vintagestory.Client.NoObf/NetworkAPI.cs-82-		Packet_NetworkChannels serverPacket = packet.NetworkChannels;
+Vintagestory.Client.NoObf/NetworkAPI.cs-83-		List<NetworkChannel> list = new List<NetworkChannel>(clientchannels.Values);
+Vintagestory.Client.NoObf/NetworkAPI.cs-84-		List<UdpNetworkChannel> list2 = new List<UdpNetworkChannel>(clientchannelsUdp.Values);
+Vintagestory.Client.NoObf/NetworkAPI.cs-85-		int i;
+Vintagestory.Client.NoObf/NetworkAPI.cs-86-		for (i = 0; i < serverPacket.ChannelNamesCount; i++)
+Vintagestory.Client.NoObf/NetworkAPI.cs-87-		{
+Vintagestory.Client.NoObf/NetworkAPI.cs-88-			NetworkChannel networkChannel = list.FirstOrDefault((NetworkChannel ch) => ch.ChannelName == serverPacket.ChannelNames[i]);
+Vintagestory.Client.NoObf/NetworkAPI.cs-89-			if (networkChannel != null)
+Vintagestory.Client.NoObf/NetworkAPI.cs-90-			{
+Vintagestory.Client.NoObf/NetworkAPI.cs-91-				list.Remove(networkChannel);
+Vintagestory.Client.NoObf/NetworkAPI.cs:92:				networkChannel.channelId = serverPacket.ChannelIds[i];
+Vintagestory.Client.NoObf/NetworkAPI.cs-93-				networkChannel.Connected = true;
+Vintagestory.Client.NoObf/NetworkAPI.cs:94:				dictionary[serverPacket.ChannelIds[i]] = networkChannel;
+Vintagestory.Client.NoObf/NetworkAPI.cs-95-			}
+Vintagestory.Client.NoObf/NetworkAPI.cs-96-			else
+Vintagestory.Client.NoObf/NetworkAPI.cs-97-			{
+Vintagestory.Client.NoObf/NetworkAPI.cs-98-				game.Logger.Warning("Improperly configured mod. Server sends me channel name {0}, but no client side mod registered it.", serverPacket.ChannelNames[i]);
+Vintagestory.Client.NoObf/NetworkAPI.cs-99-			}
+Vintagestory.Client.NoObf/NetworkAPI.cs-100-		}
+Vintagestory.Client.NoObf/NetworkAPI.cs-101-		if (list.Count > 0)
+Vintagestory.Client.NoObf/NetworkAPI.cs-102-		{
+Vintagestory.Client.NoObf/NetworkAPI.cs-103-			game.Logger.Warning("Client registered {0} network channels ({1}) the server does not know about, may cause issues.", list.Count, string.Join(", ", list.Select((NetworkChannel ch) => ch.channelName)));
+Vintagestory.Client.NoObf/NetworkAPI.cs-104-			foreach (NetworkChannel item in list)
+Vintagestory.Client.NoObf/NetworkAPI.cs-105-			{
+Vintagestory.Client.NoObf/NetworkAPI.cs-106-				item.Connected = false;
+Vintagestory.Client.NoObf/NetworkAPI.cs-107-				item.channelId = 0;
+Vintagestory.Client.NoObf/NetworkAPI.cs-108-			}
+Vintagestory.Client.NoObf/NetworkAPI.cs-109-		}
+Vintagestory.Client.NoObf/NetworkAPI.cs-110-		int i2;
+Vintagestory.Client.NoObf/NetworkAPI.cs-111-		for (i2 = 0; i2 < serverPacket.ChannelUdpNamesCount; i2++)
+Vintagestory.Client.NoObf/NetworkAPI.cs-112-		{
+Vintagestory.Client.NoObf/NetworkAPI.cs-113-			UdpNetworkChannel udpNetworkChannel = list2.FirstOrDefault((UdpNetworkChannel ch) => ch.ChannelName == serverPacket.ChannelUdpNames[i2]);
+Vintagestory.Client.NoObf/NetworkAPI.cs-114-			if (udpNetworkChannel != null)
+Vintagestory.Client.NoObf/NetworkAPI.cs-115-			{
+Vintagestory.Client.NoObf/NetworkAPI.cs-116-				list2.Remove(udpNetworkChannel);
+Vintagestory.Client.NoObf/NetworkAPI.cs-117-				udpNetworkChannel.channelId = serverPacket.ChannelUdpIds[i2];
+Vintagestory.Client.NoObf/NetworkAPI.cs-118-				udpNetworkChannel.Connected = true;
+Vintagestory.Client.NoObf/NetworkAPI.cs-119-				dictionary2[serverPacket.ChannelUdpIds[i2]] = udpNetworkChannel;
+--
+Vintagestory.Client.NoObf/NetworkAPI.cs-144-			HandleCustomUdpPacket(earlyUdpPackets.Dequeue());
+Vintagestory.Client.NoObf/NetworkAPI.cs-145-		}
+Vintagestory.Client.NoObf/NetworkAPI.cs-146-	}
+Vintagestory.Client.NoObf/NetworkAPI.cs-147-
+Vintagestory.Client.NoObf/NetworkAPI.cs-148-	private void HandleCustomPacket(Packet_Server packet)
+Vintagestory.Client.NoObf/NetworkAPI.cs-149-	{
+Vintagestory.Client.NoObf/NetworkAPI.cs-150-		if (!serverChannelsReceived)
+Vintagestory.Client.NoObf/NetworkAPI.cs-151-		{
+Vintagestory.Client.NoObf/NetworkAPI.cs-152-			earlyPackets.Enqueue(packet);
+Vintagestory.Client.NoObf/NetworkAPI.cs-153-			return;
+Vintagestory.Client.NoObf/NetworkAPI.cs-154-		}
+Vintagestory.Client.NoObf/NetworkAPI.cs-155-		Packet_CustomPacket customPacket = packet.CustomPacket;
+Vintagestory.Client.NoObf/NetworkAPI.cs:156:		if (channels.TryGetValue(customPacket.ChannelId, out var value))
+Vintagestory.Client.NoObf/NetworkAPI.cs-157-		{
+Vintagestory.Client.NoObf/NetworkAPI.cs-158-			value.OnPacket(customPacket);
+Vintagestory.Client.NoObf/NetworkAPI.cs-159-		}
+Vintagestory.Client.NoObf/NetworkAPI.cs-160-	}
+Vintagestory.Client.NoObf/NetworkAPI.cs-161-
+Vintagestory.Client.NoObf/NetworkAPI.cs-162-	private void HandleCustomUdpPacket(Packet_CustomPacket packet)
+Vintagestory.Client.NoObf/NetworkAPI.cs-163-	{
+Vintagestory.Client.NoObf/NetworkAPI.cs-164-		UdpNetworkChannel value;
+Vintagestory.Client.NoObf/NetworkAPI.cs-165-		if (!serverChannelsReceived)
+Vintagestory.Client.NoObf/NetworkAPI.cs-166-		{
+Vintagestory.Client.NoObf/NetworkAPI.cs-167-			earlyUdpPackets.Enqueue(packet);
+Vintagestory.Client.NoObf/NetworkAPI.cs-168-		}
+Vintagestory.Client.NoObf/NetworkAPI.cs:169:		else if (channelsUdp.TryGetValue(packet.ChannelId, out value))
+Vintagestory.Client.NoObf/NetworkAPI.cs-170-		{
+Vintagestory.Client.NoObf/NetworkAPI.cs-171-			value.OnPacket(packet);
+Vintagestory.Client.NoObf/NetworkAPI.cs-172-		}
+Vintagestory.Client.NoObf/NetworkAPI.cs-173-	}
+Vintagestory.Client.NoObf/NetworkAPI.cs-174-
+Vintagestory.Client.NoObf/NetworkAPI.cs-175-	public IClientNetworkChannel RegisterChannel(string channelName)
+Vintagestory.Client.NoObf/NetworkAPI.cs-176-	{
+Vintagestory.Client.NoObf/NetworkAPI.cs-177-		if (serverChannelsReceived)
+Vintagestory.Client.NoObf/NetworkAPI.cs-178-		{
+Vintagestory.Client.NoObf/NetworkAPI.cs-179-			throw new Exception("Cannot register network channels at this point. Server already sent his channel list. Make sure to register your network channel early enough, i.e. in StartClientSide().");
+Vintagestory.Client.NoObf/NetworkAPI.cs-180-		}
+Vintagestory.Client.NoObf/NetworkAPI.cs:181:		nextFreeChannelId++;
+Vintagestory.Client.NoObf/NetworkAPI.cs:182:		clientchannels[nextFreeChannelId] = new NetworkChannel(this, nextFreeChannelId, channelName);
+Vintagestory.Client.NoObf/NetworkAPI.cs:183:		return clientchannels[nextFreeChannelId];
+Vintagestory.Client.NoObf/NetworkAPI.cs-184-	}
+Vintagestory.Client.NoObf/NetworkAPI.cs-185-
+Vintagestory.Client.NoObf/NetworkAPI.cs-186-	public IClientNetworkChannel RegisterUdpChannel(string channelName)
+Vintagestory.Client.NoObf/NetworkAPI.cs-187-	{
+Vintagestory.Client.NoObf/NetworkAPI.cs-188-		if (serverChannelsReceived)
+Vintagestory.Client.NoObf/NetworkAPI.cs-189-		{
+Vintagestory.Client.NoObf/NetworkAPI.cs-190-			throw new Exception("Cannot register network udp channels at this point. Server already sent his udp channel list. Make sure to register your network channel early enough, i.e. in StartClientSide().");
+Vintagestory.Client.NoObf/NetworkAPI.cs-191-		}
+Vintagestory.Client.NoObf/NetworkAPI.cs:192:		nextFreeUdpChannelId++;
+Vintagestory.Client.NoObf/NetworkAPI.cs:193:		clientchannelsUdp[nextFreeUdpChannelId] = new UdpNetworkChannel(this, nextFreeUdpChannelId, channelName);
+Vintagestory.Client.NoObf/NetworkAPI.cs:194:		return clientchannelsUdp[nextFreeUdpChannelId];
+Vintagestory.Client.NoObf/NetworkAPI.cs-195-	}
+Vintagestory.Client.NoObf/NetworkAPI.cs-196-
+Vintagestory.Client.NoObf/NetworkAPI.cs-197-	public void SendArbitraryPacket(byte[] data)
+Vintagestory.Client.NoObf/NetworkAPI.cs-198-	{
+Vintagestory.Client.NoObf/NetworkAPI.cs-199-		game.SendArbitraryPacket(data);
+Vintagestory.Client.NoObf/NetworkAPI.cs-200-	}
+Vintagestory.Client.NoObf/NetworkAPI.cs-201-
+Vintagestory.Client.NoObf/NetworkAPI.cs-202-	public void SendBlockEntityPacket(int x, int y, int z, int packetId, byte[] data = null)
+Vintagestory.Client.NoObf/NetworkAPI.cs-203-	{
+Vintagestory.Client.NoObf/NetworkAPI.cs-204-		game.SendBlockEntityPacket(x, y, z, packetId, data);
+Vintagestory.Client.NoObf/NetworkAPI.cs-205-	}
+Vintagestory.Client.NoObf/NetworkAPI.cs-206-
+Vintagestory.Client.NoObf/NetworkAPI.cs-207-	public void SendBlockEntityPacket(BlockPos pos, int packetId, byte[] data = null)
+Vintagestory.Client.NoObf/NetworkAPI.cs-208-	{
+Vintagestory.Client.NoObf/NetworkAPI.cs-209-		game.SendBlockEntityPacket(pos.X, pos.InternalY, pos.Z, packetId, data);
+Vintagestory.Client.NoObf/NetworkAPI.cs-210-	}
+Vintagestory.Client.NoObf/NetworkAPI.cs-211-
+Vintagestory.Client.NoObf/NetworkAPI.cs-212-	public void SendBlockEntityPacket(int x, int y, int z, object packetClient)
+Vintagestory.Client.NoObf/NetworkAPI.cs-213-	{
+Vintagestory.Client.NoObf/NetworkAPI.cs-214-		Packet_Client packet_Client = packetClient as Packet_Client;
+Vintagestory.Client.NoObf/NetworkAPI.cs-215-		byte[] data = game.Serialize(packet_Client);
+Vintagestory.Client.NoObf/NetworkAPI.cs-216-		game.SendBlockEntityPacket(x, y, z, packet_Client.Id, data);
+Vintagestory.Client.NoObf/NetworkAPI.cs-217-	}
+Vintagestory.Client.NoObf/NetworkAPI.cs-218-
+Vintagestory.Client.NoObf/NetworkAPI.cs-219-	public void SendBlockEntityPacketWithOffset(int x, int y, int z, int packetIdOffset, object packetClient)
+--
+Vintagestory.Client.NoObf/UdpNetworkChannel.cs-43-		{
+Vintagestory.Client.NoObf/UdpNetworkChannel.cs-44-			throw new Exception("Attempting to send data to a not connected udp channel. For optionally dependent network channels test if your channel is Connected before sending data.");
+Vintagestory.Client.NoObf/UdpNetworkChannel.cs-45-		}
+Vintagestory.Client.NoObf/UdpNetworkChannel.cs-46-		if (!messageTypes.TryGetValue(typeof(T), out var value))
+Vintagestory.Client.NoObf/UdpNetworkChannel.cs-47-		{
+Vintagestory.Client.NoObf/UdpNetworkChannel.cs-48-			throw new Exception("No such message type " + typeof(T)?.ToString() + " registered. Did you forgot to call RegisterMessageType?");
+Vintagestory.Client.NoObf/UdpNetworkChannel.cs-49-		}
+Vintagestory.Client.NoObf/UdpNetworkChannel.cs-50-		using FastMemoryStream fastMemoryStream = reusableStream ?? (reusableStream = new FastMemoryStream());
+Vintagestory.Client.NoObf/UdpNetworkChannel.cs-51-		fastMemoryStream.Reset();
+Vintagestory.Client.NoObf/UdpNetworkChannel.cs-52-		Serializer.Serialize((Stream)fastMemoryStream, message);
+Vintagestory.Client.NoObf/UdpNetworkChannel.cs-53-		Packet_CustomPacket channelPacket = new Packet_CustomPacket
+Vintagestory.Client.NoObf/UdpNetworkChannel.cs-54-		{
+Vintagestory.Client.NoObf/UdpNetworkChannel.cs:55:			ChannelId = channelId,
+Vintagestory.Client.NoObf/UdpNetworkChannel.cs-56-			MessageId = value,
+Vintagestory.Client.NoObf/UdpNetworkChannel.cs-57-			Data = fastMemoryStream.ToArray()
+Vintagestory.Client.NoObf/UdpNetworkChannel.cs-58-		};
+Vintagestory.Client.NoObf/UdpNetworkChannel.cs-59-		Packet_UdpPacket udpPacket = new Packet_UdpPacket
+Vintagestory.Client.NoObf/UdpNetworkChannel.cs-60-		{
+Vintagestory.Client.NoObf/UdpNetworkChannel.cs-61-			Id = 6,
+Vintagestory.Client.NoObf/UdpNetworkChannel.cs-62-			ChannelPacket = channelPacket
+Vintagestory.Client.NoObf/UdpNetworkChannel.cs-63-		};
+Vintagestory.Client.NoObf/UdpNetworkChannel.cs-64-		if (api.game.FallBackToTcp)
+Vintagestory.Client.NoObf/UdpNetworkChannel.cs-65-		{
+Vintagestory.Client.NoObf/UdpNetworkChannel.cs-66-			Packet_Client packetClient = new Packet_Client
+Vintagestory.Client.NoObf/UdpNetworkChannel.cs-67-			{
+Vintagestory.Client.NoObf/UdpNetworkChannel.cs-68-				Id = 35,
+Vintagestory.Client.NoObf/UdpNetworkChannel.cs-69-				UdpPacket = udpPacket
+Vintagestory.Client.NoObf/UdpNetworkChannel.cs-70-			};
+Vintagestory.Client.NoObf/UdpNetworkChannel.cs-71-			api.game.SendPacketClient(packetClient);
+Vintagestory.Client.NoObf/UdpNetworkChannel.cs-72-		}
+Vintagestory.Client.NoObf/UdpNetworkChannel.cs-73-		else
+Vintagestory.Client.NoObf/UdpNetworkChannel.cs-74-		{
+Vintagestory.Client.NoObf/UdpNetworkChannel.cs-75-			api.game.UdpNetClient.Send(udpPacket);
+Vintagestory.Client.NoObf/UdpNetworkChannel.cs-76-		}
+Vintagestory.Client.NoObf/UdpNetworkChannel.cs-77-	}
+Vintagestory.Client.NoObf/UdpNetworkChannel.cs-78-
+Vintagestory.Client.NoObf/UdpNetworkChannel.cs-79-	public new void OnPacket(Packet_CustomPacket packet)
+Vintagestory.Client.NoObf/UdpNetworkChannel.cs-80-	{
+--
+Packet_CustomPacket.cs-1-public class Packet_CustomPacket
+Packet_CustomPacket.cs-2-{
+Packet_CustomPacket.cs:3:	public int ChannelId;
+Packet_CustomPacket.cs-4-
+Packet_CustomPacket.cs-5-	public int MessageId;
+Packet_CustomPacket.cs-6-
+Packet_CustomPacket.cs-7-	public byte[] Data;
+Packet_CustomPacket.cs-8-
+Packet_CustomPacket.cs:9:	public const int ChannelIdFieldID = 1;
+Packet_CustomPacket.cs-10-
+Packet_CustomPacket.cs-11-	public const int MessageIdFieldID = 2;
+Packet_CustomPacket.cs-12-
+Packet_CustomPacket.cs-13-	public const int DataFieldID = 3;
+Packet_CustomPacket.cs-14-
+Packet_CustomPacket.cs-15-	public int size;
+Packet_CustomPacket.cs-16-
+Packet_CustomPacket.cs:17:	public void SetChannelId(int value)
+Packet_CustomPacket.cs-18-	{
+Packet_CustomPacket.cs:19:		ChannelId = value;
+Packet_CustomPacket.cs-20-	}
+Packet_CustomPacket.cs-21-
+Packet_CustomPacket.cs-22-	public void SetMessageId(int value)
+Packet_CustomPacket.cs-23-	{
+Packet_CustomPacket.cs-24-		MessageId = value;
+Packet_CustomPacket.cs-25-	}
+Packet_CustomPacket.cs-26-
+Packet_CustomPacket.cs-27-	public void SetData(byte[] value)
+Packet_CustomPacket.cs-28-	{
+Packet_CustomPacket.cs-29-		Data = value;
+Packet_CustomPacket.cs-30-	}
+Packet_CustomPacket.cs-31-
+Packet_CustomPacket.cs-32-	internal void InitializeValues()
+Packet_CustomPacket.cs-33-	{
+Packet_CustomPacket.cs-34-	}
+Packet_CustomPacket.cs-35-}
+--
+Packet_NetworkChannelsSerializer.cs-28-			{
+Packet_NetworkChannelsSerializer.cs-29-				num = ProtocolParser.ReadKeyAsInt(num, stream);
+Packet_NetworkChannelsSerializer.cs-30-				if ((num & 0x4000) != 0)
+Packet_NetworkChannelsSerializer.cs-31-				{
+Packet_NetworkChannelsSerializer.cs-32-					break;
+Packet_NetworkChannelsSerializer.cs-33-				}
+Packet_NetworkChannelsSerializer.cs-34-			}
+Packet_NetworkChannelsSerializer.cs-35-			switch (num)
+Packet_NetworkChannelsSerializer.cs-36-			{
+Packet_NetworkChannelsSerializer.cs-37-			case 0:
+Packet_NetworkChannelsSerializer.cs-38-				return null;
+Packet_NetworkChannelsSerializer.cs-39-			case 8:
+Packet_NetworkChannelsSerializer.cs:40:				instance.ChannelIdsAdd(ProtocolParser.ReadUInt32(stream));
+Packet_NetworkChannelsSerializer.cs-41-				break;
+Packet_NetworkChannelsSerializer.cs-42-			case 18:
+Packet_NetworkChannelsSerializer.cs-43-				instance.ChannelNamesAdd(ProtocolParser.ReadString(stream));
+Packet_NetworkChannelsSerializer.cs-44-				break;
+Packet_NetworkChannelsSerializer.cs-45-			case 24:
+Packet_NetworkChannelsSerializer.cs-46-				instance.ChannelUdpIdsAdd(ProtocolParser.ReadUInt32(stream));
+Packet_NetworkChannelsSerializer.cs-47-				break;
+Packet_NetworkChannelsSerializer.cs-48-			case 34:
+Packet_NetworkChannelsSerializer.cs-49-				instance.ChannelUdpNamesAdd(ProtocolParser.ReadString(stream));
+Packet_NetworkChannelsSerializer.cs-50-				break;
+Packet_NetworkChannelsSerializer.cs-51-			default:
+Packet_NetworkChannelsSerializer.cs-52-				ProtocolParser.SkipKey(stream, Key.Create(num));
+Packet_NetworkChannelsSerializer.cs-53-				break;
+Packet_NetworkChannelsSerializer.cs-54-			}
+Packet_NetworkChannelsSerializer.cs-55-		}
+Packet_NetworkChannelsSerializer.cs-56-		if (num >= 0)
+Packet_NetworkChannelsSerializer.cs-57-		{
+Packet_NetworkChannelsSerializer.cs-58-			return null;
+Packet_NetworkChannelsSerializer.cs-59-		}
+Packet_NetworkChannelsSerializer.cs-60-		return instance;
+Packet_NetworkChannelsSerializer.cs-61-	}
+Packet_NetworkChannelsSerializer.cs-62-
+Packet_NetworkChannelsSerializer.cs-63-	public static Packet_NetworkChannels DeserializeLengthDelimited(CitoMemoryStream stream, Packet_NetworkChannels instance)
+Packet_NetworkChannelsSerializer.cs-64-	{
+Packet_NetworkChannelsSerializer.cs-65-		int num = ProtocolParser.ReadUInt32(stream);
+Packet_NetworkChannelsSerializer.cs-66-		int length = stream.GetLength();
+Packet_NetworkChannelsSerializer.cs-67-		stream.SetLength(stream.Position() + num);
+Packet_NetworkChannelsSerializer.cs-68-		Packet_NetworkChannels result = Deserialize(stream, instance);
+Packet_NetworkChannelsSerializer.cs-69-		stream.SetLength(length);
+Packet_NetworkChannelsSerializer.cs-70-		return result;
+Packet_NetworkChannelsSerializer.cs-71-	}
+Packet_NetworkChannelsSerializer.cs-72-
+Packet_NetworkChannelsSerializer.cs-73-	public static void Serialize(CitoStream stream, Packet_NetworkChannels instance)
+Packet_NetworkChannelsSerializer.cs-74-	{
+Packet_NetworkChannelsSerializer.cs:75:		if (instance.ChannelIds != null)
+Packet_NetworkChannelsSerializer.cs-76-		{
+Packet_NetworkChannelsSerializer.cs:77:			int[] channelIds = instance.ChannelIds;
+Packet_NetworkChannelsSerializer.cs:78:			int channelIdsCount = instance.ChannelIdsCount;
+Packet_NetworkChannelsSerializer.cs-79-			for (int i = 0; i < channelIds.Length && i < channelIdsCount; i++)
+Packet_NetworkChannelsSerializer.cs-80-			{
+Packet_NetworkChannelsSerializer.cs-81-				stream.WriteByte(8);
+Packet_NetworkChannelsSerializer.cs-82-				ProtocolParser.WriteUInt32(stream, channelIds[i]);
+Packet_NetworkChannelsSerializer.cs-83-			}
+Packet_NetworkChannelsSerializer.cs-84-		}
+Packet_NetworkChannelsSerializer.cs-85-		if (instance.ChannelNames != null)
+Packet_NetworkChannelsSerializer.cs-86-		{
+Packet_NetworkChannelsSerializer.cs-87-			string[] channelNames = instance.ChannelNames;
+Packet_NetworkChannelsSerializer.cs-88-			int channelNamesCount = instance.ChannelNamesCount;
+Packet_NetworkChannelsSerializer.cs-89-			for (int j = 0; j < channelNames.Length && j < channelNamesCount; j++)
+Packet_NetworkChannelsSerializer.cs-90-			{
+Packet_NetworkChannelsSerializer.cs-91-				stream.WriteByte(18);
+Packet_NetworkChannelsSerializer.cs-92-				ProtocolParser.WriteString(stream, channelNames[j]);
+Packet_NetworkChannelsSerializer.cs-93-			}
+Packet_NetworkChannelsSerializer.cs-94-		}
+Packet_NetworkChannelsSerializer.cs-95-		if (instance.ChannelUdpIds != null)
+Packet_NetworkChannelsSerializer.cs-96-		{
+Packet_NetworkChannelsSerializer.cs-97-			int[] channelUdpIds = instance.ChannelUdpIds;
+Packet_NetworkChannelsSerializer.cs-98-			int channelUdpIdsCount = instance.ChannelUdpIdsCount;
+Packet_NetworkChannelsSerializer.cs-99-			for (int k = 0; k < channelUdpIds.Length && k < channelUdpIdsCount; k++)
+Packet_NetworkChannelsSerializer.cs-100-			{
+Packet_NetworkChannelsSerializer.cs-101-				stream.WriteByte(24);
+Packet_NetworkChannelsSerializer.cs-102-				ProtocolParser.WriteUInt32(stream, channelUdpIds[k]);
+Packet_NetworkChannelsSerializer.cs-103-			}
+--
+Packet_NetworkChannelsSerializer.cs-108-			int channelUdpNamesCount = instance.ChannelUdpNamesCount;
+Packet_NetworkChannelsSerializer.cs-109-			for (int l = 0; l < channelUdpNames.Length && l < channelUdpNamesCount; l++)
+Packet_NetworkChannelsSerializer.cs-110-			{
+Packet_NetworkChannelsSerializer.cs-111-				stream.WriteByte(34);
+Packet_NetworkChannelsSerializer.cs-112-				ProtocolParser.WriteString(stream, channelUdpNames[l]);
+Packet_NetworkChannelsSerializer.cs-113-			}
+Packet_NetworkChannelsSerializer.cs-114-		}
+Packet_NetworkChannelsSerializer.cs-115-	}
+Packet_NetworkChannelsSerializer.cs-116-
+Packet_NetworkChannelsSerializer.cs-117-	public static int GetSize(Packet_NetworkChannels instance)
+Packet_NetworkChannelsSerializer.cs-118-	{
+Packet_NetworkChannelsSerializer.cs-119-		int num = 0;
+Packet_NetworkChannelsSerializer.cs:120:		if (instance.ChannelIds != null)
+Packet_NetworkChannelsSerializer.cs-121-		{
+Packet_NetworkChannelsSerializer.cs:122:			for (int i = 0; i < instance.ChannelIdsCount; i++)
+Packet_NetworkChannelsSerializer.cs-123-			{
+Packet_NetworkChannelsSerializer.cs:124:				int v = instance.ChannelIds[i];
+Packet_NetworkChannelsSerializer.cs-125-				num += ProtocolParser.GetSize(v) + 1;
+Packet_NetworkChannelsSerializer.cs-126-			}
+Packet_NetworkChannelsSerializer.cs-127-		}
+Packet_NetworkChannelsSerializer.cs-128-		if (instance.ChannelNames != null)
+Packet_NetworkChannelsSerializer.cs-129-		{
+Packet_NetworkChannelsSerializer.cs-130-			for (int j = 0; j < instance.ChannelNamesCount; j++)
+Packet_NetworkChannelsSerializer.cs-131-			{
+Packet_NetworkChannelsSerializer.cs-132-				string s = instance.ChannelNames[j];
+Packet_NetworkChannelsSerializer.cs-133-				num += ProtocolParser.GetSize(s) + 1;
+Packet_NetworkChannelsSerializer.cs-134-			}
+Packet_NetworkChannelsSerializer.cs-135-		}
+Packet_NetworkChannelsSerializer.cs-136-		if (instance.ChannelUdpIds != null)
+Packet_NetworkChannelsSerializer.cs-137-		{
+Packet_NetworkChannelsSerializer.cs-138-			for (int k = 0; k < instance.ChannelUdpIdsCount; k++)
+Packet_NetworkChannelsSerializer.cs-139-			{
+Packet_NetworkChannelsSerializer.cs-140-				int v2 = instance.ChannelUdpIds[k];
+Packet_NetworkChannelsSerializer.cs-141-				num += ProtocolParser.GetSize(v2) + 1;
+Packet_NetworkChannelsSerializer.cs-142-			}
+Packet_NetworkChannelsSerializer.cs-143-		}
+Packet_NetworkChannelsSerializer.cs-144-		if (instance.ChannelUdpNames != null)
+Packet_NetworkChannelsSerializer.cs-145-		{
+Packet_NetworkChannelsSerializer.cs-146-			for (int l = 0; l < instance.ChannelUdpNamesCount; l++)
+Packet_NetworkChannelsSerializer.cs-147-			{
+Packet_NetworkChannelsSerializer.cs-148-				string s2 = instance.ChannelUdpNames[l];
+Packet_NetworkChannelsSerializer.cs-149-				num += ProtocolParser.GetSize(s2) + 1;
+--
+Vintagestory.Server/NetworkChannel.cs-93-		Serializer.Serialize((Stream)reusableStream, message);
+Vintagestory.Server/NetworkChannel.cs-94-		return GenPacket(message, reusableStream.ToArray());
+Vintagestory.Server/NetworkChannel.cs-95-	}
+Vintagestory.Server/NetworkChannel.cs-96-
+Vintagestory.Server/NetworkChannel.cs-97-	private Packet_Server GenPacket<T>(T message, byte[] data)
+Vintagestory.Server/NetworkChannel.cs-98-	{
+Vintagestory.Server/NetworkChannel.cs-99-		if (!messageTypes.TryGetValue(typeof(T), out var value))
+Vintagestory.Server/NetworkChannel.cs-100-		{
+Vintagestory.Server/NetworkChannel.cs-101-			throw new Exception("No such message type " + typeof(T)?.ToString() + " registered. Did you forgot to call RegisterMessageType?");
+Vintagestory.Server/NetworkChannel.cs-102-		}
+Vintagestory.Server/NetworkChannel.cs-103-		Packet_CustomPacket packet_CustomPacket = new Packet_CustomPacket
+Vintagestory.Server/NetworkChannel.cs-104-		{
+Vintagestory.Server/NetworkChannel.cs:105:			ChannelId = channelId,
+Vintagestory.Server/NetworkChannel.cs-106-			MessageId = value
+Vintagestory.Server/NetworkChannel.cs-107-		};
+Vintagestory.Server/NetworkChannel.cs-108-		packet_CustomPacket.SetData(data);
+Vintagestory.Server/NetworkChannel.cs-109-		return new Packet_Server
+Vintagestory.Server/NetworkChannel.cs-110-		{
+Vintagestory.Server/NetworkChannel.cs-111-			Id = 55,
+Vintagestory.Server/NetworkChannel.cs-112-			CustomPacket = packet_CustomPacket
+Vintagestory.Server/NetworkChannel.cs-113-		};
+Vintagestory.Server/NetworkChannel.cs-114-	}
+Vintagestory.Server/NetworkChannel.cs-115-}
+--
+Vintagestory.Server/NetworkAPI.cs-8-using Vintagestory.API.Util;
+Vintagestory.Server/NetworkAPI.cs-9-
+Vintagestory.Server/NetworkAPI.cs-10-namespace Vintagestory.Server;
+Vintagestory.Server/NetworkAPI.cs-11-
+Vintagestory.Server/NetworkAPI.cs-12-public class NetworkAPI : IServerNetworkAPI, INetworkAPI
+Vintagestory.Server/NetworkAPI.cs-13-{
+Vintagestory.Server/NetworkAPI.cs-14-	internal ServerMain server;
+Vintagestory.Server/NetworkAPI.cs-15-
+Vintagestory.Server/NetworkAPI.cs-16-	private Vintagestory.API.Datastructures.OrderedDictionary<int, NetworkChannel> channels = new Vintagestory.API.Datastructures.OrderedDictionary<int, NetworkChannel>();
+Vintagestory.Server/NetworkAPI.cs-17-
+Vintagestory.Server/NetworkAPI.cs-18-	private Vintagestory.API.Datastructures.OrderedDictionary<int, UdpNetworkChannel> channelsUdp = new Vintagestory.API.Datastructures.OrderedDictionary<int, UdpNetworkChannel>();
+Vintagestory.Server/NetworkAPI.cs-19-
+Vintagestory.Server/NetworkAPI.cs:20:	private int nextFreeChannelId;
+Vintagestory.Server/NetworkAPI.cs-21-
+Vintagestory.Server/NetworkAPI.cs:22:	private int nextFreeUdpChannelId;
+Vintagestory.Server/NetworkAPI.cs-23-
+Vintagestory.Server/NetworkAPI.cs-24-	public NetworkAPI(ServerMain server)
+Vintagestory.Server/NetworkAPI.cs-25-	{
+Vintagestory.Server/NetworkAPI.cs-26-		this.server = server;
+Vintagestory.Server/NetworkAPI.cs-27-		server.PacketHandlers[23] = HandleCustomPacket;
+Vintagestory.Server/NetworkAPI.cs-28-		server.HandleCustomUdpPackets = HandleCustomUdpPacket;
+Vintagestory.Server/NetworkAPI.cs-29-	}
+Vintagestory.Server/NetworkAPI.cs-30-
+Vintagestory.Server/NetworkAPI.cs-31-	private void HandleCustomUdpPacket(Packet_CustomPacket packet, IServerPlayer player)
+Vintagestory.Server/NetworkAPI.cs-32-	{
+Vintagestory.Server/NetworkAPI.cs:33:		if (channelsUdp.TryGetValue(packet.ChannelId, out var value))
+Vintagestory.Server/NetworkAPI.cs-34-		{
+Vintagestory.Server/NetworkAPI.cs-35-			value.OnPacket(packet, player);
+Vintagestory.Server/NetworkAPI.cs-36-		}
+Vintagestory.Server/NetworkAPI.cs-37-	}
+Vintagestory.Server/NetworkAPI.cs-38-
+Vintagestory.Server/NetworkAPI.cs-39-	public void SendChannelsPacket(IServerPlayer player)
+Vintagestory.Server/NetworkAPI.cs-40-	{
+Vintagestory.Server/NetworkAPI.cs-41-		Packet_NetworkChannels packet_NetworkChannels = new Packet_NetworkChannels();
+Vintagestory.Server/NetworkAPI.cs:42:		packet_NetworkChannels.SetChannelIds(channels.Keys.ToArray());
+Vintagestory.Server/NetworkAPI.cs-43-		packet_NetworkChannels.SetChannelNames(channels.Values.Select((NetworkChannel ch) => ch.ChannelName).ToArray());
+Vintagestory.Server/NetworkAPI.cs-44-		packet_NetworkChannels.SetChannelUdpIds(channelsUdp.Keys.ToArray());
+Vintagestory.Server/NetworkAPI.cs-45-		packet_NetworkChannels.SetChannelUdpNames(channelsUdp.Values.Select((UdpNetworkChannel ch) => ch.ChannelName).ToArray());
+Vintagestory.Server/NetworkAPI.cs-46-		server.SendPacket(player.ClientId, new Packet_Server
+Vintagestory.Server/NetworkAPI.cs-47-		{
+Vintagestory.Server/NetworkAPI.cs-48-			Id = 56,
+Vintagestory.Server/NetworkAPI.cs-49-			NetworkChannels = packet_NetworkChannels
+Vintagestory.Server/NetworkAPI.cs-50-		});
+Vintagestory.Server/NetworkAPI.cs-51-	}
+Vintagestory.Server/NetworkAPI.cs-52-
+Vintagestory.Server/NetworkAPI.cs-53-	private void HandleCustomPacket(Packet_Client packet, ConnectedClient client)
+Vintagestory.Server/NetworkAPI.cs-54-	{
+Vintagestory.Server/NetworkAPI.cs-55-		Packet_CustomPacket customPacket = packet.CustomPacket;
+Vintagestory.Server/NetworkAPI.cs:56:		if (channels.TryGetValue(customPacket.ChannelId, out var value))
+Vintagestory.Server/NetworkAPI.cs-57-		{
+Vintagestory.Server/NetworkAPI.cs-58-			value.OnPacket(customPacket, client.Player);
+Vintagestory.Server/NetworkAPI.cs-59-		}
+Vintagestory.Server/NetworkAPI.cs-60-	}
+Vintagestory.Server/NetworkAPI.cs-61-
+Vintagestory.Server/NetworkAPI.cs-62-	public IServerNetworkChannel RegisterChannel(string channelName)
+Vintagestory.Server/NetworkAPI.cs-63-	{
+Vintagestory.Server/NetworkAPI.cs:64:		nextFreeChannelId++;
+Vintagestory.Server/NetworkAPI.cs:65:		channels[nextFreeChannelId] = new NetworkChannel(this, nextFreeChannelId, channelName);
+Vintagestory.Server/NetworkAPI.cs:66:		return channels[nextFreeChannelId];
+Vintagestory.Server/NetworkAPI.cs-67-	}
+Vintagestory.Server/NetworkAPI.cs-68-
+Vintagestory.Server/NetworkAPI.cs-69-	public IServerNetworkChannel RegisterUdpChannel(string channelName)
+Vintagestory.Server/NetworkAPI.cs-70-	{
+Vintagestory.Server/NetworkAPI.cs:71:		nextFreeUdpChannelId++;
+Vintagestory.Server/NetworkAPI.cs:72:		channelsUdp[nextFreeUdpChannelId] = new UdpNetworkChannel(this, nextFreeUdpChannelId, channelName);
+Vintagestory.Server/NetworkAPI.cs:73:		return channelsUdp[nextFreeUdpChannelId];
+Vintagestory.Server/NetworkAPI.cs-74-	}
+Vintagestory.Server/NetworkAPI.cs-75-
+Vintagestory.Server/NetworkAPI.cs-76-	public void BroadcastArbitraryPacket(byte[] data, params IServerPlayer[] exceptPlayers)
+Vintagestory.Server/NetworkAPI.cs-77-	{
+Vintagestory.Server/NetworkAPI.cs-78-		server.BroadcastArbitraryPacket(data, exceptPlayers);
+Vintagestory.Server/NetworkAPI.cs-79-	}
+Vintagestory.Server/NetworkAPI.cs-80-
+Vintagestory.Server/NetworkAPI.cs-81-	public void BroadcastArbitraryPacket(object packet, params IServerPlayer[] exceptPlayers)
+Vintagestory.Server/NetworkAPI.cs-82-	{
+Vintagestory.Server/NetworkAPI.cs-83-		server.BroadcastArbitraryPacket(packet as Packet_Server, exceptPlayers);
+Vintagestory.Server/NetworkAPI.cs-84-	}
+Vintagestory.Server/NetworkAPI.cs-85-
+Vintagestory.Server/NetworkAPI.cs-86-	public void BroadcastBlockEntityPacket(BlockPos pos, int packetId, byte[] data = null)
+Vintagestory.Server/NetworkAPI.cs-87-	{
+Vintagestory.Server/NetworkAPI.cs-88-		server.BroadcastBlockEntityPacket(pos.X, pos.InternalY, pos.Z, packetId, data);
+Vintagestory.Server/NetworkAPI.cs-89-	}
+Vintagestory.Server/NetworkAPI.cs-90-
+Vintagestory.Server/NetworkAPI.cs-91-	public void BroadcastBlockEntityPacket(BlockPos pos, int packetId, byte[] data = null, params IServerPlayer[] skipPlayers)
+Vintagestory.Server/NetworkAPI.cs-92-	{
+Vintagestory.Server/NetworkAPI.cs-93-		server.BroadcastBlockEntityPacket(pos.X, pos.InternalY, pos.Z, packetId, data, skipPlayers);
+Vintagestory.Server/NetworkAPI.cs-94-	}
+Vintagestory.Server/NetworkAPI.cs-95-
+Vintagestory.Server/NetworkAPI.cs-96-	public void SendArbitraryPacket(byte[] data, params IServerPlayer[] players)
+Vintagestory.Server/NetworkAPI.cs-97-	{
+Vintagestory.Server/NetworkAPI.cs-98-		server.SendArbitraryPacket(data, players);
+--
+Vintagestory.Server/UdpNetworkChannel.cs-52-	}
+Vintagestory.Server/UdpNetworkChannel.cs-53-
+Vintagestory.Server/UdpNetworkChannel.cs-54-	public override void BroadcastPacket<T>(T message, params IServerPlayer[] exceptPlayers)
+Vintagestory.Server/UdpNetworkChannel.cs-55-	{
+Vintagestory.Server/UdpNetworkChannel.cs-56-		if (!messageTypes.TryGetValue(typeof(T), out var value))
+Vintagestory.Server/UdpNetworkChannel.cs-57-		{
+Vintagestory.Server/UdpNetworkChannel.cs-58-			throw new Exception("No such message type " + typeof(T)?.ToString() + " registered. Did you forgot to call RegisterMessageType?");
+Vintagestory.Server/UdpNetworkChannel.cs-59-		}
+Vintagestory.Server/UdpNetworkChannel.cs-60-		reusableStream.Reset();
+Vintagestory.Server/UdpNetworkChannel.cs-61-		Serializer.Serialize((Stream)reusableStream, message);
+Vintagestory.Server/UdpNetworkChannel.cs-62-		Packet_CustomPacket channelPacket = new Packet_CustomPacket
+Vintagestory.Server/UdpNetworkChannel.cs-63-		{
+Vintagestory.Server/UdpNetworkChannel.cs:64:			ChannelId = channelId,
+Vintagestory.Server/UdpNetworkChannel.cs-65-			MessageId = value,
+Vintagestory.Server/UdpNetworkChannel.cs-66-			Data = reusableStream.ToArray()
+Vintagestory.Server/UdpNetworkChannel.cs-67-		};
+Vintagestory.Server/UdpNetworkChannel.cs-68-		Packet_UdpPacket data = new Packet_UdpPacket
+Vintagestory.Server/UdpNetworkChannel.cs-69-		{
+Vintagestory.Server/UdpNetworkChannel.cs-70-			Id = 6,
+Vintagestory.Server/UdpNetworkChannel.cs-71-			ChannelPacket = channelPacket
+Vintagestory.Server/UdpNetworkChannel.cs-72-		};
+Vintagestory.Server/UdpNetworkChannel.cs-73-		api.server.BroadcastArbitraryUdpPacket(data, exceptPlayers);
+Vintagestory.Server/UdpNetworkChannel.cs-74-	}
+Vintagestory.Server/UdpNetworkChannel.cs-75-
+Vintagestory.Server/UdpNetworkChannel.cs-76-	public override void SendPacket<T>(T message, params IServerPlayer[] players)
+Vintagestory.Server/UdpNetworkChannel.cs-77-	{
+Vintagestory.Server/UdpNetworkChannel.cs-78-		if (players == null || players.Length == 0)
+Vintagestory.Server/UdpNetworkChannel.cs-79-		{
+Vintagestory.Server/UdpNetworkChannel.cs-80-			throw new ArgumentNullException("No players supplied to send the packet to");
+Vintagestory.Server/UdpNetworkChannel.cs-81-		}
+Vintagestory.Server/UdpNetworkChannel.cs-82-		if (!messageTypes.TryGetValue(typeof(T), out var value))
+Vintagestory.Server/UdpNetworkChannel.cs-83-		{
+Vintagestory.Server/UdpNetworkChannel.cs-84-			throw new Exception("No such message type " + typeof(T)?.ToString() + " registered. Did you forgot to call RegisterMessageType?");
+Vintagestory.Server/UdpNetworkChannel.cs-85-		}
+Vintagestory.Server/UdpNetworkChannel.cs-86-		reusableStream.Reset();
+Vintagestory.Server/UdpNetworkChannel.cs-87-		Serializer.Serialize((Stream)reusableStream, message);
+Vintagestory.Server/UdpNetworkChannel.cs-88-		Packet_CustomPacket channelPacket = new Packet_CustomPacket
+Vintagestory.Server/UdpNetworkChannel.cs-89-		{
+Vintagestory.Server/UdpNetworkChannel.cs:90:			ChannelId = channelId,
+Vintagestory.Server/UdpNetworkChannel.cs-91-			MessageId = value,
+Vintagestory.Server/UdpNetworkChannel.cs-92-			Data = reusableStream.ToArray()
+Vintagestory.Server/UdpNetworkChannel.cs-93-		};
+Vintagestory.Server/UdpNetworkChannel.cs-94-		Packet_UdpPacket packet = new Packet_UdpPacket
+Vintagestory.Server/UdpNetworkChannel.cs-95-		{
+Vintagestory.Server/UdpNetworkChannel.cs-96-			Id = 6,
+Vintagestory.Server/UdpNetworkChannel.cs-97-			ChannelPacket = channelPacket
+Vintagestory.Server/UdpNetworkChannel.cs-98-		};
+Vintagestory.Server/UdpNetworkChannel.cs-99-		api.server.SendArbitraryUdpPacket(packet, players);
+Vintagestory.Server/UdpNetworkChannel.cs-100-	}
+Vintagestory.Server/UdpNetworkChannel.cs-101-}
+--
+Packet_CustomPacketSerializer.cs-28-			{
+Packet_CustomPacketSerializer.cs-29-				num = ProtocolParser.ReadKeyAsInt(num, stream);
+Packet_CustomPacketSerializer.cs-30-				if ((num & 0x4000) != 0)
+Packet_CustomPacketSerializer.cs-31-				{
+Packet_CustomPacketSerializer.cs-32-					break;
+Packet_CustomPacketSerializer.cs-33-				}
+Packet_CustomPacketSerializer.cs-34-			}
+Packet_CustomPacketSerializer.cs-35-			switch (num)
+Packet_CustomPacketSerializer.cs-36-			{
+Packet_CustomPacketSerializer.cs-37-			case 0:
+Packet_CustomPacketSerializer.cs-38-				return null;
+Packet_CustomPacketSerializer.cs-39-			case 8:
+Packet_CustomPacketSerializer.cs:40:				instance.ChannelId = ProtocolParser.ReadUInt32(stream);
+Packet_CustomPacketSerializer.cs-41-				break;
+Packet_CustomPacketSerializer.cs-42-			case 16:
+Packet_CustomPacketSerializer.cs-43-				instance.MessageId = ProtocolParser.ReadUInt32(stream);
+Packet_CustomPacketSerializer.cs-44-				break;
+Packet_CustomPacketSerializer.cs-45-			case 26:
+Packet_CustomPacketSerializer.cs-46-				instance.Data = ProtocolParser.ReadBytes(stream);
+Packet_CustomPacketSerializer.cs-47-				break;
+Packet_CustomPacketSerializer.cs-48-			default:
+Packet_CustomPacketSerializer.cs-49-				ProtocolParser.SkipKey(stream, Key.Create(num));
+Packet_CustomPacketSerializer.cs-50-				break;
+Packet_CustomPacketSerializer.cs-51-			}
+Packet_CustomPacketSerializer.cs-52-		}
+Packet_CustomPacketSerializer.cs-53-		if (num >= 0)
+Packet_CustomPacketSerializer.cs-54-		{
+Packet_CustomPacketSerializer.cs-55-			return null;
+Packet_CustomPacketSerializer.cs-56-		}
+Packet_CustomPacketSerializer.cs-57-		return instance;
+Packet_CustomPacketSerializer.cs-58-	}
+Packet_CustomPacketSerializer.cs-59-
+Packet_CustomPacketSerializer.cs-60-	public static Packet_CustomPacket DeserializeLengthDelimited(CitoMemoryStream stream, Packet_CustomPacket instance)
+Packet_CustomPacketSerializer.cs-61-	{
+Packet_CustomPacketSerializer.cs-62-		int num = ProtocolParser.ReadUInt32(stream);
+Packet_CustomPacketSerializer.cs-63-		int length = stream.GetLength();
+Packet_CustomPacketSerializer.cs-64-		stream.SetLength(stream.Position() + num);
+Packet_CustomPacketSerializer.cs-65-		Packet_CustomPacket result = Deserialize(stream, instance);
+Packet_CustomPacketSerializer.cs-66-		stream.SetLength(length);
+Packet_CustomPacketSerializer.cs-67-		return result;
+Packet_CustomPacketSerializer.cs-68-	}
+Packet_CustomPacketSerializer.cs-69-
+Packet_CustomPacketSerializer.cs-70-	public static void Serialize(CitoStream stream, Packet_CustomPacket instance)
+Packet_CustomPacketSerializer.cs-71-	{
+Packet_CustomPacketSerializer.cs:72:		if (instance.ChannelId != 0)
+Packet_CustomPacketSerializer.cs-73-		{
+Packet_CustomPacketSerializer.cs-74-			stream.WriteByte(8);
+Packet_CustomPacketSerializer.cs:75:			ProtocolParser.WriteUInt32(stream, instance.ChannelId);
+Packet_CustomPacketSerializer.cs-76-		}
+Packet_CustomPacketSerializer.cs-77-		if (instance.MessageId != 0)
+Packet_CustomPacketSerializer.cs-78-		{
+Packet_CustomPacketSerializer.cs-79-			stream.WriteByte(16);
+Packet_CustomPacketSerializer.cs-80-			ProtocolParser.WriteUInt32(stream, instance.MessageId);
+Packet_CustomPacketSerializer.cs-81-		}
+Packet_CustomPacketSerializer.cs-82-		if (instance.Data != null)
+Packet_CustomPacketSerializer.cs-83-		{
+Packet_CustomPacketSerializer.cs-84-			stream.WriteByte(26);
+Packet_CustomPacketSerializer.cs-85-			ProtocolParser.WriteBytes(stream, instance.Data);
+Packet_CustomPacketSerializer.cs-86-		}
+Packet_CustomPacketSerializer.cs-87-	}
+Packet_CustomPacketSerializer.cs-88-
+Packet_CustomPacketSerializer.cs-89-	public static int GetSize(Packet_CustomPacket instance)
+Packet_CustomPacketSerializer.cs-90-	{
+Packet_CustomPacketSerializer.cs-91-		int num = 0;
+Packet_CustomPacketSerializer.cs:92:		if (instance.ChannelId != 0)
+Packet_CustomPacketSerializer.cs-93-		{
+Packet_CustomPacketSerializer.cs:94:			num += ProtocolParser.GetSize(instance.ChannelId) + 1;
+Packet_CustomPacketSerializer.cs-95-		}
+Packet_CustomPacketSerializer.cs-96-		if (instance.MessageId != 0)
+Packet_CustomPacketSerializer.cs-97-		{
+Packet_CustomPacketSerializer.cs-98-			num += ProtocolParser.GetSize(instance.MessageId) + 1;
+Packet_CustomPacketSerializer.cs-99-		}
+Packet_CustomPacketSerializer.cs-100-		if (instance.Data != null)
+Packet_CustomPacketSerializer.cs-101-		{
+Packet_CustomPacketSerializer.cs-102-			num += ProtocolParser.GetSize(instance.Data) + 1;
+Packet_CustomPacketSerializer.cs-103-		}
+Packet_CustomPacketSerializer.cs-104-		instance.size = num;
+Packet_CustomPacketSerializer.cs-105-		return num;
+Packet_CustomPacketSerializer.cs-106-	}
+Packet_CustomPacketSerializer.cs-107-
+Packet_CustomPacketSerializer.cs-108-	public static void SerializeWithSize(CitoStream stream, Packet_CustomPacket instance)
+Packet_CustomPacketSerializer.cs-109-	{
+Packet_CustomPacketSerializer.cs-110-		ProtocolParser.WriteUInt32_(stream, instance.size);
+Packet_CustomPacketSerializer.cs-111-		int num = stream.Position();
+Packet_CustomPacketSerializer.cs-112-		Serialize(stream, instance);
+Packet_CustomPacketSerializer.cs-113-		int num2 = stream.Position() - num;
+Packet_CustomPacketSerializer.cs-114-		if (num2 != instance.size)
+Packet_CustomPacketSerializer.cs-115-		{
+Packet_CustomPacketSerializer.cs-116-			throw new Exception("Sizing mismatch: " + instance.size + " != " + num2);
+Packet_CustomPacketSerializer.cs-117-		}
+Packet_CustomPacketSerializer.cs-118-	}
+Packet_CustomPacketSerializer.cs-119-

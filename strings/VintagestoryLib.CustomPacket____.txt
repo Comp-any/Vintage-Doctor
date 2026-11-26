@@ -1,0 +1,370 @@
+Packet_Server.cs-470-	public void SetHighlightBlocks(Packet_HighlightBlocks value)
+Packet_Server.cs-471-	{
+Packet_Server.cs-472-		HighlightBlocks = value;
+Packet_Server.cs-473-	}
+Packet_Server.cs-474-
+Packet_Server.cs-475-	public void SetSelectedHotbarSlot(Packet_SelectedHotbarSlot value)
+Packet_Server.cs-476-	{
+Packet_Server.cs-477-		SelectedHotbarSlot = value;
+Packet_Server.cs-478-	}
+Packet_Server.cs-479-
+Packet_Server.cs-480-	public void SetCustomPacket(Packet_CustomPacket value)
+Packet_Server.cs-481-	{
+Packet_Server.cs:482:		CustomPacket = value;
+Packet_Server.cs-483-	}
+Packet_Server.cs-484-
+Packet_Server.cs-485-	public void SetNetworkChannels(Packet_NetworkChannels value)
+Packet_Server.cs-486-	{
+Packet_Server.cs-487-		NetworkChannels = value;
+Packet_Server.cs-488-	}
+Packet_Server.cs-489-
+Packet_Server.cs-490-	public void SetGotoGroup(Packet_GotoGroup value)
+Packet_Server.cs-491-	{
+Packet_Server.cs-492-		GotoGroup = value;
+Packet_Server.cs-493-	}
+Packet_Server.cs-494-
+Packet_Server.cs-495-	public void SetExchangeBlock(Packet_ServerExchangeBlock value)
+Packet_Server.cs-496-	{
+Packet_Server.cs-497-		ExchangeBlock = value;
+Packet_Server.cs-498-	}
+Packet_Server.cs-499-
+Packet_Server.cs-500-	public void SetBulkEntityAttributes(Packet_BulkEntityAttributes value)
+Packet_Server.cs-501-	{
+Packet_Server.cs-502-		BulkEntityAttributes = value;
+Packet_Server.cs-503-	}
+Packet_Server.cs-504-
+Packet_Server.cs-505-	public void SetSpawnParticles(Packet_SpawnParticles value)
+Packet_Server.cs-506-	{
+Packet_Server.cs-507-		SpawnParticles = value;
+--
+Vintagestory.Client.NoObf/NetworkChannel.cs-73-			throw new Exception("Attempting to send data to a not connected channel. For optionally dependent network channels test if your channel is Connected before sending data.");
+Vintagestory.Client.NoObf/NetworkChannel.cs-74-		}
+Vintagestory.Client.NoObf/NetworkChannel.cs-75-		if (!messageTypes.TryGetValue(typeof(T), out var value))
+Vintagestory.Client.NoObf/NetworkChannel.cs-76-		{
+Vintagestory.Client.NoObf/NetworkChannel.cs-77-			throw new Exception("No such message type " + typeof(T)?.ToString() + " registered. Did you forgot to call RegisterMessageType?");
+Vintagestory.Client.NoObf/NetworkChannel.cs-78-		}
+Vintagestory.Client.NoObf/NetworkChannel.cs-79-		byte[] data;
+Vintagestory.Client.NoObf/NetworkChannel.cs-80-		using (MemoryStream memoryStream = new MemoryStream())
+Vintagestory.Client.NoObf/NetworkChannel.cs-81-		{
+Vintagestory.Client.NoObf/NetworkChannel.cs-82-			Serializer.Serialize((Stream)memoryStream, message);
+Vintagestory.Client.NoObf/NetworkChannel.cs-83-			data = memoryStream.ToArray();
+Vintagestory.Client.NoObf/NetworkChannel.cs-84-		}
+Vintagestory.Client.NoObf/NetworkChannel.cs:85:		Packet_CustomPacket packet_CustomPacket = new Packet_CustomPacket
+Vintagestory.Client.NoObf/NetworkChannel.cs-86-		{
+Vintagestory.Client.NoObf/NetworkChannel.cs-87-			ChannelId = channelId,
+Vintagestory.Client.NoObf/NetworkChannel.cs-88-			MessageId = value
+Vintagestory.Client.NoObf/NetworkChannel.cs-89-		};
+Vintagestory.Client.NoObf/NetworkChannel.cs-90-		packet_CustomPacket.SetData(data);
+Vintagestory.Client.NoObf/NetworkChannel.cs-91-		api.game.SendPacketClient(new Packet_Client
+Vintagestory.Client.NoObf/NetworkChannel.cs-92-		{
+Vintagestory.Client.NoObf/NetworkChannel.cs-93-			Id = 23,
+Vintagestory.Client.NoObf/NetworkChannel.cs:94:			CustomPacket = packet_CustomPacket
+Vintagestory.Client.NoObf/NetworkChannel.cs-95-		});
+Vintagestory.Client.NoObf/NetworkChannel.cs-96-	}
+Vintagestory.Client.NoObf/NetworkChannel.cs-97-}
+--
+Vintagestory.Client.NoObf/NetworkAPI.cs-283-		if (double.IsNaN(mount.Pos.Motion.X))
+Vintagestory.Client.NoObf/NetworkAPI.cs-284-		{
+Vintagestory.Client.NoObf/NetworkAPI.cs-285-			throw new ArgumentException("Mount Motion is not a number");
+Vintagestory.Client.NoObf/NetworkAPI.cs-286-		}
+Vintagestory.Client.NoObf/NetworkAPI.cs-287-		Packet_EntityPosition entityPositionPacket = ServerPackets.getEntityPositionPacket(mount.Pos, mount, 0);
+Vintagestory.Client.NoObf/NetworkAPI.cs-288-		Packet_UdpPacket packet_UdpPacket = new Packet_UdpPacket
+Vintagestory.Client.NoObf/NetworkAPI.cs-289-		{
+Vintagestory.Client.NoObf/NetworkAPI.cs-290-			Id = 3,
+Vintagestory.Client.NoObf/NetworkAPI.cs-291-			EntityPosition = entityPositionPacket
+Vintagestory.Client.NoObf/NetworkAPI.cs-292-		};
+Vintagestory.Client.NoObf/NetworkAPI.cs-293-		if (mount.AnimManager != null)
+Vintagestory.Client.NoObf/NetworkAPI.cs-294-		{
+Vintagestory.Client.NoObf/NetworkAPI.cs:295:			Packet_CustomPacket packet_CustomPacket = (packet_UdpPacket.ChannelPacket = new Packet_CustomPacket());
+Vintagestory.Client.NoObf/NetworkAPI.cs-296-			string gaitCode = mount.WatchedAttributes.GetString("currentgait");
+Vintagestory.Client.NoObf/NetworkAPI.cs-297-			MountAnimationPacket instance = new MountAnimationPacket
+Vintagestory.Client.NoObf/NetworkAPI.cs-298-			{
+Vintagestory.Client.NoObf/NetworkAPI.cs-299-				gaitCode = gaitCode,
+Vintagestory.Client.NoObf/NetworkAPI.cs-300-				animPacket = new AnimationPacket(mount)
+Vintagestory.Client.NoObf/NetworkAPI.cs-301-			};
+Vintagestory.Client.NoObf/NetworkAPI.cs-302-			if (mountStream == null)
+Vintagestory.Client.NoObf/NetworkAPI.cs-303-			{
+Vintagestory.Client.NoObf/NetworkAPI.cs-304-				mountStream = new FastMemoryStream(64);
+Vintagestory.Client.NoObf/NetworkAPI.cs-305-			}
+Vintagestory.Client.NoObf/NetworkAPI.cs-306-			mountStream.Reset();
+Vintagestory.Client.NoObf/NetworkAPI.cs-307-			Serializer.Serialize((Stream)mountStream, instance);
+Vintagestory.Client.NoObf/NetworkAPI.cs-308-			packet_CustomPacket.SetData(mountStream.ToArray());
+Vintagestory.Client.NoObf/NetworkAPI.cs-309-		}
+Vintagestory.Client.NoObf/NetworkAPI.cs-310-		if (game.FallBackToTcp)
+Vintagestory.Client.NoObf/NetworkAPI.cs-311-		{
+Vintagestory.Client.NoObf/NetworkAPI.cs-312-			Packet_Client packetClient = new Packet_Client
+Vintagestory.Client.NoObf/NetworkAPI.cs-313-			{
+Vintagestory.Client.NoObf/NetworkAPI.cs-314-				Id = 35,
+Vintagestory.Client.NoObf/NetworkAPI.cs-315-				UdpPacket = packet_UdpPacket
+Vintagestory.Client.NoObf/NetworkAPI.cs-316-			};
+Vintagestory.Client.NoObf/NetworkAPI.cs-317-			game.SendPacketClient(packetClient);
+Vintagestory.Client.NoObf/NetworkAPI.cs-318-		}
+Vintagestory.Client.NoObf/NetworkAPI.cs-319-		else
+Vintagestory.Client.NoObf/NetworkAPI.cs-320-		{
+--
+Packet_UdpPacketIdEnum.cs-1-public class Packet_UdpPacketIdEnum
+Packet_UdpPacketIdEnum.cs-2-{
+Packet_UdpPacketIdEnum.cs-3-	public const int Connect = 1;
+Packet_UdpPacketIdEnum.cs-4-
+Packet_UdpPacketIdEnum.cs-5-	public const int Position = 2;
+Packet_UdpPacketIdEnum.cs-6-
+Packet_UdpPacketIdEnum.cs-7-	public const int MountPosition = 3;
+Packet_UdpPacketIdEnum.cs-8-
+Packet_UdpPacketIdEnum.cs-9-	public const int ClientBulkPacket = 4;
+Packet_UdpPacketIdEnum.cs-10-
+Packet_UdpPacketIdEnum.cs-11-	public const int ClientSinglePacket = 5;
+Packet_UdpPacketIdEnum.cs-12-
+Packet_UdpPacketIdEnum.cs:13:	public const int CustomPacket = 6;
+Packet_UdpPacketIdEnum.cs-14-
+Packet_UdpPacketIdEnum.cs-15-	public const int KeepAlive = 7;
+Packet_UdpPacketIdEnum.cs-16-}
+--
+Packet_Client.cs-221-	public void SetBlockEntityPacket(Packet_BlockEntityPacket value)
+Packet_Client.cs-222-	{
+Packet_Client.cs-223-		BlockEntityPacket = value;
+Packet_Client.cs-224-	}
+Packet_Client.cs-225-
+Packet_Client.cs-226-	public void SetEntityPacket(Packet_EntityPacket value)
+Packet_Client.cs-227-	{
+Packet_Client.cs-228-		EntityPacket = value;
+Packet_Client.cs-229-	}
+Packet_Client.cs-230-
+Packet_Client.cs-231-	public void SetCustomPacket(Packet_CustomPacket value)
+Packet_Client.cs-232-	{
+Packet_Client.cs:233:		CustomPacket = value;
+Packet_Client.cs-234-	}
+Packet_Client.cs-235-
+Packet_Client.cs-236-	public void SetHandInteraction(Packet_ClientHandInteraction value)
+Packet_Client.cs-237-	{
+Packet_Client.cs-238-		HandInteraction = value;
+Packet_Client.cs-239-	}
+Packet_Client.cs-240-
+Packet_Client.cs-241-	public void SetToolMode(Packet_ToolMode value)
+Packet_Client.cs-242-	{
+Packet_Client.cs-243-		ToolMode = value;
+Packet_Client.cs-244-	}
+Packet_Client.cs-245-
+Packet_Client.cs-246-	public void SetBlockDamage(Packet_BlockDamage value)
+Packet_Client.cs-247-	{
+Packet_Client.cs-248-		BlockDamage = value;
+Packet_Client.cs-249-	}
+Packet_Client.cs-250-
+Packet_Client.cs-251-	public void SetClientPlaying(Packet_ClientPlaying value)
+Packet_Client.cs-252-	{
+Packet_Client.cs-253-		ClientPlaying = value;
+Packet_Client.cs-254-	}
+Packet_Client.cs-255-
+Packet_Client.cs-256-	public void SetInvOpenedClosed(Packet_InvOpenClose value)
+Packet_Client.cs-257-	{
+Packet_Client.cs-258-		InvOpenedClosed = value;
+--
+Packet_ClientIdEnum.cs-29-	public const int ServerQuery = 15;
+Packet_ClientIdEnum.cs-30-
+Packet_ClientIdEnum.cs-31-	public const int EntityInteraction = 17;
+Packet_ClientIdEnum.cs-32-
+Packet_ClientIdEnum.cs-33-	public const int RequestModeChange = 20;
+Packet_ClientIdEnum.cs-34-
+Packet_ClientIdEnum.cs-35-	public const int MoveKeyChange = 21;
+Packet_ClientIdEnum.cs-36-
+Packet_ClientIdEnum.cs-37-	public const int BlockEntityPacket = 22;
+Packet_ClientIdEnum.cs-38-
+Packet_ClientIdEnum.cs-39-	public const int EntityPacket = 31;
+Packet_ClientIdEnum.cs-40-
+Packet_ClientIdEnum.cs:41:	public const int CustomPacket = 23;
+Packet_ClientIdEnum.cs-42-
+Packet_ClientIdEnum.cs-43-	public const int HandInteraction = 25;
+Packet_ClientIdEnum.cs-44-
+Packet_ClientIdEnum.cs-45-	public const int ClientLoaded = 26;
+Packet_ClientIdEnum.cs-46-
+Packet_ClientIdEnum.cs-47-	public const int SetToolMode = 27;
+Packet_ClientIdEnum.cs-48-
+Packet_ClientIdEnum.cs-49-	public const int BlockDamage = 28;
+Packet_ClientIdEnum.cs-50-
+Packet_ClientIdEnum.cs-51-	public const int ClientPlaying = 29;
+Packet_ClientIdEnum.cs-52-
+Packet_ClientIdEnum.cs-53-	public const int InvOpenClose = 30;
+Packet_ClientIdEnum.cs-54-
+Packet_ClientIdEnum.cs-55-	public const int RuntimeSetting = 32;
+Packet_ClientIdEnum.cs-56-
+Packet_ClientIdEnum.cs-57-	public const int RequestPositionTCP = 34;
+Packet_ClientIdEnum.cs-58-
+Packet_ClientIdEnum.cs-59-	public const int UdpPacket = 35;
+Packet_ClientIdEnum.cs-60-}
+--
+Packet_ClientSerializer.cs-233-				if (instance.EntityPacket == null)
+Packet_ClientSerializer.cs-234-				{
+Packet_ClientSerializer.cs-235-					instance.EntityPacket = Packet_EntityPacketSerializer.DeserializeLengthDelimitedNew(stream);
+Packet_ClientSerializer.cs-236-				}
+Packet_ClientSerializer.cs-237-				else
+Packet_ClientSerializer.cs-238-				{
+Packet_ClientSerializer.cs-239-					Packet_EntityPacketSerializer.DeserializeLengthDelimited(stream, instance.EntityPacket);
+Packet_ClientSerializer.cs-240-				}
+Packet_ClientSerializer.cs-241-				break;
+Packet_ClientSerializer.cs-242-			case 194:
+Packet_ClientSerializer.cs-243-				if (instance.CustomPacket == null)
+Packet_ClientSerializer.cs-244-				{
+Packet_ClientSerializer.cs:245:					instance.CustomPacket = Packet_CustomPacketSerializer.DeserializeLengthDelimitedNew(stream);
+Packet_ClientSerializer.cs-246-				}
+Packet_ClientSerializer.cs-247-				else
+Packet_ClientSerializer.cs-248-				{
+Packet_ClientSerializer.cs-249-					Packet_CustomPacketSerializer.DeserializeLengthDelimited(stream, instance.CustomPacket);
+Packet_ClientSerializer.cs-250-				}
+Packet_ClientSerializer.cs-251-				break;
+Packet_ClientSerializer.cs-252-			case 202:
+Packet_ClientSerializer.cs-253-				if (instance.HandInteraction == null)
+Packet_ClientSerializer.cs-254-				{
+Packet_ClientSerializer.cs-255-					instance.HandInteraction = Packet_ClientHandInteractionSerializer.DeserializeLengthDelimitedNew(stream);
+Packet_ClientSerializer.cs-256-				}
+Packet_ClientSerializer.cs-257-				else
+Packet_ClientSerializer.cs-258-				{
+Packet_ClientSerializer.cs-259-					Packet_ClientHandInteractionSerializer.DeserializeLengthDelimited(stream, instance.HandInteraction);
+Packet_ClientSerializer.cs-260-				}
+Packet_ClientSerializer.cs-261-				break;
+Packet_ClientSerializer.cs-262-			case 210:
+Packet_ClientSerializer.cs-263-				if (instance.ToolMode == null)
+Packet_ClientSerializer.cs-264-				{
+Packet_ClientSerializer.cs-265-					instance.ToolMode = Packet_ToolModeSerializer.DeserializeLengthDelimitedNew(stream);
+Packet_ClientSerializer.cs-266-				}
+Packet_ClientSerializer.cs-267-				else
+Packet_ClientSerializer.cs-268-				{
+Packet_ClientSerializer.cs-269-					Packet_ToolModeSerializer.DeserializeLengthDelimited(stream, instance.ToolMode);
+Packet_ClientSerializer.cs-270-				}
+--
+Packet_ServerSerializer.cs-443-				if (instance.SelectedHotbarSlot == null)
+Packet_ServerSerializer.cs-444-				{
+Packet_ServerSerializer.cs-445-					instance.SelectedHotbarSlot = Packet_SelectedHotbarSlotSerializer.DeserializeLengthDelimitedNew(stream);
+Packet_ServerSerializer.cs-446-				}
+Packet_ServerSerializer.cs-447-				else
+Packet_ServerSerializer.cs-448-				{
+Packet_ServerSerializer.cs-449-					Packet_SelectedHotbarSlotSerializer.DeserializeLengthDelimited(stream, instance.SelectedHotbarSlot);
+Packet_ServerSerializer.cs-450-				}
+Packet_ServerSerializer.cs-451-				break;
+Packet_ServerSerializer.cs-452-			case 442:
+Packet_ServerSerializer.cs-453-				if (instance.CustomPacket == null)
+Packet_ServerSerializer.cs-454-				{
+Packet_ServerSerializer.cs:455:					instance.CustomPacket = Packet_CustomPacketSerializer.DeserializeLengthDelimitedNew(stream);
+Packet_ServerSerializer.cs-456-				}
+Packet_ServerSerializer.cs-457-				else
+Packet_ServerSerializer.cs-458-				{
+Packet_ServerSerializer.cs-459-					Packet_CustomPacketSerializer.DeserializeLengthDelimited(stream, instance.CustomPacket);
+Packet_ServerSerializer.cs-460-				}
+Packet_ServerSerializer.cs-461-				break;
+Packet_ServerSerializer.cs-462-			case 450:
+Packet_ServerSerializer.cs-463-				if (instance.NetworkChannels == null)
+Packet_ServerSerializer.cs-464-				{
+Packet_ServerSerializer.cs-465-					instance.NetworkChannels = Packet_NetworkChannelsSerializer.DeserializeLengthDelimitedNew(stream);
+Packet_ServerSerializer.cs-466-				}
+Packet_ServerSerializer.cs-467-				else
+Packet_ServerSerializer.cs-468-				{
+Packet_ServerSerializer.cs-469-					Packet_NetworkChannelsSerializer.DeserializeLengthDelimited(stream, instance.NetworkChannels);
+Packet_ServerSerializer.cs-470-				}
+Packet_ServerSerializer.cs-471-				break;
+Packet_ServerSerializer.cs-472-			case 458:
+Packet_ServerSerializer.cs-473-				if (instance.GotoGroup == null)
+Packet_ServerSerializer.cs-474-				{
+Packet_ServerSerializer.cs-475-					instance.GotoGroup = Packet_GotoGroupSerializer.DeserializeLengthDelimitedNew(stream);
+Packet_ServerSerializer.cs-476-				}
+Packet_ServerSerializer.cs-477-				else
+Packet_ServerSerializer.cs-478-				{
+Packet_ServerSerializer.cs-479-					Packet_GotoGroupSerializer.DeserializeLengthDelimited(stream, instance.GotoGroup);
+Packet_ServerSerializer.cs-480-				}
+--
+Packet_ServerIdEnum.cs-77-	public const int BlockEntities = 48;
+Packet_ServerIdEnum.cs-78-
+Packet_ServerIdEnum.cs-79-	public const int PlayerGroups = 49;
+Packet_ServerIdEnum.cs-80-
+Packet_ServerIdEnum.cs-81-	public const int PlayerGroup = 50;
+Packet_ServerIdEnum.cs-82-
+Packet_ServerIdEnum.cs-83-	public const int SpawnPosition = 51;
+Packet_ServerIdEnum.cs-84-
+Packet_ServerIdEnum.cs-85-	public const int HighlightBlocks = 52;
+Packet_ServerIdEnum.cs-86-
+Packet_ServerIdEnum.cs-87-	public const int SelectedHotbarSlot = 53;
+Packet_ServerIdEnum.cs-88-
+Packet_ServerIdEnum.cs:89:	public const int CustomPacket = 55;
+Packet_ServerIdEnum.cs-90-
+Packet_ServerIdEnum.cs-91-	public const int NetworkChannels = 56;
+Packet_ServerIdEnum.cs-92-
+Packet_ServerIdEnum.cs-93-	public const int GotoGroup = 57;
+Packet_ServerIdEnum.cs-94-
+Packet_ServerIdEnum.cs-95-	public const int ExchangeBlock = 58;
+Packet_ServerIdEnum.cs-96-
+Packet_ServerIdEnum.cs-97-	public const int StopMovement = 59;
+Packet_ServerIdEnum.cs-98-
+Packet_ServerIdEnum.cs-99-	public const int EntityBulkAttributes = 60;
+Packet_ServerIdEnum.cs-100-
+Packet_ServerIdEnum.cs-101-	public const int SpawnParticles = 61;
+Packet_ServerIdEnum.cs-102-
+Packet_ServerIdEnum.cs-103-	public const int EntityBulkDebugAttributes = 62;
+Packet_ServerIdEnum.cs-104-
+Packet_ServerIdEnum.cs-105-	public const int SetBlocksNoRelight = 63;
+Packet_ServerIdEnum.cs-106-
+Packet_ServerIdEnum.cs-107-	public const int BlockDamage = 64;
+Packet_ServerIdEnum.cs-108-
+Packet_ServerIdEnum.cs-109-	public const int Ambient = 65;
+Packet_ServerIdEnum.cs-110-
+Packet_ServerIdEnum.cs-111-	public const int NotifySlot = 66;
+Packet_ServerIdEnum.cs-112-
+Packet_ServerIdEnum.cs-113-	public const int IngameError = 68;
+Packet_ServerIdEnum.cs-114-
+--
+Vintagestory.Server/NetworkChannel.cs-91-	{
+Vintagestory.Server/NetworkChannel.cs-92-		reusableStream.Reset();
+Vintagestory.Server/NetworkChannel.cs-93-		Serializer.Serialize((Stream)reusableStream, message);
+Vintagestory.Server/NetworkChannel.cs-94-		return GenPacket(message, reusableStream.ToArray());
+Vintagestory.Server/NetworkChannel.cs-95-	}
+Vintagestory.Server/NetworkChannel.cs-96-
+Vintagestory.Server/NetworkChannel.cs-97-	private Packet_Server GenPacket<T>(T message, byte[] data)
+Vintagestory.Server/NetworkChannel.cs-98-	{
+Vintagestory.Server/NetworkChannel.cs-99-		if (!messageTypes.TryGetValue(typeof(T), out var value))
+Vintagestory.Server/NetworkChannel.cs-100-		{
+Vintagestory.Server/NetworkChannel.cs-101-			throw new Exception("No such message type " + typeof(T)?.ToString() + " registered. Did you forgot to call RegisterMessageType?");
+Vintagestory.Server/NetworkChannel.cs-102-		}
+Vintagestory.Server/NetworkChannel.cs:103:		Packet_CustomPacket packet_CustomPacket = new Packet_CustomPacket
+Vintagestory.Server/NetworkChannel.cs-104-		{
+Vintagestory.Server/NetworkChannel.cs-105-			ChannelId = channelId,
+Vintagestory.Server/NetworkChannel.cs-106-			MessageId = value
+Vintagestory.Server/NetworkChannel.cs-107-		};
+Vintagestory.Server/NetworkChannel.cs-108-		packet_CustomPacket.SetData(data);
+Vintagestory.Server/NetworkChannel.cs-109-		return new Packet_Server
+Vintagestory.Server/NetworkChannel.cs-110-		{
+Vintagestory.Server/NetworkChannel.cs-111-			Id = 55,
+Vintagestory.Server/NetworkChannel.cs:112:			CustomPacket = packet_CustomPacket
+Vintagestory.Server/NetworkChannel.cs-113-		};
+Vintagestory.Server/NetworkChannel.cs-114-	}
+Vintagestory.Server/NetworkChannel.cs-115-}
+--
+Packet_CustomPacketSerializer.cs-1-using System;
+Packet_CustomPacketSerializer.cs-2-
+Packet_CustomPacketSerializer.cs-3-public class Packet_CustomPacketSerializer
+Packet_CustomPacketSerializer.cs-4-{
+Packet_CustomPacketSerializer.cs-5-	private const int field = 8;
+Packet_CustomPacketSerializer.cs-6-
+Packet_CustomPacketSerializer.cs-7-	public static Packet_CustomPacket DeserializeLengthDelimitedNew(CitoMemoryStream stream)
+Packet_CustomPacketSerializer.cs-8-	{
+Packet_CustomPacketSerializer.cs:9:		Packet_CustomPacket packet_CustomPacket = new Packet_CustomPacket();
+Packet_CustomPacketSerializer.cs-10-		DeserializeLengthDelimited(stream, packet_CustomPacket);
+Packet_CustomPacketSerializer.cs-11-		return packet_CustomPacket;
+Packet_CustomPacketSerializer.cs-12-	}
+Packet_CustomPacketSerializer.cs-13-
+Packet_CustomPacketSerializer.cs-14-	public static Packet_CustomPacket DeserializeBuffer(byte[] buffer, int length, Packet_CustomPacket instance)
+Packet_CustomPacketSerializer.cs-15-	{
+Packet_CustomPacketSerializer.cs-16-		Deserialize(new CitoMemoryStream(buffer, length), instance);
+Packet_CustomPacketSerializer.cs-17-		return instance;
+Packet_CustomPacketSerializer.cs-18-	}
+Packet_CustomPacketSerializer.cs-19-
+Packet_CustomPacketSerializer.cs-20-	public static Packet_CustomPacket Deserialize(CitoMemoryStream stream, Packet_CustomPacket instance)
+Packet_CustomPacketSerializer.cs-21-	{
+Packet_CustomPacketSerializer.cs-22-		instance.InitializeValues();
+Packet_CustomPacketSerializer.cs-23-		int num;
+Packet_CustomPacketSerializer.cs-24-		while (true)
+Packet_CustomPacketSerializer.cs-25-		{
+Packet_CustomPacketSerializer.cs-26-			num = stream.ReadByte();
+Packet_CustomPacketSerializer.cs-27-			if ((num & 0x80) != 0)
+Packet_CustomPacketSerializer.cs-28-			{
+Packet_CustomPacketSerializer.cs-29-				num = ProtocolParser.ReadKeyAsInt(num, stream);
+Packet_CustomPacketSerializer.cs-30-				if ((num & 0x4000) != 0)
+Packet_CustomPacketSerializer.cs-31-				{
+Packet_CustomPacketSerializer.cs-32-					break;
+Packet_CustomPacketSerializer.cs-33-				}
+Packet_CustomPacketSerializer.cs-34-			}
