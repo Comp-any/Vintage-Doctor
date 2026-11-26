@@ -25,7 +25,7 @@ namespace VintageDoctor
         public static readonly string[] Topics =
         {
             Overview, Checks.TopicCrash, Checks.TopicStartup, Checks.TopicLog, Checks.TopicMods, Checks.TopicMod, Checks.TopicPerf, Checks.TopicFiles,
-            Checks.TopicPatches, Checks.TopicClashes, Checks.TopicChanges, Checks.TopicWorld, Checks.TopicItem, Checks.TopicBlock, Checks.TopicCraft, Checks.TopicHotkeys, BugReportTopic, Api
+            Checks.TopicPatches, Checks.TopicClashes, Checks.TopicChanges, Checks.TopicWorld, Checks.TopicItem, Checks.TopicBlock, Checks.TopicCraft, Checks.TopicHotkeys, Checks.TopicNetwork, BugReportTopic, Api
         };
 
         public static string Canonical(string topic)
@@ -46,6 +46,7 @@ namespace VintageDoctor
                 case "hand": case "held": return Checks.TopicItem;
                 case "recipe": case "crafting": return Checks.TopicCraft;
                 case "keys": case "hotkey": return Checks.TopicHotkeys;
+                case "net": case "bandwidth": case "traffic": case "ping": case "connection": return Checks.TopicNetwork;
                 case "report": case "bug": return BugReportTopic;
                 default: return topic;
             }
@@ -109,7 +110,10 @@ namespace VintageDoctor
                 case Checks.TopicPerf:
                     if (server) Checks.Guarded(x, "performance", () => Checks.ServerPerformance(x, true));
                     else Checks.Guarded(x, "performance", () => Checks.ClientPerformance(x, true));
+                    // The traffic in a card, with the button to its own page.
+                    if (!(server && x.SameProcess)) Checks.Guarded(x, "network", () => { x.Section(x.T("sec-net")); Checks.Network(x, false); });
                     break;
+                case Checks.TopicNetwork: Checks.Guarded(x, "network", () => Checks.Network(x, true)); break;
                 case Checks.TopicFiles:
                     if (server && x.SameProcess) break;
                     Checks.Guarded(x, "folder", () => Checks.Folder(x, true));
@@ -329,6 +333,7 @@ namespace VintageDoctor
                 Checks.Guarded(x, "configs", () => Checks.Configs(x, false));
             }
             Checks.Guarded(x, "performance", () => Checks.ServerPerformance(x, false));
+            if (!x.SameProcess) Checks.Guarded(x, "network", () => Checks.Network(x, false));
             Checks.Guarded(x, "world", () => Checks.WorldChecks(x, false));
             Checks.Guarded(x, "clashes", () => Checks.Clashes(x, false));
             Checks.Guarded(x, "conflicts", () => Checks.Conflicts(x));
@@ -353,6 +358,7 @@ namespace VintageDoctor
             Checks.Guarded(x, "folder", () => Checks.Folder(x, false));
             Checks.Guarded(x, "configs", () => Checks.Configs(x, false));
             Checks.Guarded(x, "performance", () => Checks.ClientPerformance(x, false));
+            Checks.Guarded(x, "network", () => Checks.Network(x, false));
             Checks.Guarded(x, "hotkeys", () => Checks.Hotkeys(x, false));
             Checks.Guarded(x, "chat", () => Checks.Chat(x, false));
             Checks.Guarded(x, "versus", () => Checks.ModsVersusServer(x, false));
@@ -683,6 +689,7 @@ namespace VintageDoctor
             Line(x.T("questions-help"));   // plain text: a note under the last card would be taken for one of its details
             Line(DoctorReport.Open(Checks.TopicCrash, "", x.T("q-crash")));
             Line(DoctorReport.Open(Checks.TopicPerf, "", x.T("q-perf")));
+            Line(DoctorReport.Open(Checks.TopicNetwork, "", x.T("q-network")));
             Line(DoctorReport.Open(Checks.TopicMods, "", x.T("q-mods")));
             Line(DoctorReport.Open(Checks.TopicChanges, "", x.T("q-changes")));
             Line(DoctorReport.Open(Checks.TopicItem, "hand", x.HeldItem?.Collectible != null ? x.T("q-item-held", DoctorReport.NameOf(x.HeldItem.Collectible)) : x.T("q-item")));

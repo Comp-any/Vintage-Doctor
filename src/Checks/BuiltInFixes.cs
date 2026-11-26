@@ -32,6 +32,7 @@ namespace VintageDoctor
             Add("doctor:unwrap", Unwrap);
             Add("doctor:disable-mod", DisableMod);
             Add("doctor:profile", Profile);
+            Add("doctor:netmeasure", NetMeasure);
             if (api.Side == EnumAppSide.Server) Add("doctor:remove-items", RemoveItems);
             else
             {
@@ -209,6 +210,18 @@ namespace VintageDoctor
             if (p.Running) return x.T("fix-profile-running", p.SecondsLeft);
             if (!p.Start(x.Api.World, seconds)) return x.Failed(x.T("fix-profile-failed", p.Error ?? "?"));
             return x.T("fix-profile-started", p.Seconds);
+        }
+
+        /// <summary>Counts the network traffic by kind and by mod for a while (1.9.0).</summary>
+        static string NetMeasure(DoctorFixContext x)
+        {
+            int.TryParse(x.Argument, NumberStyles.Integer, CultureInfo.InvariantCulture, out int seconds);
+            if (seconds <= 0) seconds = 20;
+            NetWatch n = x.Doctor.Net;
+            if (n == null) return x.Failed(x.T("fix-netmeasure-failed", "?"));
+            if (n.Running) return x.T("fix-netmeasure-running", n.SecondsLeft);
+            if (!n.Start(seconds)) return x.Failed(x.T("fix-netmeasure-failed", n.MeasureError ?? "?"));
+            return x.T("fix-netmeasure-started", n.RunSeconds);
         }
 
         /// <summary>Removes the items lying on the ground in the loaded part of the world.</summary>

@@ -176,6 +176,8 @@ namespace VintageDoctor
             public readonly List<Detail> Details = new List<Detail>();
             public readonly List<(string kind, string target, string arg, string label)> Actions = new List<(string, string, string, string)>();
             public bool HasFix => Details.Any(d => d.Fix) || Actions.Any(a => a.kind == "fix");
+            /// <summary>Graphs on this line (1.9.0): drawn under its text, before its buttons.</summary>
+            public readonly List<(string values, string unit, string label)> Graphs = new List<(string, string, string)>();
         }
 
         sealed class Detail
@@ -235,6 +237,17 @@ namespace VintageDoctor
                 plain.Title = TakeActions(t, plain.Actions);
                 plain.Plain = DoctorReport.Plain(capi.World, plain.Title);
                 entries.Add(plain);
+            }
+            // Graphs are drawn, not buttons. One in a card's details is written out in words there.
+            foreach (Entry e in entries)
+            {
+                foreach (var a in e.Actions.Where(a => a.kind == "graph").ToList()) { e.Actions.Remove(a); e.Graphs.Add((a.target, a.arg, a.label)); }
+                foreach (Detail d in e.Details)
+                    foreach (var a in d.Actions.Where(a => a.kind == "graph").ToList())
+                    {
+                        d.Actions.Remove(a);
+                        d.Text = (d.Text + " " + GameFont.Drawable(DoctorReport.PlainAction(a.kind, a.target, a.arg, a.label))).Trim();
+                    }
             }
             // Every card that isn't simply "passed" gets a button that copies it whole, to paste into a report.
             foreach (Entry e in entries)
@@ -421,7 +434,7 @@ namespace VintageDoctor
             }
             foreach (Entry e in entries)
             {
-                if (e.Kind == Kind.Text && e.Title.Length == 0 && e.Actions.Count > 0) group.Add(e);
+                if (e.Kind == Kind.Text && e.Title.Length == 0 && e.Actions.Count > 0 && e.Graphs.Count == 0) group.Add(e);
                 else EndGroup();
             }
             EndGroup();
@@ -542,6 +555,7 @@ namespace VintageDoctor
                             : e.Style == DoctorLineStyle.Total ? CairoFont.WhiteSmallText().WithColor(Green).WithWeight(FontWeight.Bold)
                             : CairoFont.WhiteSmallText();
                         if (e.Title.Length > 0) y = AddText(c, parent, e.Title, f, CardX + 4 + e.Indent * 16, y, CardW - 8 - e.Indent * 16);
+                        foreach (var g in e.Graphs) y = AddGraph(c, parent, g.values, g.unit, g.label, CardX + 4 + e.Indent * 16, y + 4, CardW - 8 - e.Indent * 16);
                         if (e.Actions.Count > 0) y = AddActions(c, parent, e.Actions, CardX + 4 + e.Indent * 16, y + 2, CardW - 8, dense: e.Title.Length == 0, uniform: uniformWidth.TryGetValue(e, out double uw) ? uw : (double?)null);
                         return y + 2;
                     }
@@ -798,6 +812,56 @@ namespace VintageDoctor
         }
 
         /// <summary>A small triangle centred on (tx, cy): pointing right when closed, down when open.</summary>
+        // ------------------------------------------------------------------ graphs (1.9.0)
+
+        public const double GraphH = 118;
+        static readonly double[][] GraphColours = { new[] { 0.95, 0.62, 0.25, 1 }, new[] { 0.40, 0.70, 0.95, 1 } };
+
+        double AddGraph(GuiComposer c, ElementBounds parent, string values, string unit, string label, double x, double y, double width)
+        {
+            List<List<double>> lines = DoctorReport.GraphValues(values);
+            string title = GameFont.Drawable(label);
+            Canvas(c, In(parent, ElementBounds.Fixed(x, y, width, GraphH)), (ctx, b) => DrawGraph(ctx, b, lines, unit, title));
+            return y + GraphH + 6;
+        }
+
+        /// <summary>A graph: a dark panel, a line per series (orange then blue), the highest value at the top left and the title.</summary>
+        static void DrawGraph(Context ctx, ElementBounds b, List<List<double>> lines, string unit, string title)
+        {
+            double w = b.OuterWidth, h = b.OuterHeight, pad = GuiElement.scaled(6), text = GuiElement.scaled(12);
+            ctx.SetSourceRGBA(0, 0, 0, 0.35);
+            GuiElement.RoundRectangle(ctx, 0, 0, w, h, GuiElement.scaled(4));
+            ctx.Fill();
+            double max = 0;
+            foreach (var l in lines) foreach (double v in l) max = Math.Max(max, v);
+            if (max <= 0) max = 1;
+            ctx.SelectFontFace("sans-serif", FontSlant.Normal, FontWeight.Normal);
+            ctx.SetFontSize(text);
+            ctx.SetSourceRGBA(0.9, 0.88, 0.84, 1);
+            ctx.MoveTo(pad, pad + text);
+            ctx.ShowText(title + "   " + GameFont.Drawable(DoctorReport.GraphNumber(max, unit)));
+            double top = pad * 2 + text, bottom = h - pad, left = pad, right = w - pad;
+            // A faint line at the middle, so heights can be read.
+            ctx.SetSourceRGBA(1, 1, 1, 0.08);
+            ctx.LineWidth = 1;
+            ctx.MoveTo(left, (top + bottom) / 2); ctx.LineTo(right, (top + bottom) / 2); ctx.Stroke();
+            for (int s = 0; s < lines.Count && s < GraphColours.Length; s++)
+            {
+                List<double> v = lines[s];
+                if (v.Count == 0) continue;
+                double[] col = GraphColours[s];
+                ctx.SetSourceRGBA(col[0], col[1], col[2], col[3]);
+                ctx.LineWidth = GuiElement.scaled(1.6);
+                for (int i = 0; i < v.Count; i++)
+                {
+                    double px = v.Count == 1 ? right : left + (right - left) * i / (v.Count - 1);
+                    double py = bottom - (bottom - top) * v[i] / max;
+                    if (i == 0) ctx.MoveTo(px, py); else ctx.LineTo(px, py);
+                }
+                ctx.Stroke();
+            }
+        }
+
         static void DrawTriangle(Context ctx, double tx, double cy, bool open, double[] colour)
         {
             double s = GuiElement.scaled(5);

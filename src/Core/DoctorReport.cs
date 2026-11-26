@@ -68,7 +68,7 @@ namespace VintageDoctor
         // ---------------------------------------------------------------- tokens
 
         public static readonly Regex RefToken = new Regex(@"\[\[((?:item|block):[^\[\]]+)\]\]", RegexOptions.Compiled);
-        public static readonly Regex ActionToken = new Regex(@"\{\{(open|fix|url|copy|folder)\|([^|{}]*)\|([^|{}]*)\|([^{}|]*)\}\}", RegexOptions.Compiled);
+        public static readonly Regex ActionToken = new Regex(@"\{\{(open|fix|url|copy|folder|graph)\|([^|{}]*)\|([^|{}]*)\|([^{}|]*)\}\}", RegexOptions.Compiled);
 
         /// <summary>Text made safe to sit inside a token (the separators taken out).</summary>
         public static string Safe(string s) => (s ?? "").Replace('{', '(').Replace('}', ')').Replace('|', '/').Replace("[[", "[").Replace("]]", "]");
@@ -79,6 +79,46 @@ namespace VintageDoctor
         public static string Fix(char side, string fixId, string arg, string label) => Token("fix", side + ":" + fixId, arg, label);
         public static string Url(string url, string label) => Token("url", url, "", label);
         public static string Copy(string text, string label) => Token("copy", text, "", label);
+
+        /// <summary>
+        /// A graph (1.9.0): one or two lines of numbers over time, oldest first, drawn by the window; elsewhere written
+        /// as the newest, the average and the highest. <paramref name="unit"/> is "bytes" (shown as B/s, KB/s...) or
+        /// any word written after each number.
+        /// </summary>
+        public static string Graph(string label, string unit, IList<double> first, IList<double> second = null)
+        {
+            string Join(IList<double> v) => string.Join(",", v.Select(d => Math.Round(d, 1).ToString(System.Globalization.CultureInfo.InvariantCulture)));
+            return Token("graph", Join(first) + (second != null && second.Count > 0 ? ";" + Join(second) : ""), unit, label);
+        }
+
+        /// <summary>A graph token's lines of numbers.</summary>
+        public static List<List<double>> GraphValues(string target)
+        {
+            var all = new List<List<double>>();
+            foreach (string part in (target ?? "").Split(';'))
+            {
+                var v = new List<double>();
+                foreach (string n in part.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                    if (double.TryParse(n, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double d)) v.Add(d);
+                all.Add(v);
+            }
+            return all;
+        }
+
+        /// <summary>A number in a graph's unit: bytes a second as B/s, KB/s, MB/s.</summary>
+        public static string GraphNumber(double v, string unit)
+        {
+            if (unit != "bytes") return Math.Round(v, 1).ToString(System.Globalization.CultureInfo.InvariantCulture) + (string.IsNullOrEmpty(unit) ? "" : " " + unit);
+            return Rate(v);
+        }
+
+        public static string Rate(double bytesPerSecond)
+        {
+            var c = System.Globalization.CultureInfo.InvariantCulture;
+            if (bytesPerSecond < 1024) return Math.Round(bytesPerSecond).ToString(c) + " B/s";
+            if (bytesPerSecond < 1024 * 1024) return (bytesPerSecond / 1024).ToString(bytesPerSecond < 10240 ? "0.0" : "0", c) + " KB/s";
+            return (bytesPerSecond / 1024 / 1024).ToString("0.00", c) + " MB/s";
+        }
         public static string Folder(string which, string label) => Token("folder", which, "", label);
         /// <summary>
         /// A button that opens one file of a folder on the player's computer ("logs", "client-main.log"). It is a
@@ -138,6 +178,12 @@ namespace VintageDoctor
                     }
                 case "url": return label + " (" + target + ")";
                 case "copy": return label + ": " + target;
+                case "graph":
+                    {
+                        var lines = GraphValues(target).Where(v => v.Count > 0).ToList();
+                        if (lines.Count == 0) return label;
+                        return label + ": " + string.Join(" / ", lines.Select(v => GraphNumber(v[v.Count - 1], arg) + " (avg " + GraphNumber(v.Average(), arg) + ", top " + GraphNumber(v.Max(), arg) + ")"));
+                    }
                 default: return label;
             }
         }

@@ -172,6 +172,9 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             };
 
             // The measured run takes a few seconds: its result is added when it is over, and the file written then.
+            bool netStarted = doctor.Net.Start(5);
+            t.Check("network: measuring starts, with the game's own count by kind switched on", netStarted && doctor.Net.GameCounting && doctor.Net.SecondsLeft >= 3, doctor.Net.MeasureError);
+            t.Check("network: counting mods' messages by channel is patched into both of the server's ways of sending them", NetWatch.ChannelPatches == 2, NetWatch.ChannelPatches + " patched");
             bool started = doctor.Profile.Start(sapi.World, 5);
             t.Check("the tick profiler starts", started, doctor.Profile.Error);
             t.Check("while it runs it knows its seconds left, which go to the player's window with each page", !started || (doctor.Profile.Running && doctor.Profile.SecondsLeft >= 3 && doctor.Profile.SecondsLeft <= 5), doctor.Profile.SecondsLeft + " s left");
@@ -189,6 +192,18 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
                         string text = r.PlainText(sapi.World);
                         File.WriteAllText(Path.Combine(folder, "page-perf-profiled.txt"), text);
                         t.Check("the performance page shows the measured run", text.Contains("ms") && text.Contains("%"), null);
+                    });
+                    t.Guard("the network", () =>
+                    {
+                        NetWatch n = doctor.Net;
+                        t.Check("network: the traffic is sampled every second", n.Error == null && n.Seconds().Count >= 5, (n.Error ?? "") + " " + n.Seconds().Count + " seconds");
+                        t.Check("network: the measured run finished, and the game's count by kind is off again", n.HasResult && !n.GameCounting && n.MeasureError == null, n.MeasureError);
+                        DoctorReport r = doctor.BuildPage(doctor.EvidenceNow(false), null, "en", Checks.TopicNetwork, "");
+                        string text = r.PlainText(sapi.World);
+                        File.WriteAllText(Path.Combine(folder, "page-network-measured.txt"), text);
+                        t.Check("network: the page shows the measured run and graphs", text.Contains("Measured over") && text.Contains("Last minute") && text.Contains("avg"), First(text, "Measured"));
+                        t.Check("network: the page has the measure button and the perf page a button to it", text.Contains("fix doctor:netmeasure")
+                            && doctor.BuildPage(doctor.EvidenceNow(false), null, "en", Checks.TopicPerf, "").PlainText(sapi.World).Contains("/doctor network"), null);
                     });
                     whatCameLater();
                     Finish(t, doctor, sapi, folder);
@@ -211,6 +226,17 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
 
         static void SmallThings(Run_ t)
         {
+            string g = DoctorReport.Graph("Sent and received", "bytes", new double[] { 0, 1024, 2048 }, new double[] { 10, 20.5, 30 });
+            var gm = DoctorReport.ActionToken.Match(g);
+            var gv = DoctorReport.GraphValues(gm.Groups[2].Value);
+            t.Check("graph: a token holds two lines of numbers and reads back", gm.Success && gm.Groups[1].Value == "graph" && gv.Count == 2 && gv[0].Count == 3 && gv[1][1] == 20.5, g);
+            string gp = DoctorReport.Plain(null, g);
+            t.Check("graph: written out, it is the newest, the average and the top of each line", gp == "Sent and received: 2.0 KB/s (avg 1.0 KB/s, top 2.0 KB/s) / 30 B/s (avg 20 B/s, top 30 B/s)", gp);
+            t.Check("network: rates in B/s, KB/s, MB/s", DoctorReport.Rate(500) == "500 B/s" && DoctorReport.Rate(20 * 1024) == "20 KB/s" && DoctorReport.Rate(3 * 1024 * 1024) == "3.00 MB/s");
+            t.Check("network: a lot is over 1.5 MB/s for each player for half a minute", Checks.NetHigh(4e6, 2, 60) && !Checks.NetHigh(2e6, 2, 60) && !Checks.NetHigh(4e6, 2, 10) && Checks.NetHigh(2e6, 0, 60));
+            var secs = Enumerable.Range(0, 120).Select(i => new NetWatch.Second { SentTcp = i }).ToList();
+            var pts = NetWatch.Points(secs, q => q.Sent, 60);
+            t.Check("network: ten minutes put together into points for a graph", pts.Count == 60 && pts[0] == 0.5 && pts[59] == 118.5, string.Join(",", pts.Take(3)));
             t.Check("versions: 1.10.0 is newer than 1.9.2", Versions.Compare("1.10.0", "1.9.2") > 0);
             t.Check("versions: 1.0.0 is newer than 1.0.0-rc.1", Versions.Compare("1.0.0", "1.0.0-rc.1") > 0);
             t.Check("versions: rc.2 is newer than rc.1", Versions.Compare("1.0.0-rc.2", "1.0.0-rc.1") > 0);
@@ -1008,7 +1034,7 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             var pages = new List<(string topic, string arg)>
             {
                 (Pages.Overview, ""), ("deep", ""), (Checks.TopicCrash, ""), (Checks.TopicStartup, ""), (Checks.TopicLog, ""), (Checks.TopicLog, firstMod), (Checks.TopicMods, ""),
-                (Checks.TopicMod, DoctorApi.ModId), (Checks.TopicMod, firstMod), (Checks.TopicMod, "nosuchmod"), (Checks.TopicPerf, ""), (Checks.TopicFiles, ""), (Checks.TopicPatches, ""), (Checks.TopicClashes, ""),
+                (Checks.TopicMod, DoctorApi.ModId), (Checks.TopicMod, firstMod), (Checks.TopicMod, "nosuchmod"), (Checks.TopicPerf, ""), (Checks.TopicNetwork, ""), (Checks.TopicFiles, ""), (Checks.TopicPatches, ""), (Checks.TopicClashes, ""),
                 (Checks.TopicChanges, ""), (Checks.TopicWorld, ""), (Checks.TopicItem, "game:ingot-copper"), (Checks.TopicItem, "game:nosuchitem"), (Checks.TopicItem, ""), (Checks.TopicBlock, ""),
                 (Checks.TopicCraft, "game:axe-copper"), (Checks.TopicCraft, "game:ingot-copper"), (Pages.BugReportTopic, ""), (Pages.BugReportTopic, firstMod), (Pages.Api, ""),
                 ("example-tanks", ""), ("example-pipes", ""), ("nosuchpage", ""), (firstMod, ""), ("game:ingot-copper", "")

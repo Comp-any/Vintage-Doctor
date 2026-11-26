@@ -18,7 +18,7 @@ namespace VintageDoctor
         /// <summary>What the check-up found right after start-up, for the log line and the note to admins.</summary>
         public int StartupProblems { get; private set; } = -1;
         public int StartupWarnings { get; private set; }
-        string profileAsker;
+        string profileAsker, netAsker;
 
         public override void StartServerSide(ICoreServerAPI api)
         {
@@ -28,8 +28,11 @@ namespace VintageDoctor
             serverChannel = api.Network.GetChannel(Channel);
             serverChannel.SetMessageHandler<DoctorRequestPacket>(OnRequest);
             BeginSession();
-            api.Event.RegisterGameTickListener(_ => { Ticks.Tick(); MemoryTrend.Tick(); if (Profile.Running) Profile.Tick(); }, 1);
+            Net = new NetWatch(api);
+            api.Event.RegisterGameTickListener(_ => { Ticks.Tick(); MemoryTrend.Tick(); if (Profile.Running) Profile.Tick(); if (Net.Running) Net.Tick(); }, 1);
+            api.Event.RegisterGameTickListener(_ => Net.Sample(), 1000);
             Profile.OnFinished = _ => OnProfileFinished();
+            Net.OnFinished = _ => OnNetFinished();
             RegisterCommand(api);
             api.Event.PlayerDisconnect += p => { lock (gate) clientsWithDoctor.Remove(p.PlayerUID); };
             api.Event.PlayerNowPlaying += OnPlayerNowPlaying;
@@ -145,6 +148,7 @@ namespace VintageDoctor
                         packet.ServerTopics = topics.Select(t => t.Id + "|" + WordsIn(lang, t.Question ?? t.Id)).ToArray();
                         packet.ServerTopicMods = topics.Select(t => t.ModId ?? "").ToArray();
                         packet.ServerProfileLeft = Profile.Running ? Math.Max(1, Profile.SecondsLeft) : 0;
+                        packet.ServerNetLeft = Net.Running ? Math.Max(1, Net.SecondsLeft) : 0;
                         serverChannel.SendPacket(packet, player);
                     }, Working);
                 }
@@ -154,6 +158,7 @@ namespace VintageDoctor
                     WithEvidence(false, ev =>
                     {
                         if (p.FixId == "doctor:profile") profileAsker = player.PlayerUID;
+                        if (p.FixId == "doctor:netmeasure") netAsker = player.PlayerUID;
                         // What was read may no longer be true after a fix.
                         RunFixThen(p.FixId, p.FixArg, player, lang, ev, facts, outcome => WithEvidence(true, fresh => Answer(fresh, outcome)), Working);
                     });
@@ -167,18 +172,22 @@ namespace VintageDoctor
             }
         }
 
-        void OnProfileFinished()
+        void OnProfileFinished() => OpenWhenDone(ref profileAsker, Checks.TopicPerf);
+        void OnNetFinished() => OpenWhenDone(ref netAsker, Checks.TopicNetwork);
+
+        /// <summary>A measured run is done: the page it belongs to opens again on the game of whoever started it.</summary>
+        void OpenWhenDone(ref string asker, string topic)
         {
             if (sapi == null) return;
-            string uid = profileAsker;
-            profileAsker = null;
+            string uid = asker;
+            asker = null;
             if (uid == null) return;
             try
             {
                 var player = sapi.World.PlayerByUid(uid) as IServerPlayer;
                 bool has;
                 lock (gate) has = clientsWithDoctor.Contains(uid);
-                if (player != null && has && player.ConnectionState == EnumClientState.Playing) serverChannel.SendPacket(new DoctorOpenPacket { Topic = Checks.TopicPerf, Arg = "" }, player);
+                if (player != null && has && player.ConnectionState == EnumClientState.Playing) serverChannel.SendPacket(new DoctorOpenPacket { Topic = topic, Arg = "" }, player);
             }
             catch { }
         }

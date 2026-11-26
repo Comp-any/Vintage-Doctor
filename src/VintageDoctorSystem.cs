@@ -46,6 +46,8 @@ namespace VintageDoctor
         public readonly TickWatch Ticks = new TickWatch();
         public readonly TickProfile Profile = new TickProfile();
         public readonly MemoryWatch MemoryTrend = new MemoryWatch();
+        /// <summary>The network traffic, sampled every second (1.9.0).</summary>
+        public NetWatch Net;
         public string DataFolder { get; private set; }
         public bool IsDedicated { get; private set; }
 
@@ -491,6 +493,7 @@ namespace VintageDoctor
         public override void Dispose()
         {
             try { Profile.Stop(); } catch { }
+            try { Net?.Stop(); } catch { }
             EndSession();
             lock (live) live.Remove(this);
             base.Dispose();

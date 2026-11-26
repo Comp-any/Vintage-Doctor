@@ -335,6 +335,13 @@ Inside a line:
   (`server-main.log`, `client-debug.log`; only a plain `.log` or `.txt` name), and `{{folder|logs||<label>}}` the
   folder. A doctor before 1.4.0 opens the folder for both. You rarely need to write it: naming the file in the
   line is enough (below), and then the button is only there where the file is on the player's computer.
+- `{{graph|<values>|<unit>|<title>}}` (1.9.0) is a graph, drawn under the line's text: the values oldest first,
+  separated by `,` (a dot for decimals), and a second line (blue, the first is orange) after `;`. `<unit>` is
+  `bytes` for bytes a second (written B/s, KB/s, MB/s) or any word written after each number. Put it on a line of
+  its own that isn't a card's detail (`Line` with the plain style): in a card's details it is written out in words.
+  The console and the copy buttons get the newest, the average and the top value. A doctor before 1.9.0 shows the
+  token as it is, so only send it when the doctor's version (`api.ModLoader.GetMod("vintagedoctor")?.Info.Version`) is 1.9.0 or later. About 60
+  values is plenty: the window is not much wider than that in points worth telling apart.
 - `[[item:game:ingot-copper]]` or `[[block:...]]` shows the thing's icon and name.
 
 Labels and arguments can't contain `{`, `}` or `|`.

@@ -47,7 +47,7 @@ button that copies it all for a report.
   said once. The server's half needs the `controlserver` privilege.
 - **Pages** (each also a command, `/doctor <page> [argument]`):
   - `crash`, `perf`, `mods`, `mod <id>`, `log [id]`, `startup`, `files`, `patches`, `clashes`, `changes`, `world`;
-  - `item [code]`, `block`, `craft [code]`, `hotkeys`, `bugreport [id]`, `api`;
+  - `item [code]`, `block`, `craft [code]`, `hotkeys`, `network`, `bugreport [id]`, `api`;
   - plus any page a mod adds (`emc`, `farrelief`).
 
   `/doctor fix <id> [argument]` runs a fix.
@@ -72,6 +72,8 @@ button that copies it all for a report.
   - a `.dll` in a subfolder;
   - broken or empty config files.
 - **Lag:** tick times / frame rate, memory growth, a 20 s profile with the game's own profiler.
+- **Network** (1.9.0): traffic sent and received on both sides, graphs, and a 20 s measurement by kind of packet
+  and by mod (mods' channels). Code: `src/Core/NetWatch.cs`, `src/Checks/ChecksNet.cs`.
 - **Mods against each other:**
   - classes and behaviours no mod has;
   - things registered twice;
@@ -112,7 +114,7 @@ button that copies it all for a report.
 - **A report line's text** carries:
   - **marks:** ✓ ⚠ ✖ • for the level, → for advice;
   - **buttons as tokens:** `{{open|page|arg|label}}`, `{{fix|id|arg|label}}`, `{{url|address||label}}`,
-    `{{copy|text||label}}`, `{{folder|logs|file|label}}`;
+    `{{copy|text||label}}`, `{{folder|logs|file|label}}`, `{{graph|1,2,3;4,5,6|bytes|title}}` (1.9.0);
   - **references:** `[[item:code]]`, `[[block:code]]`.
 
   Labels and arguments can't contain `{ } |`.

@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.9.0
+
+- **Network traffic.** The check-up and the performance page have a card for the network: what the server sends and receives (and for how many players), and what your game receives, averaged over the last minute, with the busiest second and the totals. It warns when the traffic stays over 1.5 MB/s for each player, which slow connections can't keep up with.
+- **A network page of its own** (`/doctor network`, or the button on the card): the same with graphs of the last minute and the last ten minutes, sent and received, for the server and for your game.
+- **Measure the network.** A button on the network page counts the traffic for 20 seconds, on the server and your game at once, and shows what it is made of: chunks, creatures, changed blocks, block entities by type, and mods' messages by mod (each mod's channel, with a button to its page). A mod that sends most of the traffic gets a warning card with a copy button for its author. The window's status line counts down while it measures, and the page opens again when it is done. It uses the game's own counters; the count by mod is done by two small patches on the server's sending that do nothing between measurements.
+- **Graphs for other mods.** A page line can hold `{{graph|values|unit|title}}` (values comma separated, a second line after `;`, unit `bytes` for B/s): the window draws it, the console writes the newest, the average and the top. See docs/api.md.
+
 ## 1.8.0
 
 - **A countdown while measuring.** When you press "Measure where the time goes", the window's status line now says what is being measured and how long is left ("Measuring the server: 14 s left", or your game, or both), counting down every half second; the page opens by itself when it is done. The server tells your game its seconds left with each page.

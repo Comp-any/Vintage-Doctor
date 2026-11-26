@@ -49,8 +49,12 @@ namespace VintageDoctor
             clientChannel.SetMessageHandler<DoctorReportPacket>(OnServerReport);
             clientChannel.SetMessageHandler<DoctorOpenPacket>(p => OpenDoctor(p?.Topic ?? "", p?.Arg ?? ""));
             BeginSession();
-            api.Event.RegisterGameTickListener(_ => { Ticks.Tick(); MemoryTrend.Tick(); if (Profile.Running) Profile.Tick(); }, 1);
+            Net = new NetWatch(api);
+            api.Event.RegisterGameTickListener(_ => { Ticks.Tick(); MemoryTrend.Tick(); if (Profile.Running) Profile.Tick(); if (Net.Running) Net.Tick(); }, 1);
+            api.Event.RegisterGameTickListener(_ => Net.Sample(), 1000);
             Profile.OnFinished = _ => { if (dialog != null && dialog.IsOpened()) OpenDoctor(Checks.TopicPerf, ""); };
+            // With the server measuring too, its answer opens the page; alone, this game does.
+            Net.OnFinished = _ => { if (dialog != null && dialog.IsOpened() && !ServerAnswers) OpenDoctor(Checks.TopicNetwork, ""); };
             // While a measured run goes (this game's or the server's), the window counts it down.
             api.Event.RegisterGameTickListener(_ => ShowProfileCountdown(), 500);
 
@@ -194,7 +198,7 @@ namespace VintageDoctor
         }
 
         /// <summary>When the server's measured run ends, by this game's clock (0: none running, as far as the last page said).</summary>
-        long serverProfileEndsAt;
+        long serverProfileEndsAt, serverNetEndsAt;
 
         /// <summary>
         /// The countdown in the window's status line while the profiler runs: on this game (its frames) or on the
@@ -211,6 +215,14 @@ namespace VintageDoctor
             if (mine > 0 && server > 0) text = Lang.Get("vintagedoctor:gui-profiling-both", mine, server);
             else if (mine > 0) text = Lang.Get(capi.IsSinglePlayer ? "vintagedoctor:gui-profiling-game" : "vintagedoctor:gui-profiling-client", mine);
             else if (server > 0) text = Lang.Get(capi.IsSinglePlayer ? "vintagedoctor:gui-profiling-world" : "vintagedoctor:gui-profiling-server", server);
+            if (text == null)
+            {
+                // The network's measured run, on either side.
+                long netMs = serverNetEndsAt - capi.ElapsedMilliseconds;
+                if (serverNetEndsAt > 0 && netMs <= -5000) serverNetEndsAt = 0;
+                int net = Math.Max(Net != null && Net.Running ? Math.Max(1, Net.SecondsLeft) : 0, serverNetEndsAt > 0 && netMs > 0 ? (int)Math.Ceiling(netMs / 1000.0) : 0);
+                if (net > 0) text = Lang.Get("vintagedoctor:gui-netmeasuring", net);
+            }
             dialog.SetProfiling(text == null ? null : GameFont.Drawable(text));
         }
 
@@ -253,6 +265,7 @@ namespace VintageDoctor
             if (packet.ServerMods != null) ServerMods = packet.ServerMods;
             if (packet.ServerTopics != null) { serverTopics = packet.ServerTopics; serverTopicMods = packet.ServerTopicMods; }
             serverProfileEndsAt = packet.ServerProfileLeft > 0 ? capi.ElapsedMilliseconds + packet.ServerProfileLeft * 1000L : 0;
+            serverNetEndsAt = packet.ServerNetLeft > 0 ? capi.ElapsedMilliseconds + packet.ServerNetLeft * 1000L : 0;
             Finish(p);
         }
 
@@ -357,7 +370,12 @@ namespace VintageDoctor
                 {
                     case "open": OpenDoctor(target, arg); break;
                     case "refresh": OpenDoctor(target, arg, fresh: true); break;
-                    case "fix": OpenDoctor(pending?.Topic ?? Pages.Overview, pending?.Arg ?? "", target, arg); break;
+                    case "fix":
+                        // Measuring the network on the server measures what this game receives at the same time.
+                        if (target == "s:doctor:netmeasure" && Net != null && !Net.Running && !capi.IsSinglePlayer)
+                            Net.Start(int.TryParse(arg, out int secs) ? secs : 20);
+                        OpenDoctor(pending?.Topic ?? Pages.Overview, pending?.Arg ?? "", target, arg);
+                        break;
                     case "url":
                         if (target.StartsWith("https://", StringComparison.OrdinalIgnoreCase) || target.StartsWith("http://", StringComparison.OrdinalIgnoreCase)) NetUtil.OpenUrlInBrowser(target);
                         break;

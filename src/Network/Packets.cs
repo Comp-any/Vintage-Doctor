@@ -66,6 +66,8 @@ namespace VintageDoctor
         [ProtoMember(17)] public string[] ServerTopicMods;
         /// <summary>(1.8.0) Seconds the server's measured run (the profiler) still has to go; 0 when none is running.</summary>
         [ProtoMember(18)] public int ServerProfileLeft;
+        /// <summary>Seconds left of the server's measured network run (1.9.0), 0 when none runs.</summary>
+        [ProtoMember(19)] public int ServerNetLeft;
     }
 
     /// <summary>Server → client: open the doctor's window on this page (the player typed /doctor).</summary>
