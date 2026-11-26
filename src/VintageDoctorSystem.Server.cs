@@ -144,6 +144,7 @@ namespace VintageDoctor
                         // In the asker's language: their game may not have the mod whose lang key the question is.
                         packet.ServerTopics = topics.Select(t => t.Id + "|" + WordsIn(lang, t.Question ?? t.Id)).ToArray();
                         packet.ServerTopicMods = topics.Select(t => t.ModId ?? "").ToArray();
+                        packet.ServerProfileLeft = Profile.Running ? Math.Max(1, Profile.SecondsLeft) : 0;
                         serverChannel.SendPacket(packet, player);
                     }, Working);
                 }

@@ -950,11 +950,22 @@ namespace VintageDoctor
         }
 
         /// <summary>Stops waiting and says something in the status line (a failure, "copied").</summary>
+        /// <summary>The measured run's countdown, shown in the status line in place of what was there; null when none runs.</summary>
+        string profiling, beforeProfiling;
+        public void SetProfiling(string text)
+        {
+            if (text == profiling) return;
+            profiling = text;
+            if (busy) return;
+            SingleComposer?.GetDynamicText("last")?.SetNewText(text ?? beforeProfiling ?? "");
+        }
+
         public void SetIdle(string text)
         {
             busy = false;
             busyText = null;
-            SingleComposer?.GetDynamicText("last")?.SetNewText(text ?? "");
+            beforeProfiling = text;
+            SingleComposer?.GetDynamicText("last")?.SetNewText(profiling ?? text ?? "");
             if (SingleComposer?.GetButton("run") is GuiElementTextButton run) run.Enabled = true;
         }
 

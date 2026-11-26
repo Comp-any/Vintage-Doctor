@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.8.0
+
+- **A countdown while measuring.** When you press "Measure where the time goes", the window's status line now says what is being measured and how long is left ("Measuring the server: 14 s left", or your game, or both), counting down every half second; the page opens by itself when it is done. The server tells your game its seconds left with each page.
+- The measuring card now says which side each button times (your game's frames, or the server's ticks) and that it runs for real seconds, so a lagging or overloaded game fits fewer ticks into it and its slow ticks show up as the time they took.
+
 ## 1.7.0
 
 - **Lines that break the chat, and a button that clears it.** The game draws all of a chat tab's lines as one formatted text, so a single line with a tag it never closes (say a mod's message with `<font ...>` and no `</font>`) changes every line after it, and a stray closing tag or `>` makes it write an error each time the chat is drawn, until the line is gone. The check-up now reads the chat's lines on your game and says which ones do this, with **Clear the chat** (the same as typing `.clearchat`) and **Copy the lines**, to send to whoever wrote them.

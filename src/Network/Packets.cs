@@ -64,6 +64,8 @@ namespace VintageDoctor
         [ProtoMember(16)] public string[] SectionTitles;
         /// <summary>(1.3.0) The mod each of <see cref="ServerTopics"/> belongs to, in the same order.</summary>
         [ProtoMember(17)] public string[] ServerTopicMods;
+        /// <summary>(1.8.0) Seconds the server's measured run (the profiler) still has to go; 0 when none is running.</summary>
+        [ProtoMember(18)] public int ServerProfileLeft;
     }
 
     /// <summary>Server → client: open the doctor's window on this page (the player typed /doctor).</summary>

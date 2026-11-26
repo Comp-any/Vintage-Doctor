@@ -51,6 +51,8 @@ namespace VintageDoctor
             BeginSession();
             api.Event.RegisterGameTickListener(_ => { Ticks.Tick(); MemoryTrend.Tick(); if (Profile.Running) Profile.Tick(); }, 1);
             Profile.OnFinished = _ => { if (dialog != null && dialog.IsOpened()) OpenDoctor(Checks.TopicPerf, ""); };
+            // While a measured run goes (this game's or the server's), the window counts it down.
+            api.Event.RegisterGameTickListener(_ => ShowProfileCountdown(), 500);
 
             api.Input.RegisterHotKey(Hotkey, Lang.Get("vintagedoctor:hotkey"), GlKeys.D, HotkeyType.GUIOrOtherControls, ctrlPressed: true, shiftPressed: true);
             api.Input.SetHotKeyHandler(Hotkey, _ => ToggleDoctor());
@@ -191,6 +193,27 @@ namespace VintageDoctor
             else WithEvidence(fresh || serverFix, ev => { p.Ev = ev; Finish(p); });
         }
 
+        /// <summary>When the server's measured run ends, by this game's clock (0: none running, as far as the last page said).</summary>
+        long serverProfileEndsAt;
+
+        /// <summary>
+        /// The countdown in the window's status line while the profiler runs: on this game (its frames) or on the
+        /// server (its ticks), each with its seconds left. The page opens by itself when a run is done.
+        /// </summary>
+        void ShowProfileCountdown()
+        {
+            if (dialog == null || !dialog.IsOpened()) return;
+            int mine = Profile.Running ? Math.Max(1, Profile.SecondsLeft) : 0;
+            long serverMs = serverProfileEndsAt - capi.ElapsedMilliseconds;
+            int server = serverProfileEndsAt > 0 && serverMs > 0 ? (int)Math.Ceiling(serverMs / 1000.0) : 0;
+            if (serverProfileEndsAt > 0 && serverMs <= -5000) serverProfileEndsAt = 0;
+            string text = null;
+            if (mine > 0 && server > 0) text = Lang.Get("vintagedoctor:gui-profiling-both", mine, server);
+            else if (mine > 0) text = Lang.Get(capi.IsSinglePlayer ? "vintagedoctor:gui-profiling-game" : "vintagedoctor:gui-profiling-client", mine);
+            else if (server > 0) text = Lang.Get(capi.IsSinglePlayer ? "vintagedoctor:gui-profiling-world" : "vintagedoctor:gui-profiling-server", server);
+            dialog.SetProfiling(text == null ? null : GameFont.Drawable(text));
+        }
+
         /// <summary>The server hasn't answered in time. Unless it said a mod is still working: then the wait goes on until that time is up.</summary>
         void ServerTimeout(PendingPage p)
         {
@@ -229,6 +252,7 @@ namespace VintageDoctor
             p.ServerDone = true;
             if (packet.ServerMods != null) ServerMods = packet.ServerMods;
             if (packet.ServerTopics != null) { serverTopics = packet.ServerTopics; serverTopicMods = packet.ServerTopicMods; }
+            serverProfileEndsAt = packet.ServerProfileLeft > 0 ? capi.ElapsedMilliseconds + packet.ServerProfileLeft * 1000L : 0;
             Finish(p);
         }
 

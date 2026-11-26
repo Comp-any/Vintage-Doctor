@@ -174,6 +174,7 @@ System.IO.FileNotFoundException: Could not load file or assembly 'SomeLib, Versi
             // The measured run takes a few seconds: its result is added when it is over, and the file written then.
             bool started = doctor.Profile.Start(sapi.World, 5);
             t.Check("the tick profiler starts", started, doctor.Profile.Error);
+            t.Check("while it runs it knows its seconds left, which go to the player's window with each page", !started || (doctor.Profile.Running && doctor.Profile.SecondsLeft >= 3 && doctor.Profile.SecondsLeft <= 5), doctor.Profile.SecondsLeft + " s left");
             if (started)
             {
                 sapi.Event.RegisterCallback(_ =>
