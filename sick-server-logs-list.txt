@@ -1,0 +1,10 @@
+total 272
+drwxr-xr-x  2 runner runner   4096 Nov 26 15:24 .
+drwxr-xr-x 13 runner runner   4096 Nov 26 15:24 ..
+-rw-r--r--  1 runner runner      0 Nov 26 15:24 server-audit.log
+-rw-r--r--  1 runner runner      0 Nov 26 15:24 server-build.log
+-rw-r--r--  1 runner runner      0 Nov 26 15:24 server-chat.log
+-rw-r--r--  1 runner runner    630 Nov 26 15:24 server-crash.log
+-rw-r--r--  1 runner runner 215052 Nov 26 15:25 server-debug.log
+-rw-r--r--  1 runner runner  47126 Nov 26 15:25 server-main.log
+-rw-r--r--  1 runner runner      0 Nov 26 15:24 server-worldgen.log

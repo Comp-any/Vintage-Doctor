@@ -1,0 +1,11 @@
+== Crash reports ==
+⚠ The game crashed (11/21/2026 05:56:18): NullReferenceException
+  System.NullReferenceException: Object reference not set to an instance of an object.
+  The code used something that wasn't there. That is a bug in the code named in the trace; nothing you set up wrong.
+  The game didn't name a mod and no mod's code is in the trace, so this may be the game itself, a mod that changes the game's code without showing in the trace, or the computer (memory, graphics driver).
+    at Vintagestory.API.Common.FrameProfilerUtil.End() in VintagestoryApi\Common\FrameProfilerUtil.cs:line 213
+    at Vintagestory.Server.ServerMain.Process() in VintagestoryLib\Server\ServerMain.cs:line 941
+    at Vintagestory.Server.ServerProgram.Main() in VintagestoryLib\Server\ServerProgram.cs:line 156
+    at Vintagestory.ClientNative.CrashReporter.Start(ThreadStart start) in VintagestoryLib\Client\ClientPlatform\ClientNative\CrashReporter.cs:line 95
+  → If it happens again, try without the mods you added or updated last, and post the report on the game's forum or Discord.
+  Put together a report to post (/doctor bugreport)

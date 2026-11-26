@@ -1,0 +1,5 @@
+Crash reports
+{{folder|logs||Open the Logs folder}}
+✓ No crash reports: the game hasn't crashed on this side.
+  The game writes one to Logs/server-crash.log each time it crashes.
+  {{folder|logs||Open the Logs folder}}

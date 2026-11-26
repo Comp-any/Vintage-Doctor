@@ -1,0 +1,133 @@
+== The game (Vintage Story 1.22.7) ==
+✓ No crash reports: the game hasn't crashed on this side.
+✓ No errors in the log this session.
+✓ 6 mod file(s) in 2 folder(s), nothing wrong with them.
+  Every file in 4 zip(s) was read to the end.
+✓ 5 config file(s) read without a problem.
+✓ The server keeps up: a tick every 33.2 ms (30 a second).
+  Last minute: average 33.2 ms, 95% under 34 ms, worst 36 ms (123 ticks).
+  Measure where the time goes (20 seconds) (/doctor fix doctor:profile 20)
+✓ 36 creatures and things loaded (0 items on the ground), 392 chunks, 0 player(s).
+  Most of: game:raccoon 11, game:pig 9, game:wolf 4, game:hare 4, game:fox 3
+  392 chunks loaded for 0 player(s).
+✓ Memory: the game holds 1.3 GB of the 15.6 GB it can use.
+  949.5 MB in the game's own objects; 14 full clean-ups so far; 4 processor threads.
+✓ 86.7 GB free where the world is saved.
+  The save file is 4 KB.
+✓ Nothing in this world comes from a mod that isn't installed.
+✓ Time runs at the normal pace.
+✓ Every block and item that needs code has it.
+✓ No mod tries to change a file that isn't there.
+✓ Every mod that has block and item files has them in the game.
+✓ No mod brings its own copy of a library the game or another mod already has.
+✓ No two mods replace the same file, and none replaces the game's own.
+✓ No recipe from a mod has the same ingredients as another recipe that makes something else (13748 crafting recipes looked at).
+✓ 33 JSON patches in 85 files, no two mods replacing the same thing.
+✓ Every mod's blocks and items have names.
+✓ No formatting tags out of place: no errors about them in the log, and none in the mods' texts.
+✓ No two mods change the same place in the game's code.
+• This is the first session the doctor has seen here, so there is nothing to compare with yet.
+  From now on it notes the mods and their versions at every start, and shows here what changed.
+Pick what matches; each opens a page that looks into just that.
+The game crashed (/doctor crash)
+The game is slow or stutters (/doctor perf)
+A mod isn't working (/doctor mods)
+Something broke after I added or updated mods (/doctor changes)
+An item looks or acts wrong (hold it first) (/doctor item hand)
+The block I'm looking at looks or acts wrong (/doctor block)
+I can't craft something (/doctor craft hand)
+Show me what happened while the game started (/doctor startup)
+Show me every error and warning (/doctor log)
+Check my Mods folder and config files (/doctor files)
+Are any mods getting in each other's way? (/doctor clashes)
+Which mods change the game's code? (/doctor patches)
+Is my world all right? (/doctor world)
+Put together a report to post (/doctor bugreport)
+For mod authors: what mods told the doctor (/doctor api)
+
+== busmod (not loaded) ==
+⚠ busmod: 2 tanks are leaking
+  tank at 1 1 1
+  tank at 2 2 2
+  Seal them (/doctor fix bus:busmod:seal)
+
+== Config lib (not loaded) ==
+⚠ 1 mod(s) were left out because something they need is missing: configlib (needs vsimgui@1.2.0)
+  The game doesn't load a mod whose requirements aren't met, so nothing of these mods is in the game.
+  → Install what they need (the name after 'needs' is a mod id, with the lowest version that will do), or remove them.
+  Find vsimgui on the Mod DB (https://mods.vintagestory.at/list/mod?text=vsimgui)
+  Everything from start-up (/doctor startup)
+
+== Doctor Example (JSON) 1.0.0 ==
+⚠ Doctor Example: An example pump jammed
+  [doctorexample] pump 3 jammed (a made-up warning from the example mod)
+  This line in the log comes from the example mod; the JSON example mod knows what it means.
+  → Nothing to do: it is only an example.
+  Start the example's config afresh (/doctor fix doctorexamplejson:pump-jammed/fix)
+• Doctor Example (JSON) and Doctor Example don't get on
+  Nothing is really wrong: the two example mods say they clash so the doctor has a clash to show.
+  Doctor Example (JSON) says so itself (in its vintagedoctor.json).
+  Doctor Example (JSON)'s page (/doctor mod doctorexamplejson) Doctor Example's page (/doctor mod doctorexample)
+Everything about Doctor Example (JSON) (/doctor mod doctorexamplejson)
+
+== Doctor Example 1.0.0 ==
+⚠ An example pump jammed
+  [doctorexample] pump 3 jammed (a made-up warning from the example mod)
+  This line in the log comes from the example mod; the JSON example mod knows what it means.
+  → Nothing to do: it is only an example.
+  Start the example's config afresh (/doctor fix doctorexamplejson:pump-jammed/fix)
+• Doctor Example (JSON) and Doctor Example don't get on
+  Nothing is really wrong: the two example mods say they clash so the doctor has a clash to show.
+  Doctor Example (JSON) says so itself (in its vintagedoctor.json).
+  Doctor Example (JSON)'s page (/doctor mod doctorexamplejson) Doctor Example's page (/doctor mod doctorexample)
+• 2 mod(s) change the game's code in 2 place(s)
+  Carry On (1), Doctor Example (1)
+  Mods patch the game's own code where it offers no other way in. It is normal, but it is also what breaks first when the game updates, and two mods patching the same place can get in each other's way.
+  All code patches (/doctor patches)
+• 1 kind(s) of messages from the example mod this session
+⚠ 3 example pumps are jammed
+  pump at 10 5 10
+  A pump jams when its outlet is blocked.
+  → Clear the outlets, or let the doctor restart the pumps.
+  Restart the example pumps (/doctor fix doctorexample:unjam all)
+  1 message(s) from this mod in the log
+• 2 example tanks are half empty
+  tank at 10 3 10
+  tank at 12 3 10
+  → Fill them from a pump.
+  Fill the example tanks (/doctor fix bus:doctorexample:fill)
+• The example mod started
+  reported with ReportIncident
+  Last at 2026-11-26 15:23.
+My example pipes leak (/doctor example-pipes)
+My example pumps aren't pumping (/doctor example-pumps)
+My example tanks are empty (/doctor example-tanks)
+Everything about Doctor Example (/doctor mod doctorexample)
+
+== doctorselftest (not loaded) ==
+⚠ doctorselftest: 3 pipes aren't connected
+  at 10 5 10
+  pipes need a neighbour
+  → connect them
+  Reconnect them (/doctor fix doctorselftest:reconnect all)
+✓ doctorselftest: pumps are fine
+• doctorselftest: a deeper look
+⚠ doctorselftest's own check 'doctorselftest:throws' stopped with an error: InvalidOperationException: the check's own bug
+  That is a bug in the mod's check, not in your game; the mod's author will want to know.
+⚠ doctorselftest: A pump jammed (×2)
+  at 4 5 6
+  Last at 2026-11-26 15:24.
+My pipes aren't moving anything (/doctor selftest-pipes)
+
+== Carry On 1.14.3 ==
+• 2 mod(s) change the game's code in 2 place(s)
+  Carry On (1), Doctor Example (1)
+  Mods patch the game's own code where it offers no other way in. It is normal, but it is also what breaks first when the game updates, and two mods patching the same place can get in each other's way.
+  All code patches (/doctor patches)
+Everything about Carry On (/doctor mod carryon)
+
+== The other mods ==
+✓ 2 mod(s) have nothing against them
+  Primitive Survival, Vintage Doctor
+Every mod at a glance (/doctor mods)
+Every page is a command: /doctor crash, perf, mods, mod [mod id], log [mod id], startup, files, patches, changes, world, item [code], craft [code], bugreport [mod id], api. A fix: /doctor fix [id] [argument].

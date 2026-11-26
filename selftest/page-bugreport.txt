@@ -1,0 +1,54 @@
+== A report to post ==
+Everything a mod's author or the game's forum needs, with addresses, player ids and user folders taken out. Read it over, then post it with what you were doing and what you expected.
+✓ Saved to ModData/vintagedoctor/bug-report-server.txt
+Copy this page (the button below) or attach the saved file.
+
+== The report ==
+Vintage Doctor 1.8.0 on Vintage Story v1.22.7 (Stable), dedicated server, 2026-11-26 15:24
+Linux (Ubuntu 26.04.1 LTS) [Kernel 7.0.0.1020]; AMD EPYC 9V45 96-Core Processor; 15983 MB RAM; .net 10.0.15
+
+Mods (5)
+carryon 1.14.3, doctorexample 1.0.0, doctorexamplejson 1.0.0, primitivesurvival 5.1.4, vintagedoctor 1.8.0
+
+Findings
+✓ No crash reports: the game hasn't crashed on this side.
+⚠ 1 mod(s) were left out because something they need is missing: configlib (needs vsimgui@1.2.0)
+⚠ Doctor Example: An example pump jammed
+  [doctorexample] pump 3 jammed (a made-up warning from the example mod)
+✓ No errors in the log this session (3 kind(s) of warnings, 5 line(s)).
+✓ 6 mod file(s) in 2 folder(s), nothing wrong with them.
+  Every file in 4 zip(s) was read to the end.
+✓ 5 config file(s) read without a problem.
+✓ The server keeps up: a tick every 33.2 ms (30 a second).
+  Last minute: average 33.2 ms, 95% under 34 ms, worst 36 ms (123 ticks).
+✓ 36 creatures and things loaded (0 items on the ground), 392 chunks, 0 player(s).
+  Most of: game:raccoon 11, game:pig 9, game:wolf 4, game:hare 4, game:fox 3
+  392 chunks loaded for 0 player(s).
+✓ Memory: the game holds 1.3 GB of the 15.6 GB it can use.
+  1006.5 MB in the game's own objects; 14 full clean-ups so far; 4 processor threads.
+✓ 86.7 GB free where the world is saved.
+  The save file is 4 KB.
+• Doctor Example (JSON) and Doctor Example don't get on
+  Nothing is really wrong: the two example mods say they clash so the doctor has a clash to show.
+✓ 33 JSON patches in 85 files, no two mods replacing the same thing.
+✓ Every mod's blocks and items have names.
+• 2 mod(s) change the game's code in 2 place(s)
+  Carry On (1), Doctor Example (1)
+• Doctor Example: 1 kind(s) of messages from the example mod this session
+⚠ Doctor Example: 3 example pumps are jammed
+  pump at 10 5 10
+  1 message(s) from this mod in the log
+• Doctor Example: 2 example tanks are half empty
+  tank at 10 3 10
+  tank at 12 3 10
+• Doctor Example: The example mod started
+  reported with ReportIncident
+  Last at 2026-11-26 15:23.
+
+Errors and warnings in server-main.log (most frequent first)
+×2 [Warning] [doctorselftest] Its check 'doctorselftest:throws' for Vintage Doctor failed: System.InvalidOperationException: the check's own bug  (doctorselftest)
+    at VintageDoctor.SelfTest.<>c.<Api>b__16_1(IDoctorContext ctx)
+    at VintageDoctor.Checks.RunChecks(DoctorContext x, List`1 checks)
+×2 [Warning] [vintagedoctor] guestmod said it would deliver 'guest-notes' later and didn't in time.  (vintagedoctor)
+[Warning] [doctorexample] pump 3 jammed (a made-up warning from the example mod)  (doctorexample)
+[Warning] [vintagedoctor] A mod offered a page with the id 'crash', which is taken by the doctor itself or has characters other than a-z, 0-9 and '-'. It was left out.  (vintagedoctor)
