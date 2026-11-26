@@ -1,0 +1,77 @@
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-65-	}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-66-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-67-	public SystemNetworkProcess(ClientMain game)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-68-		: base(game)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-69-	{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-70-		totalByteCount = 0;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-71-		game.RegisterGameTickListener(UpdatePacketCount, 1000);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-72-		game.RegisterGameTickListener(ClientUdpTick, 15);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-73-		game.PacketHandlers[78] = HandleRequestPositionTcp;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-74-		game.PacketHandlers[79] = EnqueueUdpPacket;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-75-		game.PacketHandlers[80] = HandleEntitySpawnPosition;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-76-		game.PacketHandlers[81] = HandleDidReceiveUdp;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs:77:		game.api.ChatCommands.Create("netbenchmark").WithDescription("Toggles network benchmarking").HandleWith(CmdBenchmark);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-78-		clientNetworkChannel = game.api.Network.RegisterChannel("EntityAnims");
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-79-		clientNetworkChannel.RegisterMessageType<AnimationPacket>().RegisterMessageType<BulkAnimationPacket>().RegisterMessageType<EntityTagPacket>()
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-80-			.SetMessageHandler<AnimationPacket>(HandleAnimationPacket)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-81-			.SetMessageHandler<BulkAnimationPacket>(HandleBulkAnimationPacket)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-82-			.SetMessageHandler<EntityTagPacket>(HandleTagPacket);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-83-		packetDebug = ClientSettings.Inst.Bool["packetDebug"];
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-84-	}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-85-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-86-	private void UdpConnectionRequestFromServer()
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-87-	{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-88-		if (!DidReceiveUdp)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-89-		{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-90-			game.Logger.Debug("UDP: Server send UDP connect");
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-91-			DidReceiveUdp = true;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-92-		}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-93-	}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-94-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-95-	private void HandleDidReceiveUdp(Packet_Server packet)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-96-	{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-97-		game.UdpTryConnect = false;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-98-		game.Logger.Debug("UDP: Server send DidReceiveUdp");
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-99-		TyronThreadPool.QueueTask(async () =>
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-100-		{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-101-			for (int i = 0; i < 20; i++)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-102-			{
+--
+Vintagestory.Server/CmdDebug.cs-100-			})
+Vintagestory.Server/CmdDebug.cs-101-			.EndSub()
+Vintagestory.Server/CmdDebug.cs-102-			.BeginSub("heldcoattr")
+Vintagestory.Server/CmdDebug.cs-103-			.WithDesc("Get/Set collectible attributes of the currently held item")
+Vintagestory.Server/CmdDebug.cs-104-			.WithArgs(parsers.Word("key"), parsers.OptionalAll("value"))
+Vintagestory.Server/CmdDebug.cs-105-			.HandleWith(getSetCollectibleAttr)
+Vintagestory.Server/CmdDebug.cs-106-			.EndSub()
+Vintagestory.Server/CmdDebug.cs-107-			.BeginSub("heldstattr")
+Vintagestory.Server/CmdDebug.cs-108-			.WithDesc("Get/Set itemstack attributes of the currently held item")
+Vintagestory.Server/CmdDebug.cs-109-			.WithArgs(parsers.Word("key"), parsers.OptionalWordRange("type", "int", "bool", "string", "tree", "double", "float"), parsers.OptionalAll("value"))
+Vintagestory.Server/CmdDebug.cs-110-			.HandleWith(getSetItemstackAttr)
+Vintagestory.Server/CmdDebug.cs-111-			.EndSub()
+Vintagestory.Server/CmdDebug.cs:112:			.BeginSub("netbench")
+Vintagestory.Server/CmdDebug.cs-113-			.WithDesc("Toggle network benchmarking mode")
+Vintagestory.Server/CmdDebug.cs-114-			.HandleWith(toggleNetworkBenchmarking)
+Vintagestory.Server/CmdDebug.cs-115-			.EndSub()
+Vintagestory.Server/CmdDebug.cs-116-			.BeginSub("rebuildlandclaimpartitions")
+Vintagestory.Server/CmdDebug.cs-117-			.WithDesc("Rebuild land claim partitions")
+Vintagestory.Server/CmdDebug.cs-118-			.HandleWith((TextCommandCallingArgs args) =>
+Vintagestory.Server/CmdDebug.cs-119-			{
+Vintagestory.Server/CmdDebug.cs-120-				server.WorldMap.RebuildLandClaimPartitions();
+Vintagestory.Server/CmdDebug.cs-121-				return TextCommandResult.Success("Partitioned land claim index rebuilt");
+Vintagestory.Server/CmdDebug.cs-122-			})
+Vintagestory.Server/CmdDebug.cs-123-			.EndSub()
+Vintagestory.Server/CmdDebug.cs-124-			.BeginSub("privileges")
+Vintagestory.Server/CmdDebug.cs-125-			.WithDesc("Toggle privileges debug mode")
+Vintagestory.Server/CmdDebug.cs-126-			.WithArgs(parsers.OptionalBool("on"))
+Vintagestory.Server/CmdDebug.cs-127-			.HandleWith((TextCommandCallingArgs args) =>
+Vintagestory.Server/CmdDebug.cs-128-			{
+Vintagestory.Server/CmdDebug.cs-129-				if (args.Parsers[0].IsMissing)
+Vintagestory.Server/CmdDebug.cs-130-				{
+Vintagestory.Server/CmdDebug.cs-131-					return TextCommandResult.Success("Privilege debugging is currently " + (server.DebugPrivileges ? "on" : "off"));
+Vintagestory.Server/CmdDebug.cs-132-				}
+Vintagestory.Server/CmdDebug.cs-133-				server.DebugPrivileges = (bool)args[0];
+Vintagestory.Server/CmdDebug.cs-134-				return TextCommandResult.Success("Privilege debugging now " + (server.DebugPrivileges ? "on" : "off"));
+Vintagestory.Server/CmdDebug.cs-135-			})
+Vintagestory.Server/CmdDebug.cs-136-			.EndSub()
+Vintagestory.Server/CmdDebug.cs-137-			.BeginSub("cloh")

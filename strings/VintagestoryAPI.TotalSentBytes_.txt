@@ -1,0 +1,38 @@
+Vintagestory.API.Server/IServerAPI.cs-41-	/// </summary>
+Vintagestory.API.Server/IServerAPI.cs-42-	/// <value><i>true</i>
+Vintagestory.API.Server/IServerAPI.cs-43-	///   if server is about to shutdown</value>
+Vintagestory.API.Server/IServerAPI.cs-44-	bool IsShuttingDown { get; }
+Vintagestory.API.Server/IServerAPI.cs-45-
+Vintagestory.API.Server/IServerAPI.cs-46-	/// <summary>
+Vintagestory.API.Server/IServerAPI.cs-47-	/// If true, code should generally aim to reduce the number of CPU threads used on the server, even at the cost of slight performance delays
+Vintagestory.API.Server/IServerAPI.cs-48-	/// </summary>
+Vintagestory.API.Server/IServerAPI.cs-49-	bool ReducedServerThreads { get; }
+Vintagestory.API.Server/IServerAPI.cs-50-
+Vintagestory.API.Server/IServerAPI.cs-51-	long TotalReceivedBytes { get; }
+Vintagestory.API.Server/IServerAPI.cs-52-
+Vintagestory.API.Server/IServerAPI.cs:53:	long TotalSentBytes { get; }
+Vintagestory.API.Server/IServerAPI.cs-54-
+Vintagestory.API.Server/IServerAPI.cs-55-	/// <summary>
+Vintagestory.API.Server/IServerAPI.cs-56-	/// Returns the number of seconds the server has been running since last restart
+Vintagestory.API.Server/IServerAPI.cs-57-	/// </summary>
+Vintagestory.API.Server/IServerAPI.cs-58-	/// <value>Server uptime in seconds</value>
+Vintagestory.API.Server/IServerAPI.cs-59-	int ServerUptimeSeconds { get; }
+Vintagestory.API.Server/IServerAPI.cs-60-
+Vintagestory.API.Server/IServerAPI.cs-61-	/// <summary>
+Vintagestory.API.Server/IServerAPI.cs-62-	/// Server uptime in milliseconds
+Vintagestory.API.Server/IServerAPI.cs-63-	/// </summary>
+Vintagestory.API.Server/IServerAPI.cs-64-	/// <value></value>
+Vintagestory.API.Server/IServerAPI.cs-65-	long ServerUptimeMilliseconds { get; }
+Vintagestory.API.Server/IServerAPI.cs-66-
+Vintagestory.API.Server/IServerAPI.cs-67-	/// <summary>
+Vintagestory.API.Server/IServerAPI.cs-68-	/// Returns the number of seconds the current world has been running. This is the playtime displayed on the singleplayer world list.
+Vintagestory.API.Server/IServerAPI.cs-69-	/// </summary>
+Vintagestory.API.Server/IServerAPI.cs-70-	int TotalWorldPlayTime { get; }
+Vintagestory.API.Server/IServerAPI.cs-71-
+Vintagestory.API.Server/IServerAPI.cs-72-	/// <summary>
+Vintagestory.API.Server/IServerAPI.cs-73-	/// Returns a logging interface to log any log level message
+Vintagestory.API.Server/IServerAPI.cs-74-	/// </summary>
+Vintagestory.API.Server/IServerAPI.cs-75-	/// <returns></returns>
+Vintagestory.API.Server/IServerAPI.cs-76-	ILogger Logger { get; }
+Vintagestory.API.Server/IServerAPI.cs-77-
+Vintagestory.API.Server/IServerAPI.cs-78-	/// <summary>

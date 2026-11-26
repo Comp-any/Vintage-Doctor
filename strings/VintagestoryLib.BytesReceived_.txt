@@ -1,0 +1,155 @@
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-40-	private bool commitingMinimalUpdate;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-41-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-42-	private readonly IClientNetworkChannel clientNetworkChannel;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-43-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-44-	public static readonly Dictionary<int, string> ServerPacketNames;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-45-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-46-	public bool DidReceiveUdp;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-47-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-48-	private bool bulkPositions;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-49-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-50-	public override string Name => "nwp";
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-51-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs:52:	public int TotalBytesReceivedAndReceiving => totalByteCount + game.MainNetClient.CurrentlyReceivingBytes;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-53-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-54-	static SystemNetworkProcess()
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-55-	{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-56-		ServerPacketNames = new Dictionary<int, string>();
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-57-		FieldInfo[] fields = typeof(Packet_ServerIdEnum).GetFields();
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-58-		for (int i = 0; i < fields.Length; i++)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-59-		{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-60-			if ((fields[i].Attributes & FieldAttributes.Literal) != 0 && !(fields[i].FieldType != typeof(int)))
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-61-			{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-62-				ServerPacketNames[(int)fields[i].GetValue(null)] = fields[i].Name;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-63-			}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-64-		}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-65-	}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-66-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-67-	public SystemNetworkProcess(ClientMain game)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-68-		: base(game)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-69-	{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-70-		totalByteCount = 0;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-71-		game.RegisterGameTickListener(UpdatePacketCount, 1000);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-72-		game.RegisterGameTickListener(ClientUdpTick, 15);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-73-		game.PacketHandlers[78] = HandleRequestPositionTcp;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-74-		game.PacketHandlers[79] = EnqueueUdpPacket;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-75-		game.PacketHandlers[80] = HandleEntitySpawnPosition;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-76-		game.PacketHandlers[81] = HandleDidReceiveUdp;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-77-		game.api.ChatCommands.Create("netbenchmark").WithDescription("Toggles network benchmarking").HandleWith(CmdBenchmark);
+--
+Vintagestory.Client/GuiScreenConnectingToServer.cs-294-				}
+Vintagestory.Client/GuiScreenConnectingToServer.cs-295-			}
+Vintagestory.Client/GuiScreenConnectingToServer.cs-296-		}
+Vintagestory.Client/GuiScreenConnectingToServer.cs-297-		else if (runningGame.Connectdata.ErrorMessage == null)
+Vintagestory.Client/GuiScreenConnectingToServer.cs-298-		{
+Vintagestory.Client/GuiScreenConnectingToServer.cs-299-			if (ellapsedMs - lastTextUpdate <= 150)
+Vintagestory.Client/GuiScreenConnectingToServer.cs-300-			{
+Vintagestory.Client/GuiScreenConnectingToServer.cs-301-				return;
+Vintagestory.Client/GuiScreenConnectingToServer.cs-302-			}
+Vintagestory.Client/GuiScreenConnectingToServer.cs-303-			lastTextUpdate = ellapsedMs;
+Vintagestory.Client/GuiScreenConnectingToServer.cs-304-			if (runningGame.Connectdata.Connected)
+Vintagestory.Client/GuiScreenConnectingToServer.cs-305-			{
+Vintagestory.Client/GuiScreenConnectingToServer.cs:306:				int num2 = runningGame.networkProc.TotalBytesReceivedAndReceiving / 1024;
+Vintagestory.Client/GuiScreenConnectingToServer.cs-307-				string text2;
+Vintagestory.Client/GuiScreenConnectingToServer.cs-308-				if (runningGame.Connectdata.PositionInQueue > 0)
+Vintagestory.Client/GuiScreenConnectingToServer.cs-309-				{
+Vintagestory.Client/GuiScreenConnectingToServer.cs-310-					text2 = Lang.Get("connect-inqueue", runningGame.Connectdata.PositionInQueue);
+Vintagestory.Client/GuiScreenConnectingToServer.cs-311-				}
+Vintagestory.Client/GuiScreenConnectingToServer.cs-312-				else
+Vintagestory.Client/GuiScreenConnectingToServer.cs-313-				{
+Vintagestory.Client/GuiScreenConnectingToServer.cs-314-					text2 = Lang.Get("Connected to server, downloading data...");
+Vintagestory.Client/GuiScreenConnectingToServer.cs-315-					text2 = text2 + "\n" + Lang.Get("{0} kilobyte received", num2);
+Vintagestory.Client/GuiScreenConnectingToServer.cs-316-				}
+Vintagestory.Client/GuiScreenConnectingToServer.cs-317-				if (text2 != ElementComposer.GetDynamicText("centertext").GetText())
+Vintagestory.Client/GuiScreenConnectingToServer.cs-318-				{
+Vintagestory.Client/GuiScreenConnectingToServer.cs-319-					Logger.Notification(text2);
+Vintagestory.Client/GuiScreenConnectingToServer.cs-320-				}
+Vintagestory.Client/GuiScreenConnectingToServer.cs-321-				ElementComposer.GetDynamicText("centertext").SetNewText(text2);
+Vintagestory.Client/GuiScreenConnectingToServer.cs-322-			}
+Vintagestory.Client/GuiScreenConnectingToServer.cs-323-		}
+Vintagestory.Client/GuiScreenConnectingToServer.cs-324-		else
+Vintagestory.Client/GuiScreenConnectingToServer.cs-325-		{
+Vintagestory.Client/GuiScreenConnectingToServer.cs-326-			string text3 = Lang.Get("error-connecting", runningGame.Connectdata.ErrorMessage);
+Vintagestory.Client/GuiScreenConnectingToServer.cs-327-			if (text3 != ElementComposer.GetDynamicText("centertext").GetText())
+Vintagestory.Client/GuiScreenConnectingToServer.cs-328-			{
+Vintagestory.Client/GuiScreenConnectingToServer.cs-329-				Logger.Notification(Lang.Get("error-connecting-host", runningGame.Connectdata.Host, runningGame.Connectdata.ErrorMessage));
+Vintagestory.Client/GuiScreenConnectingToServer.cs-330-			}
+Vintagestory.Client/GuiScreenConnectingToServer.cs-331-			ElementComposer.GetDynamicText("centertext").SetNewText(text3);
+--
+Vintagestory.Common/TCPNetworkConnection.cs-64-				tCPNetworkConnection.connected = tCPNetworkConnection.tcpSocket.Connected;
+Vintagestory.Common/TCPNetworkConnection.cs-65-				tCPNetworkConnection.address = tCPNetworkConnection.tcpSocket.RemoteEndPoint?.ToString();
+Vintagestory.Common/TCPNetworkConnection.cs-66-				ConnectionResult obj = new ConnectionResult
+Vintagestory.Common/TCPNetworkConnection.cs-67-				{
+Vintagestory.Common/TCPNetworkConnection.cs-68-					connected = tCPNetworkConnection.connected
+Vintagestory.Common/TCPNetworkConnection.cs-69-				};
+Vintagestory.Common/TCPNetworkConnection.cs-70-				onConnectResult(obj);
+Vintagestory.Common/TCPNetworkConnection.cs-71-				if (tCPNetworkConnection.tosendBeforeConnected.Count > 0)
+Vintagestory.Common/TCPNetworkConnection.cs-72-				{
+Vintagestory.Common/TCPNetworkConnection.cs-73-					tCPNetworkConnection.Send(tCPNetworkConnection.tosendBeforeConnected.ToArray(), tCPNetworkConnection.tosendBeforeConnected.Count);
+Vintagestory.Common/TCPNetworkConnection.cs-74-					tCPNetworkConnection.tosendBeforeConnected.Clear();
+Vintagestory.Common/TCPNetworkConnection.cs-75-				}
+Vintagestory.Common/TCPNetworkConnection.cs:76:				Task task = new Task(tCPNetworkConnection.OnBytesReceived, null, tCPNetworkConnection.cts.Token, TaskCreationOptions.LongRunning);
+Vintagestory.Common/TCPNetworkConnection.cs-77-				task.Start();
+Vintagestory.Common/TCPNetworkConnection.cs-78-				await task.WaitAsync(tCPNetworkConnection.cts.Token);
+Vintagestory.Common/TCPNetworkConnection.cs-79-			}
+Vintagestory.Common/TCPNetworkConnection.cs-80-			catch (Exception ex2)
+Vintagestory.Common/TCPNetworkConnection.cs-81-			{
+Vintagestory.Common/TCPNetworkConnection.cs-82-				tCPNetworkConnection.Disconnect();
+Vintagestory.Common/TCPNetworkConnection.cs-83-				ConnectionResult obj2 = new ConnectionResult
+Vintagestory.Common/TCPNetworkConnection.cs-84-				{
+Vintagestory.Common/TCPNetworkConnection.cs-85-					connected = tCPNetworkConnection.tcpSocket.Connected,
+Vintagestory.Common/TCPNetworkConnection.cs-86-					errorMessage = ex2.Message,
+Vintagestory.Common/TCPNetworkConnection.cs-87-					exception = ex2
+Vintagestory.Common/TCPNetworkConnection.cs-88-				};
+Vintagestory.Common/TCPNetworkConnection.cs-89-				onConnectResult(obj2);
+Vintagestory.Common/TCPNetworkConnection.cs-90-			}
+Vintagestory.Common/TCPNetworkConnection.cs-91-		}, "TCPSocketAccept");
+Vintagestory.Common/TCPNetworkConnection.cs-92-	}
+Vintagestory.Common/TCPNetworkConnection.cs-93-
+Vintagestory.Common/TCPNetworkConnection.cs-94-	public void Disconnect()
+Vintagestory.Common/TCPNetworkConnection.cs-95-	{
+Vintagestory.Common/TCPNetworkConnection.cs-96-		if (tcpSocket != null)
+Vintagestory.Common/TCPNetworkConnection.cs-97-		{
+Vintagestory.Common/TCPNetworkConnection.cs-98-			try
+Vintagestory.Common/TCPNetworkConnection.cs-99-			{
+Vintagestory.Common/TCPNetworkConnection.cs-100-				tcpSocket.Shutdown(SocketShutdown.Send);
+Vintagestory.Common/TCPNetworkConnection.cs-101-			}
+--
+Vintagestory.Common/TCPNetworkConnection.cs-117-					}
+Vintagestory.Common/TCPNetworkConnection.cs-118-				}
+Vintagestory.Common/TCPNetworkConnection.cs-119-				catch
+Vintagestory.Common/TCPNetworkConnection.cs-120-				{
+Vintagestory.Common/TCPNetworkConnection.cs-121-				}
+Vintagestory.Common/TCPNetworkConnection.cs-122-			}, "disconnect");
+Vintagestory.Common/TCPNetworkConnection.cs-123-		}
+Vintagestory.Common/TCPNetworkConnection.cs-124-		onDisconnected = null;
+Vintagestory.Common/TCPNetworkConnection.cs-125-		disconnected = true;
+Vintagestory.Common/TCPNetworkConnection.cs-126-		connected = false;
+Vintagestory.Common/TCPNetworkConnection.cs-127-	}
+Vintagestory.Common/TCPNetworkConnection.cs-128-
+Vintagestory.Common/TCPNetworkConnection.cs:129:	protected async void OnBytesReceived(object state)
+Vintagestory.Common/TCPNetworkConnection.cs-130-	{
+Vintagestory.Common/TCPNetworkConnection.cs-131-		try
+Vintagestory.Common/TCPNetworkConnection.cs-132-		{
+Vintagestory.Common/TCPNetworkConnection.cs-133-			while (tcpSocket.Connected && !cts.Token.IsCancellationRequested)
+Vintagestory.Common/TCPNetworkConnection.cs-134-			{
+Vintagestory.Common/TCPNetworkConnection.cs-135-				int num = await tcpSocket.ReceiveAsync(dataRcvBuf, cts.Token);
+Vintagestory.Common/TCPNetworkConnection.cs-136-				if (num <= 0)
+Vintagestory.Common/TCPNetworkConnection.cs-137-				{
+Vintagestory.Common/TCPNetworkConnection.cs-138-					disconnected = true;
+Vintagestory.Common/TCPNetworkConnection.cs-139-					if (onDisconnected == null)
+Vintagestory.Common/TCPNetworkConnection.cs-140-					{
+Vintagestory.Common/TCPNetworkConnection.cs-141-						try
+Vintagestory.Common/TCPNetworkConnection.cs-142-						{
+Vintagestory.Common/TCPNetworkConnection.cs-143-							tcpSocket.Close();
+Vintagestory.Common/TCPNetworkConnection.cs-144-							cts.Cancel();
+Vintagestory.Common/TCPNetworkConnection.cs-145-							break;
+Vintagestory.Common/TCPNetworkConnection.cs-146-						}
+Vintagestory.Common/TCPNetworkConnection.cs-147-						catch
+Vintagestory.Common/TCPNetworkConnection.cs-148-						{
+Vintagestory.Common/TCPNetworkConnection.cs-149-							break;
+Vintagestory.Common/TCPNetworkConnection.cs-150-						}
+Vintagestory.Common/TCPNetworkConnection.cs-151-					}
+Vintagestory.Common/TCPNetworkConnection.cs-152-					onDisconnected(new Exception("The server closed down the socket without response. The server may be password protected or whitelisted"));
+Vintagestory.Common/TCPNetworkConnection.cs-153-					break;
+Vintagestory.Common/TCPNetworkConnection.cs-154-				}

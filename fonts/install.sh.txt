@@ -1,0 +1,140 @@
+#!/bin/bash
+
+if [[ $EUID -eq 0 ]]; then
+   echo "Please do not run this script with sudo."
+   exit 1
+fi
+
+current_path=$(pwd)
+
+# Define color codes
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BOLD='\033[1m'
+RESET='\033[0m'
+
+command -v xdg-desktop-menu >/dev/null 2>&1 || { echo -e "${YELLOW}Waring! I require xdg-desktop-menu to install the desktop files but it's not installed. ${RESET}" >&2; }
+command -v lspci >/dev/null 2>&1 || { echo -e "${RED}Fatal! I require lspci but it's not installed. (apt install pciutils)  Aborting.${RESET}" >&2; exit 1; }
+command -v envsubst >/dev/null 2>&1 || { echo -e "${RED}Fatal! I require envsubst but it's not installed. (apt install gettext-base)  Aborting.${RESET}" >&2; exit 1; }
+command -v sysctl >/dev/null 2>&1 || { echo -e "${RED}Fatal! I require sysctl but it's not installed.  Aborting.${RESET}" >&2; exit 1; }
+command -v dotnet >/dev/null 2>&1 && dotnet --list-runtimes | grep -q "Microsoft\.NETCore\.App 10\.0" || { echo -e "${RED}Fatal! I require dotnet 10.0 but it's not installed. (https://dotnet.microsoft.com/en-us/download/dotnet/10.0)  Aborting.${RESET}" >&2; exit 1; }
+
+## current location of this script
+PHYS_PATH="$(readlink -f -- "$0")"
+THIS_FILE="$(basename -- "$PHYS_PATH")"
+PACKAGE_PATH="${PHYS_PATH%/$THIS_FILE}"
+
+## switch to working directory (logical - maybe a link)
+cd "$PACKAGE_PATH"
+
+## define installation targets
+export INST_DIR="$HOME/.local/share/vintagestory"
+
+# Prompt user for directory path
+echo -e "${BOLD}Enter the vintagestory install directory [default: $INST_DIR]:${RESET} "
+read -ep ": " user_directory
+
+# Use the default if user input is empty
+export INST_DIR="${user_directory:-$INST_DIR}"
+INST_DIR_BASE="${INST_DIR%/$(basename -- "$INST_DIR")}"
+
+## set list separator to enable iteration over filenames with spaces
+IFS=$(echo -en "\n\b")
+
+echo -e "${BOLD}Install game into ${RESET}";
+
+## relocate installation if not already in the right place
+if [ "$(readlink -f -- "$INST_DIR")" != "$(readlink -f -- "$PWD")" ]; then
+    ## check/cleanup old installation
+    if [ -d "$INST_DIR" ]; then
+       OLD_INST="$INST_DIR.bak.$(date '+%Y_%m_%d-%H_%M_%S')"
+       echo "Cleanup: Moving old installation to $OLD_INST";
+       echo -e "${YELLOW} After testing the new installation you can remove $OLD_INST ${RESET}";
+       mv -f "$INST_DIR/" "$OLD_INST"
+    fi
+
+    if [ ! -d "$INST_DIR_BASE" ]; then
+        mkdir -p "$INST_DIR_BASE"
+    fi
+    echo "Moving VintageStory files from $PACKAGE_PATH to $INST_DIR"
+    mv -f "$PACKAGE_PATH" "$INST_DIR/" && cd "$INST_DIR"
+fi
+
+## check/install menu starters if possible
+if [ "${1}" != "--minimal" ]; then
+    echo "Create MenuStarter, connect handler and mod install handler ";
+    envsubst < "./Vintagestory.desktop" | tee "./Vintagestory.desktop.tmp"> /dev/null && mv "./Vintagestory.desktop.tmp" "./Vintagestory.desktop"
+    envsubst < "./Vintagestory_url_connect.desktop" | tee "./Vintagestory_url_connect.desktop.tmp"> /dev/null && mv "./Vintagestory_url_connect.desktop.tmp" "./Vintagestory_url_connect.desktop"
+    envsubst < "./Vintagestory_url_mod.desktop" | tee "./Vintagestory_url_mod.desktop.tmp"> /dev/null && mv "./Vintagestory_url_mod.desktop.tmp" "./Vintagestory_url_mod.desktop"
+    # use xdg-desktop-menu to install desktop files
+    # since it will refresh the desktop file db automatically and register the mime types for mod install and url connect
+    xdg-desktop-menu install --novendor "./Vintagestory.desktop"
+    xdg-desktop-menu install --novendor "./Vintagestory_url_connect.desktop"
+    xdg-desktop-menu install --novendor "./Vintagestory_url_mod.desktop"
+fi
+
+# check vm.max_map_count
+current_value=$(sysctl -n vm.max_map_count)
+
+if [ "$current_value" -lt 262144 ]; then
+  echo -e "${BOLD}Your vm.max_map_count is lower then 262144 and might cause out of memory issues. Do you want to increase it to 262144?${RESET} "
+    read -p "(y/N): " response
+    if [[ $response =~ ^[Yy]$ ]]; then
+      echo "vm.max_map_count=262144" | sudo tee /etc/sysctl.d/99-vintagestory.conf
+      sudo sysctl --system
+      echo "vm.max_map_count set to 262144"
+    fi
+else
+    echo "vm.max_map_count is already greater than or equal to 262144"
+fi
+
+## Check if the user wants to enable mesa_glthread
+# if the user has a Intel or AMD Graphics we enable mesa_glthread which should give a performance boost
+# we assume when having AMD that they are using the newer mesa driver (not AMD Catalyst driver) since that should be the default and recommended by AMD anyways
+# intel has always been mesa
+# note: we advise against using the Nouveau on NVIDIA (mesa) since it is no where near the proprietary drivers performance
+
+if lspci -vnn | grep VGA | grep -q "AMD\|Intel"; then
+  echo "Do you want to enable 'mesa_glthread'?"
+  echo "Enabling this feature can provide a performance boost. However, if you experience a freezing window, you can navigate to your installation directory and remove it from the run.sh file."
+  echo -e "${BOLD}Enable 'mesa_glthread'? :${RESET} "
+  read -p "(y/N): " response
+
+  if [[ $response =~ ^[Yy]$ ]]; then
+      echo "Enabling mesa_glthread=true in run.sh"
+      cat > run.sh << EOL
+#!/bin/bash
+
+# Get the absolute directory path of where the script is located
+SCRIPT_DIR="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
+
+# Required for the game to load its own fonts (must be absolute path)
+export FONTCONFIG_FILE="$SCRIPT_DIR"/fonts.conf
+
+# Change directory to where the game executable should also be
+cd "$SCRIPT_DIR"
+
+# try to use the more powerful/dedicated GPU if available - set this if by default it uses your integrated graphics card
+# export DRI_PRIME=1
+
+# Run the game, pass along all arguments given to the script
+mesa_glthread=true ./Vintagestory "$@"
+EOL
+  else
+      echo "'mesa_glthread' disabled"
+  fi
+fi
+
+# check if there was an old installation and ask if it should be removed
+if [ -n "$OLD_INST" ]; then
+  echo -e "${BOLD}Do you want to remove your old installation which was moved to $OLD_INST?${RESET} "
+  read -p "(Y/n): " response
+  response=${response:-Y}
+  if [[ $response =~ ^[Yy]$ ]]; then
+      echo "Removing old installation $OLD_INST"
+      rm -rf "$OLD_INST"
+  fi
+fi
+
+echo -e "${GREEN}Install complete${RESET} If the desktop icon does not work, you can still run the game by executing './VintageStory'."

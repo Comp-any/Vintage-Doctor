@@ -1,0 +1,39 @@
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-315-				stringBuilder.AppendLine(text + ": " + ((item2.Value > 9999) ? (((float)item2.Value / 1024f).ToString("#.#") + "kb") : (item2.Value + "b")));
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-316-			}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-317-			return TextCommandResult.Success(stringBuilder.ToString());
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-318-		}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-319-		packetBenchmark.Clear();
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-320-		return TextCommandResult.Success("Benchmarking started. Stop it after a while to get results.");
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-321-	}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-322-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-323-	private void UpdatePacketCount(float dt)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-324-	{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-325-		if (game.extendedDebugInfo)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-326-		{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs:327:			string text = ((deltaByteCount > 1024) ? (((float)deltaByteCount / 1024f).ToString("0.0") + "kb/s") : (deltaByteCount + "b/s"));
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs:328:			string text2 = ((deltaUdpByteCount > 1024) ? (((float)deltaUdpByteCount / 1024f).ToString("0.0") + "kb/s") : (deltaUdpByteCount + "b/s"));
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-329-			game.DebugScreenInfo["incomingbytes"] = "Network TCP/UDP: " + ((float)totalByteCount / 1024f).ToString("#.#", GlobalConstants.DefaultCultureInfo) + " kb, " + text + " / " + ((float)totalUdpByteCount / 1024f).ToString("#.#", GlobalConstants.DefaultCultureInfo) + " kb, " + text2;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-330-		}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-331-		else
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-332-		{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-333-			game.DebugScreenInfo["incomingbytes"] = "";
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-334-		}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-335-		deltaByteCount = 0;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-336-		deltaUdpByteCount = 0;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-337-	}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-338-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-339-	public override void OnSeperateThreadGameTick(float dt)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-340-	{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-341-		if (game.MainNetClient == null)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-342-		{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-343-			return;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-344-		}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-345-		while (true)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-346-		{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-347-			NetIncomingMessage netIncomingMessage = game.MainNetClient.ReadMessage();
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-348-			if (netIncomingMessage != null)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-349-			{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-350-				totalByteCount += netIncomingMessage.originalMessageLength;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-351-				deltaByteCount += netIncomingMessage.originalMessageLength;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-352-				TryReadPacket(netIncomingMessage.message, netIncomingMessage.messageLength);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-353-				continue;

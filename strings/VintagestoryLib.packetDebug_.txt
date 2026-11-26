@@ -1,0 +1,155 @@
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-20-public class SystemNetworkProcess : ClientSystem
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-21-{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-22-	private Stack<Packet_ServerChunk> cheapFixChunkQueue = new Stack<Packet_ServerChunk>();
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-23-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-24-	private int totalByteCount;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-25-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-26-	private int deltaByteCount;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-27-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-28-	private int totalUdpByteCount;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-29-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-30-	private int deltaUdpByteCount;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-31-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs:32:	private readonly bool packetDebug;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-33-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-34-	private bool doBenchmark;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-35-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-36-	private readonly SortedDictionary<int, int> packetBenchmark = new SortedDictionary<int, int>();
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-37-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-38-	private readonly SortedDictionary<int, int> udpPacketBenchmark = new SortedDictionary<int, int>();
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-39-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-40-	private bool commitingMinimalUpdate;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-41-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-42-	private readonly IClientNetworkChannel clientNetworkChannel;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-43-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-44-	public static readonly Dictionary<int, string> ServerPacketNames;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-45-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-46-	public bool DidReceiveUdp;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-47-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-48-	private bool bulkPositions;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-49-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-50-	public override string Name => "nwp";
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-51-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-52-	public int TotalBytesReceivedAndReceiving => totalByteCount + game.MainNetClient.CurrentlyReceivingBytes;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-53-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-54-	static SystemNetworkProcess()
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-55-	{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-56-		ServerPacketNames = new Dictionary<int, string>();
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-57-		FieldInfo[] fields = typeof(Packet_ServerIdEnum).GetFields();
+--
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-71-		game.RegisterGameTickListener(UpdatePacketCount, 1000);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-72-		game.RegisterGameTickListener(ClientUdpTick, 15);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-73-		game.PacketHandlers[78] = HandleRequestPositionTcp;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-74-		game.PacketHandlers[79] = EnqueueUdpPacket;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-75-		game.PacketHandlers[80] = HandleEntitySpawnPosition;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-76-		game.PacketHandlers[81] = HandleDidReceiveUdp;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-77-		game.api.ChatCommands.Create("netbenchmark").WithDescription("Toggles network benchmarking").HandleWith(CmdBenchmark);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-78-		clientNetworkChannel = game.api.Network.RegisterChannel("EntityAnims");
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-79-		clientNetworkChannel.RegisterMessageType<AnimationPacket>().RegisterMessageType<BulkAnimationPacket>().RegisterMessageType<EntityTagPacket>()
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-80-			.SetMessageHandler<AnimationPacket>(HandleAnimationPacket)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-81-			.SetMessageHandler<BulkAnimationPacket>(HandleBulkAnimationPacket)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-82-			.SetMessageHandler<EntityTagPacket>(HandleTagPacket);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs:83:		packetDebug = ClientSettings.Inst.Bool["packetDebug"];
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-84-	}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-85-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-86-	private void UdpConnectionRequestFromServer()
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-87-	{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-88-		if (!DidReceiveUdp)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-89-		{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-90-			game.Logger.Debug("UDP: Server send UDP connect");
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-91-			DidReceiveUdp = true;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-92-		}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-93-	}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-94-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-95-	private void HandleDidReceiveUdp(Packet_Server packet)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-96-	{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-97-		game.UdpTryConnect = false;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-98-		game.Logger.Debug("UDP: Server send DidReceiveUdp");
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-99-		TyronThreadPool.QueueTask(async () =>
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-100-		{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-101-			for (int i = 0; i < 20; i++)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-102-			{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-103-				await Task.Delay(500);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-104-				if (game.disposed)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-105-				{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-106-					return;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-107-				}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-108-				if (DidReceiveUdp || game.FallBackToTcp)
+--
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-249-		if (game.UdpNetClient == null)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-250-		{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-251-			return;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-252-		}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-253-		IEnumerable<Packet_UdpPacket> enumerable = game.UdpNetClient.ReadMessage();
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-254-		if (enumerable == null)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-255-		{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-256-			return;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-257-		}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-258-		foreach (Packet_UdpPacket packet in enumerable)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-259-		{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-260-			int udpByteCount = packet.Length;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs:261:			if (packetDebug)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-262-			{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-263-				ScreenManager.EnqueueMainThreadTask(() =>
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-264-				{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-265-					game.Logger.VerboseDebug("Received UDP packet id {0}, dataLength {1}", packet.Id, udpByteCount);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-266-				});
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-267-			}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-268-			UpdateUdpStatsAndBenchmark(packet, udpByteCount);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-269-			switch (packet.Id)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-270-			{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-271-			case 4:
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-272-				HandleBulkPacket(packet.BulkPositions);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-273-				break;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-274-			case 5:
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-275-				HandleSinglePacket(packet.EntityPosition);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-276-				break;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-277-			case 6:
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-278-				game.HandleCustomUdpPackets(packet.ChannelPacket);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-279-				break;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-280-			}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-281-		}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-282-	}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-283-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-284-	private void UpdateUdpStatsAndBenchmark(Packet_UdpPacket packet, int udpByteCount)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-285-	{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-286-		if (doBenchmark)
+--
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-355-			break;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-356-		}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-357-	}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-358-
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-359-	public void TryReadPacket(byte[] data, int dataLength)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-360-	{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-361-		Packet_Server packet = new Packet_Server();
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-362-		Packet_ServerSerializer.DeserializeBuffer(data, dataLength, packet);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-363-		if (game.disposed)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-364-		{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-365-			return;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-366-		}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs:367:		if (packetDebug)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-368-		{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-369-			ScreenManager.EnqueueMainThreadTask(() =>
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-370-			{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-371-				game.Logger.VerboseDebug("Received packet id {0}, dataLength {1}", packet.Id, dataLength);
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-372-			});
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-373-		}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-374-		if (doBenchmark)
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-375-		{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-376-			if (packetBenchmark.TryGetValue(packet.Id, out var value))
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-377-			{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-378-				packetBenchmark[packet.Id] = value + data.Length;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-379-			}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-380-			else
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-381-			{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-382-				packetBenchmark[packet.Id] = data.Length;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-383-			}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-384-		}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-385-		if (ProcessInBackground(packet))
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-386-		{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-387-			return;
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-388-		}
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-389-		ProcessPacketTask task = new ProcessPacketTask
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-390-		{
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-391-			game = game,
+Vintagestory.Client.NoObf/SystemNetworkProcess.cs-392-			packet = packet

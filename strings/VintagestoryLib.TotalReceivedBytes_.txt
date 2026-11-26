@@ -1,0 +1,161 @@
+Vintagestory.Server.Systems/ServerUdpNetwork.cs-43-		UNetServer[] udpSockets = server.UdpSockets;
+Vintagestory.Server.Systems/ServerUdpNetwork.cs-44-		foreach (UNetServer uNetServer in udpSockets)
+Vintagestory.Server.Systems/ServerUdpNetwork.cs-45-		{
+Vintagestory.Server.Systems/ServerUdpNetwork.cs-46-			UdpPacket[] array = uNetServer?.ReadMessage();
+Vintagestory.Server.Systems/ServerUdpNetwork.cs-47-			if (array == null)
+Vintagestory.Server.Systems/ServerUdpNetwork.cs-48-			{
+Vintagestory.Server.Systems/ServerUdpNetwork.cs-49-				continue;
+Vintagestory.Server.Systems/ServerUdpNetwork.cs-50-			}
+Vintagestory.Server.Systems/ServerUdpNetwork.cs-51-			UdpPacket[] array2 = array;
+Vintagestory.Server.Systems/ServerUdpNetwork.cs-52-			for (int j = 0; j < array2.Length; j++)
+Vintagestory.Server.Systems/ServerUdpNetwork.cs-53-			{
+Vintagestory.Server.Systems/ServerUdpNetwork.cs-54-				UdpPacket udpPacket = array2[j];
+Vintagestory.Server.Systems/ServerUdpNetwork.cs:55:				server.TotalReceivedBytesUdp += udpPacket.Packet.Length;
+Vintagestory.Server.Systems/ServerUdpNetwork.cs-56-				switch (udpPacket.Packet.Id)
+Vintagestory.Server.Systems/ServerUdpNetwork.cs-57-				{
+Vintagestory.Server.Systems/ServerUdpNetwork.cs-58-				case 1:
+Vintagestory.Server.Systems/ServerUdpNetwork.cs-59-					HandleConnectionRequest(udpPacket, uNetServer);
+Vintagestory.Server.Systems/ServerUdpNetwork.cs-60-					break;
+Vintagestory.Server.Systems/ServerUdpNetwork.cs-61-				case 2:
+Vintagestory.Server.Systems/ServerUdpNetwork.cs-62-					HandlePlayerPosition(udpPacket.Packet.EntityPosition, udpPacket.Client.Player);
+Vintagestory.Server.Systems/ServerUdpNetwork.cs-63-					break;
+Vintagestory.Server.Systems/ServerUdpNetwork.cs-64-				case 3:
+Vintagestory.Server.Systems/ServerUdpNetwork.cs-65-					HandleMountPosition(udpPacket.Packet.EntityPosition, udpPacket.Client.Player, udpPacket.Packet.ChannelPacket);
+Vintagestory.Server.Systems/ServerUdpNetwork.cs-66-					break;
+Vintagestory.Server.Systems/ServerUdpNetwork.cs-67-				case 6:
+Vintagestory.Server.Systems/ServerUdpNetwork.cs-68-					server.HandleCustomUdpPackets(udpPacket.Packet.ChannelPacket, udpPacket.Client.Player);
+Vintagestory.Server.Systems/ServerUdpNetwork.cs-69-					break;
+Vintagestory.Server.Systems/ServerUdpNetwork.cs-70-				case 7:
+Vintagestory.Server.Systems/ServerUdpNetwork.cs-71-					udpPacket.Client.Ping.OnReceiveUdp(server.ElapsedMilliseconds);
+Vintagestory.Server.Systems/ServerUdpNetwork.cs-72-					break;
+Vintagestory.Server.Systems/ServerUdpNetwork.cs-73-				}
+Vintagestory.Server.Systems/ServerUdpNetwork.cs-74-			}
+Vintagestory.Server.Systems/ServerUdpNetwork.cs-75-		}
+Vintagestory.Server.Systems/ServerUdpNetwork.cs-76-	}
+Vintagestory.Server.Systems/ServerUdpNetwork.cs-77-
+Vintagestory.Server.Systems/ServerUdpNetwork.cs-78-	public override void OnBeginInitialization()
+Vintagestory.Server.Systems/ServerUdpNetwork.cs-79-	{
+Vintagestory.Server.Systems/ServerUdpNetwork.cs-80-		physicsManager.Init();
+--
+Vintagestory.Server/ServerAPI.cs-17-	public string ServerIp
+Vintagestory.Server/ServerAPI.cs-18-	{
+Vintagestory.Server/ServerAPI.cs-19-		get
+Vintagestory.Server/ServerAPI.cs-20-		{
+Vintagestory.Server/ServerAPI.cs-21-			if (!server.IsDedicatedServer)
+Vintagestory.Server/ServerAPI.cs-22-			{
+Vintagestory.Server/ServerAPI.cs-23-				return server.MainSockets[0].LocalEndpoint;
+Vintagestory.Server/ServerAPI.cs-24-			}
+Vintagestory.Server/ServerAPI.cs-25-			return server.MainSockets[1].LocalEndpoint;
+Vintagestory.Server/ServerAPI.cs-26-		}
+Vintagestory.Server/ServerAPI.cs-27-	}
+Vintagestory.Server/ServerAPI.cs-28-
+Vintagestory.Server/ServerAPI.cs:29:	public long TotalReceivedBytes => server.TotalReceivedBytes;
+Vintagestory.Server/ServerAPI.cs-30-
+Vintagestory.Server/ServerAPI.cs-31-	public long TotalSentBytes => server.TotalSentBytes;
+Vintagestory.Server/ServerAPI.cs-32-
+Vintagestory.Server/ServerAPI.cs:33:	public long TotalReceivedBytesUdp => server.TotalReceivedBytesUdp;
+Vintagestory.Server/ServerAPI.cs-34-
+Vintagestory.Server/ServerAPI.cs-35-	public long TotalSentBytesUdp => server.TotalSentBytesUdp;
+Vintagestory.Server/ServerAPI.cs-36-
+Vintagestory.Server/ServerAPI.cs-37-	public int ServerUptimeSeconds => (int)server.totalUnpausedTime.Elapsed.TotalSeconds;
+Vintagestory.Server/ServerAPI.cs-38-
+Vintagestory.Server/ServerAPI.cs-39-	public long ServerUptimeMilliseconds => (int)server.totalUnpausedTime.ElapsedMilliseconds;
+Vintagestory.Server/ServerAPI.cs-40-
+Vintagestory.Server/ServerAPI.cs-41-	public bool IsShuttingDown => server.exitState.Exit;
+Vintagestory.Server/ServerAPI.cs-42-
+Vintagestory.Server/ServerAPI.cs-43-	public EnumServerRunPhase CurrentRunPhase => server.RunPhase;
+Vintagestory.Server/ServerAPI.cs-44-
+Vintagestory.Server/ServerAPI.cs-45-	public IServerConfig Config => server.Config;
+Vintagestory.Server/ServerAPI.cs-46-
+Vintagestory.Server/ServerAPI.cs-47-	public IServerPlayer[] Players => server.PlayersByUid.Values.ToArray();
+Vintagestory.Server/ServerAPI.cs-48-
+Vintagestory.Server/ServerAPI.cs-49-	public bool ReducedServerThreads => server.ReducedServerThreads;
+Vintagestory.Server/ServerAPI.cs-50-
+Vintagestory.Server/ServerAPI.cs-51-	public ServerAPI(ServerMain server)
+Vintagestory.Server/ServerAPI.cs-52-		: base(server)
+Vintagestory.Server/ServerAPI.cs-53-	{
+Vintagestory.Server/ServerAPI.cs-54-	}
+Vintagestory.Server/ServerAPI.cs-55-
+Vintagestory.Server/ServerAPI.cs-56-	public void LogChat(string s)
+Vintagestory.Server/ServerAPI.cs-57-	{
+Vintagestory.Server/ServerAPI.cs-58-		ServerMain.Logger.Chat(s);
+--
+Vintagestory.Server/ServerMain.cs-118-	};
+Vintagestory.Server/ServerMain.cs-119-
+Vintagestory.Server/ServerMain.cs-120-	public int StatsCollectorIndex;
+Vintagestory.Server/ServerMain.cs-121-
+Vintagestory.Server/ServerMain.cs-122-	public CachingConcurrentDictionary<int, ConnectedClient> Clients = new CachingConcurrentDictionary<int, ConnectedClient>();
+Vintagestory.Server/ServerMain.cs-123-
+Vintagestory.Server/ServerMain.cs-124-	public Dictionary<string, ServerPlayer> PlayersByUid = new Dictionary<string, ServerPlayer>();
+Vintagestory.Server/ServerMain.cs-125-
+Vintagestory.Server/ServerMain.cs-126-	public long TotalSentBytes;
+Vintagestory.Server/ServerMain.cs-127-
+Vintagestory.Server/ServerMain.cs-128-	public long TotalSentBytesUdp;
+Vintagestory.Server/ServerMain.cs-129-
+Vintagestory.Server/ServerMain.cs:130:	public long TotalReceivedBytes;
+Vintagestory.Server/ServerMain.cs-131-
+Vintagestory.Server/ServerMain.cs:132:	public long TotalReceivedBytesUdp;
+Vintagestory.Server/ServerMain.cs-133-
+Vintagestory.Server/ServerMain.cs-134-	public ServerConfig Config;
+Vintagestory.Server/ServerMain.cs-135-
+Vintagestory.Server/ServerMain.cs-136-	public bool ConfigNeedsSaving;
+Vintagestory.Server/ServerMain.cs-137-
+Vintagestory.Server/ServerMain.cs-138-	public bool ReducedServerThreads;
+Vintagestory.Server/ServerMain.cs-139-
+Vintagestory.Server/ServerMain.cs-140-	internal long lastDisconnectTotalMs;
+Vintagestory.Server/ServerMain.cs-141-
+Vintagestory.Server/ServerMain.cs-142-	private int lastClientId;
+Vintagestory.Server/ServerMain.cs-143-
+Vintagestory.Server/ServerMain.cs-144-	public ConcurrentQueue<BlockPos> DirtyBlockEntities = new ConcurrentQueue<BlockPos>();
+Vintagestory.Server/ServerMain.cs-145-
+Vintagestory.Server/ServerMain.cs-146-	public ConcurrentQueue<BlockPos> ModifiedBlocks = new ConcurrentQueue<BlockPos>();
+Vintagestory.Server/ServerMain.cs-147-
+Vintagestory.Server/ServerMain.cs-148-	public ConcurrentQueue<Vec4i> DirtyBlocks = new ConcurrentQueue<Vec4i>();
+Vintagestory.Server/ServerMain.cs-149-
+Vintagestory.Server/ServerMain.cs-150-	public ConcurrentQueue<BlockPos> ModifiedDecors = new ConcurrentQueue<BlockPos>();
+Vintagestory.Server/ServerMain.cs-151-
+Vintagestory.Server/ServerMain.cs-152-	public ConcurrentQueue<BlockPos> ModifiedBlocksNoRelight = new ConcurrentQueue<BlockPos>();
+Vintagestory.Server/ServerMain.cs-153-
+Vintagestory.Server/ServerMain.cs-154-	public List<BlockPos> ModifiedBlocksMinimal = new List<BlockPos>();
+Vintagestory.Server/ServerMain.cs-155-
+Vintagestory.Server/ServerMain.cs-156-	public Queue<BlockPos> UpdatedBlocks = new Queue<BlockPos>();
+Vintagestory.Server/ServerMain.cs-157-
+--
+Vintagestory.Server/ServerMain.cs-3441-				Socket = senderConnection
+Vintagestory.Server/ServerMain.cs-3442-			});
+Vintagestory.Server/ServerMain.cs-3443-			connectedClient.Ping.SetTimeoutThreshold(Config.ClientConnectionTimeout);
+Vintagestory.Server/ServerMain.cs-3444-			connectedClient.Ping.TimeReceivedUdp = ElapsedMilliseconds;
+Vintagestory.Server/ServerMain.cs-3445-			ClientPackets.Enqueue(new ReceivedClientPacket(connectedClient));
+Vintagestory.Server/ServerMain.cs-3446-			break;
+Vintagestory.Server/ServerMain.cs-3447-		}
+Vintagestory.Server/ServerMain.cs-3448-		case NetworkMessageType.Data:
+Vintagestory.Server/ServerMain.cs-3449-		{
+Vintagestory.Server/ServerMain.cs-3450-			ConnectedClient client2 = msg.SenderConnection.client;
+Vintagestory.Server/ServerMain.cs-3451-			if (client2 != null)
+Vintagestory.Server/ServerMain.cs-3452-			{
+Vintagestory.Server/ServerMain.cs:3453:				TotalReceivedBytes += msg.messageLength;
+Vintagestory.Server/ServerMain.cs-3454-				ParseClientPacket_offthread(client2, msg.message, msg.messageLength);
+Vintagestory.Server/ServerMain.cs-3455-			}
+Vintagestory.Server/ServerMain.cs-3456-			break;
+Vintagestory.Server/ServerMain.cs-3457-		}
+Vintagestory.Server/ServerMain.cs-3458-		case NetworkMessageType.Disconnect:
+Vintagestory.Server/ServerMain.cs-3459-		{
+Vintagestory.Server/ServerMain.cs-3460-			ConnectedClient client = msg.SenderConnection.client;
+Vintagestory.Server/ServerMain.cs-3461-			if (client != null)
+Vintagestory.Server/ServerMain.cs-3462-			{
+Vintagestory.Server/ServerMain.cs-3463-				DisconnectedClientsThisTick.Add(client.Id);
+Vintagestory.Server/ServerMain.cs-3464-				ClientPackets.Enqueue(new ReceivedClientPacket(client, ""));
+Vintagestory.Server/ServerMain.cs-3465-			}
+Vintagestory.Server/ServerMain.cs-3466-			break;
+Vintagestory.Server/ServerMain.cs-3467-		}
+Vintagestory.Server/ServerMain.cs-3468-		}
+Vintagestory.Server/ServerMain.cs-3469-	}
+Vintagestory.Server/ServerMain.cs-3470-
+Vintagestory.Server/ServerMain.cs-3471-	private void ParseClientPacket_offthread(ConnectedClient client, byte[] data, int length)
+Vintagestory.Server/ServerMain.cs-3472-	{
+Vintagestory.Server/ServerMain.cs-3473-		Packet_Client packet_Client = new Packet_Client();
+Vintagestory.Server/ServerMain.cs-3474-		try
+Vintagestory.Server/ServerMain.cs-3475-		{
+Vintagestory.Server/ServerMain.cs-3476-			Packet_ClientSerializer.DeserializeBuffer(data, length, packet_Client);
+Vintagestory.Server/ServerMain.cs-3477-		}
+Vintagestory.Server/ServerMain.cs-3478-		catch
