@@ -187,7 +187,7 @@ namespace VintageDoctor
         }
 
         /// <summary>The kept seconds put together into at most <paramref name="points"/> points (averages), for a graph.</summary>
-        public static List<double> Points(List<Second> all, Func<Second, double> value, int points)
+        public static List<double> Points(List<Second> all, System.Func<Second, double> value, int points)
         {
             var list = new List<double>();
             if (all.Count == 0) return list;
