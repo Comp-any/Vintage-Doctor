@@ -409,7 +409,7 @@ namespace VintageDoctor
                         foreach (object kv in channels)
                         {
                             object key = Get(kv, "Key"), value = Get(kv, "Value");
-                            if (key is int id && value is INetworkChannel ch) names[id] = ch.ChannelName;
+                            if (key is int id && Get(value, "ChannelName") is string chName) names[id] = chName;
                         }
                 }
                 catch { }
