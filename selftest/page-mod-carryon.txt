@@ -1,0 +1,19 @@
+== Carry On ==
+• Carry On 1.14.3, by copygirl, NerdScurvy
+  Mod id carryon; Code mod; runs on: Universal; file CarryOn-1.22.0_v1.14.3.zip
+  Adds the capability to carry various things
+  Its website (https://github.com/NerdScurvy/CarryOn) Find Carry On on the Mod DB (https://mods.vintagestory.at/list/mod?text=Carry%20On)
+✓ Everything it needs is there (1).
+  The game: wants 1.22.0 or newer, this is 1.22.7
+✓ Its config file(s) read fine: CarryOnConfig.json
+  If the mod acts oddly after an update, an old config is a common reason: starting it afresh puts every setting back to the mod's defaults (the old file is kept in the doctor's backups).
+  Start CarryOnConfig.json afresh (the old one is kept) (/doctor fix doctor:reset-config CarryOnConfig.json)
+• It changes the game's code in 1 place(s), 0 of them shared with other mods
+  EntitySeat.onControls: runs before it
+  Mods patch the game's own code where it offers no other way in. It is normal, but it is also what breaks first when the game updates, and two mods patching the same place can get in each other's way.
+
+== Errors and warnings from Carry On ==
+✓ Nothing from Carry On in the log this session.
+
+== Next ==
+Switch Carry On off (/doctor fix doctor:disable-mod carryon) A report about Carry On (/doctor bugreport carryon) Every mod at a glance (/doctor mods) Back to the check-up (/doctor)

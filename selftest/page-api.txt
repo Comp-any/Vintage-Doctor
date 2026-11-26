@@ -1,0 +1,15 @@
+== For mod authors ==
+Other mods can hand the doctor their own checks, fixes, pages and explanations for log messages. This page shows what has been handed over on this side.
+• 3 check(s), 2 fix(es) and 3 page(s) from other mods; 16 log message(s) the doctor can explain.
+  Doctor Example: doctorexample:item, doctorexample:log, doctorexample:pumps
+    Fix from Doctor Example: doctorexample:unjam
+    Fix from Doctor Example (JSON): doctorexamplejson:pump-jammed/fix
+    Page from Doctor Example: /doctor example-pipes
+    Page from Doctor Example: /doctor example-pumps
+    Page from Doctor Example: /doctor example-tanks
+• 2 vintagedoctor.json file(s) read
+  doctorexamplejson:config/vintagedoctor.json
+  vintagedoctor:config/vintagedoctor.json
+• 1 declared clash(es) between mods.
+Three ways in: a few lines of C#, the event bus (no reference to the doctor needed), or a JSON file in your mod's assets (no code at all).
+How to hand the doctor your own checks (https://github.com/Comp-any/Vintage-Doctor/blob/main/docs/api.md)

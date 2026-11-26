@@ -1,0 +1,8 @@
+== Network traffic ==
+• Network: not watched long enough yet (4 s).
+  Measure the network (20 s) (/doctor fix doctor:netmeasure 20)
+Last minute: sent (orange), received (blue): 0 B/s (avg 0 B/s, top 0 B/s) / 0 B/s (avg 0 B/s, top 0 B/s)
+
+== What the traffic is made of ==
+• The traffic hasn't been measured yet.
+  Measuring counts every packet for 20 seconds by its kind (chunks, creatures, blocks, block entities, mods' messages and so on), and the mods' messages by their channel, to say which mod sends how much.
